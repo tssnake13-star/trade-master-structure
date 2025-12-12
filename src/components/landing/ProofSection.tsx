@@ -25,7 +25,7 @@ const cases = [
     image: rustamImg,
   },
   {
-    name: 'Леся',
+    name: 'Сергей',
     result: 'Страх "упустить" → торгует только по плану.',
     type: 'success',
     image: lesyaImg,
