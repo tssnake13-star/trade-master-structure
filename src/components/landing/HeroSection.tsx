@@ -7,8 +7,7 @@ const HeroSection = () => {
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
           {/* Text Content */}
           <div className="flex-1 max-w-2xl">
-            <h1 className="heading-hero text-foreground fade-in-up">Вы сливаете не из-за рынка.
-Вы сливаете из-за отсутствия структуры.<br />
+            <h1 className="heading-hero text-foreground fade-in-up">Вы сливаете не из-за рынка. Вы сливаете из-за отсутствия структуры.<br />
               <span className="text-muted-foreground">Вы сливаете из-за отсутствия структуры.</span>
             </h1>
             
