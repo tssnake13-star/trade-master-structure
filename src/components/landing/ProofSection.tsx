@@ -1,5 +1,9 @@
 import { ArrowRight, TrendingUp, User, AlertCircle } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
+import eurAudImg from '@/assets/trades/eur-aud.jpg';
+import gbpUsdImg from '@/assets/trades/gbp-usd.jpg';
+import usdJpyImg from '@/assets/trades/usd-jpy.jpg';
+import usdCadImg from '@/assets/trades/usd-cad.jpg';
 
 const cases = [
   {
@@ -17,6 +21,13 @@ const cases = [
     result: 'не смогла соблюдать правила → честный кейс',
     type: 'honest',
   },
+];
+
+const trades = [
+  { pair: 'EUR/AUD', result: '+17R', image: eurAudImg },
+  { pair: 'GBP/USD', result: '+16R', image: gbpUsdImg },
+  { pair: 'USD/JPY', result: '+16R', image: usdJpyImg },
+  { pair: 'USD/CAD', result: '+19R', image: usdCadImg },
 ];
 
 const ProofSection = () => {
@@ -57,23 +68,20 @@ const ProofSection = () => {
               <h3 className="text-xl font-medium text-foreground">Сделки автора</h3>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="p-4 bg-secondary/50 rounded-lg text-center">
-                <p className="text-lg font-semibold text-foreground">EUR/AUD</p>
-                <p className="text-mono text-xl font-bold text-foreground mt-2">+17R</p>
-              </div>
-              <div className="p-4 bg-secondary/50 rounded-lg text-center">
-                <p className="text-lg font-semibold text-foreground">GBP/USD</p>
-                <p className="text-mono text-xl font-bold text-foreground mt-2">+16R</p>
-              </div>
-              <div className="p-4 bg-secondary/50 rounded-lg text-center">
-                <p className="text-lg font-semibold text-foreground">USD/JPY</p>
-                <p className="text-mono text-xl font-bold text-foreground mt-2">+16R</p>
-              </div>
-              <div className="p-4 bg-secondary/50 rounded-lg text-center">
-                <p className="text-lg font-semibold text-foreground">USD/CAD</p>
-                <p className="text-mono text-xl font-bold text-foreground mt-2">+19R</p>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {trades.map((trade, index) => (
+                <div key={index} className="bg-secondary/50 rounded-lg overflow-hidden">
+                  <div className="p-4 text-center border-b border-border/50">
+                    <p className="text-lg font-semibold text-foreground">{trade.pair}</p>
+                    <p className="text-mono text-xl font-bold text-foreground mt-1">{trade.result}</p>
+                  </div>
+                  <img 
+                    src={trade.image} 
+                    alt={`Сделка ${trade.pair}`}
+                    className="w-full h-auto"
+                  />
+                </div>
+              ))}
             </div>
           </div>
           
