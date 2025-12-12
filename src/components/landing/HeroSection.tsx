@@ -27,7 +27,7 @@ const HeroSection = () => {
           
           {/* Author Photo */}
           <div className="flex-shrink-0 fade-in-up fade-in-up-delay-2">
-            <div className="relative w-80 h-[26rem] md:w-96 md:h-[34rem] lg:w-[28rem] lg:h-[38rem] rounded-2xl overflow-hidden">
+            <div className="relative w-80 h-[28rem] md:w-[26rem] md:h-[38rem] lg:w-[32rem] lg:h-[44rem] rounded-2xl overflow-hidden">
               <img src={heroAuthor} alt="Сергей — автор системы TRADE MASTER" className="w-full h-full object-cover object-top" />
               {/* Subtle gradient overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
