@@ -1,13 +1,16 @@
 import { ArrowRight } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import heroAuthor from '@/assets/hero-author.jpg';
+
 const HeroSection = () => {
-  return <section className="min-h-screen flex items-center pt-20 pb-16 md:pb-24">
+  return (
+    <section className="min-h-screen flex items-center pt-20 pb-16 md:pb-24">
       <div className="container-landing">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
           {/* Text Content */}
           <div className="flex-1 max-w-2xl">
-            <h1 className="heading-hero text-foreground fade-in-up">Вы сливаете не из-за рынка. Вы сливаете из-за отсутствия структуры.<br />
+            <h1 className="heading-hero text-foreground fade-in-up">
+              Вы сливаете не из-за рынка.<br />
               <span className="text-muted-foreground">Вы сливаете из-за отсутствия структуры.</span>
             </h1>
             
@@ -35,6 +38,8 @@ const HeroSection = () => {
           </div>
         </div>
       </div>
-    </section>;
+    </section>
+  );
 };
+
 export default HeroSection;
