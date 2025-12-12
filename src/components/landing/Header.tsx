@@ -43,7 +43,7 @@ const Header = () => {
           {/* CTA Button */}
           <div className="hidden md:block">
             <a
-              href={TELEGRAM_LINKS.bot}
+              href={TELEGRAM_LINKS.channel}
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
@@ -77,7 +77,7 @@ const Header = () => {
                 </a>
               ))}
               <a
-                href={TELEGRAM_LINKS.bot}
+                href={TELEGRAM_LINKS.channel}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent transition-all duration-200 w-fit"
