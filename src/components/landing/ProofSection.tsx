@@ -200,7 +200,7 @@ const ProofSection = () => {
           
           <div className="mt-10">
             <a
-              href={TELEGRAM_LINKS.dm}
+              href={TELEGRAM_LINKS.bot}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-secondary group"
