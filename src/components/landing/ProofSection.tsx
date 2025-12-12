@@ -54,30 +54,25 @@ const ProofSection = () => {
           <div className="mt-12 p-8 bg-card border border-border rounded-xl">
             <div className="flex items-center gap-3 mb-6">
               <TrendingUp className="w-6 h-6 text-foreground" />
-              <h3 className="text-xl font-medium text-foreground">Сделка автора</h3>
-            </div>
-            
-            <div className="flex items-center gap-4 mb-6">
-              <span className="text-2xl font-semibold text-foreground">EURJPY</span>
-              <span className="px-3 py-1 bg-accent text-foreground text-mono text-sm rounded-md">+16R</span>
+              <h3 className="text-xl font-medium text-foreground">Сделки автора</h3>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div className="p-3 bg-secondary/50 rounded-lg text-center">
-                <p className="text-mono text-sm text-muted-foreground">W1</p>
-                <p className="text-sm text-foreground mt-1">направление</p>
+              <div className="p-4 bg-secondary/50 rounded-lg text-center">
+                <p className="text-lg font-semibold text-foreground">EUR/AUD</p>
+                <p className="text-mono text-xl font-bold text-foreground mt-2">+17R</p>
               </div>
-              <div className="p-3 bg-secondary/50 rounded-lg text-center">
-                <p className="text-mono text-sm text-muted-foreground">D1</p>
-                <p className="text-sm text-foreground mt-1">подтверждение</p>
+              <div className="p-4 bg-secondary/50 rounded-lg text-center">
+                <p className="text-lg font-semibold text-foreground">GBP/USD</p>
+                <p className="text-mono text-xl font-bold text-foreground mt-2">+16R</p>
               </div>
-              <div className="p-3 bg-secondary/50 rounded-lg text-center">
-                <p className="text-mono text-sm text-muted-foreground">H4</p>
-                <p className="text-sm text-foreground mt-1">вход</p>
+              <div className="p-4 bg-secondary/50 rounded-lg text-center">
+                <p className="text-lg font-semibold text-foreground">USD/JPY</p>
+                <p className="text-mono text-xl font-bold text-foreground mt-2">+16R</p>
               </div>
-              <div className="p-3 bg-secondary/50 rounded-lg text-center">
-                <p className="text-mono text-sm text-muted-foreground">D1</p>
-                <p className="text-sm text-foreground mt-1">потенциал</p>
+              <div className="p-4 bg-secondary/50 rounded-lg text-center">
+                <p className="text-lg font-semibold text-foreground">USD/CAD</p>
+                <p className="text-mono text-xl font-bold text-foreground mt-2">+19R</p>
               </div>
             </div>
           </div>
