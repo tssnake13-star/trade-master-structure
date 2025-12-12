@@ -13,9 +13,9 @@ const FinalCTASection = () => {
           <div className="mt-12 flex flex-col sm:flex-row gap-4 justify-center">
             
             
-            <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" className="btn-secondary group">
-              <MessageCircle className="w-4 h-4 mr-2" />
-              Получить консультацию
+            <a href={TELEGRAM_LINKS.bot} target="_blank" rel="noopener noreferrer" className="btn-secondary group">
+              <Send className="w-4 h-4 mr-2" />
+              Пройти диагностику трейдера
             </a>
           </div>
         </div>
