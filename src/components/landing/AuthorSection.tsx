@@ -12,7 +12,7 @@ const AuthorSection = () => {
           
           <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start">
             <div className="flex-shrink-0">
-              <div className="w-48 h-48 md:w-64 md:h-64 rounded-xl overflow-hidden bg-secondary">
+              <div className="w-56 h-56 md:w-64 md:h-64 rounded-xl overflow-hidden bg-secondary">
                 <img 
                   alt="Сергей Тё — автор системы TRADE MASTER" 
                   className="w-full h-full object-cover" 
