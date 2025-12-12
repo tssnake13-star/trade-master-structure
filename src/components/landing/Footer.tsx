@@ -35,6 +35,13 @@ const Footer = () => {
             © {new Date().getFullYear()} TRADELIKETYO. Все права защищены.
           </p>
         </div>
+
+        {/* Disclaimer */}
+        <div className="mt-6 text-center">
+          <p className="text-xs text-muted-foreground/70 max-w-3xl mx-auto leading-relaxed">
+            Информация на сайте носит исключительно образовательный характер и не является инвестиционной рекомендацией. Торговля на финансовых рынках связана с рисками. Все решения вы принимаете самостоятельно.
+          </p>
+        </div>
       </div>
     </footer>
   );
