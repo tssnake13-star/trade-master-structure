@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ArrowRight, TrendingUp, User, AlertCircle, X } from 'lucide-react';
+import { ArrowRight, TrendingUp, User, AlertCircle, BarChart3 } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import eurAudImg from '@/assets/trades/eur-aud.jpg';
@@ -39,14 +39,39 @@ const cases = [
 ];
 
 const trades = [
-  { pair: 'EUR/AUD', result: '+17R', image: eurAudImg },
-  { pair: 'GBP/USD', result: '+16R', image: gbpUsdImg },
-  { pair: 'USD/JPY', result: '+16R', image: usdJpyImg },
-  { pair: 'USD/CAD', result: '+19R', image: usdCadImg },
+  { 
+    pair: 'EUR/AUD', 
+    date: '04.09.2025', 
+    result: '+17R', 
+    algorithm: 'W1 → D1 → H4 → потенциал',
+    image: eurAudImg 
+  },
+  { 
+    pair: 'GBP/USD', 
+    date: '17.10.2025', 
+    result: '+16R', 
+    algorithm: 'D1 → H4 → вход по системе',
+    image: gbpUsdImg 
+  },
+  { 
+    pair: 'USD/JPY', 
+    date: '17.10.2025', 
+    result: '+16R', 
+    algorithm: 'D1 → H4 → HunterBot',
+    image: usdJpyImg 
+  },
+  { 
+    pair: 'USD/CAD', 
+    date: '29.10.2025', 
+    result: '+19R', 
+    algorithm: 'W1 → D1 → H4 → потенциал',
+    image: usdCadImg 
+  },
 ];
 
 const ProofSection = () => {
   const [selectedCase, setSelectedCase] = useState<typeof cases[0] | null>(null);
+  const [selectedTrade, setSelectedTrade] = useState<typeof trades[0] | null>(null);
 
   return (
     <section id="proof" className="py-20 md:py-28 bg-card/50">
@@ -83,6 +108,7 @@ const ProofSection = () => {
             ))}
           </div>
 
+          {/* Testimonial Modal */}
           <Dialog open={!!selectedCase} onOpenChange={() => setSelectedCase(null)}>
             <DialogContent className="max-w-lg p-0 bg-card border-border overflow-hidden">
               <DialogTitle className="sr-only">
@@ -112,28 +138,65 @@ const ProofSection = () => {
             </DialogContent>
           </Dialog>
           
+          {/* Trades Section */}
           <div className="mt-12 p-8 bg-card border border-border rounded-xl">
             <div className="flex items-center gap-3 mb-6">
               <TrendingUp className="w-6 h-6 text-foreground" />
               <h3 className="text-xl font-medium text-foreground">Сделки автора</h3>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {trades.map((trade, index) => (
-                <div key={index} className="bg-secondary/50 rounded-lg overflow-hidden">
-                  <div className="p-4 text-center border-b border-border/50">
-                    <p className="text-lg font-semibold text-foreground">{trade.pair}</p>
-                    <p className="text-mono text-xl font-bold text-foreground mt-1">{trade.result}</p>
+                <button
+                  key={index}
+                  onClick={() => setSelectedTrade(trade)}
+                  className="p-5 bg-secondary/50 border border-border/50 rounded-lg text-left transition-all hover:border-muted-foreground/50 hover:bg-secondary/80 cursor-pointer group flex flex-col h-full min-h-[160px]"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <BarChart3 className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <span className="font-semibold text-foreground text-sm">{trade.pair}</span>
                   </div>
-                  <img 
-                    src={trade.image} 
-                    alt={`Сделка ${trade.pair}`}
-                    className="w-full h-auto"
-                  />
-                </div>
+                  <span className="text-xs text-muted-foreground">{trade.date}</span>
+                  <span className="text-lg font-bold text-foreground mt-2">{trade.result}</span>
+                  <span className="text-xs text-muted-foreground mt-1 flex-1">{trade.algorithm}</span>
+                  <span className="text-xs text-muted-foreground/60 mt-3 group-hover:text-muted-foreground transition-colors">
+                    Смотреть сделку →
+                  </span>
+                </button>
               ))}
             </div>
           </div>
+
+          {/* Trade Modal */}
+          <Dialog open={!!selectedTrade} onOpenChange={() => setSelectedTrade(null)}>
+            <DialogContent className="max-w-4xl p-0 bg-card border-border overflow-hidden">
+              <DialogTitle className="sr-only">
+                {selectedTrade?.pair ? `Сделка: ${selectedTrade.pair}` : 'Сделка'}
+              </DialogTitle>
+              {selectedTrade && (
+                <div className="relative">
+                  <div className="p-4 border-b border-border flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <BarChart3 className="w-5 h-5 text-muted-foreground" />
+                      <div>
+                        <span className="font-semibold text-foreground">{selectedTrade.pair}</span>
+                        <span className="text-muted-foreground mx-2">•</span>
+                        <span className="text-muted-foreground text-sm">{selectedTrade.date}</span>
+                      </div>
+                      <span className="font-bold text-foreground">{selectedTrade.result}</span>
+                    </div>
+                  </div>
+                  <div className="max-h-[75vh] overflow-y-auto">
+                    <img 
+                      src={selectedTrade.image} 
+                      alt={`Сделка ${selectedTrade.pair}`}
+                      className="w-full h-auto"
+                    />
+                  </div>
+                </div>
+              )}
+            </DialogContent>
+          </Dialog>
           
           <div className="mt-10">
             <a
