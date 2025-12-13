@@ -5,26 +5,26 @@ const steps = [
   {
     step: '1',
     timeframe: 'W1',
-    title: 'Фаза цикла',
-    description: 'Определяем, где рынок: накопление, выход, тест или тренд.',
+    title: 'Фаза рыночного цикла',
+    description: 'Сначала определяется, в какой фазе находится рынок: накопление, выход, тест или тренд.\nБез понимания фазы торговля запрещена.',
   },
   {
     step: '2',
     timeframe: 'D1',
     title: 'Подтверждение направления',
-    description: 'Совпадает ли локальное движение с глобальной фазой.',
+    description: 'Проверяем, совпадает ли локальное движение с глобальной фазой рынка.\nЕсли совпадения нет — сделка не рассматривается.',
   },
   {
     step: '3',
     timeframe: 'H4',
     title: 'Зона синхронизации (вход)',
-    description: 'Вход только там, где совпадают контекст, структура и реакция.',
+    description: 'Вход возможен только там, где одновременно совпадают контекст, структура и реакция цены.\nОдин фактор — не вход.',
   },
   {
     step: '4',
     timeframe: 'D1',
     title: 'Потенциал движения',
-    description: 'Оцениваем, есть ли ход. Без потенциала — сделки нет.',
+    description: 'Оценивается, есть ли пространство для движения цены.\nНет потенциала — сделки нет.',
   },
 ];
 
@@ -34,7 +34,7 @@ const AlgorithmSection = () => {
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
-            Основа системной торговли
+            Как выглядит системное торговое решение?
           </h2>
           
           <div className="mt-12 space-y-6">
@@ -51,7 +51,7 @@ const AlgorithmSection = () => {
                     <span className="text-mono text-muted-foreground text-sm">Шаг {item.step}</span>
                   </div>
                   <h3 className="text-lg font-medium text-foreground mb-2">{item.title}</h3>
-                  <p className="text-muted-foreground">{item.description}</p>
+                  <p className="text-muted-foreground whitespace-pre-line">{item.description}</p>
                 </div>
               </div>
             ))}
@@ -61,8 +61,8 @@ const AlgorithmSection = () => {
             <div className="flex items-start gap-4">
               <Check className="w-6 h-6 text-foreground mt-0.5 flex-shrink-0" />
               <div>
-                <p className="text-lg text-foreground font-medium">Совпали все шаги — сделка.</p>
-                <p className="text-muted-foreground mt-1">Не совпали — пропуск.</p>
+                <p className="text-lg text-foreground font-medium">Совпали все шаги — появляется сделка.</p>
+                <p className="text-muted-foreground mt-1">Не совпал хотя бы один — это осознанный пропуск.</p>
               </div>
             </div>
           </div>
