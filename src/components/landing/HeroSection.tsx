@@ -12,19 +12,23 @@ const HeroSection = () => {
               <span className="text-muted-foreground">А из-за отсутствия чёткого торгового сценария.</span>
             </h1>
             
-            <div className="mt-8 text-lg md:text-xl text-muted-foreground leading-relaxed fade-in-up fade-in-up-delay-1 space-y-4">
-              <p>
+            {/* Subheadline - two separate paragraphs */}
+            <div className="mt-8 text-lg md:text-xl leading-relaxed fade-in-up fade-in-up-delay-1 space-y-6">
+              <p className="text-muted-foreground">
                 Большинство трейдеров принимают решения на эмоциях, в середине движения или без понимания текущей фазы рынка.
               </p>
-              <p>
+              <p className="text-muted-foreground/70">
                 В результате — нестабильные входы, сомнения и повторяющиеся ошибки.
-              </p>
-              <p className="text-foreground font-medium">
-                Проблема не в вас. Проблема в отсутствии структуры.
               </p>
             </div>
             
-            <div className="mt-10 fade-in-up fade-in-up-delay-2">
+            {/* Accent phrase - key emotional point */}
+            <p className="mt-10 text-lg md:text-xl text-foreground/90 font-medium fade-in-up fade-in-up-delay-1">
+              Проблема не в вас. Проблема в отсутствии структуры.
+            </p>
+            
+            {/* CTA with increased spacing */}
+            <div className="mt-14 fade-in-up fade-in-up-delay-2">
               <a href={TELEGRAM_LINKS.bot} target="_blank" rel="noopener noreferrer" className="btn-primary group">
                 Пройти диагностику трейдера
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -38,9 +42,9 @@ const HeroSection = () => {
           {/* Author Photo */}
           <div className="flex-shrink-0 fade-in-up fade-in-up-delay-2">
             <div className="relative w-80 h-[28rem] md:w-[26rem] md:h-[38rem] lg:w-[32rem] lg:h-[44rem] rounded-2xl overflow-hidden">
-              <img src={heroAuthor} alt="Сергей — автор системы TRADE MASTER" className="w-full h-full object-cover object-top" />
-              {/* Subtle gradient overlay */}
-              <div className="absolute inset-0 bg-gradient-to-t from-background/60 via-transparent to-transparent" />
+              <img src={heroAuthor} alt="Сергей — автор системы TRADE MASTER" className="w-full h-full object-cover object-top brightness-[0.85]" />
+              {/* Gradient overlay for visual balance with text */}
+              <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/20 to-background/10" />
             </div>
           </div>
         </div>
