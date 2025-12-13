@@ -2,6 +2,7 @@ import Header from '@/components/landing/Header';
 import HeroSection from '@/components/landing/HeroSection';
 import ProblemSection from '@/components/landing/ProblemSection';
 import WhatGoesWrongSection from '@/components/landing/WhatGoesWrongSection';
+import StructureDiagram from '@/components/landing/StructureDiagram';
 import AlgorithmSection from '@/components/landing/AlgorithmSection';
 import ProofSection from '@/components/landing/ProofSection';
 import StagesSection from '@/components/landing/StagesSection';
@@ -21,6 +22,7 @@ const Index = () => {
         <HeroSection />
         <ProblemSection />
         <WhatGoesWrongSection />
+        <StructureDiagram />
         <AlgorithmSection />
         <ProofSection />
         <StagesSection />
