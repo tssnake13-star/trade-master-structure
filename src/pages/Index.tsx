@@ -7,6 +7,7 @@ import ProofSection from '@/components/landing/ProofSection';
 import StagesSection from '@/components/landing/StagesSection';
 import PhilosophySection from '@/components/landing/PhilosophySection';
 import ResultsSection from '@/components/landing/ResultsSection';
+import FitSection from '@/components/landing/FitSection';
 import FormatsSection from '@/components/landing/FormatsSection';
 import AuthorSection from '@/components/landing/AuthorSection';
 import FinalCTASection from '@/components/landing/FinalCTASection';
@@ -25,6 +26,7 @@ const Index = () => {
         <StagesSection />
         <PhilosophySection />
         <ResultsSection />
+        <FitSection />
         <FormatsSection />
         <AuthorSection />
         <FinalCTASection />
