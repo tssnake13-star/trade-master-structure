@@ -14,25 +14,25 @@ import elenaImg from '@/assets/testimonials/elena.jpg';
 const cases = [
   {
     name: 'Виталий',
-    result: 'Хаос и входы "по ощущению" → сценарий и стабильность.',
+    result: 'Хаотичные входы и постоянные сомнения →\nчёткие сценарии и спокойная торговля.',
     type: 'success',
     image: vitaliyImg,
   },
   {
     name: 'Рустам',
-    result: 'Накопления/защита/манипуляции → выплата $20 248.',
+    result: 'Торговля «по ощущениям» →\nработа с накоплением и защита капитала. Выплата $20 248.',
     type: 'success',
     image: rustamImg,
   },
   {
     name: 'Сергей',
-    result: 'Страх "упустить" → торгует только по плану.',
+    result: 'Страх упустить движение →\nвходы только по плану и заранее определённым условиям.',
     type: 'success',
     image: lesyaImg,
   },
   {
     name: 'Елена',
-    result: 'Эмоции сильнее правил → честный кейс.',
+    result: 'Эмоции сильнее правил →\nдисциплина, риск-контроль и честный результат.',
     type: 'honest',
     image: elenaImg,
   },
@@ -43,28 +43,28 @@ const trades = [
     pair: 'EUR/AUD', 
     date: '04.09.2025', 
     result: '+17R', 
-    algorithm: 'W1 → D1 → H4 → потенциал',
+    algorithm: 'W1 → D1 → H4\nВход по системе, не по импульсу',
     image: eurAudImg 
   },
   { 
     pair: 'GBP/USD', 
     date: '17.10.2025', 
     result: '+16R', 
-    algorithm: 'D1 → H4 → вход по системе',
+    algorithm: 'W1 → D1 → H4\nВход по системе, не по импульсу',
     image: gbpUsdImg 
   },
   { 
     pair: 'USD/JPY', 
     date: '17.10.2025', 
     result: '+16R', 
-    algorithm: 'D1 → H4 → HunterBot',
+    algorithm: 'W1 → D1 → H4\nВход по системе, не по импульсу',
     image: usdJpyImg 
   },
   { 
     pair: 'USD/CAD', 
     date: '29.10.2025', 
     result: '+19R', 
-    algorithm: 'W1 → D1 → H4 → потенциал',
+    algorithm: 'W1 → D1 → H4\nВход по системе, не по импульсу',
     image: usdCadImg 
   },
 ];
@@ -78,11 +78,12 @@ const ProofSection = () => {
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
-            Доказательства
+            Результаты, которые появляются после отказа от хаоса
           </h2>
           
-          <p className="mt-4 text-lg text-muted-foreground">
-            Это не быстрые успехи. Это результат отказа от хаоса.
+          <p className="mt-4 text-lg text-muted-foreground whitespace-pre-line">
+            Это не быстрые успехи и не случайные сделки.
+Это результат системного подхода и жёсткой фильтрации входов.
           </p>
           
           <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -100,7 +101,7 @@ const ProofSection = () => {
                   )}
                   <span className="font-medium text-foreground text-sm">{item.name}</span>
                 </div>
-                <p className="text-muted-foreground text-xs leading-relaxed flex-1">{item.result}</p>
+                <p className="text-muted-foreground text-xs leading-relaxed flex-1 whitespace-pre-line">{item.result}</p>
                 <span className="text-xs text-muted-foreground/60 mt-3 group-hover:text-muted-foreground transition-colors">
                   Смотреть отзыв →
                 </span>
@@ -142,7 +143,7 @@ const ProofSection = () => {
           <div className="mt-12 p-8 bg-card border border-border rounded-xl">
             <div className="flex items-center gap-3 mb-6">
               <TrendingUp className="w-6 h-6 text-foreground" />
-              <h3 className="text-xl font-medium text-foreground">Сделки автора</h3>
+              <h3 className="text-xl font-medium text-foreground">Примеры сделок по системе TRADE MASTER</h3>
             </div>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -158,7 +159,7 @@ const ProofSection = () => {
                   </div>
                   <span className="text-xs text-muted-foreground">{trade.date}</span>
                   <span className="text-lg font-bold text-foreground mt-2">{trade.result}</span>
-                  <span className="text-xs text-muted-foreground mt-1 flex-1">{trade.algorithm}</span>
+                  <span className="text-xs text-muted-foreground mt-1 flex-1 whitespace-pre-line">{trade.algorithm}</span>
                   <span className="text-xs text-muted-foreground/60 mt-3 group-hover:text-muted-foreground transition-colors">
                     Смотреть сделку →
                   </span>
