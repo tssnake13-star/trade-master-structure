@@ -170,21 +170,18 @@ const ProofSection = () => {
             {/* Visual Trade Previews */}
             <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Preview 1 */}
-              <div className="relative rounded-lg overflow-hidden">
+              <div className="relative rounded-lg overflow-hidden h-48">
                 <img 
                   src={eurAudImg} 
                   alt="Структура сделки"
-                  className="w-full h-48 object-cover filter brightness-[0.45] blur-[0.5px]"
-                  style={{ 
-                    maskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%)'
-                  }}
+                  className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground/90 font-medium tracking-wide">
+                  <div className="text-center bg-background/65 px-6 py-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground font-medium tracking-wide">
                       W1 → D1 → H4
                     </p>
-                    <p className="text-xs text-muted-foreground/70 mt-1">
+                    <p className="text-xs text-muted-foreground/80 mt-1">
                       Сценарий → Решение → Сделка
                     </p>
                   </div>
@@ -192,21 +189,18 @@ const ProofSection = () => {
               </div>
               
               {/* Preview 2 */}
-              <div className="relative rounded-lg overflow-hidden">
+              <div className="relative rounded-lg overflow-hidden h-48">
                 <img 
                   src={gbpUsdImg} 
                   alt="Структура сделки"
-                  className="w-full h-48 object-cover filter brightness-[0.45] blur-[0.5px]"
-                  style={{ 
-                    maskImage: 'radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%)'
-                  }}
+                  className="w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <p className="text-sm text-muted-foreground/90 font-medium tracking-wide">
+                  <div className="text-center bg-background/65 px-6 py-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground font-medium tracking-wide">
                       W1 → D1 → H4
                     </p>
-                    <p className="text-xs text-muted-foreground/70 mt-1">
+                    <p className="text-xs text-muted-foreground/80 mt-1">
                       Сценарий → Решение → Сделка
                     </p>
                   </div>
