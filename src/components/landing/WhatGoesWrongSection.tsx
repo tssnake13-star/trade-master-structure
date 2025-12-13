@@ -4,18 +4,18 @@ const WhatGoesWrongSection = () => {
       <div className="container-landing">
         <div className="max-w-3xl">
           <h2 className="heading-section text-foreground">
-            Что именно идёт не так
+            В чём ключевая ошибка большинства трейдеров?
           </h2>
           
           <div className="mt-10 space-y-8">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="p-6 bg-secondary/30 rounded-xl border border-border">
                 <p className="text-muted-foreground text-sm uppercase tracking-wider mb-3">Большинство</p>
-                <p className="text-lg text-foreground">ищут точку входа</p>
+                <p className="text-lg text-foreground">ищут точку входа<br />без понимания фазы рынка</p>
               </div>
               <div className="p-6 bg-accent/30 rounded-xl border border-border">
                 <p className="text-muted-foreground text-sm uppercase tracking-wider mb-3">Профессионалы</p>
-                <p className="text-lg text-foreground">сначала определяют фазу рынка</p>
+                <p className="text-lg text-foreground">сначала определяют фазу рынка<br />и только потом ищут вход</p>
               </div>
             </div>
             
@@ -23,7 +23,7 @@ const WhatGoesWrongSection = () => {
             
             <div className="space-y-4">
               <p className="text-lg text-muted-foreground">
-                Рынок движется не от уровня.
+                Рынок движется не от уровней и не от индикаторов.
               </p>
               <p className="text-lg text-foreground">
                 Он движется от фазы к фазе:
@@ -40,7 +40,7 @@ const WhatGoesWrongSection = () => {
             </div>
             
             <p className="text-lg text-foreground/80 pt-4">
-              Пока нет понимания фаз — торговля остаётся случайной.
+              Пока вы не понимаете текущую фазу рынка, торговля остаётся случайной.
             </p>
           </div>
         </div>
