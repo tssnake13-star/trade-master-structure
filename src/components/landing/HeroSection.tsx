@@ -9,7 +9,7 @@ const HeroSection = () => {
           <div className="flex-1 max-w-2xl">
             <h1 className="heading-hero text-foreground fade-in-up">
               Вы теряете деньги не из-за рынка.<br />
-              <span className="text-muted-foreground">А из-за отсутствия чёткого торгового сценария.</span>
+              <span className="text-muted-foreground">Из-за отсутствия чёткого торгового сценария.</span>
             </h1>
             
             {/* Subheadline - two separate paragraphs */}
