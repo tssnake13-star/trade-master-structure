@@ -140,25 +140,25 @@ const ProofSection = () => {
           </Dialog>
           
           {/* Trades Section */}
-          <div className="mt-12 p-8 bg-card border border-border rounded-xl">
+          <div className="mt-12 p-4 md:p-8 bg-card border border-border rounded-xl">
             <div className="flex items-center gap-3 mb-6">
-              <TrendingUp className="w-6 h-6 text-foreground" />
-              <h3 className="text-xl font-medium text-foreground">Примеры сделок по системе TRADE MASTER</h3>
+              <TrendingUp className="w-5 h-5 md:w-6 md:h-6 text-foreground" />
+              <h3 className="text-lg md:text-xl font-medium text-foreground">Примеры сделок по системе TRADE MASTER</h3>
             </div>
             
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
               {trades.map((trade, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedTrade(trade)}
-                  className="p-5 bg-secondary/50 border border-border/50 rounded-lg text-left transition-all hover:border-muted-foreground/50 hover:bg-secondary/80 cursor-pointer group flex flex-col h-full min-h-[160px]"
+                  className="p-4 md:p-5 bg-secondary/50 border border-border/50 rounded-lg text-left transition-all hover:border-muted-foreground/50 hover:bg-secondary/80 cursor-pointer group flex flex-col h-full min-h-[140px] md:min-h-[160px]"
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <BarChart3 className="w-4 h-4 text-muted-foreground shrink-0" />
-                    <span className="font-semibold text-foreground text-sm">{trade.pair}</span>
+                    <span className="font-semibold text-foreground text-xs md:text-sm">{trade.pair}</span>
                   </div>
                   <span className="text-xs text-muted-foreground">{trade.date}</span>
-                  <span className="text-lg font-bold text-foreground mt-2">{trade.result}</span>
+                  <span className="text-base md:text-lg font-bold text-foreground mt-2">{trade.result}</span>
                   <span className="text-xs text-muted-foreground mt-1 flex-1 whitespace-pre-line">{trade.algorithm}</span>
                   <span className="text-xs text-muted-foreground/60 mt-3 group-hover:text-muted-foreground transition-colors">
                     Смотреть сделку →
@@ -166,6 +166,52 @@ const ProofSection = () => {
                 </button>
               ))}
             </div>
+
+            {/* Visual Trade Previews */}
+            <div className="mt-6 md:mt-8 grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              {/* Preview 1 */}
+              <div className="relative rounded-lg overflow-hidden h-44 md:h-48">
+                <img 
+                  src={eurAudImg} 
+                  alt="Структура сделки"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center bg-background/65 px-5 py-3 md:px-6 md:py-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground font-medium tracking-wide">
+                      W1 → D1 → H4
+                    </p>
+                    <p className="text-xs text-muted-foreground/80 mt-1">
+                      Сценарий → Решение → Сделка
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Preview 2 */}
+              <div className="relative rounded-lg overflow-hidden h-44 md:h-48">
+                <img 
+                  src={gbpUsdImg} 
+                  alt="Структура сделки"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="text-center bg-background/65 px-5 py-3 md:px-6 md:py-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground font-medium tracking-wide">
+                      W1 → D1 → H4
+                    </p>
+                    <p className="text-xs text-muted-foreground/80 mt-1">
+                      Сценарий → Решение → Сделка
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Caption */}
+            <p className="mt-4 md:mt-6 text-xs md:text-sm text-muted-foreground/60 text-center">
+              Это не лучшие сделки. Это типовые решения по системе.
+            </p>
           </div>
 
           {/* Trade Modal */}
