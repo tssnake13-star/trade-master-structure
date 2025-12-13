@@ -12,15 +12,23 @@ const HeroSection = () => {
               <span className="text-muted-foreground">Вы сливаете из-за отсутствия структуры.</span>
             </h1>
             
-            <p className="mt-8 text-lg md:text-xl text-muted-foreground leading-relaxed fade-in-up fade-in-up-delay-1">
-              TRADE MASTER — система торговли, которая учит определять фазу рынка и входить только при совпадении контекста, структуры и реакции.
-              <br />
-              <span className="text-foreground/70">Без уровней, паттернов и угадываний.</span>
-            </p>
+            <div className="mt-8 text-lg md:text-xl text-muted-foreground leading-relaxed fade-in-up fade-in-up-delay-1 space-y-4">
+              <p>
+                TRADE MASTER — это система, которая помогает трейдеру перестать гадать, сократить количество сделок и принимать одинаковые решения в одинаковых рыночных ситуациях.
+              </p>
+              <p>
+                Вы начинаете понимать, <span className="text-foreground font-medium">когда входить, когда не входить и почему</span> — без сигналов, без угадываний и без хаоса.
+              </p>
+            </div>
             
             <div className="mt-10 fade-in-up fade-in-up-delay-2">
-              <a href={TELEGRAM_LINKS.bot} target="_blank" rel="noopener noreferrer" className="btn-primary group">Пройти диагностику трейдера<ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              <a href={TELEGRAM_LINKS.bot} target="_blank" rel="noopener noreferrer" className="btn-primary group">
+                Пройти диагностику трейдера
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
+              <p className="mt-3 text-sm text-muted-foreground">
+                Бесплатно · 3 минуты · Покажет, где вы теряете деньги
+              </p>
             </div>
           </div>
           
