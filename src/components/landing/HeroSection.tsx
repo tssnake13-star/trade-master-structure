@@ -8,16 +8,19 @@ const HeroSection = () => {
           {/* Text Content */}
           <div className="flex-1 max-w-2xl">
             <h1 className="heading-hero text-foreground fade-in-up">
-              Вы сливаете не из-за рынка.<br />
-              <span className="text-muted-foreground">Вы сливаете из-за отсутствия структуры.</span>
+              Вы теряете деньги не из-за рынка.<br />
+              <span className="text-muted-foreground">А из-за отсутствия чёткого торгового сценария.</span>
             </h1>
             
             <div className="mt-8 text-lg md:text-xl text-muted-foreground leading-relaxed fade-in-up fade-in-up-delay-1 space-y-4">
               <p>
-                TRADE MASTER — это система, которая помогает трейдеру перестать гадать, сократить количество сделок и принимать одинаковые решения в одинаковых рыночных ситуациях.
+                Большинство трейдеров принимают решения на эмоциях, в середине движения или без понимания текущей фазы рынка.
               </p>
               <p>
-                Вы начинаете понимать, <span className="text-foreground font-medium">когда входить, когда не входить и почему</span> — без сигналов, без угадываний и без хаоса.
+                В результате — нестабильные входы, сомнения и повторяющиеся ошибки.
+              </p>
+              <p className="text-foreground font-medium">
+                Проблема не в вас. Проблема в отсутствии структуры.
               </p>
             </div>
             
@@ -27,7 +30,7 @@ const HeroSection = () => {
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
               <p className="mt-3 text-sm text-muted-foreground">
-                Бесплатно · 3 минуты · Покажет, где вы теряете деньги
+                Бесплатно · 3 минуты · Без регистрации
               </p>
             </div>
           </div>
