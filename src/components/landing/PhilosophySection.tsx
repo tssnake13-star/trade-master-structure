@@ -15,9 +15,10 @@ const PhilosophySection = () => {
               Здесь формируется понимание структуры рынка и профессиональный способ мышления.
             </p>
             <div className="divider my-8" />
-            <p className="text-lg text-muted-foreground whitespace-pre-line">
+            <p className="text-lg text-muted-foreground">
               <span className="text-foreground font-medium">TRADE MASTER</span> — это не сигналы.
-{`Это алгоритм принятия решений и ответственность за каждое действие.`}
+              <br />
+              Это алгоритм принятия решений и ответственность за каждое действие.
             </p>
           </div>
         </div>
