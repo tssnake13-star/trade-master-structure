@@ -91,7 +91,7 @@ const ProofSection = () => {
               <button
                 key={index}
                 onClick={() => setSelectedCase(item)}
-                className="p-5 bg-card border border-border rounded-xl text-left transition-all hover:border-muted-foreground/50 hover:bg-card/80 cursor-pointer group flex flex-col h-full min-h-[140px]"
+                className="p-5 bg-card border border-border rounded-xl text-left transition-all duration-200 hover:border-muted-foreground/50 hover:bg-card/80 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-background/20 active:translate-y-0 active:shadow-none cursor-pointer group flex flex-col h-full min-h-[140px]"
               >
                 <div className="flex items-center gap-2 mb-3">
                   {item.type === 'honest' ? (
@@ -103,7 +103,7 @@ const ProofSection = () => {
                 </div>
                 <p className="text-muted-foreground text-xs leading-relaxed flex-1 whitespace-pre-line">{item.result}</p>
                 <span className="text-xs text-muted-foreground/60 mt-3 group-hover:text-muted-foreground transition-colors">
-                  Смотреть отзыв →
+                  Открыть отзыв →
                 </span>
               </button>
             ))}
@@ -151,7 +151,7 @@ const ProofSection = () => {
                 <button
                   key={index}
                   onClick={() => setSelectedTrade(trade)}
-                  className="p-4 md:p-5 bg-secondary/50 border border-border/50 rounded-lg text-left transition-all hover:border-muted-foreground/50 hover:bg-secondary/80 cursor-pointer group flex flex-col h-full min-h-[140px] md:min-h-[160px]"
+                  className="p-4 md:p-5 bg-secondary/50 border border-border/50 rounded-lg text-left transition-all duration-200 hover:border-muted-foreground/50 hover:bg-secondary/80 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-background/20 active:translate-y-0 active:shadow-none cursor-pointer group flex flex-col h-full min-h-[140px] md:min-h-[160px]"
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <BarChart3 className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -161,7 +161,7 @@ const ProofSection = () => {
                   <span className="text-base md:text-lg font-bold text-foreground mt-2">{trade.result}</span>
                   <span className="text-xs text-muted-foreground mt-1 flex-1 whitespace-pre-line">{trade.algorithm}</span>
                   <span className="text-xs text-muted-foreground/60 mt-3 group-hover:text-muted-foreground transition-colors">
-                    Смотреть сделку →
+                    Открыть сделку →
                   </span>
                 </button>
               ))}
