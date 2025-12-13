@@ -5,27 +5,27 @@ const stages = [
   {
     number: '01',
     title: 'Фундамент',
-    description: 'фазы, структура, контекст',
+    description: 'Формирование правильного взгляда на рынок:\nфазы, структура и контекст вместо хаотичных входов.',
   },
   {
     number: '02',
     title: 'Тренировки',
-    description: 'сценарии и фиксация ошибок',
+    description: 'Отработка сценариев и фиксация ошибок.\nУбираем угадывание и случайные решения.',
   },
   {
     number: '03',
     title: 'Практика',
-    description: 'дисциплина вместо хаоса',
+    description: 'Формирование дисциплины и соблюдение алгоритма.\nТорговля по правилам, а не по эмоциям.',
   },
   {
     number: '04',
     title: 'Самостоятельность',
-    description: 'фильтрация и алгоритм',
+    description: 'Фильтрация сделок и принятие решений без подсказок.\nАлгоритм становится внутренним процессом.',
   },
   {
     number: '05',
     title: 'Торговля',
-    description: 'удержание и стабильность',
+    description: 'Удержание позиций и работа на дистанции.\nСтабильность важнее количества сделок.',
   },
 ];
 
@@ -35,7 +35,7 @@ const StagesSection = () => {
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
-            Карта 5 этапов обучения
+            Как формируется системный трейдер?
           </h2>
           
           <div className="mt-12 relative">
@@ -58,7 +58,7 @@ const StagesSection = () => {
                       <span className="text-mono text-muted-foreground text-sm">{stage.number}</span>
                       <h3 className="text-lg font-medium text-foreground">{stage.title}</h3>
                     </div>
-                    <p className="text-muted-foreground">{stage.description}</p>
+                    <p className="text-muted-foreground whitespace-pre-line">{stage.description}</p>
                   </div>
                 </div>
               ))}
