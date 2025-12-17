@@ -69,10 +69,10 @@ const FormatsSection = () => {
               href={TELEGRAM_LINKS.dm}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-primary group"
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-muted-foreground text-sm font-medium rounded-lg border border-border/50 hover:bg-accent/50 hover:text-foreground hover:border-border transition-all duration-200"
             >
-              Узнать стоимость и формат участия
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              Узнать стоимость и формат
+              <ArrowRight className="ml-2 w-5 h-5" />
             </a>
           </div>
         </div>

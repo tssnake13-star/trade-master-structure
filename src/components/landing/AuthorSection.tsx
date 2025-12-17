@@ -1,4 +1,4 @@
-import { ArrowRight, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 
 const AuthorSection = () => {
@@ -54,11 +54,10 @@ const AuthorSection = () => {
                 href={TELEGRAM_LINKS.dm} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="btn-secondary group"
+                className="inline-flex items-center gap-2 px-5 py-2.5 text-muted-foreground text-sm font-medium rounded-lg border border-border/50 hover:bg-accent/50 hover:text-foreground hover:border-border transition-all duration-200"
               >
-                <Send className="w-4 h-4 mr-2" />
-                Написать в Telegram
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <Send className="w-4 h-4" />
+                Написать автору в Telegram
               </a>
             </div>
           </div>
