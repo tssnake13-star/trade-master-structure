@@ -30,11 +30,11 @@ const HeroSection = () => {
             {/* CTA with increased spacing */}
             <div className="mt-14 fade-in-up fade-in-up-delay-2">
               <a href={TELEGRAM_LINKS.bot} target="_blank" rel="noopener noreferrer" className="btn-primary group">
-                Пройти диагностику трейдера
+                Получить торговый алгоритм
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
               <p className="mt-3 text-sm text-muted-foreground">
-                Бесплатно · 3 минуты · Без регистрации
+                7 коротких вопросов → в конце вы получите мой рабочий алгоритм торговли
               </p>
             </div>
           </div>

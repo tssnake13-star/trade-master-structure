@@ -72,7 +72,7 @@ const StagesSection = () => {
               rel="noopener noreferrer"
               className="btn-secondary group"
             >
-              Узнать свой текущий этап
+              Получить торговый алгоритм
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>

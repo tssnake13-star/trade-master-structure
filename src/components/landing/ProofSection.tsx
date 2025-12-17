@@ -206,7 +206,7 @@ const ProofSection = () => {
               rel="noopener noreferrer"
               className="btn-secondary group"
             >
-              Получить разбор вашей торговли
+              Получить торговый алгоритм
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>

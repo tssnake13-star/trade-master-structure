@@ -62,7 +62,7 @@ const Header = () => {
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
               >
                 <Send className="w-4 h-4" />
-                Начать диагностику
+                Получить алгоритм
               </a>
             </div>
 
@@ -117,7 +117,7 @@ const Header = () => {
               className="inline-flex items-center gap-2 px-6 py-3 bg-secondary text-foreground font-medium rounded-lg border border-border hover:bg-accent transition-all duration-200"
             >
               <Send className="w-5 h-5" />
-              Начать диагностику
+              Получить алгоритм
             </a>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { ArrowRight, Send, MessageCircle } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 const FinalCTASection = () => {
   return <section className="py-20 md:py-28 bg-card/50">
@@ -9,12 +9,12 @@ const FinalCTASection = () => {
           </h2>
           
           <div className="mt-12 flex flex-col items-center">
-            <a href={TELEGRAM_LINKS.bot} target="_blank" rel="noopener noreferrer" className="btn-secondary group">
-              <Send className="w-4 h-4 mr-2" />
-              Пройти диагностику трейдера
+            <a href={TELEGRAM_LINKS.bot} target="_blank" rel="noopener noreferrer" className="btn-primary group">
+              Получить торговый алгоритм
+              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
             <p className="mt-3 text-sm text-muted-foreground">
-              Бесплатно · 3 минуты · Без регистрации
+              7 коротких вопросов → в конце вы получите мой рабочий алгоритм торговли
             </p>
           </div>
         </div>
