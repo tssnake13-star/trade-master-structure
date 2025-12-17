@@ -67,12 +67,12 @@ const StagesSection = () => {
           
           <div className="mt-10">
             <a
-              href={TELEGRAM_LINKS.channel}
+              href={TELEGRAM_LINKS.bot}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-secondary group"
             >
-              Посмотреть реальные разборы
+              Узнать свой текущий этап
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>
