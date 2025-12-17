@@ -69,12 +69,12 @@ const AlgorithmSection = () => {
           
           <div className="mt-10">
             <a
-              href={TELEGRAM_LINKS.channel}
+              href={TELEGRAM_LINKS.bot}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-secondary group"
             >
-              Посмотреть структуру вживую
+              Получить чек-лист алгоритма
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>
