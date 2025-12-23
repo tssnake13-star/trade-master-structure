@@ -30,7 +30,7 @@ const ProblemSection = () => {
           
           <div className="mt-12 p-6 bg-secondary/50 border-l-2 border-muted-foreground/30 rounded-r-lg">
             <p className="text-lg text-foreground font-medium">
-              Отсутствие сценария всегда приводит к одному и тому же результату — потере денег.
+              Отсутствие сценария всегда приводит к одному и тому же результату – потере денег.
             </p>
           </div>
         </div>

@@ -14,25 +14,25 @@ import elenaImg from '@/assets/testimonials/elena.jpg';
 const cases = [
   {
     name: 'Виталий',
-    result: 'Хаотичные входы и постоянные сомнения →\nчёткие сценарии и спокойная торговля.',
+    result: 'Хаотичные входы и постоянные сомнения → чёткие сценарии и спокойная торговля.',
     type: 'success',
     image: vitaliyImg,
   },
   {
     name: 'Рустам',
-    result: 'Торговля «по ощущениям» →\nработа с накоплением и защита капитала. Выплата $20 248.',
+    result: 'Торговля «по ощущениям» → работа с накоплением и защита капитала. Выплата $20 248.',
     type: 'success',
     image: rustamImg,
   },
   {
     name: 'Сергей',
-    result: 'Страх упустить движение →\nвходы только по плану и заранее определённым условиям.',
+    result: 'Страх упустить движение → входы только по плану и заранее определённым условиям.',
     type: 'success',
     image: lesyaImg,
   },
   {
     name: 'Елена',
-    result: 'Эмоции сильнее правил →\nдисциплина, риск-контроль и честный результат.',
+    result: 'Эмоции сильнее правил → дисциплина, риск-контроль и честный результат.',
     type: 'honest',
     image: elenaImg,
   },
@@ -43,28 +43,28 @@ const trades = [
     pair: 'EUR/AUD', 
     date: '04.09.2025', 
     result: '+17R', 
-    algorithm: 'W1 → D1 → H4\nВход по системе, не по импульсу',
+    algorithm: 'W1 → D1 → H4. Вход по системе, не по импульсу.',
     image: eurAudImg 
   },
   { 
     pair: 'GBP/USD', 
     date: '17.10.2025', 
     result: '+16R', 
-    algorithm: 'W1 → D1 → H4\nВход по системе, не по импульсу',
+    algorithm: 'W1 → D1 → H4. Вход по системе, не по импульсу.',
     image: gbpUsdImg 
   },
   { 
     pair: 'USD/JPY', 
     date: '17.10.2025', 
     result: '+16R', 
-    algorithm: 'W1 → D1 → H4\nВход по системе, не по импульсу',
+    algorithm: 'W1 → D1 → H4. Вход по системе, не по импульсу.',
     image: usdJpyImg 
   },
   { 
     pair: 'USD/CAD', 
     date: '29.10.2025', 
     result: '+19R', 
-    algorithm: 'W1 → D1 → H4\nВход по системе, не по импульсу',
+    algorithm: 'W1 → D1 → H4. Вход по системе, не по импульсу.',
     image: usdCadImg 
   },
 ];
@@ -81,9 +81,8 @@ const ProofSection = () => {
             Результаты, которые появляются после отказа от хаоса
           </h2>
           
-          <p className="mt-4 text-lg text-muted-foreground whitespace-pre-line">
-            Это не быстрые успехи и не случайные сделки.
-Это результат системного подхода и жёсткой фильтрации входов.
+          <p className="mt-4 text-lg text-muted-foreground">
+            Это не быстрые успехи и не случайные сделки. Это результат системного подхода и жёсткой фильтрации входов.
           </p>
           
           <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
