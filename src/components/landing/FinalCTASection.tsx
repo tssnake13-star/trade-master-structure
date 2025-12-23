@@ -14,7 +14,7 @@ const FinalCTASection = () => {
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
             <p className="mt-3 text-sm text-muted-foreground">
-              7 коротких вопросов → в конце вы получите мой рабочий алгоритм торговли
+              7 коротких вопросов → разбор вашей торговой логики → мой рабочий алгоритм
             </p>
           </div>
         </div>
