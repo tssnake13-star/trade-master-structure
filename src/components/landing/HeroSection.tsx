@@ -18,7 +18,7 @@ const HeroSection = () => {
                 Большинство трейдеров принимают решения на эмоциях, в середине движения или без понимания текущей фазы рынка.
               </p>
               <p className="text-muted-foreground/70">
-                В результате — нестабильные входы, сомнения и повторяющиеся ошибки.
+                В результате – нестабильные входы, сомнения и повторяющиеся ошибки.
               </p>
             </div>
             
@@ -30,7 +30,7 @@ const HeroSection = () => {
             {/* CTA with reduced spacing on mobile */}
             <div className="mt-6 md:mt-10 lg:mt-14 fade-in-up fade-in-up-delay-2">
               <p className="hidden md:block mb-3 text-sm text-muted-foreground/70">
-                Алгоритм работает только при понимании контекста — поэтому сначала короткий разбор.
+                Алгоритм работает только при понимании контекста – поэтому сначала короткий разбор.
               </p>
               <a href={TELEGRAM_LINKS.bot} target="_blank" rel="noopener noreferrer" className="btn-primary group text-base md:text-lg">
                 Получить торговый алгоритм
