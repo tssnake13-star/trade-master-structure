@@ -29,12 +29,15 @@ const HeroSection = () => {
             
             {/* CTA with increased spacing */}
             <div className="mt-14 fade-in-up fade-in-up-delay-2">
+              <p className="mb-3 text-sm text-muted-foreground/70">
+                Алгоритм работает только при понимании контекста — поэтому сначала короткий разбор.
+              </p>
               <a href={TELEGRAM_LINKS.bot} target="_blank" rel="noopener noreferrer" className="btn-primary group">
                 Получить торговый алгоритм
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
               <p className="mt-3 text-sm text-muted-foreground">
-                7 коротких вопросов → в конце вы получите мой рабочий алгоритм торговли
+                7 коротких вопросов → разбор вашей торговой логики → мой рабочий алгоритм
               </p>
             </div>
           </div>
