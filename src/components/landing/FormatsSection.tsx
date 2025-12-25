@@ -31,7 +31,7 @@ const FormatsSection = () => {
       <div className="container-landing">
         <div className="max-w-5xl">
           <h2 className="heading-section text-foreground">
-            Три уровня сотрудничества в TRADE MASTER
+            Три уровня сотрудничества в TRADELIKETYO
           </h2>
           
           <p className="mt-4 text-lg text-muted-foreground">
