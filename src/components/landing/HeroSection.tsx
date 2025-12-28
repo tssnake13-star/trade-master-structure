@@ -30,14 +30,14 @@ const HeroSection = () => {
             {/* CTA with reduced spacing on mobile */}
             <div className="mt-6 md:mt-10 lg:mt-14 fade-in-up fade-in-up-delay-2">
               <p className="hidden md:block mb-3 text-sm text-muted-foreground/70">
-                Алгоритм работает только при понимании контекста – поэтому сначала короткий разбор.
+                Здесь я разбираю рынок и сделки без сигналов и угадываний.
               </p>
-              <a href={TELEGRAM_LINKS.bot} target="_blank" rel="noopener noreferrer" className="btn-primary group text-base md:text-lg">
-                Получить торговый алгоритм
+              <a href={TELEGRAM_LINKS.channel} target="_blank" rel="noopener noreferrer" className="btn-primary group text-base md:text-lg">
+                Перейти в Telegram-канал
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
-              <p className="mt-2 md:mt-3 text-xs md:text-sm text-muted-foreground whitespace-nowrap">
-                7 вопросов → разбор логики → алгоритм
+              <p className="mt-2 md:mt-3 text-xs md:text-sm text-muted-foreground">
+                Разборы сделок, логика входов и путь к торговому алгоритму 🧠
               </p>
             </div>
           </div>

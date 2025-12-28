@@ -9,12 +9,15 @@ const FinalCTASection = () => {
           </h2>
           
           <div className="mt-12 flex flex-col items-center">
-            <a href={TELEGRAM_LINKS.bot} target="_blank" rel="noopener noreferrer" className="btn-primary group">
-              Получить торговый алгоритм
+            <p className="mb-3 text-sm text-muted-foreground/70">
+              Здесь я разбираю рынок и сделки без сигналов и угадываний.
+            </p>
+            <a href={TELEGRAM_LINKS.channel} target="_blank" rel="noopener noreferrer" className="btn-primary group">
+              Перейти в Telegram-канал
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
             <p className="mt-3 text-sm text-muted-foreground">
-              7 коротких вопросов → разбор вашей торговой логики → мой рабочий алгоритм
+              Разборы сделок, логика входов и путь к торговому алгоритму 🧠
             </p>
           </div>
         </div>
