@@ -11,11 +11,11 @@ const WhatGoesWrongSection = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="p-6 bg-secondary/30 rounded-xl border border-border">
                 <p className="text-muted-foreground text-sm uppercase tracking-wider mb-3">Большинство</p>
-                <p className="text-lg text-foreground">ищут точку входа без понимания фазы рынка</p>
+                <p className="text-lg text-foreground">Ищут вход, чтобы почувствовать облегчение. Входят без понимания фазы и расплачиваются сомнениями.</p>
               </div>
               <div className="p-6 bg-accent/30 rounded-xl border border-border">
                 <p className="text-muted-foreground text-sm uppercase tracking-wider mb-3">Профессионалы</p>
-                <p className="text-lg text-foreground">сначала определяют фазу рынка и только потом ищут вход</p>
+                <p className="text-lg text-foreground">Сначала возвращают ясность. Определяют фазу и условия, и только потом принимают решение.</p>
               </div>
             </div>
             
@@ -23,10 +23,7 @@ const WhatGoesWrongSection = () => {
             
             <div className="space-y-4">
               <p className="text-lg text-muted-foreground">
-                Рынок движется не от уровней и не от индикаторов.
-              </p>
-              <p className="text-lg text-foreground">
-                Он движется от фазы к фазе:
+                Рынок двигается фазами. Если вы не видите фазу, каждое решение снова становится угадыванием.
               </p>
               <div className="flex flex-wrap items-center gap-3 text-mono text-muted-foreground">
                 <span className="px-3 py-1.5 bg-secondary rounded-md">накопление</span>
@@ -40,7 +37,7 @@ const WhatGoesWrongSection = () => {
             </div>
             
             <p className="text-lg text-foreground/80 pt-4">
-              Пока вы не понимаете текущую фазу рынка, торговля остаётся случайной.
+              Без понимания фазы нет контроля. Без контроля торговля превращается в стресс.
             </p>
           </div>
         </div>

@@ -8,15 +8,12 @@ const PhilosophySection = () => {
           </h2>
           
           <div className="space-y-6">
-            <p className="text-xl text-muted-foreground leading-relaxed">
-              Здесь не продаются уровни, индикаторы и паттерны.
-            </p>
             <p className="text-xl text-foreground leading-relaxed">
-              Здесь формируется понимание структуры рынка и профессиональный способ мышления.
+              Здесь формируется спокойный профессиональный способ мышления. Когда решение не давит, потому что оно обосновано сценарием.
             </p>
             <div className="divider my-8" />
             <p className="text-lg text-muted-foreground">
-              <span className="text-foreground font-medium">TRADE MASTER</span> – это не сигналы. Это алгоритм принятия решений и ответственность за каждое действие.
+              <span className="text-foreground font-medium">TRADE MASTER</span> – это не сигналы. Это ответственность, ясные условия и умение пропускать.
             </p>
           </div>
         </div>
