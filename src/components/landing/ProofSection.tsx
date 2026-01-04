@@ -78,15 +78,15 @@ const ProofSection = () => {
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
-            Результаты, которые появляются после отказа от хаоса
+            Результаты работы по системе
           </h2>
           
           <p className="mt-4 text-lg text-muted-foreground">
-            Это не быстрые успехи. Это состояние, когда Вы меньше нервничаете и больше доверяете процессу.
+            Это не быстрые успехи. Это дисциплина и работа по правилам.
           </p>
           
           <p className="mt-6 text-foreground font-medium">
-            Главное изменение происходит не на графике. Главное изменение происходит в голове.
+            Главное изменение — решения принимаются по сценарию, а не по ситуации.
           </p>
           
           <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
