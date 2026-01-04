@@ -11,7 +11,7 @@ const FinalCTASection = () => {
           </h2>
           
           <p className="mt-6 text-lg text-muted-foreground">
-            Получи алгоритм, который работает. Без сигналов. Без угадывания.
+            Получите алгоритм, который работает. Без сигналов. Без угадывания.
           </p>
           
           <div className="mt-10 flex flex-col items-center">
