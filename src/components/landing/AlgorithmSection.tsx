@@ -78,11 +78,11 @@ const AlgorithmSection = () => {
               rel="noopener noreferrer"
               className="btn-primary group"
             >
-              Получить алгоритм
+              Внедрить алгоритм
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
             <p className="mt-3 text-xs text-muted-foreground">
-              Бесплатный разбор в Telegram-боте
+              Бесплатный разбор Вашей стратегии
             </p>
           </div>
         </div>

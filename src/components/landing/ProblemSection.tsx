@@ -3,18 +3,18 @@ import { X } from 'lucide-react';
 const fatalErrors = [
   {
     number: '01',
-    title: 'Вход без контекста',
+    title: 'Отсутствие контекста',
     description: 'Вы не видите фазу рынка. Входите в случайной точке и надеетесь на удачу.',
   },
   {
     number: '02',
-    title: 'Торговля эмоциями',
-    description: 'Страх упустить. Желание отыграться. Азарт. Это не стратегия.',
+    title: 'Работа без сценария',
+    description: 'Нет плана действий. Нет точки отмены. Решения принимаются на эмоциях.',
   },
   {
     number: '03',
-    title: 'Нет сценария отмены',
-    description: 'Вы не знаете, когда выходить. Передерживаете убыток, режете прибыль.',
+    title: 'Эмоциональные входы',
+    description: 'Страх упустить. Желание отыграться. Азарт. Это не стратегия.',
   },
 ];
 
@@ -24,11 +24,11 @@ const ProblemSection = () => {
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
-            3 фатальные ошибки вашего входа
+            3 причины Вашего хаоса
           </h2>
           
           <p className="mt-4 text-lg text-muted-foreground">
-            Пока вы не устраните их, депозит будет сливаться.
+            Мы исправим это первым делом.
           </p>
           
           <div className="mt-10 grid md:grid-cols-3 gap-4 md:gap-6">

@@ -7,11 +7,11 @@ const FinalCTASection = () => {
       <div className="container-landing">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="heading-section text-foreground">
-            Готовы перестать угадывать?
+            Готовы работать по системе?
           </h2>
           
           <p className="mt-6 text-lg text-muted-foreground">
-            Получите алгоритм, который работает. Без сигналов. Без угадывания.
+            Получите структуру, которая работает. Без сигналов. Без угадывания.
           </p>
           
           <div className="mt-10 flex flex-col items-center">
@@ -21,11 +21,11 @@ const FinalCTASection = () => {
               rel="noopener noreferrer"
               className="btn-primary group text-lg px-8 py-4"
             >
-              Забрать алгоритм в Telegram
+              Получить структуру в Telegram
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
             <p className="mt-3 text-sm text-muted-foreground">
-              Бесплатный разбор ваших ошибок
+              Бесплатный разбор Вашей стратегии
             </p>
           </div>
         </div>
