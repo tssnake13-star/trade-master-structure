@@ -9,19 +9,19 @@ const HeroSection = () => {
         <div className="flex flex-col lg:flex-row items-center gap-6 md:gap-12 lg:gap-16">
           {/* Text Content */}
           <div className="flex-1 max-w-2xl order-2 lg:order-1">
-            <h1 className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-foreground fade-in-up">
-              Ваш вход в рынок – случайность.
-              <span className="block mt-1 md:mt-2 text-muted-foreground">Узнайте, почему вы теряете там, где должны забирать.</span>
+          <h1 className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-foreground fade-in-up">
+              Трейдинг как работа, а не как казино.
+              <span className="block mt-1 md:mt-2 text-muted-foreground">Ваша новая реальность.</span>
             </h1>
             
             {/* Subheadline - hidden on mobile for compactness */}
             <p className="hidden md:block mt-6 lg:mt-8 text-lg md:text-xl text-muted-foreground leading-relaxed fade-in-up fade-in-up-delay-1">
-              Я не даю сигналы. Я убираю хаос в вашей голове и даю алгоритм профессиональной работы с контекстом и риском.
+              Большинство ищет удачу, Вы — получите структуру. Алгоритм, который превращает хаос на мониторе в предсказуемую последовательность действий.
             </p>
             
             {/* Accent phrase - compact on mobile */}
             <p className="mt-4 md:mt-8 lg:mt-10 text-base md:text-lg lg:text-xl text-foreground/90 font-medium fade-in-up fade-in-up-delay-1">
-              Торговля без системы = слив. Это не мнение. Это статистика.
+              Станьте тем самым стратегом.
             </p>
             
             {/* CTA with reduced spacing on mobile */}
@@ -32,11 +32,11 @@ const HeroSection = () => {
                 rel="noopener noreferrer"
                 className="btn-primary group text-base md:text-lg"
               >
-                Получить алгоритм
+                Забрать алгоритм профи
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
               <p className="mt-2 md:mt-3 text-xs md:text-sm text-muted-foreground">
-                Бесплатный разбор ваших ошибок в Telegram-боте
+                Бесплатный разбор Вашей стратегии в Telegram-боте
               </p>
             </div>
           </div>

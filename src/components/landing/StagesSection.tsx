@@ -35,7 +35,7 @@ const StagesSection = () => {
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
-            Как формируется системный трейдер?
+            Ваша трансформация в системного трейдера
           </h2>
           
           <div className="mt-12 relative">
@@ -72,11 +72,11 @@ const StagesSection = () => {
               rel="noopener noreferrer"
               className="btn-primary group"
             >
-              Начать трансформацию
+              Начать Вашу трансформацию
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
             <p className="mt-3 text-xs text-muted-foreground">
-              Бесплатный разбор в Telegram-боте
+              Бесплатный разбор Вашей стратегии
             </p>
           </div>
         </div>

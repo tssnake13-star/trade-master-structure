@@ -67,7 +67,7 @@ const FormatsSection = () => {
                   rel="noopener noreferrer"
                   className="mt-4 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
                 >
-                  Начать трансформацию
+                  Выбрать этот путь
                   <ArrowRight className="w-4 h-4" />
                 </a>
               </div>

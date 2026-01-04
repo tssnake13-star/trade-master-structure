@@ -29,7 +29,7 @@ const StickyButton = () => {
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-2 w-full py-3.5 bg-foreground text-background font-semibold rounded-lg hover:bg-foreground/90 transition-colors"
         >
-          Забрать алгоритм
+          Забрать алгоритм в Telegram
           <ArrowRight className="w-5 h-5" />
         </a>
       </div>
