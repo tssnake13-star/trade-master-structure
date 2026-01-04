@@ -11,11 +11,11 @@ const WhatGoesWrongSection = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="p-6 bg-secondary/30 rounded-xl border border-border">
                 <p className="text-muted-foreground text-sm uppercase tracking-wider mb-3">Большинство</p>
-                <p className="text-lg text-foreground">Ищут вход, чтобы почувствовать облегчение. Входят без понимания фазы и расплачиваются сомнениями.</p>
+                <p className="text-lg text-foreground">Входят без понимания фазы. Решение принимается наугад.</p>
               </div>
               <div className="p-6 bg-accent/30 rounded-xl border border-border">
                 <p className="text-muted-foreground text-sm uppercase tracking-wider mb-3">Профессионалы</p>
-                <p className="text-lg text-foreground">Сначала возвращают ясность. Определяют фазу и условия, и только потом принимают решение.</p>
+                <p className="text-lg text-foreground">Определяют фазу и условия. Ждут совпадения. Только потом принимают решение.</p>
               </div>
             </div>
             

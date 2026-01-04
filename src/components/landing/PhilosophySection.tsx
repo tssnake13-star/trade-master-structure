@@ -9,11 +9,11 @@ const PhilosophySection = () => {
           
           <div className="space-y-6">
             <p className="text-xl text-foreground leading-relaxed">
-              Здесь формируется спокойный профессиональный способ мышления. Когда решение не давит, потому что оно обосновано сценарием.
+              Решение принимается по сценарию. Есть условия — есть вход. Нет условий — осознанный пропуск.
             </p>
             <div className="divider my-8" />
             <p className="text-lg text-muted-foreground">
-              <span className="text-foreground font-medium">TRADE MASTER</span> – это не сигналы. Это ответственность, ясные условия и умение пропускать.
+              <span className="text-foreground font-medium">TRADE MASTER</span> — это не сигналы. Это правила, условия и дисциплина.
             </p>
           </div>
         </div>

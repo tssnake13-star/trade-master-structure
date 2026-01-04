@@ -5,27 +5,27 @@ const stages = [
   {
     number: '01',
     title: 'Фундамент',
-    description: 'Вы видите фазу, а не отдельные свечи. Хаос уходит.',
+    description: 'Понимание фаз рынка. Структура вместо хаоса.',
   },
   {
     number: '02',
-    title: 'Тренировки',
-    description: 'Отрабатываете сценарии. Убираете случайные решения.',
+    title: 'Отработка сценариев',
+    description: 'Разбор ситуаций. Закрепление логики входа и пропуска.',
   },
   {
     number: '03',
     title: 'Практика',
-    description: 'Правила становятся сильнее эмоций.',
+    description: 'Работа по правилам. Дисциплина важнее импульса.',
   },
   {
     number: '04',
-    title: 'Самостоятельность',
-    description: 'Вы понимаете, когда входа нет. Без подсказок.',
+    title: 'Самостоятельная торговля',
+    description: 'Анализ рынка и принятие решений на основе структуры, фазы и условий. Реальные сделки по системе, без подсказок и сигналов.',
   },
   {
     number: '05',
-    title: 'Торговля',
-    description: 'Работаете на дистанции. Стабильность важнее количества.',
+    title: 'Работа на дистанции',
+    description: 'Стабильность важнее количества сделок.',
   },
 ];
 
@@ -35,7 +35,7 @@ const StagesSection = () => {
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
-            Ваша трансформация в системного трейдера
+            Этапы внедрения системы
           </h2>
           
           <div className="mt-12 relative">
@@ -72,7 +72,7 @@ const StagesSection = () => {
               rel="noopener noreferrer"
               className="btn-primary group"
             >
-              Начать Вашу трансформацию
+              Получить алгоритм
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
             <p className="mt-3 text-xs text-muted-foreground">
