@@ -25,7 +25,7 @@ const Footer = () => {
               rel="noopener noreferrer"
               className="hover:text-foreground transition-colors"
             >
-              Контакт
+              Написать автору
             </a>
           </div>
         </div>

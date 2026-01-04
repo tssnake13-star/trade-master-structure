@@ -13,6 +13,7 @@ import FormatsSection from '@/components/landing/FormatsSection';
 import AuthorSection from '@/components/landing/AuthorSection';
 import FinalCTASection from '@/components/landing/FinalCTASection';
 import Footer from '@/components/landing/Footer';
+import StickyButton from '@/components/landing/StickyButton';
 
 const Index = () => {
   return (
@@ -34,6 +35,7 @@ const Index = () => {
         <FinalCTASection />
       </main>
       <Footer />
+      <StickyButton />
     </div>
   );
 };

@@ -26,18 +26,18 @@ const AuthorSection = () => {
                 Сергей Тё
               </h3>
               
-              <div className="space-y-4 mb-6">
+              <div className="space-y-3 mb-6">
                 <p className="text-muted-foreground leading-relaxed">
-                  Торгую на финансовых рынках больше 12 лет. Работаю с реальным рынком, а не с теорией и догадками.
+                  12+ лет на рынке. Работаю с реальными деньгами, а не с теорией.
                 </p>
                 
                 <p className="text-muted-foreground leading-relaxed">
-                  Моя задача не дать «секретный вход». Моя задача убрать хаос и собрать структуру принятия решений.
+                  Моя задача – убрать хаос в твоей голове и дать рабочий алгоритм.
                 </p>
               </div>
               
-              <p className="text-sm text-muted-foreground/70 mb-8">
-                TRADE MASTER – результат личной практики и многолетней работы с рынком.
+              <p className="text-sm text-muted-foreground/70 mb-6">
+                TRADE MASTER – результат личной практики.
               </p>
               
               <a 

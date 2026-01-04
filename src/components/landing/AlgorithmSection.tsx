@@ -72,20 +72,17 @@ const AlgorithmSection = () => {
           </div>
           
           <div className="mt-10">
-            <p className="mb-3 text-sm text-muted-foreground/70">
-              Здесь я разбираю рынок и сделки без сигналов и угадываний.
-            </p>
             <a
-              href={TELEGRAM_LINKS.channel}
+              href={TELEGRAM_LINKS.bot}
               target="_blank"
               rel="noopener noreferrer"
-              className="btn-secondary group"
+              className="btn-primary group"
             >
-              Перейти в Telegram-канал
+              Получить алгоритм
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
             <p className="mt-3 text-xs text-muted-foreground">
-              Разборы сделок, логика входов и путь к торговому алгоритму 🧠
+              Бесплатный разбор в Telegram-боте
             </p>
           </div>
         </div>

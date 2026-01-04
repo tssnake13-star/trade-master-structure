@@ -1,39 +1,58 @@
 import { X } from 'lucide-react';
 
-const problems = [
-  'входят, чтобы снять тревогу, а не потому что было условие',
-  'догоняют движение из страха упустить',
-  'путают коррекцию и разворот, потому что нет сценария отмены',
-  'меняют правила после убытка, пытаясь вернуть контроль',
+const fatalErrors = [
+  {
+    number: '01',
+    title: 'Вход без контекста',
+    description: 'Ты не видишь фазу рынка. Входишь в случайной точке и молишься.',
+  },
+  {
+    number: '02',
+    title: 'Торговля эмоциями',
+    description: 'Страх упустить. Желание отыграться. Азарт. Это не стратегия.',
+  },
+  {
+    number: '03',
+    title: 'Нет сценария отмены',
+    description: 'Ты не знаешь, когда выходить. Передерживаешь убыток, режешь прибыль.',
+  },
 ];
 
 const ProblemSection = () => {
   return (
-    <section className="py-20 md:py-28">
+    <section className="py-16 md:py-28">
       <div className="container-landing">
-        <div className="max-w-3xl">
+        <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
-            Почему большинство трейдеров теряют деньги снова и снова?
+            3 фатальные ошибки твоего входа
           </h2>
           
-          <ul className="mt-10 space-y-5">
-            {problems.map((problem, index) => (
-              <li 
-                key={index}
-                className="flex items-start gap-4 text-lg text-muted-foreground"
-              >
-                <X className="w-5 h-5 text-muted-foreground/50 mt-1 flex-shrink-0" />
-                <span>{problem}</span>
-              </li>
-            ))}
-          </ul>
+          <p className="mt-4 text-lg text-muted-foreground">
+            Пока ты не устранишь их, депозит будет сливаться.
+          </p>
           
-          <div className="mt-12 p-6 bg-secondary/50 border-l-2 border-muted-foreground/30 rounded-r-lg">
-            <p className="text-lg text-foreground font-medium">
-              Без сценария вы не торгуете. Вы реагируете.
+          <div className="mt-10 grid md:grid-cols-3 gap-4 md:gap-6">
+            {fatalErrors.map((error, index) => (
+              <div
+                key={index}
+                className="p-5 md:p-6 bg-card border border-border rounded-xl"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <X className="w-5 h-5 text-destructive/70 flex-shrink-0" />
+                  <span className="text-mono text-sm text-muted-foreground">{error.number}</span>
+                </div>
+                <h3 className="text-lg font-medium text-foreground mb-2">{error.title}</h3>
+                <p className="text-muted-foreground text-sm">{error.description}</p>
+              </div>
+            ))}
+          </div>
+          
+          <div className="mt-10 p-5 md:p-6 bg-secondary/50 border-l-2 border-foreground/30 rounded-r-lg">
+            <p className="text-foreground font-medium">
+              Решение есть. Но это не сигналы и не угадывание.
             </p>
-            <p className="text-muted-foreground mt-2">
-              Реакция почти всегда заканчивается потерей денег и нервов.
+            <p className="text-muted-foreground mt-2 text-sm">
+              Это алгоритм. Чёткий. Системный. Профессиональный.
             </p>
           </div>
         </div>

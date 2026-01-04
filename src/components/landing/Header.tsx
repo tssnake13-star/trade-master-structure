@@ -56,13 +56,13 @@ const Header = () => {
             {/* CTA Button */}
             <div className="hidden md:block">
               <a
-                href={TELEGRAM_LINKS.channel}
+                href={TELEGRAM_LINKS.bot}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-sm font-medium rounded-lg hover:bg-foreground/90 transition-all duration-200"
               >
                 <Send className="w-4 h-4" />
-                Telegram-канал
+                Получить алгоритм
               </a>
             </div>
 
@@ -110,14 +110,14 @@ const Header = () => {
           
           <div className="mt-auto pb-12">
             <a
-              href={TELEGRAM_LINKS.channel}
+              href={TELEGRAM_LINKS.bot}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-secondary text-foreground font-medium rounded-lg border border-border hover:bg-accent transition-all duration-200"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background font-medium rounded-lg hover:bg-foreground/90 transition-all duration-200"
             >
               <Send className="w-5 h-5" />
-              Telegram-канал
+              Получить алгоритм
             </a>
           </div>
         </div>
