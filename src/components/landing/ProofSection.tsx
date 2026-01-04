@@ -82,7 +82,7 @@ const ProofSection = () => {
           </h2>
           
           <p className="mt-4 text-lg text-muted-foreground">
-            Это не быстрые успехи. Это состояние, когда вы меньше нервничаете и больше доверяете процессу.
+            Это не быстрые успехи. Это состояние, когда Вы меньше нервничаете и больше доверяете процессу.
           </p>
           
           <p className="mt-6 text-foreground font-medium">

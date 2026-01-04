@@ -10,18 +10,18 @@ const HeroSection = () => {
           {/* Text Content */}
           <div className="flex-1 max-w-2xl order-2 lg:order-1">
           <h1 className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-foreground fade-in-up">
-              Трейдинг как работа, а не как казино.
-              <span className="block mt-1 md:mt-2 text-muted-foreground">Ваша новая реальность.</span>
+              Ваш вход в рынок — это случайность.
+              <span className="block mt-1 md:mt-2 text-muted-foreground">Узнайте, почему Вы теряете там, где должны забирать.</span>
             </h1>
             
             {/* Subheadline - hidden on mobile for compactness */}
             <p className="hidden md:block mt-6 lg:mt-8 text-lg md:text-xl text-muted-foreground leading-relaxed fade-in-up fade-in-up-delay-1">
-              Большинство ищет удачу, Вы — получите структуру. Алгоритм, который превращает хаос на мониторе в предсказуемую последовательность действий.
+              Я не даю сигналы. Я убираю хаос в Вашей голове и даю алгоритм профессиональной работы с контекстом и риском.
             </p>
             
             {/* Accent phrase - compact on mobile */}
             <p className="mt-4 md:mt-8 lg:mt-10 text-base md:text-lg lg:text-xl text-foreground/90 font-medium fade-in-up fade-in-up-delay-1">
-              Станьте тем самым стратегом.
+              Структура вместо угадывания.
             </p>
             
             {/* CTA with reduced spacing on mobile */}

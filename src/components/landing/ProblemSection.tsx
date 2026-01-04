@@ -4,17 +4,17 @@ const fatalErrors = [
   {
     number: '01',
     title: 'Отсутствие контекста',
-    description: 'Вы не видите фазу рынка. Входите в случайной точке и надеетесь на удачу.',
+    description: 'Вы не видите фазу рынка. Входите в случайной точке.',
   },
   {
     number: '02',
     title: 'Работа без сценария',
-    description: 'Нет плана действий. Нет точки отмены. Решения принимаются на эмоциях.',
+    description: 'Нет плана. Нет точки отмены. Решения на эмоциях.',
   },
   {
     number: '03',
     title: 'Эмоциональные входы',
-    description: 'Страх упустить. Желание отыграться. Азарт. Это не стратегия.',
+    description: 'Страх упустить. Желание отыграться. Азарт.',
   },
 ];
 
@@ -24,11 +24,11 @@ const ProblemSection = () => {
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
-            3 причины Вашего хаоса
+            3 фатальные ошибки Вашего входа
           </h2>
           
           <p className="mt-4 text-lg text-muted-foreground">
-            Мы исправим это первым делом.
+            Пока Вы не устраните их — депозит будет сливаться.
           </p>
           
           <div className="mt-10 grid md:grid-cols-3 gap-4 md:gap-6">
