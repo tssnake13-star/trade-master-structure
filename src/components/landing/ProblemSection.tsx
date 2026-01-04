@@ -24,11 +24,11 @@ const ProblemSection = () => {
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
-            3 фатальные ошибки твоего входа
+            3 фатальные ошибки вашего входа
           </h2>
           
           <p className="mt-4 text-lg text-muted-foreground">
-            Пока ты не устранишь их, депозит будет сливаться.
+            Пока вы не устраните их, депозит будет сливаться.
           </p>
           
           <div className="mt-10 grid md:grid-cols-3 gap-4 md:gap-6">
