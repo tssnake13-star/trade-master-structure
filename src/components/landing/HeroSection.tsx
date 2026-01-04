@@ -10,13 +10,13 @@ const HeroSection = () => {
           {/* Text Content */}
           <div className="flex-1 max-w-2xl order-2 lg:order-1">
             <h1 className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-foreground fade-in-up">
-              Твой вход в рынок – случайность.
-              <span className="block mt-1 md:mt-2 text-muted-foreground">Узнай, почему ты теряешь там, где должен забирать.</span>
+              Ваш вход в рынок – случайность.
+              <span className="block mt-1 md:mt-2 text-muted-foreground">Узнайте, почему вы теряете там, где должны забирать.</span>
             </h1>
             
             {/* Subheadline - hidden on mobile for compactness */}
             <p className="hidden md:block mt-6 lg:mt-8 text-lg md:text-xl text-muted-foreground leading-relaxed fade-in-up fade-in-up-delay-1">
-              Я не даю сигналы. Я ломаю хаос в твоей голове и даю алгоритм профессиональной работы с контекстом и риском.
+              Я не даю сигналы. Я убираю хаос в вашей голове и даю алгоритм профессиональной работы с контекстом и риском.
             </p>
             
             {/* Accent phrase - compact on mobile */}
@@ -36,7 +36,7 @@ const HeroSection = () => {
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
               <p className="mt-2 md:mt-3 text-xs md:text-sm text-muted-foreground">
-                Бесплатный разбор твоих ошибок в Telegram-боте
+                Бесплатный разбор ваших ошибок в Telegram-боте
               </p>
             </div>
           </div>

@@ -32,7 +32,7 @@ const AuthorSection = () => {
                 </p>
                 
                 <p className="text-muted-foreground leading-relaxed">
-                  Моя задача – убрать хаос в твоей голове и дать рабочий алгоритм.
+                  Моя задача – убрать хаос в вашей голове и дать рабочий алгоритм.
                 </p>
               </div>
               

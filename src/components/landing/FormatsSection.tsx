@@ -5,7 +5,7 @@ const formats = [
   {
     name: 'ProStart',
     subtitle: 'фундамент системы',
-    description: 'Наводишь порядок в голове. Изучаешь структуру рынка, фазы и базовый алгоритм.',
+    description: 'Наводите порядок в голове. Изучаете структуру рынка, фазы и базовый алгоритм.',
     goal: 'Цель – видеть рынок системно.',
     duration: '90 дней',
   },
@@ -35,7 +35,7 @@ const FormatsSection = () => {
           </h2>
           
           <p className="mt-4 text-lg text-muted-foreground">
-            Выбери формат под свою готовность.
+            Выберите формат под вашу готовность.
           </p>
           
           <div className="mt-10 grid md:grid-cols-3 gap-4 md:gap-6">

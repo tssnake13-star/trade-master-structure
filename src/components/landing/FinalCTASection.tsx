@@ -7,7 +7,7 @@ const FinalCTASection = () => {
       <div className="container-landing">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="heading-section text-foreground">
-            Готов перестать угадывать?
+            Готовы перестать угадывать?
           </h2>
           
           <p className="mt-6 text-lg text-muted-foreground">
@@ -25,7 +25,7 @@ const FinalCTASection = () => {
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
             <p className="mt-3 text-sm text-muted-foreground">
-              Бесплатный разбор твоих ошибок
+              Бесплатный разбор ваших ошибок
             </p>
           </div>
         </div>
