@@ -5,21 +5,21 @@ const formats = [
   {
     name: 'ProStart',
     subtitle: 'фундамент системы',
-    description: 'Наводите порядок в голове. Изучаете структуру рынка, фазы и базовый алгоритм.',
-    goal: 'Цель – видеть рынок системно.',
+    description: 'Порядок в голове. Структура рынка, фазы и базовый алгоритм.',
+    goal: 'Цель — видеть рынок системно.',
     duration: '90 дней',
   },
   {
     name: 'TradeMaster',
     subtitle: 'годовая программа',
-    description: 'Полная трансформация подхода. Сценарии, сопровождение сделок, работа по системе.',
+    description: 'Полная трансформация. Сценарии, сопровождение, работа по системе.',
     goal: 'От случайных входов к профессиональной торговле.',
     duration: '365 дней',
   },
   {
     name: 'VIP',
     subtitle: 'всё включено',
-    description: 'Максимальная глубина. Личная работа. Пожизненные материалы и поддержка.',
+    description: 'Максимальная глубина. Личная работа. Пожизненная поддержка.',
     goal: 'Профессиональный уровень.',
     duration: '365 дней',
   },
@@ -67,7 +67,7 @@ const FormatsSection = () => {
                   rel="noopener noreferrer"
                   className="mt-4 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
                 >
-                  Выбрать этот путь
+                  Получить алгоритм
                   <ArrowRight className="w-4 h-4" />
                 </a>
               </div>

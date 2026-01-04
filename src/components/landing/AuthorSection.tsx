@@ -1,4 +1,4 @@
-import { Send } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 
 const AuthorSection = () => {
@@ -32,23 +32,27 @@ const AuthorSection = () => {
                 </p>
                 
                 <p className="text-muted-foreground leading-relaxed">
-                  Моя задача – убрать хаос в вашей голове и дать рабочий алгоритм.
+                  Моя задача — убрать хаос в Вашей голове и дать рабочий алгоритм.
                 </p>
               </div>
               
               <p className="text-sm text-muted-foreground/70 mb-6">
-                TRADE MASTER – результат личной практики.
+                TRADE MASTER — результат личной практики.
               </p>
               
+              {/* CTA ведёт в бота, не в личку */}
               <a 
-                href={TELEGRAM_LINKS.dm} 
+                href={TELEGRAM_LINKS.bot} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="inline-flex items-center gap-2 px-5 py-2.5 text-muted-foreground text-sm font-medium rounded-lg border border-border/50 hover:bg-accent/50 hover:text-foreground hover:border-border transition-all duration-200"
+                className="btn-primary group"
               >
-                <Send className="w-4 h-4" />
-                Написать автору в Telegram
+                Получить алгоритм
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
+              <p className="mt-3 text-xs text-muted-foreground">
+                Бесплатный разбор Вашей стратегии
+              </p>
             </div>
           </div>
         </div>

@@ -23,7 +23,7 @@ const WhatGoesWrongSection = () => {
             
             <div className="space-y-4">
               <p className="text-lg text-muted-foreground">
-                Рынок двигается фазами. Если вы не видите фазу, каждое решение снова становится угадыванием.
+                Рынок двигается фазами. Не видите фазу — каждое решение становится угадыванием.
               </p>
               <div className="flex flex-wrap items-center gap-3 text-mono text-muted-foreground">
                 <span className="px-3 py-1.5 bg-secondary rounded-md">накопление</span>
@@ -37,7 +37,7 @@ const WhatGoesWrongSection = () => {
             </div>
             
             <p className="text-lg text-foreground/80 pt-4">
-              Без понимания фазы нет контроля. Без контроля торговля превращается в стресс.
+              Без понимания фазы нет контроля. Без контроля — стресс.
             </p>
           </div>
         </div>

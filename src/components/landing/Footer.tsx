@@ -10,12 +10,13 @@ const Footer = () => {
             <p className="text-sm text-muted-foreground mt-1">TRADE MASTER — система структурного анализа</p>
           </div>
           
-          <div className="flex items-center gap-6 text-sm text-muted-foreground">
+          {/* Secondary links - визуально менее заметные */}
+          <div className="flex items-center gap-6 text-xs text-muted-foreground/60">
             <a
               href={TELEGRAM_LINKS.channel}
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-foreground transition-colors"
+              className="hover:text-muted-foreground transition-colors"
             >
               Telegram-канал
             </a>
@@ -23,7 +24,7 @@ const Footer = () => {
               href={TELEGRAM_LINKS.dm}
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-foreground transition-colors"
+              className="hover:text-muted-foreground transition-colors"
             >
               Написать автору
             </a>
@@ -38,8 +39,8 @@ const Footer = () => {
 
         {/* Disclaimer */}
         <div className="mt-6 text-center">
-          <p className="text-xs text-muted-foreground/70 max-w-3xl mx-auto leading-relaxed">
-            Информация на сайте носит исключительно образовательный характер и не является инвестиционной рекомендацией. Торговля на финансовых рынках связана с рисками. Все решения вы принимаете самостоятельно.
+          <p className="text-xs text-muted-foreground/50 max-w-3xl mx-auto leading-relaxed">
+            Информация на сайте носит исключительно образовательный характер и не является инвестиционной рекомендацией. Торговля на финансовых рынках связана с рисками. Все решения Вы принимаете самостоятельно.
           </p>
         </div>
       </div>
