@@ -16,7 +16,7 @@ const PhilosophySection = () => {
                 <img 
                   src={logoFull} 
                   alt="TRADELIKETYO" 
-                  className="w-48 h-48 md:w-56 md:h-56 object-contain"
+                  className="w-72 h-72 md:w-80 md:h-80 object-contain"
                 />
               </div>
             </div>
