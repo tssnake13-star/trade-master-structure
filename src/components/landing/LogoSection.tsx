@@ -2,7 +2,7 @@ import logoFull from '@/assets/logo-full.png';
 
 const LogoSection = () => {
   return (
-    <section className="py-2 md:py-2 bg-background">
+    <section className="pt-0 pb-2 md:pt-0 md:pb-2 bg-background">
       <div className="container-landing flex justify-center">
         <img 
           src={logoFull} 
