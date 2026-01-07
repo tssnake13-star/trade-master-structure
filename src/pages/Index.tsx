@@ -11,6 +11,7 @@ import ResultsSection from '@/components/landing/ResultsSection';
 import FitSection from '@/components/landing/FitSection';
 import FormatsSection from '@/components/landing/FormatsSection';
 import AuthorSection from '@/components/landing/AuthorSection';
+import LogoSection from '@/components/landing/LogoSection';
 import FinalCTASection from '@/components/landing/FinalCTASection';
 import Footer from '@/components/landing/Footer';
 import StickyButton from '@/components/landing/StickyButton';
@@ -32,6 +33,7 @@ const Index = () => {
         <FitSection />
         <FormatsSection />
         <AuthorSection />
+        <LogoSection />
         <FinalCTASection />
       </main>
       <Footer />
