@@ -36,8 +36,15 @@ const Header = () => {
         <div className="container-landing">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
-            <a href="#" className="text-lg md:text-xl font-semibold text-foreground tracking-tight">
-              TRADELIKETYO
+            <a href="#" className="flex items-center gap-2">
+              <img 
+                src="/assets/logo.png" 
+                alt="TRADELIKETYO" 
+                className="h-7 md:h-8 w-auto"
+              />
+              <span className="text-sm md:text-base font-semibold text-foreground tracking-tight">
+                TRADELIKETYO
+              </span>
             </a>
 
             {/* Desktop Navigation */}
