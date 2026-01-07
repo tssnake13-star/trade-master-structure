@@ -36,13 +36,13 @@ const Header = () => {
         <div className="container-landing">
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
-            <a href="#" className="flex items-center gap-2">
+            <a href="#" className="flex items-center gap-2.5">
               <img 
                 src="/assets/logo.png" 
                 alt="TRADELIKETYO" 
-                className="h-7 md:h-8 w-auto"
+                className="h-8 md:h-9 w-auto brightness-110 drop-shadow-[0_0_8px_rgba(255,255,255,0.15)]"
               />
-              <span className="text-sm md:text-base font-semibold text-foreground tracking-tight">
+              <span className="text-sm md:text-base font-semibold tracking-tight" style={{ color: 'rgba(250, 248, 245, 0.95)' }}>
                 TRADELIKETYO
               </span>
             </a>
