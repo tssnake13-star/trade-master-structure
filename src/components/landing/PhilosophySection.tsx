@@ -10,7 +10,7 @@ const PhilosophySection = () => {
             <img 
               src={logoFull} 
               alt="TRADELIKETYO" 
-              className="w-40 h-40 object-contain"
+              className="w-[30rem] h-[30rem] object-contain"
             />
           </div>
           
@@ -20,7 +20,7 @@ const PhilosophySection = () => {
               <img 
                 src={logoFull} 
                 alt="TRADELIKETYO" 
-                className="w-44 h-44 lg:w-52 lg:h-52 object-contain"
+                className="w-[33rem] h-[33rem] lg:w-[39rem] lg:h-[39rem] object-contain"
               />
             </div>
             
