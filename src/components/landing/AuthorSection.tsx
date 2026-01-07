@@ -1,11 +1,21 @@
 import { ArrowRight } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
+import logoFull from '@/assets/logo-full.png';
 
 const AuthorSection = () => {
   return (
     <section id="author" className="py-20 md:py-28">
       <div className="container-landing">
         <div className="max-w-4xl">
+          {/* Logo */}
+          <div className="mb-10 md:mb-14">
+            <img 
+              src={logoFull} 
+              alt="TRADELIKETYO - Institute of Trading Logic" 
+              className="h-24 md:h-32 w-auto object-contain"
+            />
+          </div>
+          
           <h2 className="heading-section text-foreground mb-12">
             Автор
           </h2>
