@@ -7,7 +7,7 @@ const LogoSection = () => {
         <img 
           src={logoFull} 
           alt="TRADELIKETYO" 
-          className="w-32 h-32 md:w-40 md:h-40 object-contain"
+          className="w-96 h-96 md:w-[30rem] md:h-[30rem] object-contain"
         />
       </div>
     </section>
