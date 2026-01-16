@@ -36,7 +36,7 @@ const HeroSection = () => {
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
               <p className="mt-2 md:mt-3 text-xs md:text-sm text-muted-foreground">
-                Бесплатный разбор Вашей стратегии в Telegram-боте
+                Бесплатный разбор логики Ваших входов в Telegram-боте
               </p>
             </div>
           </div>
