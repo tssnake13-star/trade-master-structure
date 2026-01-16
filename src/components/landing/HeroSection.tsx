@@ -32,7 +32,7 @@ const HeroSection = () => {
                 rel="noopener noreferrer"
                 className="btn-primary group text-base md:text-lg"
               >
-                Забрать алгоритм профи
+                Проверить свою ошибку во входе
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
               <p className="mt-2 md:mt-3 text-xs md:text-sm text-muted-foreground">
