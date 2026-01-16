@@ -47,11 +47,11 @@ const AuthorSection = () => {
                 rel="noopener noreferrer" 
                 className="btn-primary group"
               >
-                Получить алгоритм
+                Проверить свою ошибку во входе
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
               <p className="mt-3 text-xs text-muted-foreground">
-                Бесплатный разбор Вашей стратегии
+                Бесплатный разбор логики Ваших входов в Telegram-боте
               </p>
             </div>
           </div>
