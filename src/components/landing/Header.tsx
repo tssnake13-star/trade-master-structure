@@ -64,7 +64,7 @@ const Header = () => {
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-sm font-medium rounded-lg hover:bg-foreground/90 transition-all duration-200"
               >
                 <Send className="w-4 h-4" />
-                Получить алгоритм
+                Проверить ошибку во входе
               </a>
             </div>
 
@@ -119,7 +119,7 @@ const Header = () => {
               className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background font-medium rounded-lg hover:bg-foreground/90 transition-all duration-200"
             >
               <Send className="w-5 h-5" />
-              Получить алгоритм
+              Проверить ошибку во входе
             </a>
           </div>
         </div>
