@@ -1,13 +1,16 @@
-import logoFull from '@/assets/logo-full.png';
+import promoVideo from '@/assets/promo-video.mp4';
 
 const LogoSection = () => {
   return (
-    <section className="pt-0 pb-2 md:pt-0 md:pb-2 bg-background">
+    <section className="py-8 md:py-12 bg-background">
       <div className="container-landing flex justify-center">
-        <img 
-          src={logoFull} 
-          alt="TRADELIKETYO" 
-          className="w-96 h-96 md:w-[30rem] md:h-[30rem] object-contain"
+        <video 
+          src={promoVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="w-full max-w-3xl rounded-xl"
         />
       </div>
     </section>
