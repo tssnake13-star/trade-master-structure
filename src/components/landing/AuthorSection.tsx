@@ -1,5 +1,3 @@
-import { ArrowRight } from 'lucide-react';
-import { TELEGRAM_LINKS } from '@/lib/constants';
 
 const AuthorSection = () => {
   return (
@@ -40,19 +38,6 @@ const AuthorSection = () => {
                 TRADE MASTER — результат личной практики.
               </p>
               
-              {/* CTA ведёт в бота, не в личку */}
-              <a 
-                href={TELEGRAM_LINKS.bot} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                className="btn-primary group"
-              >
-                Проверить свою ошибку во входе
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </a>
-              <p className="mt-3 text-xs text-muted-foreground">
-                Бесплатный разбор логики Ваших входов в Telegram-боте
-              </p>
             </div>
           </div>
         </div>
