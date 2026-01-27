@@ -33,8 +33,8 @@ const Index = () => {
         <FitSection />
         <FormatsSection />
         <AuthorSection />
-        <LogoSection />
         <FinalCTASection />
+        <LogoSection />
       </main>
       <Footer />
       <StickyButton />
