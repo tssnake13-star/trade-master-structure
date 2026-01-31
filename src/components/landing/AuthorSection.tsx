@@ -38,6 +38,16 @@ const AuthorSection = () => {
                 TRADE MASTER — результат личной практики.
               </p>
               
+              {/* Direct contact CTA */}
+              <a
+                href="http://t.me/tradeliketyo"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
+              >
+                Написать Сергею Тё
+              </a>
+              
             </div>
           </div>
         </div>
