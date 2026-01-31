@@ -38,6 +38,16 @@ const HeroSection = () => {
               <p className="mt-2 md:mt-3 text-xs md:text-sm text-muted-foreground">
                 Бесплатный разбор логики Ваших входов в Telegram-боте
               </p>
+              
+              {/* Secondary CTA - direct contact */}
+              <a
+                href={TELEGRAM_LINKS.dm}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-3 md:mt-4 inline-flex items-center justify-center gap-2 px-5 py-3 md:px-6 md:py-3.5 bg-secondary text-foreground text-sm md:text-base font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
+              >
+                Разобрать вашу ситуацию лично с автором
+              </a>
             </div>
           </div>
           

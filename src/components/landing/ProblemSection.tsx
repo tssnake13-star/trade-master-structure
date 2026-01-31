@@ -1,4 +1,5 @@
-import { X } from 'lucide-react';
+import { X, ArrowRight } from 'lucide-react';
+import { TELEGRAM_LINKS } from '@/lib/constants';
 
 const fatalErrors = [
   {
@@ -54,6 +55,27 @@ const ProblemSection = () => {
             <p className="text-muted-foreground mt-2 text-sm">
               Это алгоритм. Чёткий. Системный. Профессиональный.
             </p>
+          </div>
+          
+          {/* CTA buttons */}
+          <div className="mt-10 flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <a
+              href={TELEGRAM_LINKS.bot}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary group"
+            >
+              Проверить свою ошибку во входе
+              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </a>
+            <a
+              href={TELEGRAM_LINKS.dm}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
+            >
+              Разобрать мою ситуацию с Сергеем Тё
+            </a>
           </div>
         </div>
       </div>

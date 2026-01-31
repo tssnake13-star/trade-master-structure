@@ -202,7 +202,22 @@ const ProofSection = () => {
             </DialogContent>
           </Dialog>
           
-          <div className="mt-10">
+          {/* Direct contact CTA */}
+          <div className="mt-12 p-5 md:p-6 bg-secondary/30 border border-border rounded-xl text-center">
+            <p className="text-muted-foreground text-sm md:text-base mb-4">
+              Если вы узнали себя в этих историях — можете написать мне лично, разберём вашу ситуацию.
+            </p>
+            <a
+              href={TELEGRAM_LINKS.dm}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
+            >
+              Написать автору
+            </a>
+          </div>
+          
+          <div className="mt-8">
             <a
               href={TELEGRAM_LINKS.bot}
               target="_blank"

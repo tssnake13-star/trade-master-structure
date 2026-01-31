@@ -84,6 +84,16 @@ const AlgorithmSection = () => {
             <p className="mt-3 text-xs text-muted-foreground">
               Бесплатный разбор логики Ваших входов в Telegram-боте
             </p>
+            
+            {/* Secondary CTA - direct contact */}
+            <a
+              href={TELEGRAM_LINKS.dm}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex items-center justify-center gap-2 px-5 py-3 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
+            >
+              Обсудить мой случай напрямую
+            </a>
           </div>
         </div>
       </div>

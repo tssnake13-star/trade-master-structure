@@ -73,6 +73,18 @@ const FormatsSection = () => {
               </div>
             ))}
           </div>
+          
+          {/* Secondary CTA - help choosing format */}
+          <div className="mt-10 text-center">
+            <a
+              href={TELEGRAM_LINKS.dm}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
+            >
+              Помочь выбрать формат — написать Сергею Тё
+            </a>
+          </div>
         </div>
       </div>
     </section>
