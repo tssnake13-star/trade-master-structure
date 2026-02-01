@@ -36,6 +36,24 @@ const UniquenessSection = () => {
             ))}
           </ul>
           
+          {/* Comparison question */}
+          <div className="mt-10 md:mt-12">
+            <h3 className="text-lg md:text-xl font-medium text-foreground">
+              Чем это отличается от других школ и экспертов по трейдингу?
+            </h3>
+            <div className="mt-4 space-y-2">
+              <p className="text-muted-foreground text-base">
+                Большинство учат стратегиям и входам.
+              </p>
+              <p className="text-muted-foreground text-base">
+                Я выстраиваю систему принятия решений, которая работает до входа, а не после убытка.
+              </p>
+              <p className="text-foreground text-base font-medium">
+                Вы не ищете сделки — вы понимаете, когда не входить.
+              </p>
+            </div>
+          </div>
+          
           {/* CTA buttons - vertical on mobile */}
           <div className="mt-10 flex flex-col gap-3">
             <a
