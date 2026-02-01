@@ -1,5 +1,6 @@
 import Header from '@/components/landing/Header';
 import HeroSection from '@/components/landing/HeroSection';
+import UniquenessSection from '@/components/landing/UniquenessSection';
 import ProblemSection from '@/components/landing/ProblemSection';
 import WhatGoesWrongSection from '@/components/landing/WhatGoesWrongSection';
 import StructureDiagram from '@/components/landing/StructureDiagram';
@@ -22,6 +23,7 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
+        <UniquenessSection />
         <ProblemSection />
         <WhatGoesWrongSection />
         <StructureDiagram />
