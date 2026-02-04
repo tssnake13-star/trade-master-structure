@@ -14,7 +14,7 @@ const FinalCTASection = () => {
             Структура вместо хаоса. Правила вместо угадывания.
           </p>
           
-          <div className="mt-8 flex flex-col items-center gap-3">
+          <div className="mt-8">
             <a
               href={TELEGRAM_LINKS.bot}
               target="_blank"
@@ -23,15 +23,6 @@ const FinalCTASection = () => {
             >
               Разобрать мою ситуацию бесплатно
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </a>
-            <a
-              href={TELEGRAM_LINKS.dm}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
-            >
-              <MessageCircle className="w-4 h-4" />
-              Написать Сергею Тё
             </a>
           </div>
         </div>
