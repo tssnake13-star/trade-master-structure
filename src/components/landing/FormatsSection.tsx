@@ -1,88 +1,64 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, MessageCircle } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 
 const formats = [
   {
     name: 'ProStart',
-    subtitle: 'фундамент системы',
+    subtitle: '90 дней',
     description: 'Порядок в голове. Структура рынка, фазы и базовый алгоритм.',
-    goal: 'Цель — видеть рынок системно.',
-    duration: '90 дней',
   },
   {
     name: 'TradeMaster',
-    subtitle: 'годовая программа',
-    description: 'Полная трансформация. Сценарии, сопровождение, работа по системе.',
-    goal: 'От случайных входов к профессиональной торговле.',
-    duration: '365 дней',
+    subtitle: '365 дней',
+    description: 'Полная система. Сценарии, сопровождение, работа по правилам.',
   },
   {
     name: 'VIP',
-    subtitle: 'всё включено',
+    subtitle: '365 дней',
     description: 'Максимальная глубина. Личная работа. Пожизненная поддержка.',
-    goal: 'Профессиональный уровень.',
-    duration: '365 дней',
   },
 ];
 
 const FormatsSection = () => {
   return (
-    <section id="formats" className="py-16 md:py-28 bg-card/50">
+    <section id="formats" className="py-12 md:py-20 bg-card/50">
       <div className="container-landing">
-        <div className="max-w-5xl">
+        <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
             Три уровня сотрудничества
           </h2>
           
-          <p className="mt-4 text-lg text-muted-foreground">
-            Выберите формат под вашу готовность.
-          </p>
-          
-          <div className="mt-10 grid md:grid-cols-3 gap-4 md:gap-6">
+          <div className="mt-8 md:mt-10 grid md:grid-cols-3 gap-3 md:gap-4">
             {formats.map((format, index) => (
               <div
                 key={index}
-                className="flex flex-col p-5 md:p-6 bg-card border border-border rounded-xl hover:border-muted-foreground/30 transition-all duration-300"
+                className="p-4 md:p-5 bg-card border border-border rounded-xl"
               >
-                <div className="mb-4">
-                  <h3 className="text-xl font-semibold text-foreground">{format.name}</h3>
-                  <p className="text-muted-foreground text-sm mt-1">{format.subtitle}</p>
-                </div>
-                
-                <p className="text-muted-foreground text-sm leading-relaxed flex-1">
-                  {format.description}
-                </p>
-                
-                <p className="text-foreground/80 text-sm mt-3">
-                  {format.goal}
-                </p>
-                
-                <div className="mt-4 pt-4 border-t border-border">
-                  <p className="text-mono text-sm text-muted-foreground">{format.duration}</p>
-                </div>
-                
-                <a
-                  href={TELEGRAM_LINKS.bot}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
-                >
-                  Проверить свою ошибку во входе
-                  <ArrowRight className="w-4 h-4" />
-                </a>
+                <h3 className="text-lg font-semibold text-foreground">{format.name}</h3>
+                <p className="text-mono text-xs text-muted-foreground mt-1">{format.subtitle}</p>
+                <p className="text-sm text-muted-foreground mt-3">{format.description}</p>
               </div>
             ))}
           </div>
           
-          {/* Secondary CTA - help choosing format */}
-          <div className="mt-10 text-center">
+          <div className="mt-8 flex flex-col gap-3">
+            <a
+              href={TELEGRAM_LINKS.bot}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary group"
+            >
+              Разобрать мою ситуацию бесплатно
+              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </a>
             <a
               href={TELEGRAM_LINKS.dm}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
             >
-              Помочь выбрать формат — написать Сергею Тё
+              <MessageCircle className="w-4 h-4" />
+              Написать Сергею Тё
             </a>
           </div>
         </div>

@@ -1,11 +1,6 @@
 import { useState } from 'react';
-import { ArrowRight, TrendingUp, User, AlertCircle, BarChart3 } from 'lucide-react';
-import { TELEGRAM_LINKS } from '@/lib/constants';
+import { User } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import eurAudImg from '@/assets/trades/eur-aud.jpg';
-import gbpUsdImg from '@/assets/trades/gbp-usd.jpg';
-import usdJpyImg from '@/assets/trades/usd-jpy.jpg';
-import usdCadImg from '@/assets/trades/usd-cad.jpg';
 import vitaliyImg from '@/assets/testimonials/vitaliy.jpg';
 import rustamImg from '@/assets/testimonials/rustam.jpg';
 import lesyaImg from '@/assets/testimonials/lesya.jpg';
@@ -14,105 +9,65 @@ import elenaImg from '@/assets/testimonials/elena.jpg';
 const cases = [
   {
     name: 'Виталий',
-    result: 'Постоянная тревога и хаотичные входы → спокойствие и чёткие сценарии.',
-    type: 'success',
+    before: 'Был хаос.',
+    after: 'Появились правила.',
     image: vitaliyImg,
   },
   {
     name: 'Рустам',
-    result: 'Спешка и торговля «по ощущениям» → дисциплина и защита капитала. Выплата $20 248.',
-    type: 'success',
+    before: 'Торговля «по ощущениям».',
+    after: 'Дисциплина и защита капитала.',
     image: rustamImg,
   },
   {
     name: 'Сергей',
-    result: 'Страх упустить движение → уверенность в решении и отсутствие спешки.',
-    type: 'success',
+    before: 'Страх нажать кнопку.',
+    after: 'Сценарий и спокойствие.',
     image: lesyaImg,
   },
   {
     name: 'Елена',
-    result: 'Эмоции сильнее правил → дисциплина и доверие процессу.',
-    type: 'honest',
+    before: 'Эмоции сильнее правил.',
+    after: 'Дисциплина и доверие процессу.',
     image: elenaImg,
-  },
-];
-
-const trades = [
-  { 
-    pair: 'EUR/AUD', 
-    date: '04.09.2025', 
-    result: '+17R', 
-    algorithm: 'W1 → D1 → H4. Вход по системе, не из тревоги.',
-    image: eurAudImg 
-  },
-  { 
-    pair: 'GBP/USD', 
-    date: '17.10.2025', 
-    result: '+16R', 
-    algorithm: 'W1 → D1 → H4. Вход по системе, не из тревоги.',
-    image: gbpUsdImg 
-  },
-  { 
-    pair: 'USD/JPY', 
-    date: '17.10.2025', 
-    result: '+16R', 
-    algorithm: 'W1 → D1 → H4. Вход по системе, не из тревоги.',
-    image: usdJpyImg 
-  },
-  { 
-    pair: 'USD/CAD', 
-    date: '29.10.2025', 
-    result: '+19R', 
-    algorithm: 'W1 → D1 → H4. Вход по системе, не из тревоги.',
-    image: usdCadImg 
   },
 ];
 
 const ProofSection = () => {
   const [selectedCase, setSelectedCase] = useState<typeof cases[0] | null>(null);
-  const [selectedTrade, setSelectedTrade] = useState<typeof trades[0] | null>(null);
 
   return (
-    <section id="proof" className="py-20 md:py-28 bg-card/50">
+    <section id="proof" className="py-12 md:py-20 bg-card/50">
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
-            Результаты работы по системе
+            Трансформации учеников
           </h2>
           
-          <p className="mt-4 text-lg text-muted-foreground">
-            Это не быстрые успехи. Это дисциплина и работа по правилам.
+          <p className="mt-4 text-base md:text-lg text-muted-foreground">
+            Не быстрые успехи, а дисциплина и работа по правилам.
           </p>
           
-          <p className="mt-6 text-foreground font-medium">
-            Главное изменение — решения принимаются по сценарию, а не по ситуации.
-          </p>
-          
-          <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="mt-8 md:mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {cases.map((item, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedCase(item)}
-                className="p-5 bg-card border border-border rounded-xl text-left transition-all duration-200 hover:border-muted-foreground/50 hover:bg-card/80 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-background/20 active:translate-y-0 active:shadow-none cursor-pointer group flex flex-col h-full min-h-[140px]"
+                className="p-4 bg-card border border-border rounded-xl text-left transition-all hover:border-muted-foreground/50 cursor-pointer group"
               >
                 <div className="flex items-center gap-2 mb-3">
-                  {item.type === 'honest' ? (
-                    <AlertCircle className="w-4 h-4 text-muted-foreground shrink-0" />
-                  ) : (
-                    <User className="w-4 h-4 text-muted-foreground shrink-0" />
-                  )}
+                  <User className="w-4 h-4 text-muted-foreground" />
                   <span className="font-medium text-foreground text-sm">{item.name}</span>
                 </div>
-                <p className="text-muted-foreground text-xs leading-relaxed flex-1 whitespace-pre-line">{item.result}</p>
-                <span className="text-xs text-muted-foreground/60 mt-3 group-hover:text-muted-foreground transition-colors">
-                  Открыть отзыв →
+                <p className="text-xs text-muted-foreground mb-1">Было: {item.before}</p>
+                <p className="text-xs text-foreground font-medium">Стало: {item.after}</p>
+                <span className="text-xs text-muted-foreground/60 mt-2 block group-hover:text-muted-foreground">
+                  Открыть →
                 </span>
               </button>
             ))}
           </div>
 
-          {/* Testimonial Modal */}
           <Dialog open={!!selectedCase} onOpenChange={() => setSelectedCase(null)}>
             <DialogContent className="max-w-lg p-0 bg-card border-border overflow-hidden">
               <DialogTitle className="sr-only">
@@ -120,15 +75,9 @@ const ProofSection = () => {
               </DialogTitle>
               {selectedCase && (
                 <div className="relative">
-                  <div className="p-4 border-b border-border flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      {selectedCase.type === 'honest' ? (
-                        <AlertCircle className="w-4 h-4 text-muted-foreground" />
-                      ) : (
-                        <User className="w-4 h-4 text-muted-foreground" />
-                      )}
-                      <span className="font-medium text-foreground">{selectedCase.name}</span>
-                    </div>
+                  <div className="p-4 border-b border-border flex items-center gap-2">
+                    <User className="w-4 h-4 text-muted-foreground" />
+                    <span className="font-medium text-foreground">{selectedCase.name}</span>
                   </div>
                   <div className="max-h-[70vh] overflow-y-auto">
                     <img 
@@ -141,96 +90,6 @@ const ProofSection = () => {
               )}
             </DialogContent>
           </Dialog>
-          
-          {/* Trades Section */}
-          <div className="mt-12 p-4 md:p-8 bg-card border border-border rounded-xl">
-            <div className="flex items-center gap-3 mb-6">
-              <TrendingUp className="w-5 h-5 md:w-6 md:h-6 text-foreground" />
-              <h3 className="text-lg md:text-xl font-medium text-foreground">Примеры сделок по системе TRADE MASTER</h3>
-            </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-              {trades.map((trade, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedTrade(trade)}
-                  className="p-4 md:p-5 bg-secondary/50 border border-border/50 rounded-lg text-left transition-all duration-200 hover:border-muted-foreground/50 hover:bg-secondary/80 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-background/20 active:translate-y-0 active:shadow-none cursor-pointer group flex flex-col h-full min-h-[140px] md:min-h-[160px]"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <BarChart3 className="w-4 h-4 text-muted-foreground shrink-0" />
-                    <span className="font-semibold text-foreground text-xs md:text-sm">{trade.pair}</span>
-                  </div>
-                  <span className="text-xs text-muted-foreground">{trade.date}</span>
-                  <span className="text-base md:text-lg font-bold text-foreground mt-2">{trade.result}</span>
-                  <span className="text-xs text-muted-foreground mt-1 flex-1 whitespace-pre-line">{trade.algorithm}</span>
-                  <span className="text-xs text-muted-foreground/60 mt-3 group-hover:text-muted-foreground transition-colors">
-                    Открыть сделку →
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Trade Modal */}
-          <Dialog open={!!selectedTrade} onOpenChange={() => setSelectedTrade(null)}>
-            <DialogContent className="max-w-4xl p-0 bg-card border-border overflow-hidden">
-              <DialogTitle className="sr-only">
-                {selectedTrade?.pair ? `Сделка: ${selectedTrade.pair}` : 'Сделка'}
-              </DialogTitle>
-              {selectedTrade && (
-                <div className="relative">
-                  <div className="p-4 border-b border-border flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <BarChart3 className="w-5 h-5 text-muted-foreground" />
-                      <div>
-                        <span className="font-semibold text-foreground">{selectedTrade.pair}</span>
-                        <span className="text-muted-foreground mx-2">•</span>
-                        <span className="text-muted-foreground text-sm">{selectedTrade.date}</span>
-                      </div>
-                      <span className="font-bold text-foreground">{selectedTrade.result}</span>
-                    </div>
-                  </div>
-                  <div className="max-h-[75vh] overflow-y-auto">
-                    <img 
-                      src={selectedTrade.image} 
-                      alt={`Сделка ${selectedTrade.pair}`}
-                      className="w-full h-auto"
-                    />
-                  </div>
-                </div>
-              )}
-            </DialogContent>
-          </Dialog>
-          
-          {/* Direct contact CTA */}
-          <div className="mt-12 p-5 md:p-6 bg-secondary/30 border border-border rounded-xl text-center">
-            <p className="text-muted-foreground text-sm md:text-base mb-4">
-              Если вы узнали себя в этих историях — можете написать мне лично, разберём вашу ситуацию.
-            </p>
-            <a
-              href={TELEGRAM_LINKS.dm}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
-            >
-              Написать автору
-            </a>
-          </div>
-          
-          <div className="mt-8">
-            <a
-              href={TELEGRAM_LINKS.bot}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-primary group"
-            >
-              Проверить свою ошибку во входе
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </a>
-            <p className="mt-3 text-xs text-muted-foreground">
-              Бесплатный разбор логики Ваших входов в Telegram-боте
-            </p>
-          </div>
         </div>
       </div>
     </section>

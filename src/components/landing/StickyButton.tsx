@@ -7,7 +7,6 @@ const StickyButton = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Show button after scrolling past hero section (around 100vh)
       const scrollThreshold = window.innerHeight * 0.8;
       setIsVisible(window.scrollY > scrollThreshold);
     };
@@ -29,7 +28,7 @@ const StickyButton = () => {
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-2 w-full py-3.5 bg-foreground text-background font-semibold rounded-lg hover:bg-foreground/90 transition-colors"
         >
-          Проверить свою ошибку во входе
+          Разобрать мою ситуацию
           <ArrowRight className="w-5 h-5" />
         </a>
       </div>

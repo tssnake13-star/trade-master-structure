@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, MessageCircle } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import heroAuthor from '@/assets/hero-author.jpg';
 
@@ -9,49 +9,43 @@ const HeroSection = () => {
         <div className="flex flex-col lg:flex-row items-center gap-6 md:gap-12 lg:gap-16">
           {/* Text Content */}
           <div className="flex-1 max-w-2xl order-2 lg:order-1">
-          <h1 className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-foreground fade-in-up">
-              Ваш вход в рынок — это случайность.
-              <span className="block mt-1 md:mt-2 text-muted-foreground">Узнайте, почему Вы теряете там, где должны забирать.</span>
+            <h1 className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-foreground fade-in-up">
+              Вы торгуете в хаосе, а не по системе.
             </h1>
-            
-            {/* Subheadline - hidden on mobile for compactness */}
-            <p className="hidden md:block mt-6 lg:mt-8 text-lg md:text-xl text-muted-foreground leading-relaxed fade-in-up fade-in-up-delay-1">
-              Я не даю сигналы. Я убираю хаос в Вашей голове и даю алгоритм профессиональной работы с контекстом и риском.
+            <p className="mt-3 md:mt-4 text-lg md:text-xl lg:text-2xl text-muted-foreground leading-snug fade-in-up fade-in-up-delay-1">
+              Я помогаю собрать один чёткий алгоритм вместо угадываний и эмоций.
             </p>
             
-            {/* Accent phrase - compact on mobile */}
-            <p className="mt-4 md:mt-8 lg:mt-10 text-base md:text-lg lg:text-xl text-foreground/90 font-medium fade-in-up fade-in-up-delay-1">
-              Структура вместо угадывания.
+            {/* Target audience - compact */}
+            <p className="mt-4 md:mt-6 text-sm md:text-base text-foreground/80 fade-in-up fade-in-up-delay-1">
+              Для трейдеров с опытом, которые устали терять деньги и хотят работать по правилам, а не по чутью.
             </p>
             
-            {/* CTA with reduced spacing on mobile */}
-            <div className="mt-6 md:mt-10 lg:mt-14 fade-in-up fade-in-up-delay-2">
+            {/* CTA - 2 buttons only */}
+            <div className="mt-6 md:mt-10 flex flex-col gap-3 fade-in-up fade-in-up-delay-2">
               <a
                 href={TELEGRAM_LINKS.bot}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-primary group text-base md:text-lg"
               >
-                Проверить свою ошибку во входе
+                Разобрать мою ситуацию бесплатно
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
-              <p className="mt-2 md:mt-3 text-xs md:text-sm text-muted-foreground">
-                Бесплатный разбор логики Ваших входов в Telegram-боте
-              </p>
               
-              {/* Secondary CTA - direct contact */}
               <a
                 href={TELEGRAM_LINKS.dm}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-3 md:mt-4 inline-flex items-center justify-center gap-2 px-5 py-3 md:px-6 md:py-3.5 bg-secondary text-foreground text-sm md:text-base font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 md:px-6 md:py-3.5 bg-secondary text-foreground text-sm md:text-base font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
               >
-                Разобрать вашу ситуацию лично с автором
+                <MessageCircle className="w-4 h-4" />
+                Написать Сергею Тё
               </a>
             </div>
           </div>
           
-          {/* Author Photo - smaller on mobile, shown first */}
+          {/* Author Photo */}
           <div className="flex-shrink-0 fade-in-up fade-in-up-delay-1 order-1 lg:order-2">
             <div className="relative w-48 h-56 md:w-72 md:h-[24rem] lg:w-[28rem] lg:h-[36rem] xl:w-[32rem] xl:h-[44rem] rounded-xl md:rounded-2xl overflow-hidden">
               <img
@@ -59,7 +53,6 @@ const HeroSection = () => {
                 alt="Сергей — автор системы TRADE MASTER"
                 className="w-full h-full object-cover object-top brightness-[0.85]"
               />
-              {/* Gradient overlay for visual balance with text */}
               <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/20 to-background/10" />
             </div>
           </div>

@@ -1,20 +1,17 @@
 const PhilosophySection = () => {
   return (
-    <section className="py-20 md:py-28 bg-card/50">
+    <section className="py-12 md:py-20 bg-card/50">
       <div className="container-landing">
-        <div className="max-w-4xl">
-          <h2 className="heading-section text-foreground mb-8">
-            Философия
-          </h2>
-          <div className="space-y-6">
-            <p className="text-xl text-foreground leading-relaxed">
-              Решение принимается по сценарию. Есть условия — есть вход. Нет условий — осознанный пропуск.
-            </p>
-            <div className="divider my-6 md:my-8" />
-            <p className="text-lg text-muted-foreground">
-              <span className="text-foreground font-medium">TRADE MASTER</span> — это не сигналы. Это правила, условия и дисциплина.
-            </p>
-          </div>
+        <div className="max-w-3xl">
+          <p className="text-lg md:text-xl text-foreground font-medium">
+            Есть условия — есть вход.
+          </p>
+          <p className="mt-2 text-lg md:text-xl text-muted-foreground">
+            Нет условий — осознанный пропуск.
+          </p>
+          <p className="mt-6 text-sm text-muted-foreground">
+            TRADE MASTER — это не сигналы. Это правила и дисциплина.
+          </p>
         </div>
       </div>
     </section>

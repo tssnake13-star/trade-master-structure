@@ -1,18 +1,20 @@
+import { MessageCircle } from 'lucide-react';
+import { TELEGRAM_LINKS } from '@/lib/constants';
 
 const AuthorSection = () => {
   return (
-    <section id="author" className="py-20 md:py-28">
+    <section id="author" className="py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-4xl">
-          <h2 className="heading-section text-foreground mb-12">
+          <h2 className="heading-section text-foreground mb-8">
             Автор
           </h2>
           
-          <div className="flex flex-col md:flex-row gap-8 md:gap-12 items-start">
+          <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-start">
             <div className="flex-shrink-0">
-              <div className="w-56 h-56 md:w-64 md:h-64 rounded-xl overflow-hidden bg-secondary">
+              <div className="w-48 h-48 md:w-56 md:h-56 rounded-xl overflow-hidden bg-secondary">
                 <img 
-                  alt="Сергей Тё — автор системы TRADE MASTER" 
+                  alt="Сергей Тё" 
                   className="w-full h-full object-cover" 
                   src="/lovable-uploads/b039968f-d8a6-42e3-9c62-6ee1e7af3057.jpg" 
                 />
@@ -20,34 +22,26 @@ const AuthorSection = () => {
             </div>
             
             <div className="flex-1">
-              <h3 className="text-2xl font-semibold text-foreground mb-6">
+              <h3 className="text-xl font-semibold text-foreground mb-4">
                 Сергей Тё
               </h3>
               
-              <div className="space-y-3 mb-6">
-                <p className="text-muted-foreground leading-relaxed">
-                  12+ лет на рынке. Работаю с реальными деньгами, а не с теорией.
-                </p>
-                
-                <p className="text-muted-foreground leading-relaxed">
-                  Моя задача — убрать хаос в Вашей голове и дать рабочий алгоритм.
-                </p>
-              </div>
-              
-              <p className="text-sm text-muted-foreground/70 mb-6">
-                TRADE MASTER — результат личной практики.
+              <p className="text-muted-foreground mb-2">
+                12+ лет на рынке. Работаю с реальными деньгами.
+              </p>
+              <p className="text-muted-foreground mb-4">
+                Моя задача — убрать хаос и дать рабочий алгоритм.
               </p>
               
-              {/* Direct contact CTA */}
               <a
-                href="http://t.me/tradeliketyo"
+                href={TELEGRAM_LINKS.dm}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
               >
+                <MessageCircle className="w-4 h-4" />
                 Написать Сергею Тё
               </a>
-              
             </div>
           </div>
         </div>
