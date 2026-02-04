@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, Send } from 'lucide-react';
 import { NAV_ITEMS, TELEGRAM_LINKS } from '@/lib/constants';
+import logoVideo from '@/assets/logo-video.mp4';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -37,9 +38,14 @@ const Header = () => {
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <a href="#" className="flex items-center">
-              <span className="text-base md:text-lg font-semibold tracking-tight text-foreground">
-                TRADELIKETYO
-              </span>
+              <video
+                src={logoVideo}
+                autoPlay
+                muted
+                loop
+                playsInline
+                className="h-8 md:h-10 w-auto"
+              />
             </a>
 
             {/* Desktop Navigation */}
