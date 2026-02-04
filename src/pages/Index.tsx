@@ -7,6 +7,7 @@ import StructureDiagram from '@/components/landing/StructureDiagram';
 import DisciplineSection from '@/components/landing/DisciplineSection';
 import AlgorithmSection from '@/components/landing/AlgorithmSection';
 import ProofSection from '@/components/landing/ProofSection';
+import TradesSection from '@/components/landing/TradesSection';
 import StagesSection from '@/components/landing/StagesSection';
 import PhilosophySection from '@/components/landing/PhilosophySection';
 import ResultsSection from '@/components/landing/ResultsSection';
@@ -31,6 +32,7 @@ const Index = () => {
         <DisciplineSection />
         <AlgorithmSection />
         <ProofSection />
+        <TradesSection />
         <StagesSection />
         <PhilosophySection />
         <ResultsSection />
