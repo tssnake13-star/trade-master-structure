@@ -21,7 +21,7 @@ const FinalCTASection = () => {
               rel="noopener noreferrer"
               className="btn-primary group text-base md:text-lg px-6 py-3.5"
             >
-              Разобрать мою ситуацию бесплатно
+              Диагностика совместимости
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>

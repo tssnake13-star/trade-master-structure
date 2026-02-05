@@ -5,17 +5,17 @@ const formats = [
   {
     name: 'ProStart',
     subtitle: '90 дней',
-    description: 'Порядок в голове. Структура рынка, фазы и базовый алгоритм.',
+    description: 'Базовая прошивка. Установка архитектуры рынка, фаз и фундамент алгоритма принятия решений.',
   },
   {
     name: 'TradeMaster',
     subtitle: '365 дней',
-    description: 'Полная система. Сценарии, сопровождение, работа по правилам.',
+    description: 'Полная интеграция. Внедрение всех сценариев, сопровождение и работа по жестким правилам системы.',
   },
   {
     name: 'VIP',
     subtitle: '365 дней',
-    description: 'Максимальная глубина. Личная работа. Пожизненная поддержка.',
+    description: 'Индивидуальная настройка. Прямой доступ к архитектору системы и личный контроль ваших сделок.',
   },
 ];
 
@@ -48,7 +48,7 @@ const FormatsSection = () => {
               rel="noopener noreferrer"
               className="btn-primary group"
             >
-              Разобрать мою ситуацию бесплатно
+              Диагностика совместимости
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
             <a
