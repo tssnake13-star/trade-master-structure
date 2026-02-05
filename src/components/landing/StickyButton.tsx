@@ -28,7 +28,7 @@ const StickyButton = () => {
           rel="noopener noreferrer"
           className="flex items-center justify-center gap-2 w-full py-3.5 bg-foreground text-background font-semibold rounded-lg hover:bg-foreground/90 transition-colors"
         >
-          Разобрать мою ситуацию
+          Диагностика совместимости
           <ArrowRight className="w-5 h-5" />
         </a>
       </div>
