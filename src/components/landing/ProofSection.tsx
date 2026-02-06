@@ -1,35 +1,39 @@
 import { useState } from 'react';
 import { User } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import vitaliyImg from '@/assets/testimonials/vitaliy.jpg';
-import rustamImg from '@/assets/testimonials/rustam.jpg';
-import lesyaImg from '@/assets/testimonials/lesya.jpg';
-import elenaImg from '@/assets/testimonials/elena.jpg';
+import lesiaImg from '@/assets/testimonials/lesia.jpg';
+import nikolayImg from '@/assets/testimonials/nikolay.jpg';
+import elenaImg from '@/assets/testimonials/elena-new.jpg';
+import pavelImg from '@/assets/testimonials/pavel.jpg';
 
 const cases = [
   {
-    name: 'Виталий',
-    before: 'Был хаос.',
-    after: 'Появились правила.',
-    image: vitaliyImg,
+    name: 'Lesia',
+    before: 'Курсы и практика без результата.',
+    after: 'Полгода торговли в плюсе.',
+    key: 'Сделки по системе.',
+    image: lesiaImg,
   },
   {
-    name: 'Рустам',
-    before: 'Торговля «по ощущениям».',
-    after: 'Дисциплина и защита капитала.',
-    image: rustamImg,
-  },
-  {
-    name: 'Сергей',
-    before: 'Страх нажать кнопку.',
-    after: 'Сценарий и спокойствие.',
-    image: lesyaImg,
+    name: 'Николай',
+    before: 'Разрозненные знания.',
+    after: 'Структура и понимание рынка.',
+    key: 'Направление и риск.',
+    image: nikolayImg,
   },
   {
     name: 'Елена',
-    before: 'Эмоции сильнее правил.',
-    after: 'Дисциплина и доверие процессу.',
+    before: 'Растерянность в сделках.',
+    after: 'Алгоритм и спокойствие.',
+    key: 'Есть опора.',
     image: elenaImg,
+  },
+  {
+    name: 'Pavel',
+    before: 'Интуиция и новости.',
+    after: 'Сценарий и подтверждение.',
+    key: 'Работа по правилам.',
+    image: pavelImg,
   },
 ];
 
@@ -45,7 +49,7 @@ const ProofSection = () => {
           </h2>
           
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            Не быстрые успехи, а дисциплина и работа по правилам.
+            Не быстрые успехи. А дисциплина и работа по правилам.
           </p>
           
           <div className="mt-8 md:mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
@@ -60,7 +64,8 @@ const ProofSection = () => {
                   <span className="font-medium text-foreground text-sm">{item.name}</span>
                 </div>
                 <p className="text-xs text-muted-foreground mb-1">Было: {item.before}</p>
-                <p className="text-xs text-foreground font-medium">Стало: {item.after}</p>
+                <p className="text-xs text-foreground">Стало: {item.after}</p>
+                <p className="text-xs text-primary/80 font-medium">Ключ: {item.key}</p>
                 <span className="text-xs text-muted-foreground/60 mt-2 block group-hover:text-muted-foreground">
                   Открыть →
                 </span>
