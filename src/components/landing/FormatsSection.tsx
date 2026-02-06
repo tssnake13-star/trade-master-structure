@@ -48,7 +48,7 @@ const FormatsSection = () => {
               rel="noopener noreferrer"
               className="btn-primary group"
             >
-              Диагностика совместимости
+              Встроить алгоритм
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
             <a

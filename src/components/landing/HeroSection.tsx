@@ -10,26 +10,21 @@ const HeroSection = () => {
           {/* Text Content */}
           <div className="flex-1 max-w-2xl order-2 lg:order-1">
             <h1 className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-foreground fade-in-up">
-              Вы торгуете в хаосе, а не по системе.
+              TRADE MASTER 4.5 — операционная система трейдинга
             </h1>
-            <p className="mt-3 md:mt-4 text-lg md:text-xl lg:text-2xl text-muted-foreground leading-snug fade-in-up fade-in-up-delay-1">
-              Я помогаю собрать один чёткий алгоритм вместо угадываний и эмоций.
-            </p>
-            
-            {/* Target audience - compact */}
-            <p className="mt-4 md:mt-6 text-sm md:text-base text-foreground/80 fade-in-up fade-in-up-delay-1">
-              Для трейдеров с опытом, которые устали терять деньги и хотят работать по правилам, а не по чутью.
+            <p className="mt-4 md:mt-6 text-base md:text-lg lg:text-xl text-muted-foreground leading-snug fade-in-up fade-in-up-delay-1">
+              Если вы торгуете в хаосе и платите за это деньгами — проблема не в рынке.
             </p>
             
             {/* CTA - 2 buttons only */}
-            <div className="mt-6 md:mt-10 flex flex-col gap-3 fade-in-up fade-in-up-delay-2">
+            <div className="mt-8 md:mt-10 flex flex-col gap-3 fade-in-up fade-in-up-delay-2">
               <a
                 href={TELEGRAM_LINKS.bot}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn-primary group text-base md:text-lg"
               >
-                Диагностика совместимости
+                Встроить алгоритм
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
               
