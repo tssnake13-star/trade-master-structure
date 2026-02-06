@@ -1,28 +1,41 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { ArrowRight } from 'lucide-react';
-import eurAudImg from '@/assets/trades/eur-aud.jpg';
-import gbpUsdImg from '@/assets/trades/gbp-usd.jpg';
-import usdCadImg from '@/assets/trades/usd-cad.jpg';
+import usdCadImg from '@/assets/trades/usd-cad-29-10.jpg';
+import gbpJpyImg from '@/assets/trades/gbp-jpy-16-12.jpg';
+import eurUsdImg from '@/assets/trades/eur-usd-17-10.jpg';
+import gbpUsdImg from '@/assets/trades/gbp-usd-17-10.jpg';
+import usdJpyImg from '@/assets/trades/usd-jpy-17-10.jpg';
 
 const trades = [
   {
-    instrument: 'EUR/AUD',
-    date: '12.01.2025',
-    description: 'Вход по сценарию. Совпадение условий. Осознанное решение.',
-    image: eurAudImg,
+    instrument: 'USD/CAD',
+    date: '29.10.2025',
+    description: 'Контекст сформирован.\nУсловия совпали.\nИсполнение без эмоций.',
+    image: usdCadImg,
+  },
+  {
+    instrument: 'GBP/JPY',
+    date: '16.12.2025',
+    description: 'Фаза рынка определена.\nСценарий подтверждён.\nВход по алгоритму.',
+    image: gbpJpyImg,
+  },
+  {
+    instrument: 'EUR/USD',
+    date: '17.10.2025',
+    description: 'Структура сохранена.\nПодтверждение получено.\nРешение по системе.',
+    image: eurUsdImg,
   },
   {
     instrument: 'GBP/USD',
-    date: '28.12.2024',
-    description: 'Фаза определена. Сценарий подтверждён. Исполнение по правилам.',
+    date: '17.10.2025',
+    description: 'Контекст → подтверждение → исполнение.\nБез угадываний.',
     image: gbpUsdImg,
   },
   {
-    instrument: 'USD/CAD',
-    date: '15.01.2025',
-    description: 'Чёткий контекст. Условия совпали. Решение без эмоций.',
-    image: usdCadImg,
+    instrument: 'USD/JPY',
+    date: '17.10.2025',
+    description: 'Работа внутри сценария.\nКонтроль риска соблюдён.',
+    image: usdJpyImg,
   },
 ];
 
@@ -41,7 +54,7 @@ const TradesSection = () => {
             Не из импульса. Не из страха. По правилам.
           </p>
           
-          <div className="mt-8 md:mt-10 grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="mt-8 md:mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
             {trades.map((trade, index) => (
               <button
                 key={index}
@@ -52,11 +65,11 @@ const TradesSection = () => {
                   <span className="font-medium text-foreground text-sm">{trade.instrument}</span>
                   <span className="text-xs text-muted-foreground">{trade.date}</span>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">
+                <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line">
                   {trade.description}
                 </p>
                 <span className="text-xs text-muted-foreground/60 mt-3 block group-hover:text-muted-foreground">
-                  Открыть сделку →
+                  Посмотреть разбор →
                 </span>
               </button>
             ))}
@@ -64,11 +77,11 @@ const TradesSection = () => {
 
           <p className="mt-8 text-sm text-muted-foreground text-center md:text-left">
             Это не поиск идеального входа.<br />
-            Это результат дисциплины и работы по правилам.
+            Это результат дисциплины и работы по алгоритму.
           </p>
 
           <Dialog open={!!selectedTrade} onOpenChange={() => setSelectedTrade(null)}>
-            <DialogContent className="max-w-lg p-0 bg-card border-border overflow-hidden">
+            <DialogContent className="max-w-4xl p-0 bg-card border-border overflow-hidden">
               <DialogTitle className="sr-only">
                 {selectedTrade?.instrument ? `Сделка: ${selectedTrade.instrument}` : 'Сделка'}
               </DialogTitle>
@@ -86,7 +99,7 @@ const TradesSection = () => {
                     />
                   </div>
                   <div className="p-4 border-t border-border">
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-sm text-muted-foreground whitespace-pre-line">
                       {selectedTrade.description}
                     </p>
                   </div>
