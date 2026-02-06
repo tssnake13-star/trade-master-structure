@@ -52,7 +52,7 @@ const TradesSection = () => {
   const [selectedTrade, setSelectedTrade] = useState<typeof trades[0] | null>(null);
 
   return (
-    <section className="py-12 md:py-20">
+    <section id="trades" className="py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
@@ -60,7 +60,8 @@ const TradesSection = () => {
           </h2>
           
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            Не из импульса. Не из страха. По правилам.
+            Ни одна из этих сделок не была обязательной.<br />
+            Все они были разрешены системой.
           </p>
           
           <div className="mt-8 md:mt-10 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">

@@ -56,7 +56,8 @@ const FitSection = () => {
           </div>
           
           <p className="mt-6 md:mt-8 text-sm md:text-base text-foreground font-medium text-center">
-            Здесь не получится торговать как хочется. Здесь работают по системе.
+            Здесь не получится торговать как хочется.<br />
+            Здесь работают по системе.
           </p>
         </div>
       </div>
