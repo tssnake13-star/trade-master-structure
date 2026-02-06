@@ -10,7 +10,7 @@ const HeroSection = () => {
           {/* Text Content */}
           <div className="flex-1 max-w-2xl order-2 lg:order-1">
             <h1 className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-foreground fade-in-up">
-              TRADE MASTER 4.5 — операционная система трейдинга
+              TRADE MASTER 4.5: операционная система трейдинга
             </h1>
             <p className="mt-4 md:mt-6 text-base md:text-lg lg:text-xl text-muted-foreground leading-snug fade-in-up fade-in-up-delay-1">
               Если вы торгуете в хаосе и платите за это деньгами — проблема не в рынке.
