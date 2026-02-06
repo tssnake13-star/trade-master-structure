@@ -1,12 +1,42 @@
 import { useState } from 'react';
 import { User } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import vitaliyImg from '@/assets/testimonials/vitaliy.jpg';
+import rustamImg from '@/assets/testimonials/rustam.jpg';
+import lesyaImg from '@/assets/testimonials/lesya.jpg';
+import elenaImg from '@/assets/testimonials/elena.jpg';
 import lesiaImg from '@/assets/testimonials/lesia.jpg';
 import nikolayImg from '@/assets/testimonials/nikolay.jpg';
-import elenaImg from '@/assets/testimonials/elena-new.jpg';
+import elenaNewImg from '@/assets/testimonials/elena-new.jpg';
 import pavelImg from '@/assets/testimonials/pavel.jpg';
 
 const cases = [
+  // Старые отзывы
+  {
+    name: 'Виталий',
+    before: 'Был хаос.',
+    after: 'Появились правила.',
+    image: vitaliyImg,
+  },
+  {
+    name: 'Рустам',
+    before: 'Торговля «по ощущениям».',
+    after: 'Дисциплина и защита капитала.',
+    image: rustamImg,
+  },
+  {
+    name: 'Сергей',
+    before: 'Страх нажать кнопку.',
+    after: 'Сценарий и спокойствие.',
+    image: lesyaImg,
+  },
+  {
+    name: 'Елена',
+    before: 'Эмоции сильнее правил.',
+    after: 'Дисциплина и доверие процессу.',
+    image: elenaImg,
+  },
+  // Новые отзывы
   {
     name: 'Lesia',
     before: 'Курсы и практика без результата.',
@@ -22,11 +52,11 @@ const cases = [
     image: nikolayImg,
   },
   {
-    name: 'Елена',
+    name: 'Елена М.',
     before: 'Растерянность в сделках.',
     after: 'Алгоритм и спокойствие.',
     key: 'Есть опора.',
-    image: elenaImg,
+    image: elenaNewImg,
   },
   {
     name: 'Pavel',
@@ -65,7 +95,9 @@ const ProofSection = () => {
                 </div>
                 <p className="text-xs text-muted-foreground mb-1">Было: {item.before}</p>
                 <p className="text-xs text-foreground">Стало: {item.after}</p>
-                <p className="text-xs text-primary/80 font-medium">Ключ: {item.key}</p>
+                {'key' in item && item.key && (
+                  <p className="text-xs text-primary/80 font-medium">Ключ: {item.key}</p>
+                )}
                 <span className="text-xs text-muted-foreground/60 mt-2 block group-hover:text-muted-foreground">
                   Открыть →
                 </span>
