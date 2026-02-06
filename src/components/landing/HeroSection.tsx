@@ -1,4 +1,4 @@
-import { ArrowRight, MessageCircle } from 'lucide-react';
+import { ArrowRight, Play } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import heroAuthor from '@/assets/hero-author.jpg';
 
@@ -10,10 +10,15 @@ const HeroSection = () => {
           {/* Text Content */}
           <div className="flex-1 max-w-2xl order-2 lg:order-1">
             <h1 className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-foreground fade-in-up">
-              TRADE MASTER 4.5: операционная система трейдинга
+              Система торговли для трейдеров, которые уже теряли деньги и больше не хотят угадывать
             </h1>
             <p className="mt-4 md:mt-6 text-base md:text-lg lg:text-xl text-muted-foreground leading-snug fade-in-up fade-in-up-delay-1">
-              Если вы торгуете в хаосе и платите за это деньгами — проблема не в рынке.
+              Не сигналы. Не индикаторы.<br />
+              Чёткий протокол принятия решений: когда входить, когда пропускать и когда выходить.
+            </p>
+            
+            <p className="mt-4 text-sm text-muted-foreground/80 fade-in-up fade-in-up-delay-1">
+              12+ лет практики. Реальные сделки. Жёсткие правила. Работа только по системе.
             </p>
             
             {/* CTA - 2 buttons only */}
@@ -24,18 +29,16 @@ const HeroSection = () => {
                 rel="noopener noreferrer"
                 className="btn-primary group text-base md:text-lg"
               >
-                Встроить алгоритм
+                Получить алгоритм принятия решений
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
               
               <a
-                href={TELEGRAM_LINKS.dm}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="#trades"
                 className="inline-flex items-center justify-center gap-2 px-5 py-3 md:px-6 md:py-3.5 bg-secondary text-foreground text-sm md:text-base font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
               >
-                <MessageCircle className="w-4 h-4" />
-                Написать Сергею Тё
+                <Play className="w-4 h-4" />
+                Посмотреть, как выглядит торговля по правилам
               </a>
             </div>
           </div>

@@ -1,12 +1,3 @@
-import { Check } from 'lucide-react';
-
-const disciplinePoints = [
-  'Сценарии',
-  'Проверки',
-  'Дисциплина',
-  'Ответственность',
-];
-
 const DisciplineSection = () => {
   return (
     <section className="py-12 md:py-20">
@@ -18,28 +9,19 @@ const DisciplineSection = () => {
           
           <div className="mt-6 md:mt-8 space-y-4">
             <p className="text-base md:text-lg text-muted-foreground">
-              В трейдинге не работает подход «делай как чувствуешь».
+              В трейдинге не работают мягкие правила.
             </p>
             <p className="text-base md:text-lg text-foreground font-medium">
-              Работает только подход «делай по правилам».
+              Работают только те, которые нельзя нарушать.
             </p>
           </div>
           
-          <div className="mt-6 md:mt-8 p-4 md:p-5 bg-card border border-border rounded-xl">
-            <p className="text-sm text-muted-foreground mb-4">В обучении есть:</p>
-            <div className="grid grid-cols-2 gap-3">
-              {disciplinePoints.map((point, index) => (
-                <div key={index} className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-foreground/70" />
-                  <span className="text-foreground text-sm">{point}</span>
-                </div>
-              ))}
-            </div>
+          <div className="mt-6 md:mt-8 p-4 md:p-5 bg-accent/30 rounded-lg border-l-2 border-foreground/30">
+            <p className="text-foreground font-medium">
+              Здесь нет свободы интерпретаций.<br />
+              Есть сценарии, точки отмены и ответственность за решение.
+            </p>
           </div>
-          
-          <p className="mt-6 text-sm text-muted-foreground">
-            Это не давление. Это защита от хаоса и слива депозита.
-          </p>
         </div>
       </div>
     </section>

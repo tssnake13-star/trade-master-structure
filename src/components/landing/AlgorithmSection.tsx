@@ -6,19 +6,19 @@ const steps = [
     step: '1',
     timeframe: 'W1',
     title: 'Фаза рынка',
-    description: 'Без этого любое решение эмоциональное.',
+    description: 'Без этого любое решение становится эмоциональным.',
   },
   {
     step: '2',
     timeframe: 'D1',
     title: 'Подтверждение',
-    description: 'Нет совпадения — нет входа.',
+    description: 'Нет совпадения условий — нет входа.',
   },
   {
     step: '3',
     timeframe: 'H4',
     title: 'Зона входа',
-    description: 'Действовать по сценарию, а не быть в рынке.',
+    description: 'Вы действуете по сценарию, а не из реакции.',
   },
   {
     step: '4',
@@ -36,10 +36,6 @@ const AlgorithmSection = () => {
           <h2 className="heading-section text-foreground">
             4 шага системного решения
           </h2>
-          
-          <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            Либо видите совпадение условий, либо спокойно проходите мимо.
-          </p>
           
           <div className="mt-8 md:mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             {steps.map((item, index) => (
@@ -64,7 +60,7 @@ const AlgorithmSection = () => {
               rel="noopener noreferrer"
               className="btn-primary group"
             >
-              Встроить алгоритм
+              Получить алгоритм принятия решений
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
             <a

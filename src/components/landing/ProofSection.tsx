@@ -16,24 +16,28 @@ const cases = [
     name: 'Виталий',
     before: 'Был хаос.',
     after: 'Появились правила.',
+    key: 'Отказ от импульсных решений и работа по сценарию.',
     image: vitaliyImg,
   },
   {
     name: 'Рустам',
     before: 'Торговля «по ощущениям».',
     after: 'Дисциплина и защита капитала.',
+    key: 'Отказ от импульсных решений и работа по сценарию.',
     image: rustamImg,
   },
   {
     name: 'Сергей',
     before: 'Страх нажать кнопку.',
     after: 'Сценарий и спокойствие.',
+    key: 'Отказ от импульсных решений и работа по сценарию.',
     image: lesyaImg,
   },
   {
     name: 'Елена',
     before: 'Эмоции сильнее правил.',
     after: 'Дисциплина и доверие процессу.',
+    key: 'Отказ от импульсных решений и работа по сценарию.',
     image: elenaImg,
   },
   // Новые отзывы
@@ -41,28 +45,28 @@ const cases = [
     name: 'Lesia',
     before: 'Курсы и практика без результата.',
     after: 'Полгода торговли в плюсе.',
-    key: 'Сделки по системе.',
+    key: 'Отказ от импульсных решений и работа по сценарию.',
     image: lesiaImg,
   },
   {
     name: 'Николай',
     before: 'Разрозненные знания.',
     after: 'Структура и понимание рынка.',
-    key: 'Направление и риск.',
+    key: 'Отказ от импульсных решений и работа по сценарию.',
     image: nikolayImg,
   },
   {
     name: 'Елена М.',
     before: 'Растерянность в сделках.',
     after: 'Алгоритм и спокойствие.',
-    key: 'Есть опора.',
+    key: 'Отказ от импульсных решений и работа по сценарию.',
     image: elenaNewImg,
   },
   {
     name: 'Pavel',
     before: 'Интуиция и новости.',
     after: 'Сценарий и подтверждение.',
-    key: 'Работа по правилам.',
+    key: 'Отказ от импульсных решений и работа по сценарию.',
     image: pavelImg,
   },
 ];
@@ -95,9 +99,7 @@ const ProofSection = () => {
                 </div>
                 <p className="text-xs text-muted-foreground mb-1">Было: {item.before}</p>
                 <p className="text-xs text-foreground">Стало: {item.after}</p>
-                {'key' in item && item.key && (
-                  <p className="text-xs text-primary/80 font-medium">Ключ: {item.key}</p>
-                )}
+                <p className="text-xs text-primary/80 font-medium mt-1">Ключ: {item.key}</p>
                 <span className="text-xs text-muted-foreground/60 mt-2 block group-hover:text-muted-foreground">
                   Открыть →
                 </span>
