@@ -1,41 +1,50 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import usdCadImg from '@/assets/trades/usd-cad-29-10.jpg';
-import gbpJpyImg from '@/assets/trades/gbp-jpy-16-12.jpg';
-import eurUsdImg from '@/assets/trades/eur-usd-17-10.jpg';
-import gbpUsdImg from '@/assets/trades/gbp-usd-17-10.jpg';
-import usdJpyImg from '@/assets/trades/usd-jpy-17-10.jpg';
+import eurJpyImg from '@/assets/trades/eur-jpy-01-12.jpg';
+import gbpJpy0511Img from '@/assets/trades/gbp-jpy-05-11.jpg';
+import usdCadImg from '@/assets/trades/usd-cad-10-12.jpg';
+import gbpJpy1612Img from '@/assets/trades/gbp-jpy-16-12-v2.jpg';
+import gbpAud1912Img from '@/assets/trades/gbp-aud-19-12.jpg';
+import gbpAud2511Img from '@/assets/trades/gbp-aud-25-11.jpg';
 
 const trades = [
+  // Ряд 1
   {
-    instrument: 'USD/CAD',
-    date: '29.10.2025',
-    description: 'Контекст сформирован.\nУсловия совпали.\nИсполнение без эмоций.',
-    image: usdCadImg,
+    instrument: 'EUR/JPY',
+    date: '01.12.2025',
+    description: 'Контекст сформирован.\nСценарий подтверждён.\nВход по алгоритму.',
+    image: eurJpyImg,
   },
   {
     instrument: 'GBP/JPY',
+    date: '05.11.2025',
+    description: 'Фаза рынка определена.\nЕсть подтверждение.\nРешение по правилам.',
+    image: gbpJpy0511Img,
+  },
+  {
+    instrument: 'USD/CAD',
+    date: '10.12.2025',
+    description: 'Чёткий контекст.\nБез угадываний.\nИсполнение по системе.',
+    image: usdCadImg,
+  },
+  // Ряд 2
+  {
+    instrument: 'GBP/JPY',
     date: '16.12.2025',
-    description: 'Фаза рынка определена.\nСценарий подтверждён.\nВход по алгоритму.',
-    image: gbpJpyImg,
+    description: 'Работа внутри сценария.\nКонтроль риска сохранён.\nБез эмоций.',
+    image: gbpJpy1612Img,
   },
   {
-    instrument: 'EUR/USD',
-    date: '17.10.2025',
-    description: 'Структура сохранена.\nПодтверждение получено.\nРешение по системе.',
-    image: eurUsdImg,
+    instrument: 'GBP/AUD',
+    date: '19.12.2025',
+    description: 'Контекст → подтверждение → вход.\nПоследовательные действия.',
+    image: gbpAud1912Img,
   },
   {
-    instrument: 'GBP/USD',
-    date: '17.10.2025',
-    description: 'Контекст → подтверждение → исполнение.\nБез угадываний.',
-    image: gbpUsdImg,
-  },
-  {
-    instrument: 'USD/JPY',
-    date: '17.10.2025',
-    description: 'Работа внутри сценария.\nКонтроль риска соблюдён.',
-    image: usdJpyImg,
+    instrument: 'GBP/AUD',
+    date: '25.11.2025',
+    description: 'Не реакция на рынок.\nА заранее подготовленный план.',
+    image: gbpAud2511Img,
   },
 ];
 
@@ -54,7 +63,7 @@ const TradesSection = () => {
             Не из импульса. Не из страха. По правилам.
           </p>
           
-          <div className="mt-8 md:mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4">
+          <div className="mt-8 md:mt-10 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
             {trades.map((trade, index) => (
               <button
                 key={index}
@@ -69,7 +78,7 @@ const TradesSection = () => {
                   {trade.description}
                 </p>
                 <span className="text-xs text-muted-foreground/60 mt-3 block group-hover:text-muted-foreground">
-                  Посмотреть разбор →
+                  Открыть сделку →
                 </span>
               </button>
             ))}
