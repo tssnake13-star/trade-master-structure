@@ -6,16 +6,25 @@ const formats = [
     name: 'Trade System',
     subtitle: '90 дней',
     description: 'Базовая инсталляция протокола. Установка фундамента архитектуры рынка и запуск ядра алгоритма принятия решений для устранения хаоса в торговле.',
+    detailTitle: 'Ядро системы (Core Protocol)',
+    detailDescription: 'Установка алгоритма «Зона синхронизации». Это фундамент, который убирает хаос и даёт чёткий ответ: «Входим или ждём?».',
+    detailResult: 'Вы перестаёте угадывать рынок и начинаете работать по строгому математическому протоколу.',
   },
   {
     name: 'Trade OS',
     subtitle: '365 дней',
     description: 'Полная конфигурация операционной системы. Внедрение всех профессиональных модулей, расширенных фильтров и драйверов системы для работы по жестким алгоритмам мастера.',
+    detailTitle: 'Расширенная конфигурация (Core + Background Modules)',
+    detailDescription: 'К вашему «Ядру» подключаются модули анализа глобального контекста и фильтрации рыночного шума. Модули автоматически отсекают сделки с низким потенциалом и защищают вас от входов в «вязком» или неопределённом рынке.',
+    detailResult: 'Ювелирная точность входов и спокойствие за счёт понимания общего рыночного фона.',
   },
   {
     name: 'V.I.P.',
     subtitle: '365 дней',
     description: 'Индивидуальная архитектура ядра. Прямой доступ к интеллекту автора для персональной настройки системы под ваш капитал и личный контроль каждой сделки.',
+    detailTitle: 'Персональная архитектура',
+    detailDescription: 'Глубокая кастомизация всей архитектуры под ваш стиль торговли и объём капитала при прямом участии автора.',
+    detailResult: null,
   },
 ];
 
@@ -32,11 +41,21 @@ const FormatsSection = () => {
             {formats.map((format, index) => (
               <div
                 key={index}
-                className="p-4 md:p-5 bg-card border border-border rounded-xl"
+                className="p-4 md:p-5 bg-card border border-border rounded-xl flex flex-col"
               >
                 <h3 className="text-lg font-semibold text-foreground">{format.name}</h3>
                 <p className="text-mono text-xs text-muted-foreground mt-1">{format.subtitle}</p>
                 <p className="text-sm text-muted-foreground mt-3">{format.description}</p>
+                
+                <div className="mt-4 pt-4 border-t border-border/60">
+                  <p className="text-xs font-semibold text-foreground/80 uppercase tracking-wider">{format.detailTitle}</p>
+                  <p className="text-sm text-muted-foreground mt-2">{format.detailDescription}</p>
+                  {format.detailResult && (
+                    <p className="text-sm text-foreground/90 mt-3 font-medium">
+                      → {format.detailResult}
+                    </p>
+                  )}
+                </div>
               </div>
             ))}
           </div>
