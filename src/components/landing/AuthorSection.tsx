@@ -22,16 +22,33 @@ const AuthorSection = () => {
             </div>
             
             <div className="flex-1">
-              <h3 className="text-xl font-semibold text-foreground mb-4">
+              <h3 className="text-xl font-semibold text-foreground mb-1">
                 Сергей Тё
               </h3>
               
-              <p className="text-muted-foreground mb-2">
-                12+ лет на рынке. Работаю с реальными деньгами.
+              <p className="text-sm text-muted-foreground mb-5">
+                Архитектор торговых систем.
               </p>
-              <p className="text-muted-foreground mb-4">
-                Моя задача — убрать хаос и дать рабочий алгоритм.
-              </p>
+              
+              <div className="space-y-4 mb-6">
+                <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                  Десять лет назад я сделал выбор в пользу{' '}
+                  <span className="font-semibold text-foreground">независимости</span>,
+                  отказавшись от работы в рамках массовых образовательных проектов
+                  ради создания собственного торгового протокола. Для меня было важнее
+                  сохранить право на честную, сухую методологию, чем следовать рыночным
+                  шаблонам.
+                </p>
+                <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                  Это время стало фильтром качества: я отсек информационный шум,
+                  создав{' '}
+                  <span className="font-semibold text-foreground">Trade OS</span> —
+                  систему, основанную на жёсткой{' '}
+                  <span className="font-semibold text-foreground">архитектуре</span>{' '}
+                  принятия решений, проверенной годами личной практики.
+                  Моя задача — убрать хаос и дать вам рабочий алгоритм.
+                </p>
+              </div>
               
               <a
                 href={TELEGRAM_LINKS.dm}
