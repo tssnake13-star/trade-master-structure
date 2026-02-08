@@ -1,28 +1,21 @@
 const stages = [
   {
     number: '01',
-    title: 'Фундамент',
-    description: 'Понимание фаз. Структура вместо хаоса.',
+    label: 'Установка Ядра',
+    title: 'Базовая прошивка',
+    description: 'Установка структуры и логики. Выход на осознанный пропуск сделок.',
   },
   {
     number: '02',
-    title: 'Сценарии',
-    description: 'Логика входа и пропуска.',
+    label: 'Конфигурация сценариев',
+    title: 'Настройка модулей',
+    description: 'Настройка модулей фона и логики отмены сценария.',
   },
   {
     number: '03',
-    title: 'Практика',
-    description: 'Дисциплина важнее импульса.',
-  },
-  {
-    number: '04',
-    title: 'Самостоятельная торговля',
-    description: 'Решения по системе, без подсказок.',
-  },
-  {
-    number: '05',
-    title: 'Дистанция',
-    description: 'Стабильность важнее количества.',
+    label: 'Эксплуатация (OS)',
+    title: 'Режим оператора',
+    description: 'Переход в режим оператора системы. Дистанция, основанная на дисциплине алгоритма, а не на поиске «идеального входа».',
   },
 ];
 
@@ -32,18 +25,21 @@ const StagesSection = () => {
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
-            Путь внедрения системы
+            Этапы развёртывания системы
           </h2>
           
-          <div className="mt-8 md:mt-10 grid grid-cols-1 md:grid-cols-5 gap-3">
+          <div className="mt-8 md:mt-10 grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
             {stages.map((stage, index) => (
               <div
                 key={index}
-                className="p-4 bg-card border border-border rounded-xl"
+                className="p-5 bg-card border border-border rounded-xl"
               >
-                <span className="text-mono text-xs text-muted-foreground">{stage.number}</span>
-                <h3 className="text-sm font-medium text-foreground mt-1 mb-1">{stage.title}</h3>
-                <p className="text-xs text-muted-foreground">{stage.description}</p>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-mono text-xs text-muted-foreground">{stage.number}</span>
+                  <span className="text-mono text-xs text-foreground/60">{stage.label}</span>
+                </div>
+                <h3 className="text-sm md:text-base font-medium text-foreground mb-1">{stage.title}</h3>
+                <p className="text-xs text-muted-foreground leading-relaxed">{stage.description}</p>
               </div>
             ))}
           </div>
