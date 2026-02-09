@@ -1,4 +1,4 @@
-import { ArrowRight, Play } from 'lucide-react';
+import { ArrowRight, MessageCircle } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import heroAuthor from '@/assets/hero-author.jpg';
 
@@ -34,11 +34,13 @@ const HeroSection = () => {
               </a>
               
               <a
-                href="#trades"
+                href={TELEGRAM_LINKS.dm}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 px-5 py-3 md:px-6 md:py-3.5 bg-secondary text-foreground text-sm md:text-base font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
               >
-                <Play className="w-4 h-4" />
-                Посмотреть, как выглядит торговля по правилам
+                <MessageCircle className="w-4 h-4" />
+                Написать Сергею Тё
               </a>
             </div>
           </div>
