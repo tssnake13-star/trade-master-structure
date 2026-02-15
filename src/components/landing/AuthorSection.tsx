@@ -42,7 +42,7 @@ const AuthorSection = () => {
                 <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
                   Это время стало фильтром качества: я отсек информационный шум,
                   создав{' '}
-                  <span className="font-semibold text-foreground">Trade OS</span> —
+                  <span className="font-semibold text-foreground">Trade Master</span> —
                   систему, основанную на жёсткой{' '}
                   <span className="font-semibold text-foreground">архитектуре</span>{' '}
                   принятия решений, проверенной годами личной практики.
