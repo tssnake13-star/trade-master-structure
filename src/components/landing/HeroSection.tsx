@@ -12,16 +12,19 @@ const HeroSection = () => {
             <h1 className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-foreground fade-in-up">
               Проблема не в рынке. Проблема в хаосе ваших решений
             </h1>
-            <p className="mt-4 md:mt-6 text-base md:text-lg lg:text-xl text-muted-foreground leading-snug fade-in-up fade-in-up-delay-1">
-              Не сигналы. Не индикаторы.<br />
-              Чёткий протокол принятия решений: когда входить, когда пропускать и когда выходить.
+            <p className="mt-4 md:mt-6 text-base md:text-lg lg:text-xl text-foreground/90 leading-snug fade-in-up fade-in-up-delay-1">
+              Вы входите без чёткого сценария. Переносите стоп. Называете это опытом.
+            </p>
+
+            <p className="mt-3 md:mt-4 text-sm md:text-base text-muted-foreground leading-snug fade-in-up fade-in-up-delay-1">
+              Я даю протокол принятия решений: когда входить, когда пропускать и когда выходить.
             </p>
             
-            <p className="mt-4 text-sm text-muted-foreground/80 fade-in-up fade-in-up-delay-1">
-              12+ лет практики. Реальные сделки. Жёсткие правила. Работа только по системе.
+            <p className="mt-4 text-xs md:text-sm text-muted-foreground/70 fade-in-up fade-in-up-delay-1">
+              Минимум сделок — максимум качества. Жёсткие правила. Ни одного входа без подтверждения.
             </p>
             
-            {/* CTA - 2 buttons only */}
+            {/* CTA */}
             <div className="mt-8 md:mt-10 flex flex-col gap-3 fade-in-up fade-in-up-delay-2">
               <a
                 href={TELEGRAM_LINKS.bot}
@@ -29,7 +32,7 @@ const HeroSection = () => {
                 rel="noopener noreferrer"
                 className="btn-primary group text-base md:text-lg"
               >
-                Получить алгоритм принятия решений
+                Получить алгоритм
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
               
@@ -37,10 +40,10 @@ const HeroSection = () => {
                 href={TELEGRAM_LINKS.dm}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 md:px-6 md:py-3.5 bg-secondary text-foreground text-sm md:text-base font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm text-muted-foreground font-medium rounded-lg border border-border/50 hover:text-foreground hover:border-border transition-all duration-200"
               >
                 <MessageCircle className="w-4 h-4" />
-                Написать Сергею Тё
+                Написать Сергею
               </a>
             </div>
           </div>
