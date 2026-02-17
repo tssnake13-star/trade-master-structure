@@ -13,9 +13,9 @@ const FormatsSection = () => {
           {/* Desktop: 3 columns with center dominant */}
           <div className="mt-8 md:mt-10 grid grid-cols-1 md:grid-cols-[1fr_1.15fr_1fr] gap-3 md:gap-4 items-start">
 
-            {/* Mobile order: TradeOS 365 first, then Plus, then Trade System */}
+            {/* Mobile order: Trade System first, then TradeOS 365, then Plus */}
             {/* Trade System — step, not alternative */}
-            <div className="order-3 md:order-1 p-4 md:p-5 bg-card border border-border/60 rounded-xl flex flex-col opacity-90">
+            <div className="order-1 md:order-1 p-4 md:p-5 bg-card border border-border/60 rounded-xl flex flex-col opacity-90">
               <h3 className="text-base font-semibold text-foreground/80">Trade System</h3>
               <p className="text-mono text-xs text-muted-foreground mt-1">90 дней</p>
               <p className="text-sm text-muted-foreground mt-3">
@@ -30,7 +30,7 @@ const FormatsSection = () => {
             </div>
 
             {/* TradeOS 365 — dominant center */}
-            <div className="order-1 md:order-2 p-5 md:p-6 bg-card border-2 border-foreground/20 rounded-xl flex flex-col relative shadow-[0_0_30px_-10px_hsl(var(--foreground)/0.08)]">
+            <div className="order-2 md:order-2 p-5 md:p-6 bg-card border-2 border-foreground/20 rounded-xl flex flex-col relative shadow-[0_0_30px_-10px_hsl(var(--foreground)/0.08)]">
               <div className="flex items-center gap-2 mb-3">
                 <span className="text-mono text-[10px] uppercase tracking-widest text-foreground/60 bg-foreground/5 px-2.5 py-1 rounded-md border border-foreground/10">
                   Основной формат
@@ -74,7 +74,7 @@ const FormatsSection = () => {
             </div>
 
             {/* TradeOS Plus — extended */}
-            <div className="order-2 md:order-3 p-4 md:p-5 bg-card border border-border rounded-xl flex flex-col">
+            <div className="order-3 md:order-3 p-4 md:p-5 bg-card border border-border rounded-xl flex flex-col">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-mono text-[10px] uppercase tracking-widest text-muted-foreground/60">
                   Максимальный уровень интеграции
