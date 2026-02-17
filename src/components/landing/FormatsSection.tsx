@@ -1,4 +1,4 @@
-import { ArrowRight, MessageCircle, Star } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 
 const FormatsSection = () => {
@@ -110,18 +110,6 @@ const FormatsSection = () => {
             </div>
           </div>
 
-          {/* Bottom CTA area */}
-          <div className="mt-8 flex flex-col items-start gap-3">
-            <a
-              href={TELEGRAM_LINKS.dm}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm text-muted-foreground/70 font-medium rounded-lg border border-border/40 hover:text-muted-foreground hover:border-border/60 transition-all duration-200"
-            >
-              <MessageCircle className="w-4 h-4" />
-              Написать Сергею
-            </a>
-          </div>
         </div>
       </div>
     </section>
