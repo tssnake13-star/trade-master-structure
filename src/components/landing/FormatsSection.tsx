@@ -6,25 +6,42 @@ const formats = [
     name: 'Trade System',
     subtitle: '90 дней',
     description: 'Базовая инсталляция протокола. Установка фундамента архитектуры рынка и запуск ядра алгоритма принятия решений для устранения хаоса в торговле.',
+    includes: null,
     detailTitle: 'Ядро системы (Core Protocol)',
     detailDescription: 'Установка алгоритма «Зона синхронизации». Это фундамент, который убирает хаос и даёт чёткий ответ: «Входим или ждём?».',
     detailResult: 'Вы перестаёте угадывать рынок и начинаете работать по строгому математическому протоколу.',
   },
   {
-    name: 'Trade OS',
-    subtitle: '365 дней',
-    description: 'Полная конфигурация операционной системы. Внедрение всех профессиональных модулей, расширенных фильтров и драйверов системы для работы по жестким алгоритмам мастера.',
-    detailTitle: 'Расширенная конфигурация (Core + Background Modules)',
-    detailDescription: 'К вашему «Ядру» подключаются модули анализа глобального контекста и фильтрации рыночного шума. Модули автоматически отсекают сделки с низким потенциалом и защищают вас от входов в «вязком» или неопределённом рынке.',
-    detailResult: 'Ювелирная точность входов и спокойствие за счёт понимания общего рыночного фона.',
+    name: 'TradeOS 365',
+    subtitle: 'Год внедрения системы',
+    description: 'Основной формат работы. Подходит тем, кто уже торговал и устал от хаоса.',
+    includes: [
+      'Полная методология TradeOS',
+      'Зона синхронизации',
+      'Алгоритм входа и сопровождения',
+      'Риск-менеджмент',
+      'Закрытая рабочая группа',
+      'Регулярные разборы',
+    ],
+    detailTitle: null,
+    detailDescription: null,
+    detailResult: 'Системное мышление. Чёткая структура принятия решений. Дисциплина вместо угадывания.',
   },
   {
-    name: 'V.I.P.',
-    subtitle: '365 дней',
-    description: 'Индивидуальная архитектура ядра. Прямой доступ к интеллекту автора для персональной настройки системы под ваш капитал и личный контроль каждой сделки.',
-    detailTitle: 'Персональная архитектура',
-    detailDescription: 'Глубокая кастомизация всей архитектуры под ваш стиль торговли и объём капитала при прямом участии автора.',
-    detailResult: null,
+    name: 'TradeOS Plus',
+    subtitle: 'Полная конфигурация системы',
+    description: 'Для тех, кто хочет максимальную интеграцию. Включает всё из TradeOS 365 плюс:',
+    includes: [
+      'Полный комплект индикаторов',
+      'HunterBot',
+      'Risk Sentinel',
+      'Расширенные модули фильтрации',
+      'Приоритетная обратная связь',
+      'Индивидуальная настройка инструментов',
+    ],
+    detailTitle: null,
+    detailDescription: null,
+    detailResult: 'Быстрое внедрение системы. Повышенная точность входов. Жёсткий контроль риска.',
   },
 ];
 
@@ -47,15 +64,33 @@ const FormatsSection = () => {
                 <p className="text-mono text-xs text-muted-foreground mt-1">{format.subtitle}</p>
                 <p className="text-sm text-muted-foreground mt-3">{format.description}</p>
                 
-                <div className="mt-4 pt-4 border-t border-border/60">
-                  <p className="text-xs font-semibold text-foreground/80 uppercase tracking-wider">{format.detailTitle}</p>
-                  <p className="text-sm text-muted-foreground mt-2">{format.detailDescription}</p>
-                  {format.detailResult && (
-                    <p className="text-sm text-foreground/90 mt-3 font-medium">
-                      → {format.detailResult}
-                    </p>
-                  )}
-                </div>
+                {format.includes && (
+                  <ul className="mt-3 space-y-1.5">
+                    {format.includes.map((item, i) => (
+                      <li key={i} className="text-sm text-muted-foreground flex items-start gap-2">
+                        <span className="text-foreground/50 mt-0.5">—</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {(format.detailTitle || format.detailDescription) && (
+                  <div className="mt-4 pt-4 border-t border-border/60">
+                    {format.detailTitle && (
+                      <p className="text-xs font-semibold text-foreground/80 uppercase tracking-wider">{format.detailTitle}</p>
+                    )}
+                    {format.detailDescription && (
+                      <p className="text-sm text-muted-foreground mt-2">{format.detailDescription}</p>
+                    )}
+                  </div>
+                )}
+
+                {format.detailResult && (
+                  <p className="text-sm text-foreground/90 mt-4 pt-4 border-t border-border/60 font-medium">
+                    → {format.detailResult}
+                  </p>
+                )}
               </div>
             ))}
           </div>
@@ -74,10 +109,10 @@ const FormatsSection = () => {
               href={TELEGRAM_LINKS.dm}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-secondary text-foreground text-sm font-medium rounded-lg border border-border hover:bg-accent hover:border-muted-foreground/30 transition-all duration-200"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm text-muted-foreground font-medium rounded-lg border border-border/50 hover:text-foreground hover:border-border transition-all duration-200"
             >
               <MessageCircle className="w-4 h-4" />
-              Написать Сергею Тё
+              Написать Сергею
             </a>
           </div>
         </div>
