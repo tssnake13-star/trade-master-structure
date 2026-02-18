@@ -1,50 +1,48 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import eurJpyImg from '@/assets/trades/eur-jpy-01-12.jpg';
-import gbpJpy0511Img from '@/assets/trades/gbp-jpy-05-11.jpg';
-import usdCadImg from '@/assets/trades/usd-cad-10-12.jpg';
-import gbpJpy1612Img from '@/assets/trades/gbp-jpy-16-12-v2.jpg';
-import gbpAud1912Img from '@/assets/trades/gbp-aud-19-12.jpg';
-import gbpAud2511Img from '@/assets/trades/gbp-aud-25-11.jpg';
+import xagUsdImg from '@/assets/trades/xag-usd-08-01.jpg';
+import xauUsdImg from '@/assets/trades/xau-usd-08-01.jpg';
+import usdCadImg from '@/assets/trades/usd-cad-10-12-v2.jpg';
+import gbpJpyImg from '@/assets/trades/gbp-jpy-16-12-v3.jpg';
+import audUsdImg from '@/assets/trades/aud-usd-18-12.jpg';
+import btcUsdtImg from '@/assets/trades/btc-usdt-28-01.jpg';
 
 const trades = [
-  // Ряд 1
   {
-    instrument: 'EUR/JPY',
-    date: '01.12.2025',
-    description: 'Контекст сформирован.\nСценарий подтверждён.\nВход по алгоритму.',
-    image: eurJpyImg,
+    instrument: 'XAG/USD',
+    date: '08.01.2026',
+    description: 'Системный сигнал получен и отфильтрован вручную.\nКонтекст и подтверждение совпали по алгоритму.\nВход WORK-BUY, сопровождение через HunterBot.',
+    image: xagUsdImg,
   },
   {
-    instrument: 'GBP/JPY',
-    date: '05.11.2025',
-    description: 'Фаза рынка определена.\nЕсть подтверждение.\nРешение по правилам.',
-    image: gbpJpy0511Img,
+    instrument: 'XAU/USD',
+    date: '08.01.2026',
+    description: 'Сделка разрешена системой после фильтрации сигнала.\nКонтекст → подтверждение → точка входа.\nИсполнение по алгоритму, без угадываний.',
+    image: xauUsdImg,
   },
   {
     instrument: 'USD/CAD',
     date: '10.12.2025',
-    description: 'Чёткий контекст.\nБез угадываний.\nИсполнение по системе.',
+    description: 'Чёткий сценарий после ручной фильтрации сигнала.\nКонтекст и подтверждение совпали.\nВход WORK-SELL, сопровождение по системе.',
     image: usdCadImg,
   },
-  // Ряд 2
   {
     instrument: 'GBP/JPY',
     date: '16.12.2025',
-    description: 'Работа внутри сценария.\nКонтроль риска сохранён.\nБез эмоций.',
-    image: gbpJpy1612Img,
+    description: 'Фаза рынка определена, сигнал отфильтрован.\nПодтверждение получено по алгоритму.\nВход WORK-BUY, дальше работа по плану.',
+    image: gbpJpyImg,
   },
   {
-    instrument: 'GBP/AUD',
-    date: '19.12.2025',
-    description: 'Контекст → подтверждение → вход.\nПоследовательные действия.',
-    image: gbpAud1912Img,
+    instrument: 'AUD/USD',
+    date: '18.12.2025',
+    description: 'Системный сигнал → ручная фильтрация.\nКонтекст и подтверждение совпали.\nВход WORK-BUY и сопровождение по правилам.',
+    image: audUsdImg,
   },
   {
-    instrument: 'GBP/AUD',
-    date: '25.11.2025',
-    description: 'Не реакция на рынок.\nА заранее подготовленный план.',
-    image: gbpAud2511Img,
+    instrument: 'BTC/USDt',
+    date: '28.01.2026',
+    description: 'Сделка разрешена системой после фильтрации.\nКонтекст → подтверждение → точка входа.\nВход WORK-SELL, точное исполнение по системе.',
+    image: btcUsdtImg,
   },
 ];
 
