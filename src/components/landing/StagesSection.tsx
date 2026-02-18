@@ -57,7 +57,7 @@ const StagesSection = () => {
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
-            5 этапов, через которые проходит каждый трейдер в TRADE MASTER
+            5 этапов, через которые проходит каждый трейдер в TRADE OS
           </h2>
           <p className="mt-3 text-sm text-muted-foreground">
             От теории к самостоятельному анализу реального рынка.
