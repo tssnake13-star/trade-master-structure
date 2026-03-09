@@ -2,6 +2,14 @@ import { ArrowRight, MessageCircle } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import heroAuthor from '@/assets/hero-author.jpg';
 
+const principles = [
+  'Контекст рынка',
+  'Сценарий',
+  'Подтверждение',
+  'Зона входа',
+  'Жёсткий риск-менеджмент',
+];
+
 const HeroSection = () => {
   return (
     <section className="min-h-[100svh] lg:min-h-screen flex items-center pt-16 md:pt-20 pb-8 md:pb-16 lg:pb-24">
@@ -10,18 +18,24 @@ const HeroSection = () => {
           {/* Text Content */}
           <div className="flex-1 max-w-2xl order-2 lg:order-1">
             <h1 className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-foreground fade-in-up">
-              Проблема не в рынке. Проблема в хаосе ваших решений
+              Трейдинг — это не поиск входов. Это система принятия решений.
             </h1>
             <p className="mt-4 md:mt-6 text-base md:text-lg lg:text-xl text-foreground/90 leading-snug fade-in-up fade-in-up-delay-1">
-              Вы входите без чёткого сценария. Переносите стоп. Называете это опытом.
+              Большинство трейдеров теряют деньги не из-за плохих входов. Они теряют деньги потому, что принимают решения хаотично. В TRADELIKETYO вы не учитесь искать сделки. Вы учитесь разрешать или запрещать их системой.
             </p>
 
-            <p className="mt-3 md:mt-4 text-sm md:text-base text-muted-foreground leading-snug fade-in-up fade-in-up-delay-1">
-              Я даю протокол принятия решений: когда входить, когда пропускать и когда выходить.
-            </p>
-            
-            <p className="mt-4 text-xs md:text-sm text-muted-foreground/70 fade-in-up fade-in-up-delay-1">
-              Минимум сделок — максимум качества. Жёсткие правила. Ни одного входа без подтверждения.
+            {/* Principles list */}
+            <ul className="mt-6 md:mt-8 space-y-2 fade-in-up fade-in-up-delay-1">
+              {principles.map((item, index) => (
+                <li key={index} className="flex items-center gap-3 text-sm md:text-base text-muted-foreground">
+                  <span className="text-mono text-xs text-foreground/40">{String(index + 1).padStart(2, '0')}</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+
+            <p className="mt-6 text-sm md:text-base text-muted-foreground/70 fade-in-up fade-in-up-delay-1">
+              Каждая сделка проходит через алгоритм. Минимум сделок. Максимум качества.
             </p>
             
             {/* CTA */}
@@ -53,7 +67,7 @@ const HeroSection = () => {
             <div className="relative w-48 h-56 md:w-72 md:h-[24rem] lg:w-[28rem] lg:h-[36rem] xl:w-[32rem] xl:h-[44rem] rounded-xl md:rounded-2xl overflow-hidden">
               <img
                 src={heroAuthor}
-                alt="Сергей — автор системы TRADE MASTER"
+                alt="Сергей — автор системы TRADELIKETYO"
                 className="w-full h-full object-cover object-top brightness-[0.85]"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/20 to-background/10" />

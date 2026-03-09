@@ -1,16 +1,18 @@
 import { Check, X } from 'lucide-react';
 
 const fitItems = [
-  'Торговали и теряли деньги',
-  'Готовы работать по правилам',
-  'Готовы пропускать сделки',
+  'Уже торговали и теряли деньги',
+  'Устали от хаотичных входов',
+  'Готовы работать по строгим правилам',
+  'Готовы пропускать большинство сделок',
+  'Хотите построить систему принятия решений',
 ];
 
 const notFitItems = [
-  'Хотите сигналы',
+  'Ищете сигналы',
+  'Хотите торговать постоянно',
   'Не готовы соблюдать правила',
-  'Ищете мягкий формат',
-  'Хотите быть в рынке постоянно',
+  'Ищете быстрый результат',
   'Не готовы к дисциплине',
 ];
 
@@ -20,14 +22,18 @@ const FitSection = () => {
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
-            Кому подходит — а кому нет
+            Кому подойдёт эта система
           </h2>
+
+          <p className="mt-4 text-base md:text-lg text-muted-foreground">
+            TRADELIKETYO — это не быстрые результаты и не поток сигналов. Это системная работа с рынком.
+          </p>
           
           <div className="mt-8 md:mt-10 grid md:grid-cols-2 gap-4 md:gap-6">
             {/* Fit column */}
             <div className="p-4 md:p-5 bg-accent/20 border border-border rounded-xl">
               <h3 className="text-base font-medium text-foreground mb-4">
-                Подходит:
+                Подойдёт, если вы:
               </h3>
               <ul className="space-y-3">
                 {fitItems.map((item, index) => (
@@ -42,7 +48,7 @@ const FitSection = () => {
             {/* Not fit column */}
             <div className="p-4 md:p-5 bg-secondary/30 border border-border rounded-xl">
               <h3 className="text-base font-medium text-foreground mb-4">
-                Не подходит:
+                Не подойдёт, если вы:
               </h3>
               <ul className="space-y-3">
                 {notFitItems.map((item, index) => (
@@ -56,7 +62,7 @@ const FitSection = () => {
           </div>
           
           <p className="mt-6 md:mt-8 text-sm md:text-base text-foreground font-medium text-center">
-            Здесь не получится торговать как хочется.<br />
+            Здесь не получится торговать по ощущениям.<br />
             Здесь работают по системе.
           </p>
         </div>

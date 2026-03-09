@@ -1,5 +1,8 @@
 import Header from '@/components/landing/Header';
 import HeroSection from '@/components/landing/HeroSection';
+import WhyCoursesFailSection from '@/components/landing/WhyCoursesFailSection';
+import DecisionProcessSection from '@/components/landing/DecisionProcessSection';
+import FiltrationSection from '@/components/landing/FiltrationSection';
 import UniquenessSection from '@/components/landing/UniquenessSection';
 import ProblemSection from '@/components/landing/ProblemSection';
 import WhatGoesWrongSection from '@/components/landing/WhatGoesWrongSection';
@@ -24,6 +27,9 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
+        <WhyCoursesFailSection />
+        <DecisionProcessSection />
+        <FiltrationSection />
         <UniquenessSection />
         <ProblemSection />
         <WhatGoesWrongSection />
