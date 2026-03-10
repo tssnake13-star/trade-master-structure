@@ -29,7 +29,7 @@ const Index = () => {
         <HeroSection />
         <WhyCoursesFailSection />
         <DecisionProcessSection />
-        <FiltrationSection />
+        
         <UniquenessSection />
         <ProblemSection />
         <WhatGoesWrongSection />
