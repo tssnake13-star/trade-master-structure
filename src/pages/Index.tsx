@@ -28,6 +28,7 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
+        <NotBeginnersSection />
         <WhyCoursesFailSection />
         <DecisionProcessSection />
         
