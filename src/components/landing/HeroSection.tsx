@@ -46,7 +46,7 @@ const HeroSection = () => {
                 rel="noopener noreferrer"
                 className="btn-primary group text-base md:text-lg"
               >
-                Получить алгоритм
+                Получить протокол торговли
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
               
