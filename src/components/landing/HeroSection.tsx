@@ -21,7 +21,7 @@ const HeroSection = () => {
               Трейдинг — это не поиск входов. Это система принятия решений.
             </h1>
             <p className="mt-4 md:mt-6 text-base md:text-lg lg:text-xl text-foreground/90 leading-snug fade-in-up fade-in-up-delay-1">
-              Большинство трейдеров теряют деньги не из-за плохих входов. Они теряют деньги потому, что принимают решения хаотично. В TRADELIKETYO вы не учитесь искать сделки. Вы учитесь разрешать или запрещать их системой.
+              TRADELIKETYO — для трейдеров, у которых есть знания о рынке, но нет порядка в решениях.
             </p>
 
             {/* Principles list */}
@@ -46,7 +46,7 @@ const HeroSection = () => {
                 rel="noopener noreferrer"
                 className="btn-primary group text-base md:text-lg"
               >
-                Получить алгоритм
+                Получить протокол торговли
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
               
