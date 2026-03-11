@@ -1,5 +1,6 @@
 import Header from '@/components/landing/Header';
 import HeroSection from '@/components/landing/HeroSection';
+import NotBeginnersSection from '@/components/landing/NotBeginnersSection';
 import WhyCoursesFailSection from '@/components/landing/WhyCoursesFailSection';
 import DecisionProcessSection from '@/components/landing/DecisionProcessSection';
 
