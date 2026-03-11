@@ -4,7 +4,7 @@ const DecisionProcessSection = () => {
       <div className="container-landing">
         <div className="max-w-3xl">
           <h2 className="heading-section text-foreground">
-            Как принимается решение по сделке
+            Задача трейдера — не искать сделки. Задача трейдера — разрешать их системой.
           </h2>
           
           <div className="mt-6 md:mt-8 space-y-4">
