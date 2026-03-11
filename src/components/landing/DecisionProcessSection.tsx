@@ -21,10 +21,7 @@ const DecisionProcessSection = () => {
           
           <div className="mt-6 md:mt-8 p-4 md:p-5 bg-accent/30 rounded-lg border-l-2 border-foreground/30">
             <p className="text-foreground font-medium">
-              Если хотя бы один элемент отсутствует — сделка запрещена.
-            </p>
-            <p className="mt-2 text-foreground font-medium">
-              Задача трейдера не искать сделки. Задача трейдера — разрешать их системой.
+              Если хотя бы один элемент не совпал — сделки нет. Это не ограничение. Это и есть профессиональный подход. Когда решение принимает система, а не эмоция, трейдинг перестаёт быть хаосом и превращается в управляемую работу с рынком.
             </p>
           </div>
         </div>
