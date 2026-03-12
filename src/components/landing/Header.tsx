@@ -125,7 +125,7 @@ const Header = () => {
               className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background font-medium rounded-lg hover:bg-foreground/90 transition-all duration-200"
             >
               <Send className="w-5 h-5" />
-              Получить алгоритм
+              Получить протокол торговли
             </a>
           </div>
         </div>
