@@ -26,7 +26,7 @@ const modules = [
   },
   {
     id: 'hunter-bot',
-    name: 'HunterBot',
+    name: 'Hunter Bot',
     label: 'Исполнение сделок',
     description: 'Автоматическое выставление ордеров, сопровождение позиции и управление сделкой.',
     icon: (
