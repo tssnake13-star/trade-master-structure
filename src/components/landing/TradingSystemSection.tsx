@@ -12,7 +12,7 @@ const modules = [
   },
   {
     id: 'echo-gate',
-    name: 'Echo-Gate',
+    name: 'Echo-Gate Prototype',
     label: 'Фильтр опыта',
     description: 'Каждый сигнал сравнивается с архивом прошлых сделок. Фильтрация через данные.',
     icon: (
