@@ -37,7 +37,6 @@ const Index = () => {
         <ProblemSection />
         <WhatGoesWrongSection />
         <StructureDiagram />
-        <TradingSystemSection />
         <DisciplineSection />
         
         <ProofSection />
@@ -47,6 +46,7 @@ const Index = () => {
         <ResultsSection />
         <FitSection />
         <FormatsSection />
+        <TradingSystemSection />
         <AuthorSection />
         <FinalCTASection />
         <LogoSection />
