@@ -7,10 +7,10 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
             <p className="text-lg font-semibold text-foreground">TRADELIKETYO</p>
-            <p className="text-sm text-muted-foreground mt-1">TRADE MASTER — система структурного анализа</p>
+            <p className="text-sm text-muted-foreground mt-1">Система допуска к сделке</p>
           </div>
           
-          {/* Secondary links - визуально менее заметные */}
+          {/* Secondary links */}
           <div className="flex items-center gap-6 text-xs text-muted-foreground/60">
             <a
               href={TELEGRAM_LINKS.channel}
@@ -40,7 +40,7 @@ const Footer = () => {
         {/* Disclaimer */}
         <div className="mt-6 text-center">
           <p className="text-xs text-muted-foreground/50 max-w-3xl mx-auto leading-relaxed">
-            Информация на сайте носит исключительно образовательный характер и не является инвестиционной рекомендацией. Торговля на финансовых рынках связана с рисками. Все решения Вы принимаете самостоятельно.
+            Информация на сайте носит исключительно образовательный характер и не является инвестиционной рекомендацией. Торговля на финансовых рынках связана с рисками. Все решения вы принимаете самостоятельно.
           </p>
         </div>
       </div>

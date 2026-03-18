@@ -7,12 +7,23 @@ const FinalCTASection = () => {
       <div className="container-landing">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="heading-section text-foreground">
-            Готовы работать по системе?
+            Заберите систему допуска
           </h2>
           
-          <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            Структура вместо хаоса. Правила вместо угадывания.
-          </p>
+          <div className="mt-4 space-y-3 text-base md:text-lg text-muted-foreground">
+            <p>Вы пройдёте короткую фильтрацию</p>
+            <p>
+              И получите PDF<br />
+              в котором показано<br />
+              как принимается решение
+            </p>
+            <p className="text-foreground font-medium">Это не обучение</p>
+            <p>
+              Это точка,<br />
+              где становится понятно<br />
+              почему вы теряете
+            </p>
+          </div>
           
           <div className="mt-8">
             <a
@@ -21,7 +32,7 @@ const FinalCTASection = () => {
               rel="noopener noreferrer"
               className="btn-primary group text-base md:text-lg px-6 py-3.5"
             >
-              Получить протокол торговли без угадываний
+              Перейти в Telegram
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>

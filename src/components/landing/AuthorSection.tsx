@@ -7,7 +7,7 @@ const AuthorSection = () => {
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground mb-8">
-            Автор
+            Кто за этим стоит
           </h2>
           
           <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-start">
@@ -32,21 +32,17 @@ const AuthorSection = () => {
               
               <div className="space-y-4 mb-6">
                 <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                  Десять лет назад я сделал выбор в пользу{' '}
-                  <span className="font-semibold text-foreground">независимости</span>,
-                  отказавшись от работы в рамках массовых образовательных проектов
-                  ради создания собственного торгового протокола. Для меня было важнее
-                  сохранить право на честную, сухую методологию, чем следовать рыночным
-                  шаблонам.
+                  Я не учу искать входы
+                </p>
+                <p className="text-sm md:text-base text-foreground font-medium leading-relaxed">
+                  Я выстраиваю систему<br />
+                  которая принимает решение
                 </p>
                 <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                  Это время стало фильтром качества: я отсек информационный шум,
-                  создав{' '}
-                  <span className="font-semibold text-foreground">Trade Master</span> —
-                  систему, основанную на жёсткой{' '}
-                  <span className="font-semibold text-foreground">архитектуре</span>{' '}
-                  принятия решений, проверенной годами личной практики.
-                  Моя задача — убрать хаос и дать вам рабочий алгоритм.
+                  Это другой уровень работы
+                </p>
+                <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                  Где вы перестаёте действовать на ощущениях
                 </p>
               </div>
               

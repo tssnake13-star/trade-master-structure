@@ -4,12 +4,24 @@ const NotBeginnersSection = () => {
       <div className="container-landing">
         <div className="max-w-3xl">
           <h2 className="heading-section text-foreground">
-            Большинство трейдеров, которые приходят ко мне, — не новички.
+            Почему даже опыт не спасает
           </h2>
           
           <div className="mt-6 md:mt-8 space-y-4">
             <p className="text-base md:text-lg text-muted-foreground">
-              Они уже прошли курсы. Изучили стратегии. Провели в рынке год, два, три. Но в момент сделки происходит одно и то же: сомнение, импульс, вход на эмоциях. А потом — или стоп, или закрытие раньше времени, потому что нервы не выдерживают. Проблема не в психологии и не в знаниях. Проблема в том, что у вас нет системы допуска к сделке. Нет протокола, который говорит «можно» или «нельзя» до того, как вы нажали кнопку.
+              Вы уже были в рынке<br />
+              видели движение<br />
+              делали прибыльные сделки
+            </p>
+            <p className="text-base md:text-lg text-foreground font-medium">
+              Но стабильности нет
+            </p>
+            <p className="text-base md:text-lg text-muted-foreground">
+              Потому что каждое решение принимается заново
+            </p>
+            <p className="text-base md:text-lg text-muted-foreground">
+              Нет единой системы<br />
+              которая держит вас в рамках
             </p>
           </div>
         </div>

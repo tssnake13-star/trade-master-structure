@@ -3,18 +3,18 @@ import { X } from 'lucide-react';
 const fatalErrors = [
   {
     number: '01',
-    title: 'Отсутствие контекста',
-    description: 'Вы принимаете решение, не понимая фазу рынка.',
+    title: 'Вход без подтверждения',
+    description: 'Вы входите без подтверждения структуры.',
   },
   {
     number: '02',
-    title: 'Работа без сценария',
-    description: 'Нет точки отмены — значит решение всегда эмоциональное.',
+    title: 'Сомнения после входа',
+    description: 'Вы сомневаетесь после входа и закрываете раньше.',
   },
   {
     number: '03',
-    title: 'Импульсные входы',
-    description: 'Страх и желание отыграться подменяют систему.',
+    title: 'Попытка отыграться',
+    description: 'Вы пытаетесь отыграться, когда нет допуска.',
   },
 ];
 
@@ -24,7 +24,7 @@ const ProblemSection = () => {
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
-            3 фатальные ошибки Вашего входа
+            3 ошибки, которые сливают результат
           </h2>
           
           <div className="mt-8 md:mt-10 grid md:grid-cols-3 gap-4">
@@ -41,6 +41,13 @@ const ProblemSection = () => {
                 <p className="text-muted-foreground text-sm">{error.description}</p>
               </div>
             ))}
+          </div>
+
+          <div className="mt-6 md:mt-8 p-4 md:p-5 bg-accent/30 rounded-lg border-l-2 border-foreground/30">
+            <p className="text-foreground font-medium">
+              Все три — это не психология<br /><br />
+              Это отсутствие системы
+            </p>
           </div>
         </div>
       </div>

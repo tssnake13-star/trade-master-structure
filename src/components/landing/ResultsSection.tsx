@@ -1,10 +1,10 @@
 import { Check } from 'lucide-react';
 
 const results = [
-  'Решение по условиям, не по импульсу',
-  'Вход только при совпадении сценария',
-  'Пропуск — часть системы',
-  'Правила важнее ситуации',
+  'Рынок становится понятным',
+  'Сделок становится меньше',
+  'Но каждая из них имеет основание',
+  'Уходит хаос, уходит спешка, уходит давление',
 ];
 
 const ResultsSection = () => {
@@ -13,7 +13,7 @@ const ResultsSection = () => {
       <div className="container-landing">
         <div className="max-w-3xl">
           <h2 className="heading-section text-foreground">
-            Что меняется
+            Что вы начинаете видеть
           </h2>
           
           <ul className="mt-6 md:mt-8 space-y-3">

@@ -2,14 +2,6 @@ import { ArrowRight, MessageCircle } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import heroAuthor from '@/assets/hero-author.jpg';
 
-const principles = [
-  'Контекст рынка',
-  'Сценарий',
-  'Подтверждение',
-  'Зона входа',
-  'Жёсткий риск-менеджмент',
-];
-
 const HeroSection = () => {
   return (
     <section className="min-h-[100svh] lg:min-h-screen flex items-center pt-16 md:pt-20 pb-8 md:pb-16 lg:pb-24">
@@ -18,25 +10,25 @@ const HeroSection = () => {
           {/* Text Content */}
           <div className="flex-1 max-w-2xl order-2 lg:order-1">
             <h1 className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-foreground fade-in-up">
-              Трейдинг — это не поиск входов. Это система принятия решений.
+              Вы уже умеете анализировать рынок<br />
+              Но всё равно теряете на решениях
             </h1>
-            <p className="mt-4 md:mt-6 text-base md:text-lg lg:text-xl text-foreground/90 leading-snug fade-in-up fade-in-up-delay-1">
-              TRADELIKETYO — для трейдеров, у которых есть знания о рынке, но нет порядка в решениях.
-            </p>
-
-            {/* Principles list */}
-            <ul className="mt-6 md:mt-8 space-y-2 fade-in-up fade-in-up-delay-1">
-              {principles.map((item, index) => (
-                <li key={index} className="flex items-center gap-3 text-sm md:text-base text-muted-foreground">
-                  <span className="text-mono text-xs text-foreground/40">{String(index + 1).padStart(2, '0')}</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-
-            <p className="mt-6 text-sm md:text-base text-muted-foreground/70 fade-in-up fade-in-up-delay-1">
-              Каждая сделка проходит через алгоритм. Минимум сделок. Максимум качества.
-            </p>
+            <div className="mt-4 md:mt-6 space-y-3 fade-in-up fade-in-up-delay-1">
+              <p className="text-base md:text-lg lg:text-xl text-foreground/90 leading-snug">
+                Вы не новичок
+              </p>
+              <p className="text-base md:text-lg lg:text-xl text-muted-foreground leading-snug">
+                Вы видите структуру<br />
+                понимаете направление
+              </p>
+              <p className="text-base md:text-lg lg:text-xl text-foreground/90 leading-snug font-medium">
+                Но в момент входа всё ломается
+              </p>
+              <p className="text-base md:text-lg lg:text-xl text-muted-foreground leading-snug">
+                Решение принимается не системой<br />
+                а состоянием
+              </p>
+            </div>
             
             {/* CTA */}
             <div className="mt-8 md:mt-10 flex flex-col gap-3 fade-in-up fade-in-up-delay-2">
@@ -46,7 +38,7 @@ const HeroSection = () => {
                 rel="noopener noreferrer"
                 className="btn-primary group text-base md:text-lg"
               >
-                Получить протокол торговли
+                Получить систему допуска
                 <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </a>
               
