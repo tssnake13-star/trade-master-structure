@@ -1,7 +1,7 @@
 import { Check, X } from 'lucide-react';
 
 const fitItems = [
-  'Уже торговали и теряли деньги',
+  'Уже были в рынке и понимаете, о чём речь',
   'Устали от хаотичных входов',
   'Готовы работать по строгим правилам',
   'Готовы пропускать большинство сделок',
@@ -9,8 +9,8 @@ const fitItems = [
 ];
 
 const notFitItems = [
-  'Ищете сигналы',
-  'Хотите торговать постоянно',
+  'Ищете быстрые решения',
+  'Хотите готовые сигналы',
   'Не готовы соблюдать правила',
   'Ищете быстрый результат',
   'Не готовы к дисциплине',
@@ -22,11 +22,12 @@ const FitSection = () => {
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
-            Кому подойдёт эта система
+            Это подойдёт не всем
           </h2>
 
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            TRADELIKETYO — это не быстрые результаты и не поток сигналов. Это системная работа с рынком.
+            Подойдёт, если вы уже были в рынке и понимаете, о чём речь.<br />
+            Не подойдёт, если вы ищете быстрые решения или готовые сигналы.
           </p>
           
           <div className="mt-8 md:mt-10 grid md:grid-cols-2 gap-4 md:gap-6">
@@ -60,11 +61,6 @@ const FitSection = () => {
               </ul>
             </div>
           </div>
-          
-          <p className="mt-6 md:mt-8 text-sm md:text-base text-foreground font-medium text-center">
-            Здесь не получится торговать по ощущениям.<br />
-            Здесь работают по системе.
-          </p>
         </div>
       </div>
     </section>

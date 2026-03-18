@@ -56,7 +56,7 @@ const TradingSystemSection = () => {
       <div className="container-landing">
         <div className="max-w-4xl mx-auto">
           <h2 className="heading-section text-foreground mb-10 md:mb-14">
-            Как сегодня выглядит моя торговля
+            Как я работаю сейчас
           </h2>
 
           {/* System Architecture */}
@@ -107,7 +107,6 @@ const TradingSystemSection = () => {
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 text-foreground/60">
                           <circle cx="12" cy="8" r="4" />
                           <path d="M5 20c0-4 3.5-7 7-7s7 3 7 7" />
-                          {/* Glasses */}
                           <circle cx="9.5" cy="8" r="2" strokeWidth="1" />
                           <circle cx="14.5" cy="8" r="2" strokeWidth="1" />
                           <path d="M11.5 8h1" strokeWidth="1" />
@@ -181,10 +180,13 @@ const TradingSystemSection = () => {
           {/* Caption */}
           <div className="mt-8 md:mt-10 max-w-2xl">
             <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
-              Моя торговля сегодня — это не постоянный поиск входов на графике.
+              Каждое решение проходит через систему
             </p>
             <p className="mt-3 text-base md:text-lg text-muted-foreground leading-relaxed">
-              Я задаю направление раз в неделю, жду сигнал, фильтрую его через архив своих сделок, а исполнение и риск контролирует система.
+              Я не вхожу, если нет допуска
+            </p>
+            <p className="mt-3 text-base md:text-lg text-foreground font-medium leading-relaxed">
+              Даже если рынок "кажется очевидным"
             </p>
           </div>
         </div>

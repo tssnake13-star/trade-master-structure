@@ -4,24 +4,27 @@ const DecisionProcessSection = () => {
       <div className="container-landing">
         <div className="max-w-3xl">
           <h2 className="heading-section text-foreground">
-            Задача трейдера — не искать сделки. Задача трейдера — разрешать их системой.
+            Без жёстких правил рынок сильнее вас
           </h2>
           
           <div className="mt-6 md:mt-8 space-y-4">
             <p className="text-base md:text-lg text-muted-foreground">
-              В большинстве торговых систем решение принимает человек. Поэтому результат зависит от эмоций, страха и желания быть в рынке.
-            </p>
-            <p className="text-base md:text-lg text-foreground font-medium">
-              В TRADELIKETYO каждая сделка проходит через последовательность фильтрации.
+              Рынок не прощает решений "на глаз"
             </p>
             <p className="text-base md:text-lg text-muted-foreground">
-              Сначала анализируется структура рынка. Затем формируется сценарий. После этого ждём подтверждение. И только потом появляется зона входа.
+              Если нет фильтра<br />
+              вы будете действовать хаотично
+            </p>
+            <p className="text-base md:text-lg text-muted-foreground">
+              Даже если иногда будете попадать
             </p>
           </div>
           
           <div className="mt-6 md:mt-8 p-4 md:p-5 bg-accent/30 rounded-lg border-l-2 border-foreground/30">
             <p className="text-foreground font-medium">
-              Если хотя бы один элемент не совпал — сделки нет. Это не ограничение. Это и есть профессиональный подход. Когда решение принимает система, а не эмоция, трейдинг перестаёт быть хаосом и превращается в управляемую работу с рынком.
+              Система нужна не чтобы зарабатывать<br /><br />
+              А чтобы не терять там<br />
+              где нельзя работать
             </p>
           </div>
         </div>
