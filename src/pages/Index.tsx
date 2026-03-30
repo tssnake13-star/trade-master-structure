@@ -56,7 +56,7 @@ const Index = () => {
         <FormatsSection />
         <TradingSystemSection />
         <AuthorSection />
-        <FinalCTASection />
+        
         <DualCTASection />
         <LogoSection />
       </main>
