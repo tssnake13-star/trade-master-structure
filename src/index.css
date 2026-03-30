@@ -126,8 +126,12 @@
 
   .section-animate {
     opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    transform: translateY(24px);
+    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
   }
 
   .section-animate.visible {

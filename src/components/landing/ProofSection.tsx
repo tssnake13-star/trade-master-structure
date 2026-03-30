@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { User } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import vitaliyImg from '@/assets/testimonials/vitaliy.jpg';
@@ -77,6 +77,20 @@ const TelegramIcon = () => (
 
 const ProofSection = () => {
   const [selectedCase, setSelectedCase] = useState<typeof cases[0] | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const handleScroll = () => {
+      const scrollLeft = el.scrollLeft;
+      const cardWidth = el.offsetWidth * 0.85 + 12; // 85% + gap
+      setActiveIndex(Math.round(scrollLeft / cardWidth));
+    };
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <section id="proof" className="py-12 md:py-20 bg-card/50 section-animate">
@@ -94,7 +108,48 @@ const ProofSection = () => {
             Нажмите на карточку — оригинальный отзыв из Telegram
           </p>
           
-          <div className="mt-8 md:mt-10 grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+          {/* Mobile — horizontal scroll snap */}
+          <div
+            ref={scrollRef}
+            className="mt-8 md:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide pb-4"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {cases.map((item, index) => (
+              <button
+                key={index}
+                onClick={() => setSelectedCase(item)}
+                className="snap-center shrink-0 p-4 bg-card border border-border rounded-xl text-left transition-all duration-200 hover:border-muted-foreground/50 cursor-pointer group"
+                style={{ width: '85%' }}
+              >
+                <div className="flex items-center gap-2 mb-3">
+                  <User className="w-4 h-4 text-muted-foreground" />
+                  <span className="font-medium text-foreground text-sm">{item.name}</span>
+                </div>
+                <p className="text-xs text-muted-foreground mb-1">Было: {item.before}</p>
+                <p className="text-xs text-foreground">Стало: {item.after}</p>
+                <p className="text-xs text-primary/80 font-medium mt-1">Ключ: {item.key}</p>
+                <div className="flex items-center gap-1.5 mt-3 justify-end">
+                  <TelegramIcon />
+                  <span className="text-xs text-[#2AABEE]/70 group-hover:text-[#2AABEE]">оригинал</span>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* Mobile dot indicators */}
+          <div className="md:hidden flex justify-center gap-1.5 mt-2">
+            {cases.map((_, i) => (
+              <div
+                key={i}
+                className={`w-1.5 h-1.5 rounded-full transition-colors duration-200 ${
+                  i === activeIndex ? 'bg-foreground' : 'bg-foreground/20'
+                }`}
+              />
+            ))}
+          </div>
+
+          {/* Desktop — grid */}
+          <div className="mt-8 md:mt-10 hidden md:grid md:grid-cols-4 gap-3 md:gap-4">
             {cases.map((item, index) => (
               <button
                 key={index}
