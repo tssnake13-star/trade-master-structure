@@ -41,7 +41,7 @@ const Index = () => {
         <WhyCoursesFailSection />
         <DecisionProcessSection />
         
-        <UniquenessSection />
+        
         <ProblemSection />
         <WhatGoesWrongSection />
         <StructureDiagram />
