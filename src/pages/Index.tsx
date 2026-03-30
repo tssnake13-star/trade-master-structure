@@ -12,7 +12,7 @@ import ProblemSection from '@/components/landing/ProblemSection';
 import WhatGoesWrongSection from '@/components/landing/WhatGoesWrongSection';
 import StructureDiagram from '@/components/landing/StructureDiagram';
 import TradingSystemSection from '@/components/landing/TradingSystemSection';
-import DisciplineSection from '@/components/landing/DisciplineSection';
+
 import ProofSection from '@/components/landing/ProofSection';
 import TradesSection from '@/components/landing/TradesSection';
 import StagesSection from '@/components/landing/StagesSection';
