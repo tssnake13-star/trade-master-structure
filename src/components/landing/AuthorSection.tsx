@@ -1,4 +1,3 @@
-import { MessageCircle } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 
 const AuthorSection = () => {
