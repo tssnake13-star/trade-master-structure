@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import xagUsdImg from '@/assets/trades/xag-usd-08-01.jpg';
 import xauUsdImg from '@/assets/trades/xau-usd-08-01.jpg';
@@ -48,6 +48,20 @@ const trades = [
 
 const TradesSection = () => {
   const [selectedTrade, setSelectedTrade] = useState<typeof trades[0] | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const handleScroll = () => {
+      const scrollLeft = el.scrollLeft;
+      const cardWidth = el.offsetWidth * 0.9 + 12; // 90% + gap
+      setActiveIndex(Math.round(scrollLeft / cardWidth));
+    };
+    el.addEventListener('scroll', handleScroll, { passive: true });
+    return () => el.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <section id="trades" className="py-12 md:py-20 section-animate">
@@ -61,15 +75,64 @@ const TradesSection = () => {
             Ни одна из этих сделок не была обязательной.<br />
             Все они были разрешены системой.
           </p>
+
+          {/* Mobile — horizontal scroll snap */}
+          <div
+            ref={scrollRef}
+            className="mt-8 md:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory pb-4"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {trades.map((trade, index) => (
+              <button
+                key={index}
+                onClick={() => setSelectedTrade(trade)}
+                className="snap-center shrink-0 bg-card border border-border rounded-xl text-left transition-all hover:border-muted-foreground/50 cursor-pointer group overflow-hidden"
+                style={{ width: '90%' }}
+              >
+                <div className="relative h-28 overflow-hidden">
+                  <img
+                    src={trade.image}
+                    alt={trade.instrument}
+                    className="w-full h-full object-cover object-center brightness-[0.4] group-hover:brightness-[0.6] transition-all duration-300 filter blur-[2px] group-hover:blur-0"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-card" />
+                </div>
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-medium text-foreground text-sm">{trade.instrument}</span>
+                    <span className="text-xs text-muted-foreground">{trade.date}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line">
+                    {trade.description}
+                  </p>
+                  <span className="text-xs text-muted-foreground/60 mt-3 block group-hover:text-muted-foreground">
+                    Открыть разбор ↗
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* Mobile dot indicators */}
+          <div className="md:hidden flex justify-center gap-1.5 mt-2">
+            {trades.map((_, i) => (
+              <div
+                key={i}
+                className={`w-1.5 h-1.5 rounded-full transition-colors duration-200 ${
+                  i === activeIndex ? 'bg-foreground' : 'bg-foreground/20'
+                }`}
+              />
+            ))}
+          </div>
           
-          <div className="mt-8 md:mt-10 grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
+          {/* Desktop — grid */}
+          <div className="mt-8 md:mt-10 hidden md:grid md:grid-cols-3 gap-3 md:gap-4">
             {trades.map((trade, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedTrade(trade)}
                 className="bg-card border border-border rounded-xl text-left transition-all hover:border-muted-foreground/50 cursor-pointer group overflow-hidden"
               >
-                {/* Chart preview thumbnail */}
                 <div className="relative h-24 md:h-28 overflow-hidden">
                   <img
                     src={trade.image}
@@ -78,7 +141,6 @@ const TradesSection = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent to-card" />
                 </div>
-
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-3">
                     <span className="font-medium text-foreground text-sm">{trade.instrument}</span>

@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { ChevronDown } from 'lucide-react';
 
 const modules = [
   {
@@ -14,7 +16,7 @@ const modules = [
   },
   {
     id: 'echo-gate',
-    name: 'Echo-Gate',
+    name: 'Echo-Gate Prototype',
     shortDesc: 'Фильтрация',
     tooltip: 'Каждый сигнал сравнивается с архивом прошлых сделок. Фильтрация через данные.',
     icon: (
@@ -59,6 +61,12 @@ const ArrowIcon = () => (
 );
 
 const TradingSystemSection = () => {
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const toggleExpand = (id: string) => {
+    setExpandedId(prev => prev === id ? null : id);
+  };
+
   return (
     <section className="py-16 md:py-24 section-animate">
       <div className="container-landing">
@@ -73,7 +81,6 @@ const TradingSystemSection = () => {
           {/* Desktop — horizontal flow */}
           <TooltipProvider delayDuration={200}>
             <div className="hidden md:flex items-start justify-between gap-2 bg-card border border-border rounded-2xl p-8 overflow-hidden relative">
-              {/* Grid background */}
               <div
                 className="absolute inset-0 opacity-[0.03]"
                 style={{
@@ -112,8 +119,8 @@ const TradingSystemSection = () => {
               </div>
             </div>
 
-            {/* Mobile — vertical */}
-            <div className="md:hidden bg-card border border-border rounded-2xl p-5 space-y-3 relative overflow-hidden">
+            {/* Mobile — accordion */}
+            <div className="md:hidden bg-card border border-border rounded-2xl p-5 space-y-2 relative overflow-hidden">
               <div
                 className="absolute inset-0 opacity-[0.03]"
                 style={{
@@ -121,21 +128,33 @@ const TradingSystemSection = () => {
                   backgroundSize: '32px 32px',
                 }}
               />
-              <div className="relative z-10 space-y-3">
+              <div className="relative z-10 space-y-2">
                 {modules.map((mod, i) => (
                   <div key={mod.id}>
-                    <div className="p-4 border border-foreground/[0.08] rounded-xl bg-background/30">
-                      <div className="flex items-center gap-2.5 mb-1">
-                        <div className="w-8 h-8 rounded-lg border border-foreground/10 bg-foreground/[0.04] flex items-center justify-center text-foreground/50">
-                          {mod.icon}
+                    <button
+                      onClick={() => toggleExpand(mod.id)}
+                      className="w-full p-4 border border-foreground/[0.08] rounded-xl bg-background/30 text-left transition-colors"
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-lg border border-foreground/10 bg-foreground/[0.04] flex items-center justify-center text-foreground/50">
+                            {mod.icon}
+                          </div>
+                          <div>
+                            <span className="text-sm font-semibold text-foreground block leading-tight">{mod.name}</span>
+                            <span className="text-mono text-[10px] text-muted-foreground/60">{mod.shortDesc}</span>
+                          </div>
                         </div>
-                        <div>
-                          <span className="text-sm font-semibold text-foreground block leading-tight">{mod.name}</span>
-                          <span className="text-mono text-[10px] text-muted-foreground/60">{mod.shortDesc}</span>
-                        </div>
+                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${expandedId === mod.id ? 'rotate-180' : ''}`} />
                       </div>
-                      <p className="text-xs text-muted-foreground/70 leading-relaxed mt-2">{mod.tooltip}</p>
-                    </div>
+                      <div
+                        className={`overflow-hidden transition-all duration-300 ${
+                          expandedId === mod.id ? 'max-h-24 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'
+                        }`}
+                      >
+                        <p className="text-xs text-muted-foreground/70 leading-relaxed">{mod.tooltip}</p>
+                      </div>
+                    </button>
                     {i < modules.length - 1 && (
                       <div className="flex justify-center py-1">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 text-foreground/15">
