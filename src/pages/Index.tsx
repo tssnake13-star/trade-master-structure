@@ -7,7 +7,7 @@ import NotBeginnersSection from '@/components/landing/NotBeginnersSection';
 import WhyCoursesFailSection from '@/components/landing/WhyCoursesFailSection';
 import DecisionProcessSection from '@/components/landing/DecisionProcessSection';
 
-import UniquenessSection from '@/components/landing/UniquenessSection';
+
 import ProblemSection from '@/components/landing/ProblemSection';
 import WhatGoesWrongSection from '@/components/landing/WhatGoesWrongSection';
 import StructureDiagram from '@/components/landing/StructureDiagram';
@@ -41,7 +41,7 @@ const Index = () => {
         <WhyCoursesFailSection />
         <DecisionProcessSection />
         
-        <UniquenessSection />
+        
         <ProblemSection />
         <WhatGoesWrongSection />
         <StructureDiagram />
