@@ -61,7 +61,7 @@ const Index = () => {
         <LogoSection />
       </main>
       <Footer />
-      <StickyButton />
+      
     </div>
   );
 };
