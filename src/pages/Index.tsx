@@ -1,5 +1,8 @@
+import useScrollAnimate from '@/hooks/useScrollAnimate';
 import Header from '@/components/landing/Header';
+import StickyHeader from '@/components/landing/StickyHeader';
 import HeroSection from '@/components/landing/HeroSection';
+import StatsCounter from '@/components/landing/StatsCounter';
 import NotBeginnersSection from '@/components/landing/NotBeginnersSection';
 import WhyCoursesFailSection from '@/components/landing/WhyCoursesFailSection';
 import DecisionProcessSection from '@/components/landing/DecisionProcessSection';
@@ -19,16 +22,21 @@ import FitSection from '@/components/landing/FitSection';
 import FormatsSection from '@/components/landing/FormatsSection';
 import AuthorSection from '@/components/landing/AuthorSection';
 import FinalCTASection from '@/components/landing/FinalCTASection';
+import DualCTASection from '@/components/landing/DualCTASection';
 import LogoSection from '@/components/landing/LogoSection';
 import Footer from '@/components/landing/Footer';
 import StickyButton from '@/components/landing/StickyButton';
 
 const Index = () => {
+  useScrollAnimate();
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
+      <StickyHeader />
       <main>
         <HeroSection />
+        <StatsCounter />
         <NotBeginnersSection />
         <WhyCoursesFailSection />
         <DecisionProcessSection />
@@ -49,6 +57,7 @@ const Index = () => {
         <TradingSystemSection />
         <AuthorSection />
         <FinalCTASection />
+        <DualCTASection />
         <LogoSection />
       </main>
       <Footer />

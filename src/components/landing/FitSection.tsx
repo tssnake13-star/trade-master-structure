@@ -18,7 +18,7 @@ const notFitItems = [
 
 const FitSection = () => {
   return (
-    <section className="py-12 md:py-20 bg-card/50">
+    <section className="section-animate py-12 md:py-20 bg-card/50">
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">

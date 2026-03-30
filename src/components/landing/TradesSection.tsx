@@ -50,7 +50,7 @@ const TradesSection = () => {
   const [selectedTrade, setSelectedTrade] = useState<typeof trades[0] | null>(null);
 
   return (
-    <section id="trades" className="py-12 md:py-20">
+    <section id="trades" className="py-12 md:py-20 section-animate">
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="heading-section text-foreground">
@@ -67,18 +67,30 @@ const TradesSection = () => {
               <button
                 key={index}
                 onClick={() => setSelectedTrade(trade)}
-                className="p-4 bg-card border border-border rounded-xl text-left transition-all hover:border-muted-foreground/50 cursor-pointer group"
+                className="bg-card border border-border rounded-xl text-left transition-all hover:border-muted-foreground/50 cursor-pointer group overflow-hidden"
               >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="font-medium text-foreground text-sm">{trade.instrument}</span>
-                  <span className="text-xs text-muted-foreground">{trade.date}</span>
+                {/* Chart preview thumbnail */}
+                <div className="relative h-24 md:h-28 overflow-hidden">
+                  <img
+                    src={trade.image}
+                    alt={trade.instrument}
+                    className="w-full h-full object-cover object-center brightness-[0.4] group-hover:brightness-[0.6] transition-all duration-300 filter blur-[2px] group-hover:blur-0"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-card" />
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line">
-                  {trade.description}
-                </p>
-                <span className="text-xs text-muted-foreground/60 mt-3 block group-hover:text-muted-foreground">
-                  Открыть сделку →
-                </span>
+
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="font-medium text-foreground text-sm">{trade.instrument}</span>
+                    <span className="text-xs text-muted-foreground">{trade.date}</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line">
+                    {trade.description}
+                  </p>
+                  <span className="text-xs text-muted-foreground/60 mt-3 block group-hover:text-muted-foreground">
+                    Открыть разбор ↗
+                  </span>
+                </div>
               </button>
             ))}
           </div>
