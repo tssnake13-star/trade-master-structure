@@ -16,11 +16,11 @@ const StickyHeader = () => {
 
   return (
     <div
-      className={`fixed top-0 left-0 right-0 z-[60] md:hidden transition-all duration-300 ${
-        visible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-full pointer-events-none'
+      className={`fixed bottom-0 left-0 right-0 z-[60] md:hidden transition-all duration-300 ${
+        visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
       }`}
     >
-      <div className="bg-background/95 backdrop-blur-sm border-b border-border">
+      <div className="bg-background/95 backdrop-blur-sm border-t border-border">
         <div className="container-landing flex items-center justify-between h-12 md:h-14">
           <video
             src={logoVideo}
