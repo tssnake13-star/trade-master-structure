@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 
 const stats = [
   { value: 14, suffix: '', label: 'лет в рынке' },
-  { value: 750, suffix: '+', label: 'эталонных сделок в архиве' },
+  { value: 1000, suffix: '+', label: 'эталонных сделок в архиве' },
   { value: 10, suffix: ':1', label: 'минимальный риск-реворд' },
   { value: 6, suffix: '–7', label: 'сделок из 15–18 сигналов/мес' },
 ];
