@@ -20,7 +20,7 @@ const StickyHeader = () => {
         visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
       }`}
     >
-      <div className="bg-background/95 backdrop-blur-sm border-b border-border">
+      <div className="bg-background/95 backdrop-blur-sm border-t border-border">
         <div className="container-landing flex items-center justify-between h-12 md:h-14">
           <video
             src={logoVideo}
