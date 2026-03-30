@@ -182,3 +182,12 @@
     transform: translateY(0);
   }
 }
+
+@keyframes ctaGlow {
+  0%, 100% {
+    box-shadow: 0 0 8px hsl(220 10% 92% / 0.15), 0 0 20px hsl(220 10% 92% / 0.08);
+  }
+  50% {
+    box-shadow: 0 0 16px hsl(220 10% 92% / 0.3), 0 0 40px hsl(220 10% 92% / 0.15);
+  }
+}
