@@ -20,27 +20,17 @@ const StickyHeader = () => {
         visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-full pointer-events-none'
       }`}
     >
-      <div className="bg-background/95 backdrop-blur-sm border-t border-border">
-        <div className="container-landing flex items-center justify-between h-12 md:h-14">
-          <video
-            src={logoVideo}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="h-6 md:h-7 w-auto"
-          />
-          <a
-            href={TELEGRAM_LINKS.bot}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-4 py-2 bg-foreground text-background text-xs md:text-sm font-medium rounded-lg hover:bg-foreground/90 transition-all"
-            style={{ animation: 'ctaGlow 2s ease-in-out infinite' }}
-          >
-            Получить систему допуска
-            <ArrowRight className="w-3.5 h-3.5" />
-          </a>
-        </div>
+      <div className="bg-background/95 backdrop-blur-sm border-t border-border px-4 py-3">
+        <a
+          href={TELEGRAM_LINKS.bot}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center justify-center gap-2 w-full py-3.5 bg-foreground text-background font-semibold rounded-lg hover:bg-foreground/90 transition-colors"
+          style={{ animation: 'ctaGlow 2s ease-in-out infinite' }}
+        >
+          Получить систему допуска
+          <ArrowRight className="w-5 h-5" />
+        </a>
       </div>
     </div>
   );
