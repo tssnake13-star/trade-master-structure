@@ -25,7 +25,7 @@ import AuthorSection from '@/components/landing/AuthorSection';
 import DualCTASection from '@/components/landing/DualCTASection';
 import LogoSection from '@/components/landing/LogoSection';
 import Footer from '@/components/landing/Footer';
-import StickyButton from '@/components/landing/StickyButton';
+
 
 const Index = () => {
   useScrollAnimate();
@@ -61,7 +61,7 @@ const Index = () => {
         <LogoSection />
       </main>
       <Footer />
-      <StickyButton />
+      
     </div>
   );
 };
