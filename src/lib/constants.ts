@@ -1,6 +1,6 @@
 // Telegram Links - легко редактируемые
 export const TELEGRAM_LINKS = {
-  bot: 'https://t.me/New_TradeLikeTYO_bot',
+  bot: 'https://t.me/New_TradeLikeTYO_bot?start=site',
   channel: 'https://t.me/+6utYXa4nAjMyNjNi',
   dm: 'http://t.me/tradeliketyo',
 } as const;
