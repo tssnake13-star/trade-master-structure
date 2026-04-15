@@ -389,9 +389,15 @@ export default function YouTubePlayer({ url, watermark }: Props) {
 
             {/* Fullscreen */}
             <button onClick={toggleFullscreen} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex' }}>
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path d="M2 6V2h4M12 2h4v4M16 12v4h-4M6 16H2v-4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              {fakeFullscreen ? (
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M6 2v4H2M12 2v4h4M16 16h-4v-4M2 16h4v-4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M2 6V2h4M12 2h4v4M16 12v4h-4M6 16H2v-4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
             </button>
           </div>
         </div>
