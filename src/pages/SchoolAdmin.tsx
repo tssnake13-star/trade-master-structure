@@ -17,7 +17,8 @@ const tabStyle = (active: boolean) => ({
 });
 
 interface Course { id: string; title: string; subtitle: string | null; is_free: boolean; sort_order: number; }
-interface Lesson { id: string; course_id: string; title: string; video_url: string | null; video_url_alt: string | null; description: string | null; sort_order: number; }
+interface Lesson { id: string; course_id: string; title: string; description: string | null; sort_order: number; }
+interface LessonVideo { id?: string; title: string; video_url: string; video_url_alt: string; sort_order: number; }
 interface Profile { user_id: string; email: string; full_name: string | null; created_at: string; }
 interface UserRole { user_id: string; role: string; }
 interface Access { id: string; user_id: string; course_id: string; granted_at: string; expires_at: string | null; }
@@ -83,7 +84,11 @@ function CoursesTab() {
   const [showAddCourse, setShowAddCourse] = useState(false);
   const [showAddLesson, setShowAddLesson] = useState<string | null>(null);
   const [form, setForm] = useState({ title: '', subtitle: '', is_free: false });
-  const [lessonForm, setLessonForm] = useState({ title: '', video_url: '', video_url_alt: '', description: '', sort_order: 0 });
+  const [lessonForm, setLessonForm] = useState({ title: '', description: '', sort_order: 0 });
+  const [lessonVideos, setLessonVideos] = useState<LessonVideo[]>([]);
+  const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
+  const [editLessonForm, setEditLessonForm] = useState({ title: '', description: '' });
+  const [editLessonVideos, setEditLessonVideos] = useState<LessonVideo[]>([]);
 
   const load = async () => {
     const [c, l] = await Promise.all([
