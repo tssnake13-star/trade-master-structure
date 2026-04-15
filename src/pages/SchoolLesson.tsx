@@ -26,8 +26,11 @@ function toEmbedUrl(url: string): string {
   try {
     const u = new URL(url);
     if (u.hostname === 'youtu.be') return `https://www.youtube.com/embed${u.pathname}`;
-    if ((u.hostname === 'www.youtube.com' || u.hostname === 'youtube.com') && u.searchParams.has('v'))
-      return `https://www.youtube.com/embed/${u.searchParams.get('v')}`;
+    if (u.hostname === 'www.youtube.com' || u.hostname === 'youtube.com') {
+      if (u.searchParams.has('v')) return `https://www.youtube.com/embed/${u.searchParams.get('v')}`;
+      const liveMatch = u.pathname.match(/^\/live\/(.+)/);
+      if (liveMatch) return `https://www.youtube.com/embed/${liveMatch[1]}`;
+    }
   } catch {}
   return url;
 }
