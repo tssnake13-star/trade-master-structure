@@ -6,10 +6,12 @@ import { useEffect } from 'react';
 
 export default function SchoolAuth() {
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgot, setIsForgot] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { session } = useAuth();
@@ -17,6 +19,24 @@ export default function SchoolAuth() {
   useEffect(() => {
     if (session) navigate('/school/dashboard', { replace: true });
   }, [session, navigate]);
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/school/reset-password`,
+      });
+      if (error) throw error;
+      setSuccess('Письмо для сброса пароля отправлено на ' + email);
+    } catch (err: any) {
+      setError(err.message || 'Произошла ошибка');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
