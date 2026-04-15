@@ -66,7 +66,7 @@ export default function SchoolDashboard() {
     );
   }
 
-  const hasAccess = (c: Course) => c.is_free || accessIds.has(c.id);
+  const hasAccess = (c: Course) => role === 'admin' || c.is_free || accessIds.has(c.id);
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
