@@ -154,6 +154,10 @@ export default function YouTubePlayer({ url }: Props) {
             }
             const d = player.getDuration();
             if (d > 0) setDuration(d);
+            // Resume from saved position if player was reinitialized
+            if (savedPositionRef.current > 1) {
+              player.seekTo(savedPositionRef.current, true);
+            }
           },
           onStateChange: (e: any) => {
             const isPlaying = e.data === 1;
