@@ -250,11 +250,15 @@ export default function YouTubePlayer({ url, watermark }: Props) {
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const showControls = controlsVisible || !playing;
 
+  const containerStyle: React.CSSProperties = fakeFullscreen
+    ? { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9999, backgroundColor: '#000', borderRadius: 0 }
+    : { position: 'relative', width: '100%', aspectRatio: '16/9', backgroundColor: '#111' };
+
   return (
     <div
       ref={containerRef}
-      className="rounded-xl overflow-hidden"
-      style={{ position: 'relative', width: '100%', aspectRatio: '16/9', backgroundColor: '#111' }}
+      className={fakeFullscreen ? 'overflow-hidden' : 'rounded-xl overflow-hidden'}
+      style={containerStyle}
       onMouseMove={scheduleHide}
       onClick={(e) => {
         if ((e.target as HTMLElement).closest('[data-controls]')) return;
