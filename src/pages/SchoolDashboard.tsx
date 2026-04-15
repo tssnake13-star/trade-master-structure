@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Lock, Settings, LogOut, ArrowRight, CheckCircle, Circle } from 'lucide-react';
@@ -29,6 +29,7 @@ const font = { heading: "'Cormorant Garamond', serif", mono: "'JetBrains Mono', 
 export default function SchoolDashboard() {
   const { session, user, role, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [courses, setCourses] = useState<Course[]>([]);
   const [accessIds, setAccessIds] = useState<Set<string>>(new Set());
   const [progress, setProgress] = useState<ProgressMap>({});
@@ -69,9 +70,11 @@ export default function SchoolDashboard() {
       }
       setProgress(pm);
 
-      // Auto-select first accessible course
+      // Auto-select course from navigation state or first accessible
       const canAccess = (c: Course) => role === 'admin' || c.is_free || accessSet.has(c.id);
-      const first = courseList.find(canAccess);
+      const stateId = (location.state as any)?.selectedCourse;
+      const fromState = stateId ? courseList.find(c => c.id === stateId && canAccess(c)) : null;
+      const first = fromState || courseList.find(canAccess);
       if (first) setSelectedCourse(first.id);
 
       setLoading(false);
@@ -113,7 +116,7 @@ export default function SchoolDashboard() {
         className="hidden sm:flex flex-col w-64 flex-shrink-0 border-r"
         style={{ borderColor: '#1a1a1a', backgroundColor: '#0a0a0a' }}
       >
-        <div className="border-b" style={{ borderColor: '#1a1a1a' }}>
+        <div className="border-b cursor-pointer" style={{ borderColor: '#1a1a1a' }} onClick={() => navigate('/school/dashboard')}>
           <img src={logo} alt="TRADELIKETYO" className="w-full object-cover" />
         </div>
 
