@@ -68,6 +68,7 @@ export default function YouTubePlayer({ url, watermark }: Props) {
   const [speed, setSpeed] = useState(1);
   const [showSpeed, setShowSpeed] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
+  const [fakeFullscreen, setFakeFullscreen] = useState(false);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const videoId = extractVideoId(url);
 
@@ -113,6 +114,16 @@ export default function YouTubePlayer({ url, watermark }: Props) {
     }, 5000);
     return () => clearInterval(interval);
   }, []);
+
+  // Exit fake fullscreen on Escape key
+  useEffect(() => {
+    if (!fakeFullscreen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setFakeFullscreen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [fakeFullscreen]);
 
   useEffect(() => {
     if (!videoId || !containerRef.current) return;
@@ -214,48 +225,50 @@ export default function YouTubePlayer({ url, watermark }: Props) {
     const el = containerRef.current;
     if (!el) return;
 
-    if (document.fullscreenElement || (document as any).webkitFullscreenElement) {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if ((document as any).webkitExitFullscreen) {
-        (document as any).webkitExitFullscreen();
-      }
-    } else {
-      // Try container fullscreen first
-      if (el.requestFullscreen) {
-        el.requestFullscreen().catch(() => {
-          // Fallback: try iframe fullscreen for mobile
-          const iframe = playerRef.current?.getIframe?.();
-          if (iframe) {
-            if (iframe.requestFullscreen) iframe.requestFullscreen();
-            else if ((iframe as any).webkitRequestFullscreen) (iframe as any).webkitRequestFullscreen();
-            else if ((iframe as any).webkitEnterFullscreen) (iframe as any).webkitEnterFullscreen();
-          }
-        });
-      } else if ((el as any).webkitRequestFullscreen) {
-        (el as any).webkitRequestFullscreen();
-      } else {
-        // Last resort: iframe directly
-        const iframe = playerRef.current?.getIframe?.();
-        if (iframe) {
-          if ((iframe as any).webkitRequestFullscreen) (iframe as any).webkitRequestFullscreen();
-          else if ((iframe as any).webkitEnterFullscreen) (iframe as any).webkitEnterFullscreen();
-        }
-      }
+    // Check if currently in native fullscreen
+    const inNativeFS = !!(document.fullscreenElement || (document as any).webkitFullscreenElement);
+    
+    if (inNativeFS) {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if ((document as any).webkitExitFullscreen) (document as any).webkitExitFullscreen();
+      return;
     }
+
+    if (fakeFullscreen) {
+      setFakeFullscreen(false);
+      scheduleHide();
+      return;
+    }
+
+    // Try native fullscreen first
+    const tryNative = el.requestFullscreen
+      ? el.requestFullscreen()
+      : (el as any).webkitRequestFullscreen
+        ? Promise.resolve((el as any).webkitRequestFullscreen())
+        : Promise.reject();
+
+    tryNative.catch(() => {
+      // Native fullscreen failed (iOS Safari) — use fake fullscreen
+      setFakeFullscreen(true);
+    });
+
     scheduleHide();
-  }, [scheduleHide]);
+  }, [scheduleHide, fakeFullscreen]);
 
   if (!videoId) return null;
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const showControls = controlsVisible || !playing;
 
+  const containerStyle: React.CSSProperties = fakeFullscreen
+    ? { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', zIndex: 9999, backgroundColor: '#000', borderRadius: 0 }
+    : { position: 'relative', width: '100%', aspectRatio: '16/9', backgroundColor: '#111' };
+
   return (
     <div
       ref={containerRef}
-      className="rounded-xl overflow-hidden"
-      style={{ position: 'relative', width: '100%', aspectRatio: '16/9', backgroundColor: '#111' }}
+      className={fakeFullscreen ? 'overflow-hidden' : 'rounded-xl overflow-hidden'}
+      style={containerStyle}
       onMouseMove={scheduleHide}
       onClick={(e) => {
         if ((e.target as HTMLElement).closest('[data-controls]')) return;
@@ -376,9 +389,15 @@ export default function YouTubePlayer({ url, watermark }: Props) {
 
             {/* Fullscreen */}
             <button onClick={toggleFullscreen} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex' }}>
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path d="M2 6V2h4M12 2h4v4M16 12v4h-4M6 16H2v-4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
+              {fakeFullscreen ? (
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M6 2v4H2M12 2v4h4M16 16h-4v-4M2 16h4v-4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              ) : (
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                  <path d="M2 6V2h4M12 2h4v4M16 12v4h-4M6 16H2v-4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              )}
             </button>
           </div>
         </div>
