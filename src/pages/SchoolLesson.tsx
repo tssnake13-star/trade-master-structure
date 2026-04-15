@@ -39,12 +39,17 @@ function getYouTubeSource(val: string): string | null {
   return candidate && isYouTubeUrl(candidate) ? candidate : null;
 }
 
-function renderPlayer(val: string) {
-  const containerStyle: React.CSSProperties = { width: '100%', aspectRatio: '16/9', backgroundColor: '#111', position: 'relative' };
+function renderPlayer(val: string, watermark?: React.ReactNode) {
+  const containerStyle: React.CSSProperties = { width: '100%', aspectRatio: '16/9', backgroundColor: '#111', position: 'relative', overflow: 'hidden' };
   const youTubeSource = getYouTubeSource(val);
 
   if (youTubeSource) {
-    return <YouTubePlayer url={youTubeSource} />;
+    return (
+      <div style={{ position: 'relative', overflow: 'hidden' }}>
+        <YouTubePlayer url={youTubeSource} />
+        {watermark}
+      </div>
+    );
   }
 
   if (val.trimStart().startsWith('<iframe')) {
@@ -59,6 +64,7 @@ function renderPlayer(val: string) {
     <div className="rounded-xl overflow-hidden" style={containerStyle}>
       <iframe src={val} style={{ width: '100%', height: '100%', border: 'none' }} allowFullScreen
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
+      {watermark}
     </div>
   );
 }
@@ -137,10 +143,7 @@ export default function SchoolLesson() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#080808', color: '#e8e0d0', position: 'relative', overflow: 'hidden' }}>
-      {profileData.email && (
-        <FloatingWatermark email={profileData.email} fullName={profileData.full_name} />
-      )}
+    <div className="min-h-screen" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
       <header className="border-b px-4 py-3" style={{ borderColor: '#1a1a1a' }}>
         <button
           onClick={() => navigate(`/school/course/${lesson.course_id}`)}
@@ -167,6 +170,7 @@ export default function SchoolLesson() {
               const hasMain = !!v.video_url;
               const hasAlt = !!v.video_url_alt;
               const hasBoth = hasMain && hasAlt;
+              const wm = profileData.email ? <FloatingWatermark email={profileData.email} fullName={profileData.full_name} /> : null;
               return (
                 <div key={v.id}>
                   {v.title && (
@@ -176,13 +180,13 @@ export default function SchoolLesson() {
                     {hasMain && (
                       <div>
                         {hasBoth && <p className="text-xs mb-1" style={{ color: '#666', fontFamily: font.mono }}>YouTube</p>}
-                        {renderPlayer(v.video_url)}
+                        {renderPlayer(v.video_url, wm)}
                       </div>
                     )}
                     {hasAlt && (
                       <div>
                         {hasBoth && <p className="text-xs mb-1" style={{ color: '#666', fontFamily: font.mono }}>Дзен / RuTube</p>}
-                        {renderPlayer(v.video_url_alt!)}
+                        {renderPlayer(v.video_url_alt!, wm)}
                       </div>
                     )}
                   </div>

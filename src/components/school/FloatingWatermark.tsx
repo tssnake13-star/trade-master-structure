@@ -60,15 +60,16 @@ export default function FloatingWatermark({ email, fullName }: Props) {
         position: 'absolute',
         left: pos.x,
         top: pos.y,
-        opacity: 0.17,
-        color: '#ccc',
-        fontSize: '13px',
+        opacity: 0.35,
+        color: '#fff',
+        fontSize: '14px',
         fontFamily: "'JetBrains Mono', monospace",
         whiteSpace: 'nowrap',
         pointerEvents: 'none',
-        zIndex: 40,
+        zIndex: 15,
         userSelect: 'none',
         letterSpacing: '0.5px',
+        textShadow: '0 1px 3px rgba(0,0,0,0.8)',
       }}
     >
       {text}
