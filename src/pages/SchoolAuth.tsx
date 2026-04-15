@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect } from 'react';
+import logo from '@/assets/logo-tradeliketyo.jpeg';
 
 export default function SchoolAuth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -62,10 +63,17 @@ export default function SchoolAuth() {
     }
   };
 
+  const LogoBlock = () => (
+    <div className="flex justify-center mb-6">
+      <img src={logo} alt="TRADELIKETYO" className="w-24 h-24 rounded-xl object-cover" />
+    </div>
+  );
+
   if (isForgot) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#080808' }}>
         <div className="w-full max-w-md">
+          <LogoBlock />
           <h1 className="text-3xl mb-8 text-center" style={{ fontFamily: "'Cormorant Garamond', serif", color: '#e8e0d0' }}>
             Сброс пароля
           </h1>
@@ -105,6 +113,7 @@ export default function SchoolAuth() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#080808' }}>
       <div className="w-full max-w-md">
+        <LogoBlock />
         <h1
           className="text-3xl mb-8 text-center"
           style={{ fontFamily: "'Cormorant Garamond', serif", color: '#e8e0d0' }}

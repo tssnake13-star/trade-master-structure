@@ -2,8 +2,25 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, Plus, Trash2, Pencil } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Pencil, GripVertical } from 'lucide-react';
 import VideoBlockEditor from '@/components/school/VideoBlockEditor';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 const font = { heading: "'Cormorant Garamond', serif", mono: "'JetBrains Mono', monospace" };
 const tabStyle = (active: boolean) => ({
@@ -27,7 +44,7 @@ interface Access { id: string; user_id: string; course_id: string; granted_at: s
 export default function SchoolAdmin() {
   const { session, role, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<'courses' | 'students' | 'access'>('courses');
+  const [tab, setTab] = useState<'courses' | 'students' | 'access' | 'settings'>('courses');
 
   useEffect(() => {
     if (!authLoading && !session) navigate('/school', { replace: true });
@@ -64,13 +81,86 @@ export default function SchoolAdmin() {
         <button style={tabStyle(tab === 'courses')} onClick={() => setTab('courses')}>Курсы</button>
         <button style={tabStyle(tab === 'students')} onClick={() => setTab('students')}>Студенты</button>
         <button style={tabStyle(tab === 'access')} onClick={() => setTab('access')}>Доступы</button>
+        <button style={tabStyle(tab === 'settings')} onClick={() => setTab('settings')}>Настройки</button>
       </div>
 
       <main className="max-w-5xl mx-auto p-4 sm:p-6">
         {tab === 'courses' && <CoursesTab />}
         {tab === 'students' && <StudentsTab />}
         {tab === 'access' && <AccessTab />}
+        {tab === 'settings' && <SettingsTab />}
       </main>
+    </div>
+  );
+}
+
+/* ========= SETTINGS TAB ========= */
+function SettingsTab() {
+  const [welcomeVideo, setWelcomeVideo] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    supabase.from('site_settings').select('value').eq('key', 'dashboard_welcome_video').single()
+      .then(({ data }) => setWelcomeVideo(data?.value || ''));
+  }, []);
+
+  const save = async () => {
+    setSaving(true);
+    await supabase.from('site_settings').update({ value: welcomeVideo, updated_at: new Date().toISOString() }).eq('key', 'dashboard_welcome_video');
+    setSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  return (
+    <div>
+      <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Настройки</h2>
+      <div className="rounded-lg border p-4 space-y-3" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
+        <label className="block text-xs mb-1" style={{ color: '#999', fontFamily: font.mono }}>
+          Приветственное видео dashboard (YouTube URL)
+        </label>
+        <input
+          value={welcomeVideo}
+          onChange={e => setWelcomeVideo(e.target.value)}
+          placeholder="https://www.youtube.com/watch?v=..."
+          className="w-full px-3 py-2 rounded border text-sm"
+          style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
+        />
+        <div className="flex items-center gap-3">
+          <button onClick={save} disabled={saving} className="text-xs px-4 py-2 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono, opacity: saving ? 0.6 : 1 }}>
+            {saving ? '...' : 'Сохранить'}
+          </button>
+          {saved && <span className="text-xs" style={{ color: '#4a8a4a', fontFamily: font.mono }}>Сохранено ✓</span>}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ========= SORTABLE COURSE ITEM ========= */
+function SortableCourseItem({ course, children }: { course: Course; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: course.id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <div className="rounded-lg border" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
+        <div className="flex items-center">
+          <button
+            className="px-2 py-4 cursor-grab active:cursor-grabbing hover:bg-white/5 rounded-l-lg"
+            {...attributes}
+            {...listeners}
+          >
+            <GripVertical size={14} style={{ color: '#444' }} />
+          </button>
+          {children}
+        </div>
+      </div>
     </div>
   );
 }
@@ -91,6 +181,11 @@ function CoursesTab() {
   const [editLessonForm, setEditLessonForm] = useState({ title: '', description: '' });
   const [editLessonVideos, setEditLessonVideos] = useState<LessonVideo[]>([]);
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
+
   const load = async () => {
     const [c, l] = await Promise.all([
       supabase.from('courses').select('*').order('sort_order'),
@@ -101,6 +196,23 @@ function CoursesTab() {
   };
 
   useEffect(() => { load(); }, []);
+
+  const handleDragEnd = async (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const oldIndex = courses.findIndex(c => c.id === active.id);
+    const newIndex = courses.findIndex(c => c.id === over.id);
+    const reordered = arrayMove(courses, oldIndex, newIndex);
+    setCourses(reordered);
+
+    // Save new sort_order to DB
+    await Promise.all(
+      reordered.map((c, i) =>
+        supabase.from('courses').update({ sort_order: i }).eq('id', c.id)
+      )
+    );
+  };
 
   const addCourse = async () => {
     if (!form.title) return;
@@ -238,119 +350,119 @@ function CoursesTab() {
         </div>
       )}
 
-      <div className="space-y-2">
-        {courses.map(c => (
-          <div key={c.id} className="rounded-lg border" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
-            <div
-              className="flex items-center justify-between p-4 cursor-pointer"
-              onClick={() => setExpandedCourse(expandedCourse === c.id ? null : c.id)}
-            >
-              <div>
-                <span className="text-sm" style={{ fontFamily: font.mono }}>{c.title}</span>
-                <span className="ml-2 text-xs" style={{ color: c.is_free ? '#4a8a4a' : '#666', fontFamily: font.mono }}>
-                  {c.is_free ? 'бесплатный' : 'платный'}
-                </span>
-              </div>
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={e => { e.stopPropagation(); startEdit(c); }}
-                  className="p-1 hover:opacity-70"
-                >
-                  <Pencil size={14} style={{ color: '#666' }} />
-                </button>
-                <button
-                  onClick={e => { e.stopPropagation(); deleteCourse(c.id); }}
-                  className="p-1 hover:opacity-70"
-                >
-                  <Trash2 size={14} style={{ color: '#666' }} />
-                </button>
-              </div>
-            </div>
-
-            {editingCourse === c.id && (
-              <div className="border-t px-4 pb-4 pt-3 space-y-3" style={{ borderColor: '#1a1a1a' }}>
-                <input
-                  placeholder="Название курса"
-                  value={editForm.title}
-                  onChange={e => setEditForm({ ...editForm, title: e.target.value })}
-                  className="w-full px-3 py-2 rounded border text-sm"
-                  style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
-                />
-                <input
-                  placeholder="Подзаголовок"
-                  value={editForm.subtitle}
-                  onChange={e => setEditForm({ ...editForm, subtitle: e.target.value })}
-                  className="w-full px-3 py-2 rounded border text-sm"
-                  style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
-                />
-                <label className="flex items-center gap-2 text-xs" style={{ color: '#999', fontFamily: font.mono }}>
-                  <input type="checkbox" checked={editForm.is_free} onChange={e => setEditForm({ ...editForm, is_free: e.target.checked })} />
-                  Бесплатный
-                </label>
-                <div className="flex gap-2">
-                  <button onClick={updateCourse} className="text-xs px-4 py-2 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}>
-                    Сохранить
-                  </button>
-                  <button onClick={() => setEditingCourse(null)} className="text-xs px-4 py-2 rounded" style={{ color: '#666', fontFamily: font.mono }}>
-                    Отмена
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {expandedCourse === c.id && (
-              <div className="border-t px-4 pb-4 pt-3 space-y-2" style={{ borderColor: '#1a1a1a' }}>
-                {lessons.filter(l => l.course_id === c.id).map(l => (
-                  <div key={l.id}>
-                    <div className="flex items-center justify-between text-xs py-1.5" style={{ fontFamily: font.mono, color: '#999' }}>
-                      <span>{l.sort_order + 1}. {l.title}</span>
-                      <div className="flex items-center gap-1">
-                        <button onClick={() => startEditLesson(l)} className="hover:opacity-70"><Pencil size={12} style={{ color: '#444' }} /></button>
-                        <button onClick={() => deleteLesson(l.id)} className="hover:opacity-70"><Trash2 size={12} style={{ color: '#444' }} /></button>
-                      </div>
-                    </div>
-                    {editingLessonId === l.id && (
-                      <div className="space-y-2 pt-2 pb-3 pl-4 border-l" style={{ borderColor: '#1a1a1a' }}>
-                        <input placeholder="Название урока" value={editLessonForm.title} onChange={e => setEditLessonForm({ ...editLessonForm, title: e.target.value })}
-                          className="w-full px-3 py-2 rounded border text-xs" style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
-                        <textarea placeholder="Описание" value={editLessonForm.description} onChange={e => setEditLessonForm({ ...editLessonForm, description: e.target.value })}
-                          className="w-full px-3 py-2 rounded border text-xs" rows={2} style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
-                        <VideoBlockEditor videos={editLessonVideos} onChange={setEditLessonVideos} />
-                        <div className="flex gap-2">
-                          <button onClick={saveEditLesson} className="text-xs px-3 py-1.5 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}>Сохранить</button>
-                          <button onClick={() => setEditingLessonId(null)} className="text-xs px-3 py-1.5" style={{ color: '#666', fontFamily: font.mono }}>Отмена</button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))}
-
-                {showAddLesson === c.id ? (
-                  <div className="space-y-2 pt-2">
-                    <input placeholder="Название урока" value={lessonForm.title} onChange={e => setLessonForm({ ...lessonForm, title: e.target.value })}
-                      className="w-full px-3 py-2 rounded border text-xs" style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
-                    <textarea placeholder="Описание" value={lessonForm.description} onChange={e => setLessonForm({ ...lessonForm, description: e.target.value })}
-                      className="w-full px-3 py-2 rounded border text-xs" rows={2} style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
-                    <VideoBlockEditor videos={lessonVideos} onChange={setLessonVideos} />
-                    <div className="flex gap-2">
-                      <button onClick={() => addLesson(c.id)} className="text-xs px-3 py-1.5 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}>Добавить</button>
-                      <button onClick={() => { setShowAddLesson(null); setLessonVideos([]); }} className="text-xs px-3 py-1.5" style={{ color: '#666', fontFamily: font.mono }}>Отмена</button>
-                    </div>
-                  </div>
-                ) : (
-                  <button
-                    onClick={() => { setShowAddLesson(c.id); setLessonVideos([]); }}
-                    className="flex items-center gap-1 text-xs mt-1"
-                    style={{ color: '#4a8a4a', fontFamily: font.mono }}
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+        <SortableContext items={courses.map(c => c.id)} strategy={verticalListSortingStrategy}>
+          <div className="space-y-2">
+            {courses.map(c => (
+              <SortableCourseItem key={c.id} course={c}>
+                <div className="flex-1">
+                  <div
+                    className="flex items-center justify-between p-4 cursor-pointer"
+                    onClick={() => setExpandedCourse(expandedCourse === c.id ? null : c.id)}
                   >
-                    <Plus size={12} /> Добавить урок
-                  </button>
-                )}
-              </div>
-            )}
+                    <div>
+                      <span className="text-sm" style={{ fontFamily: font.mono }}>{c.title}</span>
+                      <span className="ml-2 text-xs" style={{ color: c.is_free ? '#4a8a4a' : '#666', fontFamily: font.mono }}>
+                        {c.is_free ? 'бесплатный' : 'платный'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button onClick={e => { e.stopPropagation(); startEdit(c); }} className="p-1 hover:opacity-70">
+                        <Pencil size={14} style={{ color: '#666' }} />
+                      </button>
+                      <button onClick={e => { e.stopPropagation(); deleteCourse(c.id); }} className="p-1 hover:opacity-70">
+                        <Trash2 size={14} style={{ color: '#666' }} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {editingCourse === c.id && (
+                    <div className="border-t px-4 pb-4 pt-3 space-y-3" style={{ borderColor: '#1a1a1a' }}>
+                      <input
+                        placeholder="Название курса"
+                        value={editForm.title}
+                        onChange={e => setEditForm({ ...editForm, title: e.target.value })}
+                        className="w-full px-3 py-2 rounded border text-sm"
+                        style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
+                      />
+                      <input
+                        placeholder="Подзаголовок"
+                        value={editForm.subtitle}
+                        onChange={e => setEditForm({ ...editForm, subtitle: e.target.value })}
+                        className="w-full px-3 py-2 rounded border text-sm"
+                        style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
+                      />
+                      <label className="flex items-center gap-2 text-xs" style={{ color: '#999', fontFamily: font.mono }}>
+                        <input type="checkbox" checked={editForm.is_free} onChange={e => setEditForm({ ...editForm, is_free: e.target.checked })} />
+                        Бесплатный
+                      </label>
+                      <div className="flex gap-2">
+                        <button onClick={updateCourse} className="text-xs px-4 py-2 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}>
+                          Сохранить
+                        </button>
+                        <button onClick={() => setEditingCourse(null)} className="text-xs px-4 py-2 rounded" style={{ color: '#666', fontFamily: font.mono }}>
+                          Отмена
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {expandedCourse === c.id && (
+                    <div className="border-t px-4 pb-4 pt-3 space-y-2" style={{ borderColor: '#1a1a1a' }}>
+                      {lessons.filter(l => l.course_id === c.id).map(l => (
+                        <div key={l.id}>
+                          <div className="flex items-center justify-between text-xs py-1.5" style={{ fontFamily: font.mono, color: '#999' }}>
+                            <span>{l.sort_order + 1}. {l.title}</span>
+                            <div className="flex items-center gap-1">
+                              <button onClick={() => startEditLesson(l)} className="hover:opacity-70"><Pencil size={12} style={{ color: '#444' }} /></button>
+                              <button onClick={() => deleteLesson(l.id)} className="hover:opacity-70"><Trash2 size={12} style={{ color: '#444' }} /></button>
+                            </div>
+                          </div>
+                          {editingLessonId === l.id && (
+                            <div className="space-y-2 pt-2 pb-3 pl-4 border-l" style={{ borderColor: '#1a1a1a' }}>
+                              <input placeholder="Название урока" value={editLessonForm.title} onChange={e => setEditLessonForm({ ...editLessonForm, title: e.target.value })}
+                                className="w-full px-3 py-2 rounded border text-xs" style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
+                              <textarea placeholder="Описание" value={editLessonForm.description} onChange={e => setEditLessonForm({ ...editLessonForm, description: e.target.value })}
+                                className="w-full px-3 py-2 rounded border text-xs" rows={2} style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
+                              <VideoBlockEditor videos={editLessonVideos} onChange={setEditLessonVideos} />
+                              <div className="flex gap-2">
+                                <button onClick={saveEditLesson} className="text-xs px-3 py-1.5 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}>Сохранить</button>
+                                <button onClick={() => setEditingLessonId(null)} className="text-xs px-3 py-1.5" style={{ color: '#666', fontFamily: font.mono }}>Отмена</button>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+
+                      {showAddLesson === c.id ? (
+                        <div className="space-y-2 pt-2">
+                          <input placeholder="Название урока" value={lessonForm.title} onChange={e => setLessonForm({ ...lessonForm, title: e.target.value })}
+                            className="w-full px-3 py-2 rounded border text-xs" style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
+                          <textarea placeholder="Описание" value={lessonForm.description} onChange={e => setLessonForm({ ...lessonForm, description: e.target.value })}
+                            className="w-full px-3 py-2 rounded border text-xs" rows={2} style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
+                          <VideoBlockEditor videos={lessonVideos} onChange={setLessonVideos} />
+                          <div className="flex gap-2">
+                            <button onClick={() => addLesson(c.id)} className="text-xs px-3 py-1.5 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}>Добавить</button>
+                            <button onClick={() => { setShowAddLesson(null); setLessonVideos([]); }} className="text-xs px-3 py-1.5" style={{ color: '#666', fontFamily: font.mono }}>Отмена</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => { setShowAddLesson(c.id); setLessonVideos([]); }}
+                          className="flex items-center gap-1 text-xs mt-1"
+                          style={{ color: '#4a8a4a', fontFamily: font.mono }}
+                        >
+                          <Plus size={12} /> Добавить урок
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </SortableCourseItem>
+            ))}
           </div>
-        ))}
-      </div>
+        </SortableContext>
+      </DndContext>
     </div>
   );
 }
