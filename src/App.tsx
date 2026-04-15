@@ -8,6 +8,9 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SchoolAuth from "./pages/SchoolAuth";
 import SchoolDashboard from "./pages/SchoolDashboard";
+import SchoolCourse from "./pages/SchoolCourse";
+import SchoolLesson from "./pages/SchoolLesson";
+import SchoolAdmin from "./pages/SchoolAdmin";
 
 const queryClient = new QueryClient();
 
