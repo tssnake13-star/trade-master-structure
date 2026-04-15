@@ -215,37 +215,35 @@ export default function YouTubePlayer({ url, watermark }: Props) {
     const el = containerRef.current;
     if (!el) return;
 
-    if (document.fullscreenElement || (document as any).webkitFullscreenElement) {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if ((document as any).webkitExitFullscreen) {
-        (document as any).webkitExitFullscreen();
-      }
-    } else {
-      // Try container fullscreen first
-      if (el.requestFullscreen) {
-        el.requestFullscreen().catch(() => {
-          // Fallback: try iframe fullscreen for mobile
-          const iframe = playerRef.current?.getIframe?.();
-          if (iframe) {
-            if (iframe.requestFullscreen) iframe.requestFullscreen();
-            else if ((iframe as any).webkitRequestFullscreen) (iframe as any).webkitRequestFullscreen();
-            else if ((iframe as any).webkitEnterFullscreen) (iframe as any).webkitEnterFullscreen();
-          }
-        });
-      } else if ((el as any).webkitRequestFullscreen) {
-        (el as any).webkitRequestFullscreen();
-      } else {
-        // Last resort: iframe directly
-        const iframe = playerRef.current?.getIframe?.();
-        if (iframe) {
-          if ((iframe as any).webkitRequestFullscreen) (iframe as any).webkitRequestFullscreen();
-          else if ((iframe as any).webkitEnterFullscreen) (iframe as any).webkitEnterFullscreen();
-        }
-      }
+    // Check if currently in native fullscreen
+    const inNativeFS = !!(document.fullscreenElement || (document as any).webkitFullscreenElement);
+    
+    if (inNativeFS) {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if ((document as any).webkitExitFullscreen) (document as any).webkitExitFullscreen();
+      return;
     }
+
+    if (fakeFullscreen) {
+      setFakeFullscreen(false);
+      scheduleHide();
+      return;
+    }
+
+    // Try native fullscreen first
+    const tryNative = el.requestFullscreen
+      ? el.requestFullscreen()
+      : (el as any).webkitRequestFullscreen
+        ? Promise.resolve((el as any).webkitRequestFullscreen())
+        : Promise.reject();
+
+    tryNative.catch(() => {
+      // Native fullscreen failed (iOS Safari) — use fake fullscreen
+      setFakeFullscreen(true);
+    });
+
     scheduleHide();
-  }, [scheduleHide]);
+  }, [scheduleHide, fakeFullscreen]);
 
   if (!videoId) return null;
 
