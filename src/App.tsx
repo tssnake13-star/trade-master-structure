@@ -29,6 +29,7 @@ const App = () => (
             <Route path="/school/course/:id" element={<SchoolCourse />} />
             <Route path="/school/lesson/:id" element={<SchoolLesson />} />
             <Route path="/school/admin" element={<SchoolAdmin />} />
+            <Route path="/school/reset-password" element={<SchoolResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
