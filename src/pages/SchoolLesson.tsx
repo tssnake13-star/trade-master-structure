@@ -39,12 +39,17 @@ function getYouTubeSource(val: string): string | null {
   return candidate && isYouTubeUrl(candidate) ? candidate : null;
 }
 
-function renderPlayer(val: string) {
-  const containerStyle: React.CSSProperties = { width: '100%', aspectRatio: '16/9', backgroundColor: '#111', position: 'relative' };
+function renderPlayer(val: string, watermark?: React.ReactNode) {
+  const containerStyle: React.CSSProperties = { width: '100%', aspectRatio: '16/9', backgroundColor: '#111', position: 'relative', overflow: 'hidden' };
   const youTubeSource = getYouTubeSource(val);
 
   if (youTubeSource) {
-    return <YouTubePlayer url={youTubeSource} />;
+    return (
+      <div style={{ position: 'relative', overflow: 'hidden' }}>
+        <YouTubePlayer url={youTubeSource} />
+        {watermark}
+      </div>
+    );
   }
 
   if (val.trimStart().startsWith('<iframe')) {
@@ -59,6 +64,7 @@ function renderPlayer(val: string) {
     <div className="rounded-xl overflow-hidden" style={containerStyle}>
       <iframe src={val} style={{ width: '100%', height: '100%', border: 'none' }} allowFullScreen
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
+      {watermark}
     </div>
   );
 }
