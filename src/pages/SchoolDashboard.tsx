@@ -113,7 +113,7 @@ export default function SchoolDashboard() {
         className="hidden sm:flex flex-col w-64 flex-shrink-0 border-r"
         style={{ borderColor: '#1a1a1a', backgroundColor: '#0a0a0a' }}
       >
-        <div className="border-b" style={{ borderColor: '#1a1a1a' }}>
+        <div className="border-b cursor-pointer" style={{ borderColor: '#1a1a1a' }} onClick={() => navigate('/school/dashboard')}>
           <img src={logo} alt="TRADELIKETYO" className="w-full object-cover" />
         </div>
 

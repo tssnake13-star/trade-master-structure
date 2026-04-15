@@ -141,7 +141,7 @@ export default function SchoolLesson() {
     <div className="min-h-screen" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
       <header className="border-b px-4 py-3" style={{ borderColor: '#1a1a1a' }}>
         <button
-          onClick={() => navigate(`/school/course/${lesson.course_id}`)}
+          onClick={() => navigate('/school/dashboard', { state: { selectedCourse: lesson.course_id } })}
           className="flex items-center gap-2 hover:opacity-70 transition text-sm"
           style={{ color: '#666', fontFamily: font.mono }}
         >
