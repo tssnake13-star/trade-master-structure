@@ -40,6 +40,22 @@ function toEmbedUrl(raw: string): string {
   return raw;
 }
 
+function renderPlayer(val: string) {
+  if (val.trimStart().startsWith('<iframe')) {
+    const styled = val.replace(/<iframe/i, '<iframe style="position:absolute;top:0;left:0;width:100%;height:100%"');
+    return (
+      <div className="rounded-xl overflow-hidden" style={{ position: 'relative', paddingBottom: '56.25%', height: 0, backgroundColor: '#111' }}
+        dangerouslySetInnerHTML={{ __html: styled }} />
+    );
+  }
+  return (
+    <div className="aspect-video rounded-xl overflow-hidden" style={{ backgroundColor: '#111' }}>
+      <iframe src={toEmbedUrl(val)} className="w-full h-full" allowFullScreen
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
+    </div>
+  );
+}
+
 export default function SchoolLesson() {
   const { id } = useParams<{ id: string }>();
   const { session, user, loading: authLoading } = useAuth();
