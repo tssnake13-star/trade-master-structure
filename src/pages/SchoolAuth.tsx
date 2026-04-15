@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect } from 'react';
-import logo from '@/assets/logo-tradeliketyo.jpeg';
+import logo from '@/assets/logo-tradeliketyo.png';
 
 export default function SchoolAuth() {
   const [isLogin, setIsLogin] = useState(true);
