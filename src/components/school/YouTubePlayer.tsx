@@ -210,10 +210,35 @@ export default function YouTubePlayer({ url, watermark }: Props) {
   const toggleFullscreen = useCallback(() => {
     const el = containerRef.current;
     if (!el) return;
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
+
+    if (document.fullscreenElement || (document as any).webkitFullscreenElement) {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if ((document as any).webkitExitFullscreen) {
+        (document as any).webkitExitFullscreen();
+      }
     } else {
-      el.requestFullscreen();
+      // Try container fullscreen first
+      if (el.requestFullscreen) {
+        el.requestFullscreen().catch(() => {
+          // Fallback: try iframe fullscreen for mobile
+          const iframe = playerRef.current?.getIframe?.();
+          if (iframe) {
+            if (iframe.requestFullscreen) iframe.requestFullscreen();
+            else if ((iframe as any).webkitRequestFullscreen) (iframe as any).webkitRequestFullscreen();
+            else if ((iframe as any).webkitEnterFullscreen) (iframe as any).webkitEnterFullscreen();
+          }
+        });
+      } else if ((el as any).webkitRequestFullscreen) {
+        (el as any).webkitRequestFullscreen();
+      } else {
+        // Last resort: iframe directly
+        const iframe = playerRef.current?.getIframe?.();
+        if (iframe) {
+          if ((iframe as any).webkitRequestFullscreen) (iframe as any).webkitRequestFullscreen();
+          else if ((iframe as any).webkitEnterFullscreen) (iframe as any).webkitEnterFullscreen();
+        }
+      }
     }
     scheduleHide();
   }, [scheduleHide]);
