@@ -17,7 +17,7 @@ const tabStyle = (active: boolean) => ({
 });
 
 interface Course { id: string; title: string; subtitle: string | null; is_free: boolean; sort_order: number; }
-interface Lesson { id: string; course_id: string; title: string; video_url: string | null; description: string | null; sort_order: number; }
+interface Lesson { id: string; course_id: string; title: string; video_url: string | null; video_url_alt: string | null; description: string | null; sort_order: number; }
 interface Profile { user_id: string; email: string; full_name: string | null; created_at: string; }
 interface UserRole { user_id: string; role: string; }
 interface Access { id: string; user_id: string; course_id: string; granted_at: string; expires_at: string | null; }
@@ -83,7 +83,7 @@ function CoursesTab() {
   const [showAddCourse, setShowAddCourse] = useState(false);
   const [showAddLesson, setShowAddLesson] = useState<string | null>(null);
   const [form, setForm] = useState({ title: '', subtitle: '', is_free: false });
-  const [lessonForm, setLessonForm] = useState({ title: '', video_url: '', description: '', sort_order: 0 });
+  const [lessonForm, setLessonForm] = useState({ title: '', video_url: '', video_url_alt: '', description: '', sort_order: 0 });
 
   const load = async () => {
     const [c, l] = await Promise.all([
@@ -138,10 +138,11 @@ function CoursesTab() {
       course_id: courseId,
       title: lessonForm.title,
       video_url: lessonForm.video_url || null,
+      video_url_alt: lessonForm.video_url_alt || null,
       description: lessonForm.description || null,
       sort_order: lessonForm.sort_order || courseLessons.length,
     });
-    setLessonForm({ title: '', video_url: '', description: '', sort_order: 0 });
+    setLessonForm({ title: '', video_url: '', video_url_alt: '', description: '', sort_order: 0 });
     setShowAddLesson(null);
     load();
   };
@@ -268,7 +269,9 @@ function CoursesTab() {
                   <div className="space-y-2 pt-2">
                     <input placeholder="Название урока" value={lessonForm.title} onChange={e => setLessonForm({ ...lessonForm, title: e.target.value })}
                       className="w-full px-3 py-2 rounded border text-xs" style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
-                    <input placeholder="URL видео" value={lessonForm.video_url} onChange={e => setLessonForm({ ...lessonForm, video_url: e.target.value })}
+                    <input placeholder="URL видео (YouTube)" value={lessonForm.video_url} onChange={e => setLessonForm({ ...lessonForm, video_url: e.target.value })}
+                      className="w-full px-3 py-2 rounded border text-xs" style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
+                    <input placeholder="Ссылка для России (Дзен/RuTube)" value={lessonForm.video_url_alt} onChange={e => setLessonForm({ ...lessonForm, video_url_alt: e.target.value })}
                       className="w-full px-3 py-2 rounded border text-xs" style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
                     <textarea placeholder="Описание" value={lessonForm.description} onChange={e => setLessonForm({ ...lessonForm, description: e.target.value })}
                       className="w-full px-3 py-2 rounded border text-xs" rows={2} style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />

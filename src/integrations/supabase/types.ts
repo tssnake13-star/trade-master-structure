@@ -111,6 +111,7 @@ export type Database = {
           sort_order: number
           title: string
           video_url: string | null
+          video_url_alt: string | null
         }
         Insert: {
           course_id: string
@@ -120,6 +121,7 @@ export type Database = {
           sort_order?: number
           title: string
           video_url?: string | null
+          video_url_alt?: string | null
         }
         Update: {
           course_id?: string
@@ -129,6 +131,7 @@ export type Database = {
           sort_order?: number
           title?: string
           video_url?: string | null
+          video_url_alt?: string | null
         }
         Relationships: [
           {
