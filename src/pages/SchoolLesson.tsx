@@ -155,19 +155,13 @@ export default function SchoolLesson() {
                     {hasMain && (
                       <div>
                         {hasBoth && <p className="text-xs mb-1" style={{ color: '#666', fontFamily: font.mono }}>YouTube</p>}
-                        <div className="aspect-video rounded-xl overflow-hidden" style={{ backgroundColor: '#111' }}>
-                          <iframe src={toEmbedUrl(v.video_url)} className="w-full h-full" allowFullScreen
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
-                        </div>
+                        {renderPlayer(v.video_url)}
                       </div>
                     )}
                     {hasAlt && (
                       <div>
                         {hasBoth && <p className="text-xs mb-1" style={{ color: '#666', fontFamily: font.mono }}>Дзен / RuTube</p>}
-                        <div className="aspect-video rounded-xl overflow-hidden" style={{ backgroundColor: '#111' }}>
-                          <iframe src={toEmbedUrl(v.video_url_alt!)} className="w-full h-full" allowFullScreen
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
-                        </div>
+                        {renderPlayer(v.video_url_alt!)}
                       </div>
                     )}
                   </div>
