@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, Plus, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Pencil } from 'lucide-react';
 
 const font = { heading: "'Cormorant Garamond', serif", mono: "'JetBrains Mono', monospace" };
 const tabStyle = (active: boolean) => ({
@@ -78,6 +78,8 @@ function CoursesTab() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [expandedCourse, setExpandedCourse] = useState<string | null>(null);
+  const [editingCourse, setEditingCourse] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({ title: '', subtitle: '', is_free: false });
   const [showAddCourse, setShowAddCourse] = useState(false);
   const [showAddLesson, setShowAddLesson] = useState<string | null>(null);
   const [form, setForm] = useState({ title: '', subtitle: '', is_free: false });
@@ -110,6 +112,22 @@ function CoursesTab() {
   const deleteCourse = async (id: string) => {
     await supabase.from('lessons').delete().eq('course_id', id);
     await supabase.from('courses').delete().eq('id', id);
+    load();
+  };
+
+  const startEdit = (c: Course) => {
+    setEditingCourse(c.id);
+    setEditForm({ title: c.title, subtitle: c.subtitle || '', is_free: c.is_free });
+  };
+
+  const updateCourse = async () => {
+    if (!editingCourse || !editForm.title) return;
+    await supabase.from('courses').update({
+      title: editForm.title,
+      subtitle: editForm.subtitle || null,
+      is_free: editForm.is_free,
+    }).eq('id', editingCourse);
+    setEditingCourse(null);
     load();
   };
 
@@ -190,13 +208,52 @@ function CoursesTab() {
                   {c.is_free ? 'бесплатный' : 'платный'}
                 </span>
               </div>
-              <button
-                onClick={e => { e.stopPropagation(); deleteCourse(c.id); }}
-                className="p-1 hover:opacity-70"
-              >
-                <Trash2 size={14} style={{ color: '#666' }} />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={e => { e.stopPropagation(); startEdit(c); }}
+                  className="p-1 hover:opacity-70"
+                >
+                  <Pencil size={14} style={{ color: '#666' }} />
+                </button>
+                <button
+                  onClick={e => { e.stopPropagation(); deleteCourse(c.id); }}
+                  className="p-1 hover:opacity-70"
+                >
+                  <Trash2 size={14} style={{ color: '#666' }} />
+                </button>
+              </div>
             </div>
+
+            {editingCourse === c.id && (
+              <div className="border-t px-4 pb-4 pt-3 space-y-3" style={{ borderColor: '#1a1a1a' }}>
+                <input
+                  placeholder="Название курса"
+                  value={editForm.title}
+                  onChange={e => setEditForm({ ...editForm, title: e.target.value })}
+                  className="w-full px-3 py-2 rounded border text-sm"
+                  style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
+                />
+                <input
+                  placeholder="Подзаголовок"
+                  value={editForm.subtitle}
+                  onChange={e => setEditForm({ ...editForm, subtitle: e.target.value })}
+                  className="w-full px-3 py-2 rounded border text-sm"
+                  style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
+                />
+                <label className="flex items-center gap-2 text-xs" style={{ color: '#999', fontFamily: font.mono }}>
+                  <input type="checkbox" checked={editForm.is_free} onChange={e => setEditForm({ ...editForm, is_free: e.target.checked })} />
+                  Бесплатный
+                </label>
+                <div className="flex gap-2">
+                  <button onClick={updateCourse} className="text-xs px-4 py-2 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}>
+                    Сохранить
+                  </button>
+                  <button onClick={() => setEditingCourse(null)} className="text-xs px-4 py-2 rounded" style={{ color: '#666', fontFamily: font.mono }}>
+                    Отмена
+                  </button>
+                </div>
+              </div>
+            )}
 
             {expandedCourse === c.id && (
               <div className="border-t px-4 pb-4 pt-3 space-y-2" style={{ borderColor: '#1a1a1a' }}>
