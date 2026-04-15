@@ -118,7 +118,7 @@ export default function SchoolDashboard() {
         style={{ borderColor: '#1a1a1a', backgroundColor: '#0a0a0a' }}
       >
         <div className="border-b cursor-pointer" style={{ borderColor: '#1a1a1a' }} onClick={() => setSelectedCourse(null)}>
-          <img src={logo} alt="TRADELIKETYO" className="w-full object-cover" />
+          <img src={logo} alt="TRADELIKETYO" className="w-full object-cover logo-shimmer" />
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
