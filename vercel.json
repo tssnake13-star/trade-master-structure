@@ -8,5 +8,8 @@
     { "source": "/bio", "destination": "https://t.me/New_TradeLikeTYO_bot?start=bio", "permanent": false },
     { "source": "/warm", "destination": "https://t.me/New_TradeLikeTYO_bot?start=warm", "permanent": false },
     { "source": "/start", "destination": "https://t.me/New_TradeLikeTYO_bot", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
