@@ -29,17 +29,27 @@ function extractVideoId(raw: string): string | null {
   try {
     const url = raw.startsWith('http') ? raw : `https://${raw}`;
     const u = new URL(url);
-    if (u.hostname === 'youtu.be') return u.pathname.slice(1);
+    if (u.hostname === 'youtu.be') return u.pathname.slice(1).split('/')[0].split('?')[0];
     if (u.hostname === 'www.youtube.com' || u.hostname === 'youtube.com') {
       if (u.searchParams.has('v')) return u.searchParams.get('v');
       const live = u.pathname.match(/^\/live\/([^/?]+)/);
       if (live) return live[1];
       const embed = u.pathname.match(/^\/embed\/([^/?]+)/);
       if (embed) return embed[1];
+      const shorts = u.pathname.match(/^\/shorts\/([^/?]+)/);
+      if (shorts) return shorts[1];
     }
   } catch {}
   return null;
 }
+
+function formatTime(s: number): string {
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${sec.toString().padStart(2, '0')}`;
+}
+
+const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
 interface Props {
   url: string;
@@ -48,9 +58,24 @@ interface Props {
 export default function YouTubePlayer({ url }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
+  const rafRef = useRef<number>(0);
   const [playing, setPlaying] = useState(false);
   const [started, setStarted] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [speed, setSpeed] = useState(1);
+  const [showSpeed, setShowSpeed] = useState(false);
+  const [controlsVisible, setControlsVisible] = useState(true);
+  const hideTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const videoId = extractVideoId(url);
+
+  const scheduleHide = useCallback(() => {
+    clearTimeout(hideTimerRef.current);
+    setControlsVisible(true);
+    hideTimerRef.current = setTimeout(() => {
+      if (playerRef.current?.getPlayerState?.() === 1) setControlsVisible(false);
+    }, 3000);
+  }, []);
 
   const togglePlay = useCallback(() => {
     const p = playerRef.current;
@@ -61,6 +86,17 @@ export default function YouTubePlayer({ url }: Props) {
     } else {
       p.playVideo();
     }
+    scheduleHide();
+  }, [scheduleHide]);
+
+  const updateProgress = useCallback(() => {
+    const p = playerRef.current;
+    if (p?.getCurrentTime) {
+      setCurrentTime(p.getCurrentTime());
+      const d = p.getDuration();
+      if (d > 0) setDuration(d);
+    }
+    rafRef.current = requestAnimationFrame(updateProgress);
   }, []);
 
   useEffect(() => {
@@ -88,9 +124,21 @@ export default function YouTubePlayer({ url }: Props) {
           playsinline: 1,
         },
         events: {
+          onReady: () => {
+            const d = player.getDuration();
+            if (d > 0) setDuration(d);
+          },
           onStateChange: (e: any) => {
-            setPlaying(e.data === 1);
-            if (e.data === 1) setStarted(true);
+            const isPlaying = e.data === 1;
+            setPlaying(isPlaying);
+            if (isPlaying) {
+              setStarted(true);
+              rafRef.current = requestAnimationFrame(updateProgress);
+              scheduleHide();
+            } else {
+              cancelAnimationFrame(rafRef.current);
+              setControlsVisible(true);
+            }
           },
         },
       });
@@ -98,67 +146,182 @@ export default function YouTubePlayer({ url }: Props) {
     });
 
     return () => {
+      cancelAnimationFrame(rafRef.current);
+      clearTimeout(hideTimerRef.current);
       player?.destroy?.();
       playerRef.current = null;
       setPlaying(false);
       setStarted(false);
+      setCurrentTime(0);
+      setDuration(0);
     };
-  }, [videoId]);
+  }, [videoId, updateProgress, scheduleHide]);
+
+  const seek = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    const p = playerRef.current;
+    if (!p || !duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    p.seekTo(ratio * duration, true);
+    setCurrentTime(ratio * duration);
+    scheduleHide();
+  }, [duration, scheduleHide]);
+
+  const changeSpeed = useCallback((s: number) => {
+    const p = playerRef.current;
+    if (p?.setPlaybackRate) p.setPlaybackRate(s);
+    setSpeed(s);
+    setShowSpeed(false);
+    scheduleHide();
+  }, [scheduleHide]);
+
+  const toggleFullscreen = useCallback(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      el.requestFullscreen();
+    }
+    scheduleHide();
+  }, [scheduleHide]);
 
   if (!videoId) return null;
+
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const showControls = controlsVisible || !playing;
 
   return (
     <div
       ref={containerRef}
       className="rounded-xl overflow-hidden"
-      style={{
-        position: 'relative',
-        width: '100%',
-        aspectRatio: '16/9',
-        backgroundColor: '#111',
+      style={{ position: 'relative', width: '100%', aspectRatio: '16/9', backgroundColor: '#111' }}
+      onMouseMove={scheduleHide}
+      onClick={(e) => {
+        if ((e.target as HTMLElement).closest('[data-controls]')) return;
+        togglePlay();
       }}
     >
-      {/* Overlay blocks all YouTube native UI */}
-      <div
-        onClick={togglePlay}
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          zIndex: 10,
-          cursor: 'pointer',
-        }}
-      />
+      {/* Full overlay to block YouTube native UI */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, width: '100%', height: '100%',
+        zIndex: 10, cursor: showControls ? 'default' : 'none',
+      }} />
 
-      {/* Play/Pause button */}
+      {/* Center play/pause */}
       {!playing && (
         <button
-          onClick={togglePlay}
+          onClick={(e) => { e.stopPropagation(); togglePlay(); }}
           style={{
-            position: 'absolute',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            zIndex: 20,
-            width: '56px',
-            height: '56px',
-            borderRadius: '50%',
-            backgroundColor: 'rgba(0,0,0,0.6)',
-            border: '2px solid rgba(232,224,208,0.3)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            transition: 'opacity 0.2s',
+            position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
+            zIndex: 20, width: '56px', height: '56px', borderRadius: '50%',
+            backgroundColor: 'rgba(0,0,0,0.6)', border: '2px solid rgba(255,255,255,0.2)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
           }}
-          aria-label={started ? 'Play' : 'Play video'}
+          aria-label="Play"
         >
           <svg width="22" height="26" viewBox="0 0 22 26" fill="none">
-            <path d="M2 1.5L20 13L2 24.5V1.5Z" fill="#e8e0d0" />
+            <path d="M2 1.5L20 13L2 24.5V1.5Z" fill="#fff" />
           </svg>
         </button>
+      )}
+
+      {/* Bottom control bar */}
+      {started && (
+        <div
+          data-controls
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: 'absolute', bottom: 0, left: 0, width: '100%', zIndex: 20,
+            background: 'linear-gradient(transparent, rgba(0,0,0,0.85))',
+            padding: '24px 12px 8px', transition: 'opacity 0.3s',
+            opacity: showControls ? 1 : 0, pointerEvents: showControls ? 'auto' : 'none',
+          }}
+        >
+          {/* Progress bar */}
+          <div
+            onClick={seek}
+            style={{
+              width: '100%', height: '4px', backgroundColor: 'rgba(255,255,255,0.2)',
+              borderRadius: '2px', cursor: 'pointer', marginBottom: '8px', position: 'relative',
+            }}
+          >
+            <div style={{
+              width: `${progress}%`, height: '100%', backgroundColor: '#fff',
+              borderRadius: '2px', transition: 'width 0.1s linear',
+            }} />
+            <div style={{
+              position: 'absolute', top: '50%', left: `${progress}%`, transform: 'translate(-50%, -50%)',
+              width: '12px', height: '12px', borderRadius: '50%', backgroundColor: '#fff',
+            }} />
+          </div>
+
+          {/* Controls row */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Play/Pause */}
+            <button onClick={togglePlay} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex' }}>
+              {playing ? (
+                <svg width="16" height="18" viewBox="0 0 16 18" fill="none">
+                  <rect x="1" y="1" width="4" height="16" rx="1" fill="#fff" />
+                  <rect x="11" y="1" width="4" height="16" rx="1" fill="#fff" />
+                </svg>
+              ) : (
+                <svg width="16" height="18" viewBox="0 0 16 18" fill="none">
+                  <path d="M1 1L15 9L1 17V1Z" fill="#fff" />
+                </svg>
+              )}
+            </button>
+
+            {/* Time */}
+            <span style={{ fontSize: '12px', color: '#fff', fontFamily: "'JetBrains Mono', monospace", whiteSpace: 'nowrap' }}>
+              {formatTime(currentTime)} / {formatTime(duration)}
+            </span>
+
+            <div style={{ flex: 1 }} />
+
+            {/* Speed */}
+            <div style={{ position: 'relative' }}>
+              <button
+                onClick={() => setShowSpeed(!showSpeed)}
+                style={{
+                  background: 'none', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '4px',
+                  color: '#fff', fontSize: '11px', padding: '2px 6px', cursor: 'pointer',
+                  fontFamily: "'JetBrains Mono', monospace",
+                }}
+              >
+                {speed}x
+              </button>
+              {showSpeed && (
+                <div style={{
+                  position: 'absolute', bottom: '28px', right: 0, backgroundColor: 'rgba(0,0,0,0.9)',
+                  borderRadius: '6px', padding: '4px 0', minWidth: '60px',
+                }}>
+                  {SPEEDS.map(s => (
+                    <button
+                      key={s}
+                      onClick={() => changeSpeed(s)}
+                      style={{
+                        display: 'block', width: '100%', padding: '4px 12px', border: 'none',
+                        background: s === speed ? 'rgba(255,255,255,0.15)' : 'none',
+                        color: '#fff', fontSize: '12px', cursor: 'pointer', textAlign: 'left',
+                        fontFamily: "'JetBrains Mono', monospace",
+                      }}
+                    >
+                      {s}x
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Fullscreen */}
+            <button onClick={toggleFullscreen} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex' }}>
+              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path d="M2 6V2h4M12 2h4v4M16 12v4h-4M6 16H2v-4" stroke="#fff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
+        </div>
       )}
     </div>
   );
