@@ -279,7 +279,7 @@ export default function YouTubePlayer({ url }: Props) {
           >
             <div style={{
               width: `${progress}%`, height: '100%', backgroundColor: '#fff',
-              borderRadius: '2px', transition: 'width 0.1s linear',
+              borderRadius: '2px',
             }} />
             <div style={{
               position: 'absolute', top: '50%', left: `${progress}%`, transform: 'translate(-50%, -50%)',

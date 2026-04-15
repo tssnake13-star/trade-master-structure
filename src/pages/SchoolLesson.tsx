@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
 import YouTubePlayer from '@/components/school/YouTubePlayer';
+import FloatingWatermark from '@/components/school/FloatingWatermark';
 
 interface LessonData {
   id: string;
@@ -73,6 +74,7 @@ export default function SchoolLesson() {
   const [isCompleted, setIsCompleted] = useState(false);
   const [marking, setMarking] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [profileData, setProfileData] = useState<{ email: string; full_name: string | null }>({ email: '', full_name: null });
 
   useEffect(() => {
     if (!authLoading && !session) navigate('/school', { replace: true });
@@ -84,7 +86,15 @@ export default function SchoolLesson() {
     if (!userId || !id) return;
     setLoading(true);
     const load = async () => {
-      const lessonRes = await supabase.from('lessons').select('*').eq('id', id).single();
+      const [lessonRes, profileRes] = await Promise.all([
+        supabase.from('lessons').select('*').eq('id', id).single(),
+        supabase.from('profiles').select('email, full_name').eq('user_id', userId).single(),
+      ]);
+
+      if (profileRes.data) {
+        setProfileData({ email: profileRes.data.email, full_name: profileRes.data.full_name });
+      }
+
       const l = lessonRes.data as LessonData | null;
       setLesson(l);
 
@@ -127,7 +137,10 @@ export default function SchoolLesson() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#080808', color: '#e8e0d0', position: 'relative', overflow: 'hidden' }}>
+      {profileData.email && (
+        <FloatingWatermark email={profileData.email} fullName={profileData.full_name} />
+      )}
       <header className="border-b px-4 py-3" style={{ borderColor: '#1a1a1a' }}>
         <button
           onClick={() => navigate(`/school/course/${lesson.course_id}`)}
