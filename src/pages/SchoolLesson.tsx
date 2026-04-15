@@ -27,9 +27,18 @@ function isYouTubeUrl(val: string): boolean {
   return /youtube\.com|youtu\.be/i.test(val);
 }
 
+function extractSrcFromIframe(html: string): string | null {
+  const match = html.match(/src=["']([^"']+)["']/i);
+  return match ? match[1] : null;
+}
+
 function renderPlayer(val: string) {
   const containerStyle: React.CSSProperties = { width: '100%', aspectRatio: '16/9', backgroundColor: '#111', position: 'relative' };
   if (val.trimStart().startsWith('<iframe')) {
+    const src = extractSrcFromIframe(val);
+    if (src && isYouTubeUrl(src)) {
+      return <YouTubePlayer url={src} />;
+    }
     const styled = val.replace(/<iframe/i, '<iframe style="position:absolute;top:0;left:0;width:100%;height:100%"');
     return (
       <div className="rounded-xl overflow-hidden" style={containerStyle}
