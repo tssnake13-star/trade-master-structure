@@ -22,7 +22,7 @@ interface VideoData {
   sort_order: number;
 }
 
-const font = { heading: "'Cormorant Garamond', serif", mono: "'JetBrains Mono', monospace" };
+const font = { heading: "'Inter', sans-serif", mono: "'Inter', sans-serif" };
 
 function isYouTubeUrl(val: string): boolean {
   return /youtube\.com|youtu\.be/i.test(val);

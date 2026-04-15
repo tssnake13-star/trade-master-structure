@@ -11,7 +11,7 @@ interface Lesson {
   sort_order: number;
 }
 
-const font = { heading: "'Cormorant Garamond', serif", mono: "'JetBrains Mono', monospace" };
+const font = { heading: "'Inter', sans-serif", mono: "'Inter', sans-serif" };
 
 export default function SchoolCourse() {
   const { id } = useParams<{ id: string }>();

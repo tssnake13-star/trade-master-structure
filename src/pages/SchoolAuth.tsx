@@ -66,7 +66,7 @@ export default function SchoolAuth() {
   const LogoBlock = () => (
     <div className="flex flex-col items-center mb-6">
       <img src={logo} alt="TRADELIKETYO" className="rounded-xl object-cover" style={{ width: '11.7rem', height: '11.7rem' }} />
-      <p className="mt-3 text-xs tracking-[0.3em] uppercase" style={{ color: '#666', fontFamily: "'JetBrains Mono', monospace" }}>
+      <p className="mt-3 text-xs tracking-[0.3em] uppercase" style={{ color: '#666', fontFamily: "'Inter', sans-serif" }}>
         Вход в систему
       </p>
     </div>
@@ -77,7 +77,7 @@ export default function SchoolAuth() {
       <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#080808' }}>
         <div className="w-full max-w-md">
           <LogoBlock />
-          <h1 className="text-3xl mb-8 text-center" style={{ fontFamily: "'Cormorant Garamond', serif", color: '#e8e0d0' }}>
+          <h1 className="text-3xl mb-8 text-center" style={{ fontFamily: "'Inter', sans-serif", color: '#e8e0d0' }}>
             Сброс пароля
           </h1>
           <form onSubmit={handleForgotPassword} className="space-y-4">
@@ -88,7 +88,7 @@ export default function SchoolAuth() {
               onChange={e => setEmail(e.target.value)}
               required
               className="w-full px-4 py-3 rounded-lg border text-sm"
-              style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: "'JetBrains Mono', monospace" }}
+              style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: "'Inter', sans-serif" }}
             />
             {error && <p className="text-sm" style={{ color: '#e85d3a' }}>{error}</p>}
             {success && <p className="text-sm" style={{ color: '#4a8a4a' }}>{success}</p>}
@@ -96,14 +96,14 @@ export default function SchoolAuth() {
               type="submit"
               disabled={loading}
               className="w-full py-3 rounded-lg font-medium text-sm transition-all"
-              style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: "'JetBrains Mono', monospace", opacity: loading ? 0.6 : 1 }}
+              style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: "'Inter', sans-serif", opacity: loading ? 0.6 : 1 }}
             >
               {loading ? '...' : 'Отправить ссылку'}
             </button>
           </form>
           <p
             className="mt-6 text-center text-sm cursor-pointer"
-            style={{ color: '#666', fontFamily: "'JetBrains Mono', monospace" }}
+            style={{ color: '#666', fontFamily: "'Inter', sans-serif" }}
             onClick={() => { setIsForgot(false); setError(''); setSuccess(''); }}
           >
             ← Вернуться ко входу
@@ -120,7 +120,7 @@ export default function SchoolAuth() {
         {!isLogin && (
           <h1
             className="text-3xl mb-8 text-center"
-            style={{ fontFamily: "'Cormorant Garamond', serif", color: '#e8e0d0' }}
+            style={{ fontFamily: "'Inter', sans-serif", color: '#e8e0d0' }}
           >
             Регистрация
           </h1>
@@ -135,7 +135,7 @@ export default function SchoolAuth() {
               onChange={e => setFullName(e.target.value)}
               required
               className="w-full px-4 py-3 rounded-lg border text-sm"
-              style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: "'JetBrains Mono', monospace" }}
+              style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: "'Inter', sans-serif" }}
             />
           )}
           <input
@@ -145,7 +145,7 @@ export default function SchoolAuth() {
             onChange={e => setEmail(e.target.value)}
             required
             className="w-full px-4 py-3 rounded-lg border text-sm"
-            style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: "'JetBrains Mono', monospace" }}
+            style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: "'Inter', sans-serif" }}
           />
           <input
             type="password"
@@ -155,7 +155,7 @@ export default function SchoolAuth() {
             required
             minLength={6}
             className="w-full px-4 py-3 rounded-lg border text-sm"
-            style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: "'JetBrains Mono', monospace" }}
+            style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: "'Inter', sans-serif" }}
           />
 
           {error && <p className="text-sm" style={{ color: '#e85d3a' }}>{error}</p>}
@@ -164,7 +164,7 @@ export default function SchoolAuth() {
             type="submit"
             disabled={loading}
             className="w-full py-3 rounded-lg font-medium text-sm transition-all"
-            style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: "'JetBrains Mono', monospace", opacity: loading ? 0.6 : 1 }}
+            style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: "'Inter', sans-serif", opacity: loading ? 0.6 : 1 }}
           >
             {loading ? '...' : isLogin ? 'Войти' : 'Создать аккаунт'}
           </button>
@@ -173,7 +173,7 @@ export default function SchoolAuth() {
         {isLogin && (
           <p
             className="mt-4 text-center text-sm cursor-pointer"
-            style={{ color: '#666', fontFamily: "'JetBrains Mono', monospace" }}
+            style={{ color: '#666', fontFamily: "'Inter', sans-serif" }}
             onClick={() => { setIsForgot(true); setError(''); }}
           >
             Забыли пароль?
@@ -182,7 +182,7 @@ export default function SchoolAuth() {
 
         <p
           className="mt-2 text-center text-sm cursor-pointer"
-          style={{ color: '#666', fontFamily: "'JetBrains Mono', monospace" }}
+          style={{ color: '#666', fontFamily: "'Inter', sans-serif" }}
           onClick={() => { setIsLogin(!isLogin); setError(''); }}
         >
           {isLogin ? 'Нет аккаунта? Зарегистрироваться' : 'Уже есть аккаунт? Войти'}
