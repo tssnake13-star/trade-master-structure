@@ -121,8 +121,8 @@ export default function SchoolDashboard() {
         className="hidden sm:flex flex-col w-64 flex-shrink-0 border-r"
         style={{ borderColor: '#1a1a1a', backgroundColor: '#0a0a0a' }}
       >
-        <div className="border-b cursor-pointer logo-shimmer" style={{ borderColor: '#1a1a1a' }} onClick={() => setSelectedCourse(null)}>
-          <img src={logo} alt="TRADELIKETYO" className="w-full object-cover block" />
+        <div className="border-b cursor-pointer logo-shimmer relative overflow-hidden" style={{ borderColor: '#1a1a1a' }} onClick={() => setSelectedCourse(null)}>
+          <video src={logoVideo} autoPlay loop muted playsInline className="w-full object-cover block" />
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
@@ -195,7 +195,7 @@ export default function SchoolDashboard() {
         {/* Mobile header */}
         <header className="sm:hidden border-b px-4 py-3 flex items-center justify-between" style={{ borderColor: '#1a1a1a' }}>
           <div className="flex items-center gap-2">
-            <img src={logo} alt="TRADELIKETYO" className="w-8 h-8 rounded-lg object-cover" />
+            <video src={logoVideo} autoPlay loop muted playsInline className="w-8 h-8 rounded-lg object-cover" />
             <span className="text-sm" style={{ fontFamily: font.heading }}>Кабинет трейдера</span>
           </div>
           <div className="flex items-center gap-2">
