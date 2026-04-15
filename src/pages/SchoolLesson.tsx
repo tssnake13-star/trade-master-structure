@@ -22,6 +22,16 @@ interface VideoData {
 
 const font = { heading: "'Cormorant Garamond', serif", mono: "'JetBrains Mono', monospace" };
 
+function toEmbedUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    if (u.hostname === 'youtu.be') return `https://www.youtube.com/embed${u.pathname}`;
+    if ((u.hostname === 'www.youtube.com' || u.hostname === 'youtube.com') && u.searchParams.has('v'))
+      return `https://www.youtube.com/embed/${u.searchParams.get('v')}`;
+  } catch {}
+  return url;
+}
+
 export default function SchoolLesson() {
   const { id } = useParams<{ id: string }>();
   const { session, user, loading: authLoading } = useAuth();
@@ -122,7 +132,7 @@ export default function SchoolLesson() {
                       <div>
                         {hasBoth && <p className="text-xs mb-1" style={{ color: '#666', fontFamily: font.mono }}>YouTube</p>}
                         <div className="aspect-video rounded-xl overflow-hidden" style={{ backgroundColor: '#111' }}>
-                          <iframe src={v.video_url} className="w-full h-full" allowFullScreen
+                          <iframe src={toEmbedUrl(v.video_url)} className="w-full h-full" allowFullScreen
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
                         </div>
                       </div>
@@ -131,7 +141,7 @@ export default function SchoolLesson() {
                       <div>
                         {hasBoth && <p className="text-xs mb-1" style={{ color: '#666', fontFamily: font.mono }}>Дзен / RuTube</p>}
                         <div className="aspect-video rounded-xl overflow-hidden" style={{ backgroundColor: '#111' }}>
-                          <iframe src={v.video_url_alt!} className="w-full h-full" allowFullScreen
+                          <iframe src={toEmbedUrl(v.video_url_alt!)} className="w-full h-full" allowFullScreen
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
                         </div>
                       </div>
