@@ -117,7 +117,7 @@ export default function SchoolCourse() {
                         fontFamily: font.mono,
                       }}
                     >
-                      Открыть
+                      Начать
                     </button>
                   ) : (
                     <Lock size={14} className="flex-shrink-0 mt-1" style={{ color: '#333' }} />

@@ -78,8 +78,8 @@ export default function SchoolAdmin() {
       </header>
 
       <div className="border-b flex" style={{ borderColor: '#1a1a1a' }}>
-        <button style={tabStyle(tab === 'courses')} onClick={() => setTab('courses')}>Курсы</button>
-        <button style={tabStyle(tab === 'students')} onClick={() => setTab('students')}>Студенты</button>
+        <button style={tabStyle(tab === 'courses')} onClick={() => setTab('courses')}>Программы</button>
+        <button style={tabStyle(tab === 'students')} onClick={() => setTab('students')}>Ученики</button>
         <button style={tabStyle(tab === 'access')} onClick={() => setTab('access')}>Доступы</button>
         <button style={tabStyle(tab === 'settings')} onClick={() => setTab('settings')}>Настройки</button>
       </div>
@@ -309,7 +309,7 @@ function CoursesTab() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-lg" style={{ fontFamily: font.heading }}>Курсы</h2>
+        <h2 className="text-lg" style={{ fontFamily: font.heading }}>Программы</h2>
         <button
           onClick={() => setShowAddCourse(true)}
           className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg"
@@ -322,7 +322,7 @@ function CoursesTab() {
       {showAddCourse && (
         <div className="rounded-lg border p-4 mb-4 space-y-3" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
           <input
-            placeholder="Название курса"
+            placeholder="Название программы"
             value={form.title}
             onChange={e => setForm({ ...form, title: e.target.value })}
             className="w-full px-3 py-2 rounded border text-sm"
@@ -363,7 +363,7 @@ function CoursesTab() {
                     <div>
                       <span className="text-sm" style={{ fontFamily: font.mono }}>{c.title}</span>
                       <span className="ml-2 text-xs" style={{ color: c.is_free ? '#4a8a4a' : '#666', fontFamily: font.mono }}>
-                        {c.is_free ? 'бесплатный' : 'платный'}
+                        {c.is_free ? 'бесплатная' : ''}
                       </span>
                     </div>
                     <div className="flex items-center gap-1">
@@ -379,7 +379,7 @@ function CoursesTab() {
                   {editingCourse === c.id && (
                     <div className="border-t px-4 pb-4 pt-3 space-y-3" style={{ borderColor: '#1a1a1a' }}>
                       <input
-                        placeholder="Название курса"
+                        placeholder="Название программы"
                         value={editForm.title}
                         onChange={e => setEditForm({ ...editForm, title: e.target.value })}
                         className="w-full px-3 py-2 rounded border text-sm"
@@ -420,7 +420,7 @@ function CoursesTab() {
                           </div>
                           {editingLessonId === l.id && (
                             <div className="space-y-2 pt-2 pb-3 pl-4 border-l" style={{ borderColor: '#1a1a1a' }}>
-                              <input placeholder="Название урока" value={editLessonForm.title} onChange={e => setEditLessonForm({ ...editLessonForm, title: e.target.value })}
+                              <input placeholder="Название занятия" value={editLessonForm.title} onChange={e => setEditLessonForm({ ...editLessonForm, title: e.target.value })}
                                 className="w-full px-3 py-2 rounded border text-xs" style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
                               <textarea placeholder="Описание" value={editLessonForm.description} onChange={e => setEditLessonForm({ ...editLessonForm, description: e.target.value })}
                                 className="w-full px-3 py-2 rounded border text-xs" rows={2} style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
@@ -436,7 +436,7 @@ function CoursesTab() {
 
                       {showAddLesson === c.id ? (
                         <div className="space-y-2 pt-2">
-                          <input placeholder="Название урока" value={lessonForm.title} onChange={e => setLessonForm({ ...lessonForm, title: e.target.value })}
+                          <input placeholder="Название занятия" value={lessonForm.title} onChange={e => setLessonForm({ ...lessonForm, title: e.target.value })}
                             className="w-full px-3 py-2 rounded border text-xs" style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
                           <textarea placeholder="Описание" value={lessonForm.description} onChange={e => setLessonForm({ ...lessonForm, description: e.target.value })}
                             className="w-full px-3 py-2 rounded border text-xs" rows={2} style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
@@ -452,7 +452,7 @@ function CoursesTab() {
                           className="flex items-center gap-1 text-xs mt-1"
                           style={{ color: '#4a8a4a', fontFamily: font.mono }}
                         >
-                          <Plus size={12} /> Добавить урок
+                          <Plus size={12} /> Добавить занятие
                         </button>
                       )}
                     </div>
@@ -506,7 +506,7 @@ function StudentsTab() {
 
   return (
     <div>
-      <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Студенты</h2>
+      <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Ученики</h2>
 
       {grantModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
@@ -518,7 +518,7 @@ function StudentsTab() {
               className="w-full px-3 py-2 rounded border text-sm"
               style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
             >
-              <option value="">Выберите курс</option>
+              <option value="">Выберите программу</option>
               {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
             </select>
             <input

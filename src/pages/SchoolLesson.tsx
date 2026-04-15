@@ -146,7 +146,7 @@ export default function SchoolLesson() {
           style={{ color: '#666', fontFamily: font.mono }}
         >
           <ArrowLeft size={16} />
-          Вернуться к курсу
+          Вернуться к программе
         </button>
       </header>
 
@@ -200,17 +200,17 @@ export default function SchoolLesson() {
               border: '1px solid', cursor: prevLessonId ? 'pointer' : 'default', opacity: prevLessonId ? 1 : 0.4,
             }}
           >
-            <ArrowLeft size={14} /> Предыдущий
+            <ArrowLeft size={14} /> Предыдущее
           </button>
 
           {!isCompleted ? (
             <button onClick={markComplete} disabled={marking}
               style={{ ...btnBase, backgroundColor: '#4a8a4a', color: '#e8e0d0', opacity: marking ? 0.6 : 1 }}>
-              <CheckCircle size={14} /> {marking ? '...' : 'Пройден'}
+              <CheckCircle size={14} /> {marking ? '...' : 'Занятие завершено'}
             </button>
           ) : (
             <span style={{ ...btnBase, backgroundColor: '#1a2e1a', color: '#4a8a4a' }}>
-              <CheckCircle size={14} /> Пройдено
+              <CheckCircle size={14} /> Завершено
             </span>
           )}
 
@@ -224,7 +224,7 @@ export default function SchoolLesson() {
               opacity: !nextLessonId ? 0.4 : isCompleted ? 1 : 0.5,
             }}
           >
-            Следующий <ArrowRight size={14} />
+            Следующее <ArrowRight size={14} />
           </button>
         </div>
       </main>
