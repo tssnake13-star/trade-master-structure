@@ -114,7 +114,6 @@ export default function YouTubePlayer({ url }: Props) {
       style={{
         position: 'relative',
         width: '100%',
-        maxWidth: '514px',
         aspectRatio: '16/9',
         backgroundColor: '#111',
       }}
