@@ -4,6 +4,8 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Lock, BookOpen, Settings, LogOut } from 'lucide-react';
 import logo from '@/assets/logo-tradeliketyo.jpeg';
+import YouTubePlayer from '@/components/school/YouTubePlayer';
+import FloatingWatermark from '@/components/school/FloatingWatermark';
 
 interface Course {
   id: string;
