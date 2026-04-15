@@ -315,11 +315,96 @@ export default function SchoolDashboard() {
             </div>
           )}
 
-          {!selectedCourse && (
-            <div className="flex items-center justify-center py-20">
-              <p className="text-sm" style={{ color: '#555', fontFamily: font.mono }}>Выберите программу</p>
-            </div>
-          )}
+          {!selectedCourse && (() => {
+            // Find the program with most recent progress (or first accessible)
+            const canAccess = (c: Course) => role === 'admin' || c.is_free || accessIds.has(c.id);
+            const accessibleCourses = courses.filter(canAccess);
+            
+            // Find course with incomplete progress (last active)
+            let activeCourse: Course | null = null;
+            let activeNextLesson: Lesson | null = null;
+            
+            for (const c of accessibleCourses) {
+              const cLessons = allLessons.filter(l => l.course_id === c.id).sort((a, b) => a.sort_order - b.sort_order);
+              const next = cLessons.find(l => !completedIds.has(l.id));
+              if (next) {
+                activeCourse = c;
+                activeNextLesson = next;
+                break;
+              }
+            }
+            
+            // Fallback: first accessible course with lessons
+            if (!activeCourse) {
+              activeCourse = accessibleCourses.find(c => allLessons.some(l => l.course_id === c.id)) || null;
+            }
+            
+            const ap = activeCourse ? (progress[activeCourse.id] || { completed: 0, total: 0 }) : null;
+            const apct = ap && ap.total > 0 ? Math.round((ap.completed / ap.total) * 100) : 0;
+            const activeLessons = activeCourse ? allLessons.filter(l => l.course_id === activeCourse!.id).sort((a, b) => a.sort_order - b.sort_order) : [];
+
+            return (
+              <div className="py-8 sm:py-12">
+                <h1 className="text-3xl sm:text-4xl mb-2" style={{ fontFamily: font.heading }}>
+                  Добро пожаловать в систему
+                </h1>
+                <p className="text-sm mb-8" style={{ color: '#666', fontFamily: font.mono }}>
+                  Кабинет трейдера
+                </p>
+
+                {activeCourse && (
+                  <div className="rounded-xl border p-5 sm:p-6" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
+                    <p className="text-[11px] uppercase tracking-wider mb-3" style={{ color: '#555', fontFamily: font.mono }}>
+                      {ap && ap.completed > 0 ? 'Текущая программа' : 'Начните подготовку'}
+                    </p>
+                    <h2 className="text-xl sm:text-2xl mb-1" style={{ fontFamily: font.heading }}>
+                      {activeCourse.title}
+                    </h2>
+                    {activeCourse.subtitle && (
+                      <p className="text-xs mb-4" style={{ color: '#666', fontFamily: font.mono }}>{activeCourse.subtitle}</p>
+                    )}
+
+                    {ap && ap.total > 0 && (
+                      <div className="mb-4">
+                        <div className="flex items-center gap-3 mb-1">
+                          <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#1a1a1a' }}>
+                            <div className="h-full rounded-full transition-all" style={{ width: `${apct}%`, backgroundColor: '#4a8a4a' }} />
+                          </div>
+                          <span className="text-xs flex-shrink-0" style={{ color: '#666', fontFamily: font.mono }}>
+                            {ap.completed}/{ap.total} · {apct}%
+                          </span>
+                        </div>
+                      </div>
+                    )}
+
+                    {activeNextLesson && (
+                      <button
+                        onClick={() => navigate(`/school/lesson/${activeNextLesson!.id}`)}
+                        className="w-full rounded-lg border p-3 flex items-center justify-between transition-all hover:border-[#2a2a2a]"
+                        style={{ borderColor: '#1a1a1a', backgroundColor: '#111' }}
+                      >
+                        <div className="text-left min-w-0">
+                          <p className="text-[11px] uppercase tracking-wider mb-0.5" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
+                            {ap && ap.completed === 0 ? 'Начать' : 'Продолжить'}
+                          </p>
+                          <p className="text-sm truncate" style={{ fontFamily: font.mono, color: '#e8e0d0' }}>
+                            Занятие {activeLessons.indexOf(activeNextLesson!) + 1}. {activeNextLesson!.title}
+                          </p>
+                        </div>
+                        <ArrowRight size={16} style={{ color: '#4a8a4a' }} className="flex-shrink-0 ml-3" />
+                      </button>
+                    )}
+
+                    {!activeNextLesson && ap && ap.completed > 0 && (
+                      <p className="text-sm" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
+                        Все занятия завершены ✓
+                      </p>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
         </div>
       </main>
     </div>
