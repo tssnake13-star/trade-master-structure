@@ -9,6 +9,7 @@ interface LessonData {
   title: string;
   description: string | null;
   video_url: string | null;
+  video_url_alt: string | null;
   course_id: string;
   sort_order: number;
 }
@@ -20,6 +21,7 @@ export default function SchoolLesson() {
   const { session, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [lesson, setLesson] = useState<LessonData | null>(null);
+  const [prevLessonId, setPrevLessonId] = useState<string | null>(null);
   const [nextLessonId, setNextLessonId] = useState<string | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const [marking, setMarking] = useState(false);
@@ -31,18 +33,21 @@ export default function SchoolLesson() {
 
   useEffect(() => {
     if (!user || !id) return;
+    setLoading(true);
     const load = async () => {
       const lessonRes = await supabase.from('lessons').select('*').eq('id', id).single();
       const l = lessonRes.data as LessonData | null;
       setLesson(l);
 
       if (l) {
-        const [progressRes, nextRes] = await Promise.all([
+        const [progressRes, nextRes, prevRes] = await Promise.all([
           supabase.from('lesson_progress').select('id').eq('user_id', user.id).eq('lesson_id', l.id),
           supabase.from('lessons').select('id').eq('course_id', l.course_id).gt('sort_order', l.sort_order).order('sort_order').limit(1),
+          supabase.from('lessons').select('id').eq('course_id', l.course_id).lt('sort_order', l.sort_order).order('sort_order', { ascending: false }).limit(1),
         ]);
         setIsCompleted((progressRes.data || []).length > 0);
         setNextLessonId(nextRes.data?.[0]?.id || null);
+        setPrevLessonId(prevRes.data?.[0]?.id || null);
       }
       setLoading(false);
     };
@@ -65,28 +70,38 @@ export default function SchoolLesson() {
     );
   }
 
+  const hasMain = !!lesson.video_url;
+  const hasAlt = !!lesson.video_url_alt;
+  const hasBoth = hasMain && hasAlt;
+
+  const btnBase: React.CSSProperties = {
+    fontFamily: font.mono,
+    fontSize: '13px',
+    padding: '10px 16px',
+    borderRadius: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '6px',
+    transition: 'all 0.2s',
+    flex: '1',
+    justifyContent: 'center',
+  };
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
-      <header className="border-b px-4 py-3 flex items-center gap-3" style={{ borderColor: '#1a1a1a' }}>
-        <button onClick={() => navigate(`/school/course/${lesson.course_id}`)} className="hover:opacity-70 transition">
-          <ArrowLeft size={18} style={{ color: '#666' }} />
+      <header className="border-b px-4 py-3" style={{ borderColor: '#1a1a1a' }}>
+        <button
+          onClick={() => navigate(`/school/course/${lesson.course_id}`)}
+          className="flex items-center gap-2 hover:opacity-70 transition text-sm"
+          style={{ color: '#666', fontFamily: font.mono }}
+        >
+          <ArrowLeft size={16} />
+          Вернуться к курсу
         </button>
-        <h1 className="text-lg truncate" style={{ fontFamily: font.heading }}>{lesson.title}</h1>
       </header>
 
       <main className="max-w-3xl mx-auto p-4 sm:p-6">
-        {lesson.video_url && (
-          <div className="aspect-video rounded-xl overflow-hidden mb-6" style={{ backgroundColor: '#111' }}>
-            <iframe
-              src={lesson.video_url}
-              className="w-full h-full"
-              allowFullScreen
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            />
-          </div>
-        )}
-
-        <h2 className="text-2xl mb-3" style={{ fontFamily: font.heading }}>{lesson.title}</h2>
+        <h1 className="text-2xl mb-3" style={{ fontFamily: font.heading }}>{lesson.title}</h1>
 
         {lesson.description && (
           <p className="text-sm mb-6 leading-relaxed" style={{ color: '#999', fontFamily: font.mono }}>
@@ -94,48 +109,100 @@ export default function SchoolLesson() {
           </p>
         )}
 
-        <div className="flex flex-wrap gap-3">
+        {(hasMain || hasAlt) && (
+          <div className="space-y-4 mb-8">
+            {hasMain && (
+              <div>
+                {hasBoth && (
+                  <p className="text-xs mb-2" style={{ color: '#666', fontFamily: font.mono }}>YouTube</p>
+                )}
+                <div className="aspect-video rounded-xl overflow-hidden" style={{ backgroundColor: '#111' }}>
+                  <iframe
+                    src={lesson.video_url!}
+                    className="w-full h-full"
+                    allowFullScreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  />
+                </div>
+              </div>
+            )}
+            {hasAlt && (
+              <div>
+                {hasBoth && (
+                  <p className="text-xs mb-2" style={{ color: '#666', fontFamily: font.mono }}>Яндекс Дзен / RuTube</p>
+                )}
+                <div className="aspect-video rounded-xl overflow-hidden" style={{ backgroundColor: '#111' }}>
+                  <iframe
+                    src={lesson.video_url_alt!}
+                    className="w-full h-full"
+                    allowFullScreen
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        <div className="flex gap-2">
+          <button
+            onClick={() => prevLessonId && navigate(`/school/lesson/${prevLessonId}`)}
+            disabled={!prevLessonId}
+            style={{
+              ...btnBase,
+              borderColor: prevLessonId ? '#1a1a1a' : '#111',
+              color: prevLessonId ? '#e8e0d0' : '#333',
+              border: '1px solid',
+              cursor: prevLessonId ? 'pointer' : 'default',
+              opacity: prevLessonId ? 1 : 0.4,
+            }}
+          >
+            <ArrowLeft size={14} />
+            Предыдущий
+          </button>
+
           {!isCompleted ? (
             <button
               onClick={markComplete}
               disabled={marking}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm transition-all"
               style={{
+                ...btnBase,
                 backgroundColor: '#4a8a4a',
                 color: '#e8e0d0',
-                fontFamily: font.mono,
                 opacity: marking ? 0.6 : 1,
               }}
             >
-              <CheckCircle size={16} />
-              {marking ? '...' : 'Отметить как пройденный'}
+              <CheckCircle size={14} />
+              {marking ? '...' : 'Пройден'}
             </button>
           ) : (
             <span
-              className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm"
-              style={{ backgroundColor: '#1a2e1a', color: '#4a8a4a', fontFamily: font.mono }}
+              style={{
+                ...btnBase,
+                backgroundColor: '#1a2e1a',
+                color: '#4a8a4a',
+              }}
             >
-              <CheckCircle size={16} />
+              <CheckCircle size={14} />
               Пройдено
             </span>
           )}
 
-          {nextLessonId && (
-            <button
-              onClick={() => navigate(`/school/lesson/${nextLessonId}`)}
-              disabled={!isCompleted}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-lg border text-sm transition-all"
-              style={{
-                borderColor: isCompleted ? '#1a1a1a' : '#111',
-                color: isCompleted ? '#e8e0d0' : '#333',
-                fontFamily: font.mono,
-                cursor: isCompleted ? 'pointer' : 'default',
-              }}
-            >
-              Следующий урок
-              <ArrowRight size={16} />
-            </button>
-          )}
+          <button
+            onClick={() => nextLessonId && isCompleted && navigate(`/school/lesson/${nextLessonId}`)}
+            disabled={!nextLessonId || !isCompleted}
+            style={{
+              ...btnBase,
+              borderColor: nextLessonId && isCompleted ? '#1a1a1a' : '#111',
+              color: nextLessonId && isCompleted ? '#e8e0d0' : '#333',
+              border: '1px solid',
+              cursor: nextLessonId && isCompleted ? 'pointer' : 'default',
+              opacity: !nextLessonId ? 0.4 : isCompleted ? 1 : 0.5,
+            }}
+          >
+            Следующий
+            <ArrowRight size={14} />
+          </button>
         </div>
       </main>
     </div>
