@@ -152,6 +152,9 @@ export default function YouTubePlayer({ url, watermark }: Props) {
               iframe.style.height = '100%';
               iframe.style.border = '0';
               iframe.style.pointerEvents = 'none';
+              iframe.setAttribute('allowfullscreen', 'true');
+              iframe.setAttribute('webkitallowfullscreen', 'true');
+              iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen';
             }
             const d = player.getDuration();
             if (d > 0) setDuration(d);
