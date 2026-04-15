@@ -22,6 +22,16 @@ interface VideoData {
 
 const font = { heading: "'Cormorant Garamond', serif", mono: "'JetBrains Mono', monospace" };
 
+function toEmbedUrl(url: string): string {
+  try {
+    const u = new URL(url);
+    if (u.hostname === 'youtu.be') return `https://www.youtube.com/embed${u.pathname}`;
+    if ((u.hostname === 'www.youtube.com' || u.hostname === 'youtube.com') && u.searchParams.has('v'))
+      return `https://www.youtube.com/embed/${u.searchParams.get('v')}`;
+  } catch {}
+  return url;
+}
+
 export default function SchoolLesson() {
   const { id } = useParams<{ id: string }>();
   const { session, user, loading: authLoading } = useAuth();
