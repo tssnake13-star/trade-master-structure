@@ -115,6 +115,22 @@ function CoursesTab() {
     load();
   };
 
+  const startEdit = (c: Course) => {
+    setEditingCourse(c.id);
+    setEditForm({ title: c.title, subtitle: c.subtitle || '', is_free: c.is_free });
+  };
+
+  const updateCourse = async () => {
+    if (!editingCourse || !editForm.title) return;
+    await supabase.from('courses').update({
+      title: editForm.title,
+      subtitle: editForm.subtitle || null,
+      is_free: editForm.is_free,
+    }).eq('id', editingCourse);
+    setEditingCourse(null);
+    load();
+  };
+
   const addLesson = async (courseId: string) => {
     if (!lessonForm.title) return;
     const courseLessons = lessons.filter(l => l.course_id === courseId);
