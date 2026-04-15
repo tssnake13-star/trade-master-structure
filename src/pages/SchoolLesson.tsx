@@ -26,12 +26,16 @@ function toEmbedUrl(raw: string): string {
   try {
     const url = raw.startsWith('http') ? raw : `https://${raw}`;
     const u = new URL(url);
-    if (u.hostname === 'youtu.be') return `https://www.youtube.com/embed${u.pathname}`;
-    if (u.hostname === 'www.youtube.com' || u.hostname === 'youtube.com') {
-      if (u.searchParams.has('v')) return `https://www.youtube.com/embed/${u.searchParams.get('v')}`;
+    let embedId: string | null = null;
+    if (u.hostname === 'youtu.be') embedId = u.pathname.slice(1);
+    else if (u.hostname === 'www.youtube.com' || u.hostname === 'youtube.com') {
+      if (u.searchParams.has('v')) embedId = u.searchParams.get('v');
       const liveMatch = u.pathname.match(/^\/live\/([^/?]+)/);
-      if (liveMatch) return `https://www.youtube.com/embed/${liveMatch[1]}`;
+      if (liveMatch) embedId = liveMatch[1];
+      const embedMatch = u.pathname.match(/^\/embed\/([^/?]+)/);
+      if (embedMatch) embedId = embedMatch[1];
     }
+    if (embedId) return `https://www.youtube-nocookie.com/embed/${embedId}?modestbranding=1&rel=0`;
   } catch {}
   return raw;
 }
