@@ -8,9 +8,15 @@ interface LessonData {
   id: string;
   title: string;
   description: string | null;
-  video_url: string | null;
-  video_url_alt: string | null;
   course_id: string;
+  sort_order: number;
+}
+
+interface VideoData {
+  id: string;
+  title: string;
+  video_url: string;
+  video_url_alt: string | null;
   sort_order: number;
 }
 
@@ -21,6 +27,7 @@ export default function SchoolLesson() {
   const { session, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [lesson, setLesson] = useState<LessonData | null>(null);
+  const [videos, setVideos] = useState<VideoData[]>([]);
   const [prevLessonId, setPrevLessonId] = useState<string | null>(null);
   const [nextLessonId, setNextLessonId] = useState<string | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
@@ -40,14 +47,16 @@ export default function SchoolLesson() {
       setLesson(l);
 
       if (l) {
-        const [progressRes, nextRes, prevRes] = await Promise.all([
+        const [progressRes, nextRes, prevRes, videosRes] = await Promise.all([
           supabase.from('lesson_progress').select('id').eq('user_id', user.id).eq('lesson_id', l.id),
           supabase.from('lessons').select('id').eq('course_id', l.course_id).gt('sort_order', l.sort_order).order('sort_order').limit(1),
           supabase.from('lessons').select('id').eq('course_id', l.course_id).lt('sort_order', l.sort_order).order('sort_order', { ascending: false }).limit(1),
+          supabase.from('lesson_videos').select('*').eq('lesson_id', l.id).order('sort_order'),
         ]);
         setIsCompleted((progressRes.data || []).length > 0);
         setNextLessonId(nextRes.data?.[0]?.id || null);
         setPrevLessonId(prevRes.data?.[0]?.id || null);
+        setVideos((videosRes.data || []) as VideoData[]);
       }
       setLoading(false);
     };
@@ -70,21 +79,9 @@ export default function SchoolLesson() {
     );
   }
 
-  const hasMain = !!lesson.video_url;
-  const hasAlt = !!lesson.video_url_alt;
-  const hasBoth = hasMain && hasAlt;
-
   const btnBase: React.CSSProperties = {
-    fontFamily: font.mono,
-    fontSize: '13px',
-    padding: '10px 16px',
-    borderRadius: '8px',
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-    transition: 'all 0.2s',
-    flex: '1',
-    justifyContent: 'center',
+    fontFamily: font.mono, fontSize: '13px', padding: '10px 16px', borderRadius: '8px',
+    display: 'flex', alignItems: 'center', gap: '6px', transition: 'all 0.2s', flex: '1', justifyContent: 'center',
   };
 
   return (
@@ -109,38 +106,40 @@ export default function SchoolLesson() {
           </p>
         )}
 
-        {(hasMain || hasAlt) && (
-          <div className="space-y-4 mb-8">
-            {hasMain && (
-              <div>
-                {hasBoth && (
-                  <p className="text-xs mb-2" style={{ color: '#666', fontFamily: font.mono }}>YouTube</p>
-                )}
-                <div className="aspect-video rounded-xl overflow-hidden" style={{ backgroundColor: '#111' }}>
-                  <iframe
-                    src={lesson.video_url!}
-                    className="w-full h-full"
-                    allowFullScreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  />
+        {videos.length > 0 && (
+          <div className="space-y-6 mb-8">
+            {videos.map(v => {
+              const hasMain = !!v.video_url;
+              const hasAlt = !!v.video_url_alt;
+              const hasBoth = hasMain && hasAlt;
+              return (
+                <div key={v.id}>
+                  {v.title && (
+                    <p className="text-sm mb-2" style={{ color: '#e8e0d0', fontFamily: font.mono }}>{v.title}</p>
+                  )}
+                  <div className="space-y-3">
+                    {hasMain && (
+                      <div>
+                        {hasBoth && <p className="text-xs mb-1" style={{ color: '#666', fontFamily: font.mono }}>YouTube</p>}
+                        <div className="aspect-video rounded-xl overflow-hidden" style={{ backgroundColor: '#111' }}>
+                          <iframe src={v.video_url} className="w-full h-full" allowFullScreen
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
+                        </div>
+                      </div>
+                    )}
+                    {hasAlt && (
+                      <div>
+                        {hasBoth && <p className="text-xs mb-1" style={{ color: '#666', fontFamily: font.mono }}>Дзен / RuTube</p>}
+                        <div className="aspect-video rounded-xl overflow-hidden" style={{ backgroundColor: '#111' }}>
+                          <iframe src={v.video_url_alt!} className="w-full h-full" allowFullScreen
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            )}
-            {hasAlt && (
-              <div>
-                {hasBoth && (
-                  <p className="text-xs mb-2" style={{ color: '#666', fontFamily: font.mono }}>Яндекс Дзен / RuTube</p>
-                )}
-                <div className="aspect-video rounded-xl overflow-hidden" style={{ backgroundColor: '#111' }}>
-                  <iframe
-                    src={lesson.video_url_alt!}
-                    className="w-full h-full"
-                    allowFullScreen
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  />
-                </div>
-              </div>
-            )}
+              );
+            })}
           </div>
         )}
 
@@ -149,42 +148,21 @@ export default function SchoolLesson() {
             onClick={() => prevLessonId && navigate(`/school/lesson/${prevLessonId}`)}
             disabled={!prevLessonId}
             style={{
-              ...btnBase,
-              borderColor: prevLessonId ? '#1a1a1a' : '#111',
-              color: prevLessonId ? '#e8e0d0' : '#333',
-              border: '1px solid',
-              cursor: prevLessonId ? 'pointer' : 'default',
-              opacity: prevLessonId ? 1 : 0.4,
+              ...btnBase, borderColor: prevLessonId ? '#1a1a1a' : '#111', color: prevLessonId ? '#e8e0d0' : '#333',
+              border: '1px solid', cursor: prevLessonId ? 'pointer' : 'default', opacity: prevLessonId ? 1 : 0.4,
             }}
           >
-            <ArrowLeft size={14} />
-            Предыдущий
+            <ArrowLeft size={14} /> Предыдущий
           </button>
 
           {!isCompleted ? (
-            <button
-              onClick={markComplete}
-              disabled={marking}
-              style={{
-                ...btnBase,
-                backgroundColor: '#4a8a4a',
-                color: '#e8e0d0',
-                opacity: marking ? 0.6 : 1,
-              }}
-            >
-              <CheckCircle size={14} />
-              {marking ? '...' : 'Пройден'}
+            <button onClick={markComplete} disabled={marking}
+              style={{ ...btnBase, backgroundColor: '#4a8a4a', color: '#e8e0d0', opacity: marking ? 0.6 : 1 }}>
+              <CheckCircle size={14} /> {marking ? '...' : 'Пройден'}
             </button>
           ) : (
-            <span
-              style={{
-                ...btnBase,
-                backgroundColor: '#1a2e1a',
-                color: '#4a8a4a',
-              }}
-            >
-              <CheckCircle size={14} />
-              Пройдено
+            <span style={{ ...btnBase, backgroundColor: '#1a2e1a', color: '#4a8a4a' }}>
+              <CheckCircle size={14} /> Пройдено
             </span>
           )}
 
@@ -192,16 +170,13 @@ export default function SchoolLesson() {
             onClick={() => nextLessonId && isCompleted && navigate(`/school/lesson/${nextLessonId}`)}
             disabled={!nextLessonId || !isCompleted}
             style={{
-              ...btnBase,
-              borderColor: nextLessonId && isCompleted ? '#1a1a1a' : '#111',
-              color: nextLessonId && isCompleted ? '#e8e0d0' : '#333',
-              border: '1px solid',
+              ...btnBase, borderColor: nextLessonId && isCompleted ? '#1a1a1a' : '#111',
+              color: nextLessonId && isCompleted ? '#e8e0d0' : '#333', border: '1px solid',
               cursor: nextLessonId && isCompleted ? 'pointer' : 'default',
               opacity: !nextLessonId ? 0.4 : isCompleted ? 1 : 0.5,
             }}
           >
-            Следующий
-            <ArrowRight size={14} />
+            Следующий <ArrowRight size={14} />
           </button>
         </div>
       </main>

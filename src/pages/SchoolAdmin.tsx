@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, Plus, Trash2, Pencil } from 'lucide-react';
+import VideoBlockEditor from '@/components/school/VideoBlockEditor';
 
 const font = { heading: "'Cormorant Garamond', serif", mono: "'JetBrains Mono', monospace" };
 const tabStyle = (active: boolean) => ({
@@ -17,7 +18,8 @@ const tabStyle = (active: boolean) => ({
 });
 
 interface Course { id: string; title: string; subtitle: string | null; is_free: boolean; sort_order: number; }
-interface Lesson { id: string; course_id: string; title: string; video_url: string | null; video_url_alt: string | null; description: string | null; sort_order: number; }
+interface Lesson { id: string; course_id: string; title: string; description: string | null; sort_order: number; }
+interface LessonVideo { id?: string; title: string; video_url: string; video_url_alt: string; sort_order: number; }
 interface Profile { user_id: string; email: string; full_name: string | null; created_at: string; }
 interface UserRole { user_id: string; role: string; }
 interface Access { id: string; user_id: string; course_id: string; granted_at: string; expires_at: string | null; }
@@ -83,7 +85,11 @@ function CoursesTab() {
   const [showAddCourse, setShowAddCourse] = useState(false);
   const [showAddLesson, setShowAddLesson] = useState<string | null>(null);
   const [form, setForm] = useState({ title: '', subtitle: '', is_free: false });
-  const [lessonForm, setLessonForm] = useState({ title: '', video_url: '', video_url_alt: '', description: '', sort_order: 0 });
+  const [lessonForm, setLessonForm] = useState({ title: '', description: '', sort_order: 0 });
+  const [lessonVideos, setLessonVideos] = useState<LessonVideo[]>([]);
+  const [editingLessonId, setEditingLessonId] = useState<string | null>(null);
+  const [editLessonForm, setEditLessonForm] = useState({ title: '', description: '' });
+  const [editLessonVideos, setEditLessonVideos] = useState<LessonVideo[]>([]);
 
   const load = async () => {
     const [c, l] = await Promise.all([
@@ -134,16 +140,52 @@ function CoursesTab() {
   const addLesson = async (courseId: string) => {
     if (!lessonForm.title) return;
     const courseLessons = lessons.filter(l => l.course_id === courseId);
-    await supabase.from('lessons').insert({
+    const res = await supabase.from('lessons').insert({
       course_id: courseId,
       title: lessonForm.title,
-      video_url: lessonForm.video_url || null,
-      video_url_alt: lessonForm.video_url_alt || null,
       description: lessonForm.description || null,
       sort_order: lessonForm.sort_order || courseLessons.length,
-    });
-    setLessonForm({ title: '', video_url: '', video_url_alt: '', description: '', sort_order: 0 });
+    }).select('id').single();
+    if (res.data && lessonVideos.length > 0) {
+      await supabase.from('lesson_videos').insert(
+        lessonVideos.filter(v => v.video_url).map(v => ({
+          lesson_id: res.data.id,
+          title: v.title,
+          video_url: v.video_url,
+          video_url_alt: v.video_url_alt || null,
+          sort_order: v.sort_order,
+        }))
+      );
+    }
+    setLessonForm({ title: '', description: '', sort_order: 0 });
+    setLessonVideos([]);
     setShowAddLesson(null);
+    load();
+  };
+
+  const startEditLesson = async (l: Lesson) => {
+    setEditingLessonId(l.id);
+    setEditLessonForm({ title: l.title, description: l.description || '' });
+    const res = await supabase.from('lesson_videos').select('*').eq('lesson_id', l.id).order('sort_order');
+    setEditLessonVideos((res.data || []).map((v: any) => ({ id: v.id, title: v.title, video_url: v.video_url, video_url_alt: v.video_url_alt || '', sort_order: v.sort_order })));
+  };
+
+  const saveEditLesson = async () => {
+    if (!editingLessonId || !editLessonForm.title) return;
+    await supabase.from('lessons').update({ title: editLessonForm.title, description: editLessonForm.description || null }).eq('id', editingLessonId);
+    await supabase.from('lesson_videos').delete().eq('lesson_id', editingLessonId);
+    if (editLessonVideos.length > 0) {
+      await supabase.from('lesson_videos').insert(
+        editLessonVideos.filter(v => v.video_url).map(v => ({
+          lesson_id: editingLessonId,
+          title: v.title,
+          video_url: v.video_url,
+          video_url_alt: v.video_url_alt || null,
+          sort_order: v.sort_order,
+        }))
+      );
+    }
+    setEditingLessonId(null);
     load();
   };
 
@@ -259,9 +301,27 @@ function CoursesTab() {
             {expandedCourse === c.id && (
               <div className="border-t px-4 pb-4 pt-3 space-y-2" style={{ borderColor: '#1a1a1a' }}>
                 {lessons.filter(l => l.course_id === c.id).map(l => (
-                  <div key={l.id} className="flex items-center justify-between text-xs py-1.5" style={{ fontFamily: font.mono, color: '#999' }}>
-                    <span>{l.sort_order + 1}. {l.title}</span>
-                    <button onClick={() => deleteLesson(l.id)} className="hover:opacity-70"><Trash2 size={12} style={{ color: '#444' }} /></button>
+                  <div key={l.id}>
+                    <div className="flex items-center justify-between text-xs py-1.5" style={{ fontFamily: font.mono, color: '#999' }}>
+                      <span>{l.sort_order + 1}. {l.title}</span>
+                      <div className="flex items-center gap-1">
+                        <button onClick={() => startEditLesson(l)} className="hover:opacity-70"><Pencil size={12} style={{ color: '#444' }} /></button>
+                        <button onClick={() => deleteLesson(l.id)} className="hover:opacity-70"><Trash2 size={12} style={{ color: '#444' }} /></button>
+                      </div>
+                    </div>
+                    {editingLessonId === l.id && (
+                      <div className="space-y-2 pt-2 pb-3 pl-4 border-l" style={{ borderColor: '#1a1a1a' }}>
+                        <input placeholder="Название урока" value={editLessonForm.title} onChange={e => setEditLessonForm({ ...editLessonForm, title: e.target.value })}
+                          className="w-full px-3 py-2 rounded border text-xs" style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
+                        <textarea placeholder="Описание" value={editLessonForm.description} onChange={e => setEditLessonForm({ ...editLessonForm, description: e.target.value })}
+                          className="w-full px-3 py-2 rounded border text-xs" rows={2} style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
+                        <VideoBlockEditor videos={editLessonVideos} onChange={setEditLessonVideos} />
+                        <div className="flex gap-2">
+                          <button onClick={saveEditLesson} className="text-xs px-3 py-1.5 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}>Сохранить</button>
+                          <button onClick={() => setEditingLessonId(null)} className="text-xs px-3 py-1.5" style={{ color: '#666', fontFamily: font.mono }}>Отмена</button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
 
@@ -269,20 +329,17 @@ function CoursesTab() {
                   <div className="space-y-2 pt-2">
                     <input placeholder="Название урока" value={lessonForm.title} onChange={e => setLessonForm({ ...lessonForm, title: e.target.value })}
                       className="w-full px-3 py-2 rounded border text-xs" style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
-                    <input placeholder="URL видео (YouTube)" value={lessonForm.video_url} onChange={e => setLessonForm({ ...lessonForm, video_url: e.target.value })}
-                      className="w-full px-3 py-2 rounded border text-xs" style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
-                    <input placeholder="Ссылка для России (Дзен/RuTube)" value={lessonForm.video_url_alt} onChange={e => setLessonForm({ ...lessonForm, video_url_alt: e.target.value })}
-                      className="w-full px-3 py-2 rounded border text-xs" style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
                     <textarea placeholder="Описание" value={lessonForm.description} onChange={e => setLessonForm({ ...lessonForm, description: e.target.value })}
                       className="w-full px-3 py-2 rounded border text-xs" rows={2} style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
+                    <VideoBlockEditor videos={lessonVideos} onChange={setLessonVideos} />
                     <div className="flex gap-2">
                       <button onClick={() => addLesson(c.id)} className="text-xs px-3 py-1.5 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}>Добавить</button>
-                      <button onClick={() => setShowAddLesson(null)} className="text-xs px-3 py-1.5" style={{ color: '#666', fontFamily: font.mono }}>Отмена</button>
+                      <button onClick={() => { setShowAddLesson(null); setLessonVideos([]); }} className="text-xs px-3 py-1.5" style={{ color: '#666', fontFamily: font.mono }}>Отмена</button>
                     </div>
                   </div>
                 ) : (
                   <button
-                    onClick={() => setShowAddLesson(c.id)}
+                    onClick={() => { setShowAddLesson(c.id); setLessonVideos([]); }}
                     className="flex items-center gap-1 text-xs mt-1"
                     style={{ color: '#4a8a4a', fontFamily: font.mono }}
                   >
