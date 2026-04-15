@@ -29,6 +29,7 @@ const font = { heading: "'Cormorant Garamond', serif", mono: "'JetBrains Mono', 
 export default function SchoolDashboard() {
   const { session, user, role, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [courses, setCourses] = useState<Course[]>([]);
   const [accessIds, setAccessIds] = useState<Set<string>>(new Set());
   const [progress, setProgress] = useState<ProgressMap>({});
@@ -69,9 +70,11 @@ export default function SchoolDashboard() {
       }
       setProgress(pm);
 
-      // Auto-select first accessible course
+      // Auto-select course from navigation state or first accessible
       const canAccess = (c: Course) => role === 'admin' || c.is_free || accessSet.has(c.id);
-      const first = courseList.find(canAccess);
+      const stateId = (location.state as any)?.selectedCourse;
+      const fromState = stateId ? courseList.find(c => c.id === stateId && canAccess(c)) : null;
+      const first = fromState || courseList.find(canAccess);
       if (first) setSelectedCourse(first.id);
 
       setLoading(false);
