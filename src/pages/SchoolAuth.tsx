@@ -116,9 +116,10 @@ export default function SchoolAuth() {
           {!isLogin && (
             <input
               type="text"
-              placeholder="Имя"
+              placeholder="Имя и фамилия"
               value={fullName}
               onChange={e => setFullName(e.target.value)}
+              required
               className="w-full px-4 py-3 rounded-lg border text-sm"
               style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: "'JetBrains Mono', monospace" }}
             />
