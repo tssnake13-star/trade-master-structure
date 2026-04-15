@@ -24,7 +24,7 @@ interface ProgressMap {
   [courseId: string]: { completed: number; total: number };
 }
 
-const font = { heading: "'Cormorant Garamond', serif", mono: "'JetBrains Mono', monospace" };
+const font = { heading: "'Inter', sans-serif", mono: "'Inter', sans-serif" };
 
 export default function SchoolDashboard() {
   const { session, user, role, loading: authLoading, signOut } = useAuth();
