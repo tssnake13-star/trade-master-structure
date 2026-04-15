@@ -78,8 +78,10 @@ export default function SchoolLesson() {
     if (!authLoading && !session) navigate('/school', { replace: true });
   }, [authLoading, session, navigate]);
 
+  const userId = user?.id;
+
   useEffect(() => {
-    if (!user || !id) return;
+    if (!userId || !id) return;
     setLoading(true);
     const load = async () => {
       const lessonRes = await supabase.from('lessons').select('*').eq('id', id).single();
@@ -88,7 +90,7 @@ export default function SchoolLesson() {
 
       if (l) {
         const [progressRes, nextRes, prevRes, videosRes] = await Promise.all([
-          supabase.from('lesson_progress').select('id').eq('user_id', user.id).eq('lesson_id', l.id),
+          supabase.from('lesson_progress').select('id').eq('user_id', userId).eq('lesson_id', l.id),
           supabase.from('lessons').select('id').eq('course_id', l.course_id).gt('sort_order', l.sort_order).order('sort_order').limit(1),
           supabase.from('lessons').select('id').eq('course_id', l.course_id).lt('sort_order', l.sort_order).order('sort_order', { ascending: false }).limit(1),
           supabase.from('lesson_videos').select('*').eq('lesson_id', l.id).order('sort_order'),
@@ -101,7 +103,7 @@ export default function SchoolLesson() {
       setLoading(false);
     };
     load();
-  }, [user, id]);
+  }, [userId, id]);
 
   const markComplete = async () => {
     if (!user || !lesson || isCompleted) return;
