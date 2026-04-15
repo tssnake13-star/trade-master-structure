@@ -137,10 +137,7 @@ export default function SchoolLesson() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#080808', color: '#e8e0d0', position: 'relative', overflow: 'hidden' }}>
-      {profileData.email && (
-        <FloatingWatermark email={profileData.email} fullName={profileData.full_name} />
-      )}
+    <div className="min-h-screen" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
       <header className="border-b px-4 py-3" style={{ borderColor: '#1a1a1a' }}>
         <button
           onClick={() => navigate(`/school/course/${lesson.course_id}`)}
