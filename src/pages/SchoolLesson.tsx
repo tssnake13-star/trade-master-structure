@@ -78,8 +78,10 @@ export default function SchoolLesson() {
     if (!authLoading && !session) navigate('/school', { replace: true });
   }, [authLoading, session, navigate]);
 
+  const userId = user?.id;
+
   useEffect(() => {
-    if (!user || !id) return;
+    if (!userId || !id) return;
     setLoading(true);
     const load = async () => {
       const lessonRes = await supabase.from('lessons').select('*').eq('id', id).single();
