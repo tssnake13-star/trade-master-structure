@@ -35,7 +35,7 @@ function toEmbedUrl(raw: string): string {
       const embedMatch = u.pathname.match(/^\/embed\/([^/?]+)/);
       if (embedMatch) embedId = embedMatch[1];
     }
-    if (embedId) return `https://www.youtube-nocookie.com/embed/${embedId}?modestbranding=1&rel=0`;
+    if (embedId) return `https://www.youtube.com/embed/${embedId}?rel=0&modestbranding=1&iv_load_policy=3&disablekb=1`;
   } catch {}
   return raw;
 }
