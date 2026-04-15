@@ -195,3 +195,44 @@
     box-shadow: 0 0 16px hsl(220 10% 92% / 0.3), 0 0 40px hsl(220 10% 92% / 0.15);
   }
 }
+
+/* Diamond shimmer for logo */
+@keyframes diamondShimmer {
+  0% {
+    filter: brightness(1) contrast(1);
+    box-shadow: none;
+  }
+  15% {
+    filter: brightness(1.08) contrast(1.02);
+    box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.03);
+  }
+  30% {
+    filter: brightness(1.18) contrast(1.05);
+    box-shadow: inset 0 0 30px rgba(255, 255, 255, 0.06), 0 0 8px rgba(200, 210, 230, 0.08);
+  }
+  45% {
+    filter: brightness(1.05) contrast(1.01);
+    box-shadow: inset 0 0 15px rgba(255, 255, 255, 0.02);
+  }
+  60% {
+    filter: brightness(1.12) contrast(1.03);
+    box-shadow: inset 0 0 25px rgba(220, 225, 240, 0.05), 0 0 6px rgba(200, 210, 230, 0.06);
+  }
+  75% {
+    filter: brightness(1.02) contrast(1);
+    box-shadow: none;
+  }
+  100% {
+    filter: brightness(1) contrast(1);
+    box-shadow: none;
+  }
+}
+
+.logo-shimmer {
+  animation: diamondShimmer 4s ease-in-out infinite;
+  transition: filter 0.3s ease;
+}
+
+.logo-shimmer:hover {
+  filter: brightness(1.25) contrast(1.08) !important;
+}
