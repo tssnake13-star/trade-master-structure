@@ -170,6 +170,7 @@ export default function SchoolLesson() {
               const hasMain = !!v.video_url;
               const hasAlt = !!v.video_url_alt;
               const hasBoth = hasMain && hasAlt;
+              const wm = profileData.email ? <FloatingWatermark email={profileData.email} fullName={profileData.full_name} /> : null;
               return (
                 <div key={v.id}>
                   {v.title && (
@@ -179,13 +180,13 @@ export default function SchoolLesson() {
                     {hasMain && (
                       <div>
                         {hasBoth && <p className="text-xs mb-1" style={{ color: '#666', fontFamily: font.mono }}>YouTube</p>}
-                        {renderPlayer(v.video_url)}
+                        {renderPlayer(v.video_url, wm)}
                       </div>
                     )}
                     {hasAlt && (
                       <div>
                         {hasBoth && <p className="text-xs mb-1" style={{ color: '#666', fontFamily: font.mono }}>Дзен / RuTube</p>}
-                        {renderPlayer(v.video_url_alt!)}
+                        {renderPlayer(v.video_url_alt!, wm)}
                       </div>
                     )}
                   </div>
