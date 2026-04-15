@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
+import YouTubePlayer from '@/components/school/YouTubePlayer';
 
 interface LessonData {
   id: string;
@@ -22,22 +23,8 @@ interface VideoData {
 
 const font = { heading: "'Cormorant Garamond', serif", mono: "'JetBrains Mono', monospace" };
 
-function toEmbedUrl(raw: string): string {
-  try {
-    const url = raw.startsWith('http') ? raw : `https://${raw}`;
-    const u = new URL(url);
-    let embedId: string | null = null;
-    if (u.hostname === 'youtu.be') embedId = u.pathname.slice(1);
-    else if (u.hostname === 'www.youtube.com' || u.hostname === 'youtube.com') {
-      if (u.searchParams.has('v')) embedId = u.searchParams.get('v');
-      const liveMatch = u.pathname.match(/^\/live\/([^/?]+)/);
-      if (liveMatch) embedId = liveMatch[1];
-      const embedMatch = u.pathname.match(/^\/embed\/([^/?]+)/);
-      if (embedMatch) embedId = embedMatch[1];
-    }
-    if (embedId) return `https://www.youtube.com/embed/${embedId}?rel=0&modestbranding=1&iv_load_policy=3&disablekb=1`;
-  } catch {}
-  return raw;
+function isYouTubeUrl(val: string): boolean {
+  return /youtube\.com|youtu\.be/i.test(val);
 }
 
 function renderPlayer(val: string) {
@@ -48,9 +35,12 @@ function renderPlayer(val: string) {
         dangerouslySetInnerHTML={{ __html: styled }} />
     );
   }
+  if (isYouTubeUrl(val)) {
+    return <YouTubePlayer url={val} />;
+  }
   return (
     <div className="rounded-xl overflow-hidden" style={{ maxWidth: '514px', width: '100%', aspectRatio: '16/9', backgroundColor: '#111' }}>
-      <iframe src={toEmbedUrl(val)} style={{ width: '100%', height: '100%', border: 'none' }} allowFullScreen
+      <iframe src={val} style={{ width: '100%', height: '100%', border: 'none' }} allowFullScreen
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
     </div>
   );
