@@ -78,6 +78,8 @@ function CoursesTab() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [expandedCourse, setExpandedCourse] = useState<string | null>(null);
+  const [editingCourse, setEditingCourse] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({ title: '', subtitle: '', is_free: false });
   const [showAddCourse, setShowAddCourse] = useState(false);
   const [showAddLesson, setShowAddLesson] = useState<string | null>(null);
   const [form, setForm] = useState({ title: '', subtitle: '', is_free: false });
