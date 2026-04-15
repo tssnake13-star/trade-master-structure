@@ -253,7 +253,16 @@ function CoursesTab() {
                   </button>
                 </div>
               </div>
-            )
+            )}
+
+            {expandedCourse === c.id && (
+              <div className="border-t px-4 pb-4 pt-3 space-y-2" style={{ borderColor: '#1a1a1a' }}>
+                {lessons.filter(l => l.course_id === c.id).map(l => (
+                  <div key={l.id} className="flex items-center justify-between text-xs py-1.5" style={{ fontFamily: font.mono, color: '#999' }}>
+                    <span>{l.sort_order + 1}. {l.title}</span>
+                    <button onClick={() => deleteLesson(l.id)} className="hover:opacity-70"><Trash2 size={12} style={{ color: '#444' }} /></button>
+                  </div>
+                ))}
 
                 {showAddLesson === c.id ? (
                   <div className="space-y-2 pt-2">
