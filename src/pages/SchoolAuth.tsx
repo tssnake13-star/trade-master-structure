@@ -117,12 +117,14 @@ export default function SchoolAuth() {
     <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#080808' }}>
       <div className="w-full max-w-md">
         <LogoBlock />
-        <h1
-          className="text-3xl mb-8 text-center"
-          style={{ fontFamily: "'Cormorant Garamond', serif", color: '#e8e0d0' }}
-        >
-          {isLogin ? 'Вход в школу' : 'Регистрация'}
-        </h1>
+        {!isLogin && (
+          <h1
+            className="text-3xl mb-8 text-center"
+            style={{ fontFamily: "'Cormorant Garamond', serif", color: '#e8e0d0' }}
+          >
+            Регистрация
+          </h1>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (
