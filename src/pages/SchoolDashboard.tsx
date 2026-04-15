@@ -2,10 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Lock, BookOpen, Settings, LogOut } from 'lucide-react';
+import { Lock, BookOpen, Settings, LogOut, ArrowRight, Play } from 'lucide-react';
 import logo from '@/assets/logo-tradeliketyo.jpeg';
-import YouTubePlayer from '@/components/school/YouTubePlayer';
-import FloatingWatermark from '@/components/school/FloatingWatermark';
 
 interface Course {
   id: string;
@@ -15,8 +13,24 @@ interface Course {
   sort_order: number;
 }
 
+interface Lesson {
+  id: string;
+  course_id: string;
+  title: string;
+  sort_order: number;
+}
+
 interface ProgressMap {
   [courseId: string]: { completed: number; total: number };
+}
+
+interface ContinueData {
+  lessonId: string;
+  lessonTitle: string;
+  lessonNumber: number;
+  courseTitle: string;
+  courseId: string;
+  isFirstEver: boolean;
 }
 
 const font = { heading: "'Cormorant Garamond', serif", mono: "'JetBrains Mono', monospace" };
@@ -27,7 +41,7 @@ export default function SchoolDashboard() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [accessIds, setAccessIds] = useState<Set<string>>(new Set());
   const [progress, setProgress] = useState<ProgressMap>({});
-  const [welcomeVideo, setWelcomeVideo] = useState('');
+  const [continueData, setContinueData] = useState<ContinueData | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
 
@@ -38,32 +52,62 @@ export default function SchoolDashboard() {
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      const [coursesRes, accessRes, lessonsRes, progressRes, settingsRes] = await Promise.all([
+      const [coursesRes, accessRes, lessonsRes, progressRes] = await Promise.all([
         supabase.from('courses').select('*').order('sort_order'),
         supabase.from('course_access').select('course_id').eq('user_id', user.id),
-        supabase.from('lessons').select('id, course_id'),
+        supabase.from('lessons').select('id, course_id, title, sort_order').order('sort_order'),
         supabase.from('lesson_progress').select('lesson_id').eq('user_id', user.id),
-        supabase.from('site_settings').select('value').eq('key', 'dashboard_welcome_video').single(),
       ]);
 
       const courseList = (coursesRes.data || []) as Course[];
-      setCourses(courseList);
-      setAccessIds(new Set((accessRes.data || []).map(a => a.course_id)));
-      setWelcomeVideo(settingsRes.data?.value || '');
-
-      const lessons = lessonsRes.data || [];
+      const accessSet = new Set((accessRes.data || []).map(a => a.course_id));
+      const allLessons = (lessonsRes.data || []) as Lesson[];
       const completedSet = new Set((progressRes.data || []).map(p => p.lesson_id));
+
+      setCourses(courseList);
+      setAccessIds(accessSet);
+
+      // Build progress map
       const pm: ProgressMap = {};
       for (const c of courseList) {
-        const total = lessons.filter(l => l.course_id === c.id).length;
-        const completed = lessons.filter(l => l.course_id === c.id && completedSet.has(l.id)).length;
+        const total = allLessons.filter(l => l.course_id === c.id).length;
+        const completed = allLessons.filter(l => l.course_id === c.id && completedSet.has(l.id)).length;
         pm[c.id] = { completed, total };
       }
       setProgress(pm);
+
+      // Find continue lesson
+      const canAccess = (c: Course) => role === 'admin' || c.is_free || accessSet.has(c.id);
+      const accessibleCourses = courseList.filter(canAccess);
+
+      let found: ContinueData | null = null;
+
+      for (const course of accessibleCourses) {
+        const courseLessons = allLessons
+          .filter(l => l.course_id === course.id)
+          .sort((a, b) => a.sort_order - b.sort_order);
+
+        for (let i = 0; i < courseLessons.length; i++) {
+          if (!completedSet.has(courseLessons[i].id)) {
+            found = {
+              lessonId: courseLessons[i].id,
+              lessonTitle: courseLessons[i].title,
+              lessonNumber: i + 1,
+              courseTitle: course.title,
+              courseId: course.id,
+              isFirstEver: completedSet.size === 0,
+            };
+            break;
+          }
+        }
+        if (found) break;
+      }
+
+      setContinueData(found);
       setLoading(false);
     };
     load();
-  }, [user]);
+  }, [user, role]);
 
   if (authLoading || loading) {
     return (
@@ -75,15 +119,46 @@ export default function SchoolDashboard() {
 
   const hasAccess = (c: Course) => role === 'admin' || c.is_free || accessIds.has(c.id);
 
-  const extractYouTubeId = (url: string) => {
-    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|shorts\/))([^?&]+)/);
-    return match?.[1] || null;
+  const CourseCard = ({ c, accessible }: { c: Course; accessible: boolean }) => {
+    const p = progress[c.id] || { completed: 0, total: 0 };
+    const pct = p.total > 0 ? Math.round((p.completed / p.total) * 100) : 0;
+
+    return (
+      <div
+        onClick={() => accessible && navigate(`/school/course/${c.id}`)}
+        className="rounded-xl border p-4 transition-all"
+        style={{
+          borderColor: accessible ? '#1a1a1a' : '#141414',
+          backgroundColor: accessible ? '#0d0d0d' : '#0a0a0a',
+          opacity: accessible ? 1 : 0.5,
+          cursor: accessible ? 'pointer' : 'default',
+        }}
+      >
+        <div className="flex items-start justify-between mb-1">
+          <h3 className="text-sm sm:text-base" style={{ fontFamily: font.mono, color: accessible ? '#e8e0d0' : '#444' }}>{c.title}</h3>
+          {!accessible && <Lock size={14} style={{ color: '#444' }} />}
+          {accessible && <BookOpen size={14} style={{ color: '#4a8a4a' }} />}
+        </div>
+        {c.subtitle && (
+          <p className="text-xs mb-2" style={{ color: '#666', fontFamily: font.mono }}>{c.subtitle}</p>
+        )}
+        {accessible && p.total > 0 && (
+          <div className="mt-1">
+            <div className="flex justify-between text-[10px] mb-1" style={{ color: '#666', fontFamily: font.mono }}>
+              <span>{p.completed}/{p.total} занятий</span>
+              <span>{pct}%</span>
+            </div>
+            <div className="h-1 rounded-full overflow-hidden" style={{ backgroundColor: '#1a1a1a' }}>
+              <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: '#4a8a4a' }} />
+            </div>
+          </div>
+        )}
+        {!accessible && (
+          <p className="text-xs mt-1" style={{ color: '#444', fontFamily: font.mono }}>Закрыто</p>
+        )}
+      </div>
+    );
   };
-
-  const videoId = welcomeVideo ? extractYouTubeId(welcomeVideo) : null;
-
-  const profileEmail = user?.email || '';
-  const watermark = profileEmail ? <FloatingWatermark email={profileEmail} fullName={null} /> : null;
 
   return (
     <div className="min-h-screen flex flex-col sm:flex-row" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
@@ -182,7 +257,7 @@ export default function SchoolDashboard() {
 
         <div className="max-w-3xl mx-auto p-4 sm:p-8">
           {/* Welcome block */}
-          <div className="mb-8">
+          <div className="mb-6">
             <h1 className="text-2xl sm:text-3xl mb-2" style={{ fontFamily: font.heading }}>
               Добро пожаловать в систему
             </h1>
@@ -191,60 +266,42 @@ export default function SchoolDashboard() {
             </p>
           </div>
 
-          {/* Welcome video */}
-          {videoId && (
-            <div className="mb-8">
-              <YouTubePlayer url={welcomeVideo} watermark={watermark} />
+          {/* Continue card */}
+          {continueData && (
+            <div
+              className="rounded-xl border p-5 mb-6 cursor-pointer transition-all hover:border-[#2a2a2a]"
+              style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}
+              onClick={() => navigate(`/school/lesson/${continueData.lessonId}`)}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] uppercase tracking-wider mb-2" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
+                    {continueData.isFirstEver ? 'Начать подготовку' : 'Продолжить'}
+                  </p>
+                  <p className="text-sm mb-1" style={{ color: '#666', fontFamily: font.mono }}>
+                    {continueData.courseTitle}
+                  </p>
+                  <p className="text-base truncate" style={{ fontFamily: font.mono, color: '#e8e0d0' }}>
+                    Занятие {continueData.lessonNumber}. {continueData.lessonTitle}
+                  </p>
+                </div>
+                <button
+                  className="flex-shrink-0 ml-4 flex items-center gap-2 px-4 py-2.5 rounded-lg text-xs transition-all"
+                  style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}
+                >
+                  {continueData.isFirstEver ? <Play size={14} /> : <ArrowRight size={14} />}
+                  {continueData.isFirstEver ? 'Начать' : 'Продолжить'}
+                </button>
+              </div>
             </div>
           )}
 
-          {/* Mobile course list */}
-          <div className="sm:hidden">
-            <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Программы</h2>
-            <div className="space-y-3">
-              {courses.map(c => {
-                const accessible = hasAccess(c);
-                const p = progress[c.id] || { completed: 0, total: 0 };
-                const pct = p.total > 0 ? Math.round((p.completed / p.total) * 100) : 0;
-
-                return (
-                  <div
-                    key={c.id}
-                    onClick={() => accessible && navigate(`/school/course/${c.id}`)}
-                    className="rounded-xl border p-4 transition-all"
-                    style={{
-                      borderColor: accessible ? '#1a1a1a' : '#141414',
-                      backgroundColor: accessible ? '#0d0d0d' : '#0a0a0a',
-                      opacity: accessible ? 1 : 0.5,
-                      cursor: accessible ? 'pointer' : 'default',
-                    }}
-                  >
-                    <div className="flex items-start justify-between mb-1">
-                      <h3 className="text-base" style={{ fontFamily: font.mono }}>{c.title}</h3>
-                      {!accessible && <Lock size={14} style={{ color: '#444' }} />}
-                      {accessible && <BookOpen size={14} style={{ color: '#4a8a4a' }} />}
-                    </div>
-                    {c.subtitle && (
-                      <p className="text-xs mb-2" style={{ color: '#666', fontFamily: font.mono }}>{c.subtitle}</p>
-                    )}
-                    {accessible && p.total > 0 && (
-                      <div>
-                        <div className="flex justify-between text-[10px] mb-1" style={{ color: '#666', fontFamily: font.mono }}>
-                          <span>{p.completed}/{p.total} занятий</span>
-                          <span>{pct}%</span>
-                        </div>
-                        <div className="h-1 rounded-full overflow-hidden" style={{ backgroundColor: '#1a1a1a' }}>
-                          <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: '#4a8a4a' }} />
-                        </div>
-                      </div>
-                    )}
-                    {!accessible && (
-                      <p className="text-xs" style={{ color: '#444', fontFamily: font.mono }}>Доступ закрыт</p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+          {/* Programs list */}
+          <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Программы</h2>
+          <div className="space-y-3">
+            {courses.map(c => (
+              <CourseCard key={c.id} c={c} accessible={hasAccess(c)} />
+            ))}
           </div>
         </div>
       </main>
