@@ -121,7 +121,7 @@ export default function SchoolDashboard() {
         className="hidden sm:flex flex-col w-64 flex-shrink-0 border-r"
         style={{ borderColor: '#1a1a1a', backgroundColor: '#0a0a0a' }}
       >
-        <div className="border-b cursor-pointer logo-shimmer relative overflow-hidden" style={{ borderColor: '#1a1a1a' }} onClick={() => setSelectedCourse(null)}>
+        <div className="border-b cursor-pointer relative overflow-hidden" style={{ borderColor: '#1a1a1a' }} onClick={() => setSelectedCourse(null)}>
           <video src={logoVideo} autoPlay loop muted playsInline className="w-full object-cover block" />
         </div>
 
