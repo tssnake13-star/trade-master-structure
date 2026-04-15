@@ -28,10 +28,11 @@ function isYouTubeUrl(val: string): boolean {
 }
 
 function renderPlayer(val: string) {
+  const containerStyle: React.CSSProperties = { width: '100%', aspectRatio: '16/9', backgroundColor: '#111', position: 'relative' };
   if (val.trimStart().startsWith('<iframe')) {
     const styled = val.replace(/<iframe/i, '<iframe style="position:absolute;top:0;left:0;width:100%;height:100%"');
     return (
-      <div className="rounded-xl overflow-hidden" style={{ position: 'relative', paddingBottom: '56.25%', height: 0, backgroundColor: '#111' }}
+      <div className="rounded-xl overflow-hidden" style={containerStyle}
         dangerouslySetInnerHTML={{ __html: styled }} />
     );
   }
@@ -39,7 +40,7 @@ function renderPlayer(val: string) {
     return <YouTubePlayer url={val} />;
   }
   return (
-    <div className="rounded-xl overflow-hidden" style={{ maxWidth: '514px', width: '100%', aspectRatio: '16/9', backgroundColor: '#111' }}>
+    <div className="rounded-xl overflow-hidden" style={containerStyle}>
       <iframe src={val} style={{ width: '100%', height: '100%', border: 'none' }} allowFullScreen
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
     </div>
