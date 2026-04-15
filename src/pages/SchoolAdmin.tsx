@@ -22,7 +22,7 @@ import {
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
-const font = { heading: "'Cormorant Garamond', serif", mono: "'JetBrains Mono', monospace" };
+const font = { heading: "'Inter', sans-serif", mono: "'Inter', sans-serif" };
 const tabStyle = (active: boolean) => ({
   fontFamily: font.mono,
   fontSize: '12px',
