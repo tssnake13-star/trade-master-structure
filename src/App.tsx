@@ -25,7 +25,9 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/school" element={<SchoolAuth />} />
             <Route path="/school/dashboard" element={<SchoolDashboard />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/school/course/:id" element={<SchoolCourse />} />
+            <Route path="/school/lesson/:id" element={<SchoolLesson />} />
+            <Route path="/school/admin" element={<SchoolAdmin />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
