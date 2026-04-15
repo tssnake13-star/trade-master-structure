@@ -166,7 +166,7 @@ export default function SchoolDashboard() {
         <header className="sm:hidden border-b px-4 py-3 flex items-center justify-between" style={{ borderColor: '#1a1a1a' }}>
           <div className="flex items-center gap-2">
             <img src={logo} alt="TRADELIKETYO" className="w-8 h-8 rounded-lg object-cover" />
-            <span className="text-sm" style={{ fontFamily: font.heading }}>Школа</span>
+            <span className="text-sm" style={{ fontFamily: font.heading }}>Кабинет трейдера</span>
           </div>
           <div className="flex items-center gap-2">
             {role === 'admin' && (
@@ -184,7 +184,7 @@ export default function SchoolDashboard() {
           {/* Welcome block */}
           <div className="mb-8">
             <h1 className="text-2xl sm:text-3xl mb-2" style={{ fontFamily: font.heading }}>
-              Добро пожаловать
+              Добро пожаловать в систему
             </h1>
             <p className="text-sm" style={{ color: '#666', fontFamily: font.mono }}>
               {user?.email}
@@ -200,7 +200,7 @@ export default function SchoolDashboard() {
 
           {/* Mobile course list */}
           <div className="sm:hidden">
-            <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Курсы</h2>
+            <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Программы</h2>
             <div className="space-y-3">
               {courses.map(c => {
                 const accessible = hasAccess(c);
@@ -230,7 +230,7 @@ export default function SchoolDashboard() {
                     {accessible && p.total > 0 && (
                       <div>
                         <div className="flex justify-between text-[10px] mb-1" style={{ color: '#666', fontFamily: font.mono }}>
-                          <span>{p.completed}/{p.total} уроков</span>
+                          <span>{p.completed}/{p.total} занятий</span>
                           <span>{pct}%</span>
                         </div>
                         <div className="h-1 rounded-full overflow-hidden" style={{ backgroundColor: '#1a1a1a' }}>
