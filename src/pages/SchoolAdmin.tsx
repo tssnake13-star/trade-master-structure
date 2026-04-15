@@ -208,22 +208,52 @@ function CoursesTab() {
                   {c.is_free ? 'бесплатный' : 'платный'}
                 </span>
               </div>
-              <button
-                onClick={e => { e.stopPropagation(); deleteCourse(c.id); }}
-                className="p-1 hover:opacity-70"
-              >
-                <Trash2 size={14} style={{ color: '#666' }} />
-              </button>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={e => { e.stopPropagation(); startEdit(c); }}
+                  className="p-1 hover:opacity-70"
+                >
+                  <Pencil size={14} style={{ color: '#666' }} />
+                </button>
+                <button
+                  onClick={e => { e.stopPropagation(); deleteCourse(c.id); }}
+                  className="p-1 hover:opacity-70"
+                >
+                  <Trash2 size={14} style={{ color: '#666' }} />
+                </button>
+              </div>
             </div>
 
-            {expandedCourse === c.id && (
-              <div className="border-t px-4 pb-4 pt-3 space-y-2" style={{ borderColor: '#1a1a1a' }}>
-                {lessons.filter(l => l.course_id === c.id).map(l => (
-                  <div key={l.id} className="flex items-center justify-between text-xs py-1.5" style={{ fontFamily: font.mono, color: '#999' }}>
-                    <span>{l.sort_order + 1}. {l.title}</span>
-                    <button onClick={() => deleteLesson(l.id)} className="hover:opacity-70"><Trash2 size={12} style={{ color: '#444' }} /></button>
-                  </div>
-                ))}
+            {editingCourse === c.id && (
+              <div className="border-t px-4 pb-4 pt-3 space-y-3" style={{ borderColor: '#1a1a1a' }}>
+                <input
+                  placeholder="Название курса"
+                  value={editForm.title}
+                  onChange={e => setEditForm({ ...editForm, title: e.target.value })}
+                  className="w-full px-3 py-2 rounded border text-sm"
+                  style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
+                />
+                <input
+                  placeholder="Подзаголовок"
+                  value={editForm.subtitle}
+                  onChange={e => setEditForm({ ...editForm, subtitle: e.target.value })}
+                  className="w-full px-3 py-2 rounded border text-sm"
+                  style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
+                />
+                <label className="flex items-center gap-2 text-xs" style={{ color: '#999', fontFamily: font.mono }}>
+                  <input type="checkbox" checked={editForm.is_free} onChange={e => setEditForm({ ...editForm, is_free: e.target.checked })} />
+                  Бесплатный
+                </label>
+                <div className="flex gap-2">
+                  <button onClick={updateCourse} className="text-xs px-4 py-2 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}>
+                    Сохранить
+                  </button>
+                  <button onClick={() => setEditingCourse(null)} className="text-xs px-4 py-2 rounded" style={{ color: '#666', fontFamily: font.mono }}>
+                    Отмена
+                  </button>
+                </div>
+              </div>
+            )
 
                 {showAddLesson === c.id ? (
                   <div className="space-y-2 pt-2">
