@@ -93,11 +93,24 @@ export default function YouTubePlayer({ url }: Props) {
   const updateProgress = useCallback(() => {
     const p = playerRef.current;
     if (p?.getCurrentTime) {
-      setCurrentTime(p.getCurrentTime());
+      const t = p.getCurrentTime();
+      setCurrentTime(t);
+      savedPositionRef.current = t;
       const d = p.getDuration();
       if (d > 0) setDuration(d);
     }
     rafRef.current = requestAnimationFrame(updateProgress);
+  }, []);
+
+  // Save position every 5 seconds as fallback
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const p = playerRef.current;
+      if (p?.getCurrentTime) {
+        savedPositionRef.current = p.getCurrentTime();
+      }
+    }, 5000);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
