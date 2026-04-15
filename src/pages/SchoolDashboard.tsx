@@ -166,7 +166,7 @@ export default function SchoolDashboard() {
         <header className="sm:hidden border-b px-4 py-3 flex items-center justify-between" style={{ borderColor: '#1a1a1a' }}>
           <div className="flex items-center gap-2">
             <img src={logo} alt="TRADELIKETYO" className="w-8 h-8 rounded-lg object-cover" />
-            <span className="text-sm" style={{ fontFamily: font.heading }}>Школа</span>
+            <span className="text-sm" style={{ fontFamily: font.heading }}>Кабинет трейдера</span>
           </div>
           <div className="flex items-center gap-2">
             {role === 'admin' && (
