@@ -76,6 +76,10 @@ export default function SchoolDashboard() {
       if (stateId) {
         const fromState = courseList.find(c => c.id === stateId && canAccess(c));
         if (fromState) setSelectedCourse(fromState.id);
+        // Clear state so returning to dashboard shows home screen
+        window.history.replaceState({}, '');
+      } else {
+        setSelectedCourse(null);
       }
 
       setLoading(false);
