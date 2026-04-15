@@ -48,10 +48,21 @@ function renderPlayer(val: string) {
         dangerouslySetInnerHTML={{ __html: styled }} />
     );
   }
+  const isYouTube = /youtube\.com|youtu\.be/i.test(val);
   return (
-    <div className="aspect-video rounded-xl overflow-hidden" style={{ backgroundColor: '#111' }}>
-      <iframe src={toEmbedUrl(val)} className="w-full h-full" allowFullScreen
+    <div className="rounded-xl overflow-hidden" style={{ position: 'relative', paddingBottom: '56.25%', height: 0, backgroundColor: '#111' }}>
+      <iframe src={toEmbedUrl(val)} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }} allowFullScreen
         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" />
+      {isYouTube && (
+        <>
+          {/* Hide YouTube logo & "Watch on YouTube" button at bottom */}
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '40px', background: 'linear-gradient(transparent, #111)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '24px', backgroundColor: '#111', pointerEvents: 'none' }} />
+          {/* Block top-right "Watch on YouTube" link */}
+          <div style={{ position: 'absolute', top: 0, right: 0, width: '160px', height: '40px', pointerEvents: 'auto', cursor: 'default' }}
+            onClick={e => e.preventDefault()} />
+        </>
+      )}
     </div>
   );
 }
