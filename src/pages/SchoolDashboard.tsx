@@ -82,6 +82,9 @@ export default function SchoolDashboard() {
 
   const videoId = welcomeVideo ? extractYouTubeId(welcomeVideo) : null;
 
+  const profileEmail = user?.email || '';
+  const watermark = profileEmail ? <FloatingWatermark email={profileEmail} fullName={null} /> : null;
+
   return (
     <div className="min-h-screen flex flex-col sm:flex-row" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
       {/* Sidebar */}
