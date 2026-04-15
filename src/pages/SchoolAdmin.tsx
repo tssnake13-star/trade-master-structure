@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, Plus, Trash2, Pencil } from 'lucide-react';
+import VideoBlockEditor from '@/components/school/VideoBlockEditor';
 
 const font = { heading: "'Cormorant Garamond', serif", mono: "'JetBrains Mono', monospace" };
 const tabStyle = (active: boolean) => ({
