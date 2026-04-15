@@ -355,6 +355,9 @@ export default function YouTubePlayer({ url, watermark }: Props) {
           </div>
         </div>
       )}
+
+      {/* Watermark inside fullscreen container */}
+      {watermark}
     </div>
   );
 }
