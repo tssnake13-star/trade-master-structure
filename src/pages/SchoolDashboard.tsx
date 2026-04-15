@@ -92,11 +92,8 @@ export default function SchoolDashboard() {
         className="hidden sm:flex flex-col w-64 flex-shrink-0 border-r"
         style={{ borderColor: '#1a1a1a', backgroundColor: '#0a0a0a' }}
       >
-        <div className="p-4 border-b flex items-center gap-3" style={{ borderColor: '#1a1a1a' }}>
-          <img src={logo} alt="TRADELIKETYO" className="w-10 h-10 rounded-lg object-cover" />
-          <span className="text-sm font-medium" style={{ fontFamily: font.heading, color: '#e8e0d0' }}>
-            TRADELIKETYO
-          </span>
+        <div className="border-b" style={{ borderColor: '#1a1a1a' }}>
+          <img src={logo} alt="TRADELIKETYO" className="w-full object-cover" />
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
