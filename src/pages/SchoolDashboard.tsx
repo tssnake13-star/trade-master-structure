@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Lock, Settings, LogOut, ArrowRight, CheckCircle, Circle } from 'lucide-react';
-import logo from '@/assets/logo-tradeliketyo.jpeg';
+import logo from '@/assets/logo-tradeliketyo.png';
 
 interface Course {
   id: string;
