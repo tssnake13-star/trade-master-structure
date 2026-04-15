@@ -44,12 +44,7 @@ function renderPlayer(val: string, watermark?: React.ReactNode) {
   const youTubeSource = getYouTubeSource(val);
 
   if (youTubeSource) {
-    return (
-      <div style={{ position: 'relative', overflow: 'hidden' }}>
-        <YouTubePlayer url={youTubeSource} />
-        {watermark}
-      </div>
-    );
+    return <YouTubePlayer url={youTubeSource} watermark={watermark} />;
   }
 
   if (val.trimStart().startsWith('<iframe')) {

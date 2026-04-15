@@ -53,9 +53,10 @@ const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
 interface Props {
   url: string;
+  watermark?: React.ReactNode;
 }
 
-export default function YouTubePlayer({ url }: Props) {
+export default function YouTubePlayer({ url, watermark }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
   const rafRef = useRef<number>(0);
@@ -354,6 +355,9 @@ export default function YouTubePlayer({ url }: Props) {
           </div>
         </div>
       )}
+
+      {/* Watermark inside fullscreen container */}
+      {watermark}
     </div>
   );
 }
