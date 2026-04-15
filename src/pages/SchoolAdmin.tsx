@@ -139,16 +139,52 @@ function CoursesTab() {
   const addLesson = async (courseId: string) => {
     if (!lessonForm.title) return;
     const courseLessons = lessons.filter(l => l.course_id === courseId);
-    await supabase.from('lessons').insert({
+    const res = await supabase.from('lessons').insert({
       course_id: courseId,
       title: lessonForm.title,
-      video_url: lessonForm.video_url || null,
-      video_url_alt: lessonForm.video_url_alt || null,
       description: lessonForm.description || null,
       sort_order: lessonForm.sort_order || courseLessons.length,
-    });
-    setLessonForm({ title: '', video_url: '', video_url_alt: '', description: '', sort_order: 0 });
+    }).select('id').single();
+    if (res.data && lessonVideos.length > 0) {
+      await supabase.from('lesson_videos').insert(
+        lessonVideos.filter(v => v.video_url).map(v => ({
+          lesson_id: res.data.id,
+          title: v.title,
+          video_url: v.video_url,
+          video_url_alt: v.video_url_alt || null,
+          sort_order: v.sort_order,
+        }))
+      );
+    }
+    setLessonForm({ title: '', description: '', sort_order: 0 });
+    setLessonVideos([]);
     setShowAddLesson(null);
+    load();
+  };
+
+  const startEditLesson = async (l: Lesson) => {
+    setEditingLessonId(l.id);
+    setEditLessonForm({ title: l.title, description: l.description || '' });
+    const res = await supabase.from('lesson_videos').select('*').eq('lesson_id', l.id).order('sort_order');
+    setEditLessonVideos((res.data || []).map((v: any) => ({ id: v.id, title: v.title, video_url: v.video_url, video_url_alt: v.video_url_alt || '', sort_order: v.sort_order })));
+  };
+
+  const saveEditLesson = async () => {
+    if (!editingLessonId || !editLessonForm.title) return;
+    await supabase.from('lessons').update({ title: editLessonForm.title, description: editLessonForm.description || null }).eq('id', editingLessonId);
+    await supabase.from('lesson_videos').delete().eq('lesson_id', editingLessonId);
+    if (editLessonVideos.length > 0) {
+      await supabase.from('lesson_videos').insert(
+        editLessonVideos.filter(v => v.video_url).map(v => ({
+          lesson_id: editingLessonId,
+          title: v.title,
+          video_url: v.video_url,
+          video_url_alt: v.video_url_alt || null,
+          sort_order: v.sort_order,
+        }))
+      );
+    }
+    setEditingLessonId(null);
     load();
   };
 
