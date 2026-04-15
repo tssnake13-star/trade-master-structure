@@ -115,6 +115,16 @@ export default function YouTubePlayer({ url, watermark }: Props) {
     return () => clearInterval(interval);
   }, []);
 
+  // Exit fake fullscreen on Escape key
+  useEffect(() => {
+    if (!fakeFullscreen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setFakeFullscreen(false);
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [fakeFullscreen]);
+
   useEffect(() => {
     if (!videoId || !containerRef.current) return;
 
