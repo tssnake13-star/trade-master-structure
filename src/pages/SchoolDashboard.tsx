@@ -120,7 +120,7 @@ export default function SchoolDashboard() {
                 }}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs truncate" style={{ fontFamily: font.mono, color: accessible ? '#e8e0d0' : '#444' }}>
+                  <span className="text-sm truncate" style={{ fontFamily: font.mono, color: accessible ? '#e8e0d0' : '#444' }}>
                     {c.title}
                   </span>
                   {!accessible && <Lock size={12} style={{ color: '#333' }} />}
@@ -220,7 +220,7 @@ export default function SchoolDashboard() {
                     }}
                   >
                     <div className="flex items-start justify-between mb-1">
-                      <h3 className="text-sm" style={{ fontFamily: font.mono }}>{c.title}</h3>
+                      <h3 className="text-base" style={{ fontFamily: font.mono }}>{c.title}</h3>
                       {!accessible && <Lock size={14} style={{ color: '#444' }} />}
                       {accessible && <BookOpen size={14} style={{ color: '#4a8a4a' }} />}
                     </div>
