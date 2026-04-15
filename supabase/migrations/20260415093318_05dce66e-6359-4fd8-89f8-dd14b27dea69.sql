@@ -1,0 +1,1 @@
+ALTER TABLE public.lessons ADD COLUMN video_url_alt TEXT DEFAULT NULL;
