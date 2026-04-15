@@ -190,15 +190,15 @@ export default function SchoolDashboard() {
                 className="w-full text-left rounded-lg px-3 py-2.5 transition-all"
                 style={{
                   backgroundColor: isSelected ? '#141414' : 'transparent',
-                  opacity: accessible ? 1 : 0.4,
+                  opacity: accessible ? 1 : 0.5,
                   cursor: accessible ? 'pointer' : 'default',
                 }}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-sm truncate" style={{ fontFamily: font.mono, color: accessible ? '#e8e0d0' : '#444' }}>
+                  <span className="text-sm truncate" style={{ fontFamily: font.mono, color: accessible ? '#e8e0d0' : '#555' }}>
                     {c.title}
                   </span>
-                  {!accessible && <Lock size={12} style={{ color: '#333' }} />}
+                  {!accessible && <Lock size={12} style={{ color: '#444' }} />}
                 </div>
                 {accessible && p.total > 0 && (
                   <div className="mt-1.5">
@@ -206,9 +206,14 @@ export default function SchoolDashboard() {
                       <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: '#4a8a4a' }} />
                     </div>
                     <span className="text-[10px] mt-0.5 block" style={{ color: '#555', fontFamily: font.mono }}>
-                      {p.completed}/{p.total}
+                      {p.completed}/{p.total} занятий
                     </span>
                   </div>
+                )}
+                {!accessible && (
+                  <span className="text-[10px] mt-0.5 block" style={{ color: '#444', fontFamily: font.mono }}>
+                    Закрыто
+                  </span>
                 )}
               </button>
             );
@@ -296,13 +301,30 @@ export default function SchoolDashboard() {
             </div>
           )}
 
-          {/* Programs list */}
-          <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Программы</h2>
-          <div className="space-y-3">
-            {courses.map(c => (
-              <CourseCard key={c.id} c={c} accessible={hasAccess(c)} />
-            ))}
-          </div>
+          {/* Current program progress */}
+          {continueData && (() => {
+            const p = progress[continueData.courseId] || { completed: 0, total: 0 };
+            const pct = p.total > 0 ? Math.round((p.completed / p.total) * 100) : 0;
+            return (
+              <div className="rounded-xl border p-4" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-[11px] uppercase tracking-wider" style={{ color: '#666', fontFamily: font.mono }}>
+                    Прохождение
+                  </p>
+                  <span className="text-[11px]" style={{ color: '#666', fontFamily: font.mono }}>{pct}%</span>
+                </div>
+                <p className="text-sm mb-2" style={{ fontFamily: font.mono, color: '#e8e0d0' }}>
+                  {continueData.courseTitle}
+                </p>
+                <div className="h-1.5 rounded-full overflow-hidden mb-1" style={{ backgroundColor: '#1a1a1a' }}>
+                  <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: '#4a8a4a' }} />
+                </div>
+                <span className="text-[10px]" style={{ color: '#555', fontFamily: font.mono }}>
+                  {p.completed}/{p.total} занятий
+                </span>
+              </div>
+            );
+          })()}
         </div>
       </main>
     </div>
