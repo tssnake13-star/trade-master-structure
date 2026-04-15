@@ -102,6 +102,44 @@ export type Database = {
           },
         ]
       }
+      lesson_videos: {
+        Row: {
+          created_at: string
+          id: string
+          lesson_id: string
+          sort_order: number
+          title: string
+          video_url: string
+          video_url_alt: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          lesson_id: string
+          sort_order?: number
+          title?: string
+          video_url: string
+          video_url_alt?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          lesson_id?: string
+          sort_order?: number
+          title?: string
+          video_url?: string
+          video_url_alt?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lesson_videos_lesson_id_fkey"
+            columns: ["lesson_id"]
+            isOneToOne: false
+            referencedRelation: "lessons"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       lessons: {
         Row: {
           course_id: string
