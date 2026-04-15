@@ -59,6 +59,7 @@ export default function YouTubePlayer({ url }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
   const rafRef = useRef<number>(0);
+  const savedPositionRef = useRef<number>(0);
   const [playing, setPlaying] = useState(false);
   const [started, setStarted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
