@@ -64,8 +64,11 @@ export default function SchoolAuth() {
   };
 
   const LogoBlock = () => (
-    <div className="flex justify-center mb-6">
-      <img src={logo} alt="TRADELIKETYO" className="w-24 h-24 rounded-xl object-cover" />
+    <div className="flex flex-col items-center mb-6">
+      <img src={logo} alt="TRADELIKETYO" className="rounded-xl object-cover" style={{ width: '7.8rem', height: '7.8rem' }} />
+      <p className="mt-3 text-xs tracking-[0.3em] uppercase" style={{ color: '#666', fontFamily: "'JetBrains Mono', monospace" }}>
+        Вход в систему
+      </p>
     </div>
   );
 
