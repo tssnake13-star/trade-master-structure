@@ -70,12 +70,13 @@ export default function SchoolDashboard() {
       }
       setProgress(pm);
 
-      // Auto-select course from navigation state or first accessible
+      // Auto-select course from navigation state only (not by default — home screen shown)
       const canAccess = (c: Course) => role === 'admin' || c.is_free || accessSet.has(c.id);
       const stateId = (location.state as any)?.selectedCourse;
-      const fromState = stateId ? courseList.find(c => c.id === stateId && canAccess(c)) : null;
-      const first = fromState || courseList.find(canAccess);
-      if (first) setSelectedCourse(first.id);
+      if (stateId) {
+        const fromState = courseList.find(c => c.id === stateId && canAccess(c));
+        if (fromState) setSelectedCourse(fromState.id);
+      }
 
       setLoading(false);
     };
