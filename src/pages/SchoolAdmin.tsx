@@ -337,7 +337,7 @@ function CoursesTab() {
           />
           <label className="flex items-center gap-2 text-xs" style={{ color: '#999', fontFamily: font.mono }}>
             <input type="checkbox" checked={form.is_free} onChange={e => setForm({ ...form, is_free: e.target.checked })} />
-            Бесплатный
+            Бесплатная
           </label>
           <div className="flex gap-2">
             <button onClick={addCourse} className="text-xs px-4 py-2 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}>
@@ -394,7 +394,7 @@ function CoursesTab() {
                       />
                       <label className="flex items-center gap-2 text-xs" style={{ color: '#999', fontFamily: font.mono }}>
                         <input type="checkbox" checked={editForm.is_free} onChange={e => setEditForm({ ...editForm, is_free: e.target.checked })} />
-                        Бесплатный
+                        Бесплатная
                       </label>
                       <div className="flex gap-2">
                         <button onClick={updateCourse} className="text-xs px-4 py-2 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}>
@@ -610,8 +610,8 @@ function AccessTab() {
         <table className="w-full text-xs" style={{ fontFamily: font.mono }}>
           <thead>
             <tr style={{ borderBottom: '1px solid #1a1a1a' }}>
-              <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Студент</th>
-              <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Курс</th>
+              <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Ученик</th>
+              <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Программа</th>
               <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Выдан</th>
               <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Истекает</th>
               <th className="text-left py-2" style={{ color: '#666' }}></th>
