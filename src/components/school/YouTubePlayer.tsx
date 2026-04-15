@@ -103,6 +103,10 @@ export default function YouTubePlayer({ url }: Props) {
     if (!videoId || !containerRef.current) return;
 
     const el = document.createElement('div');
+    el.style.position = 'absolute';
+    el.style.inset = '0';
+    el.style.width = '100%';
+    el.style.height = '100%';
     containerRef.current.prepend(el);
 
     let player: any;
@@ -125,6 +129,15 @@ export default function YouTubePlayer({ url }: Props) {
         },
         events: {
           onReady: () => {
+            const iframe = player.getIframe?.();
+            if (iframe instanceof HTMLIFrameElement) {
+              iframe.style.position = 'absolute';
+              iframe.style.inset = '0';
+              iframe.style.width = '100%';
+              iframe.style.height = '100%';
+              iframe.style.border = '0';
+              iframe.style.pointerEvents = 'none';
+            }
             const d = player.getDuration();
             if (d > 0) setDuration(d);
           },
