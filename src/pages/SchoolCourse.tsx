@@ -56,6 +56,9 @@ export default function SchoolCourse() {
   }
 
   const isUnlocked = (index: number) => {
+    const lesson = lessons[index];
+    if (!lesson) return false;
+    if (completedIds.has(lesson.id)) return true;
     if (role === 'admin' || isFree) return true;
     return unlockedSortOrders.includes(index + 1);
   };
