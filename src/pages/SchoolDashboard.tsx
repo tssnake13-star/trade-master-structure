@@ -126,6 +126,10 @@ export default function SchoolDashboard() {
 
   const hasAccess = (c: Course) => role === 'admin' || c.is_free || accessMap.has(c.id);
 
+  // Show "Начните здесь" hint only for users with only free courses
+  const hasPaidAccess = role === 'admin' || courses.some((c) => !c.is_free && accessMap.has(c.id));
+  const showMenuHint = !hasPaidAccess;
+
   const getCourseLessons = (courseId: string) =>
     allLessons.filter((l) => l.course_id === courseId).sort((a, b) => a.sort_order - b.sort_order);
 
