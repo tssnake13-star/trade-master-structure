@@ -17,6 +17,7 @@ interface Lesson {
   id: string;
   course_id: string;
   title: string;
+  description: string | null;
   sort_order: number;
 }
 
