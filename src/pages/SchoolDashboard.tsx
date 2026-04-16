@@ -98,7 +98,7 @@ export default function SchoolDashboard() {
     );
   }
 
-  const hasAccess = (c: Course) => role === 'admin' || c.is_free || accessIds.has(c.id);
+  const hasAccess = (c: Course) => role === 'admin' || c.is_free || accessMap.has(c.id);
 
   // Lessons for selected course
   const selectedLessons = selectedCourse
