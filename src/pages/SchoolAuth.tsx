@@ -50,13 +50,15 @@ export default function SchoolAuth() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       } else {
-        // Validate invite code first
-        const { data: isValid, error: codeErr } = await supabase.rpc('validate_invite_code', { _code: inviteCode });
-        if (codeErr) throw codeErr;
-        if (!isValid) {
-          setError('Инвайт-код недействителен или уже использован');
-          setLoading(false);
-          return;
+        // Validate invite code if provided
+        if (inviteCode.trim()) {
+          const { data: isValid, error: codeErr } = await supabase.rpc('validate_invite_code', { _code: inviteCode });
+          if (codeErr) throw codeErr;
+          if (!isValid) {
+            setError('Инвайт-код недействителен или уже использован');
+            setLoading(false);
+            return;
+          }
         }
 
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
@@ -66,8 +68,8 @@ export default function SchoolAuth() {
         });
         if (signUpError) throw signUpError;
 
-        // Mark invite code as used — this also creates course_access on the server
-        if (signUpData.user) {
+        // Mark invite code as used if provided
+        if (inviteCode.trim() && signUpData.user) {
           await supabase.rpc('use_invite_code', { _code: inviteCode, _user_id: signUpData.user.id });
         }
       }
@@ -156,10 +158,9 @@ export default function SchoolAuth() {
           {!isLogin && (
             <input
               type="text"
-              placeholder="Инвайт-код"
+              placeholder="Инвайт-код (необязательно)"
               value={inviteCode}
               onChange={e => setInviteCode(e.target.value)}
-              required
               className="w-full px-4 py-3 rounded-lg border text-sm"
               style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: "'Inter', sans-serif" }}
             />

@@ -656,7 +656,7 @@ interface InviteCode {
   used_by: string | null;
   created_at: string;
   used_at: string | null;
-  course_id: string | null;
+  course_ids: string[];
 }
 
 function InviteCodesTab() {
@@ -665,7 +665,7 @@ function InviteCodesTab() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [expiresDays, setExpiresDays] = useState(30);
-  const [selectedCourseId, setSelectedCourseId] = useState('');
+  const [selectedCourseIds, setSelectedCourseIds] = useState<string[]>([]);
   const [generating, setGenerating] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
@@ -685,10 +685,9 @@ function InviteCodesTab() {
     setProfiles(p.data || []);
     const courseList = (cr.data || []) as Course[];
     setCourses(courseList);
-    if (!selectedCourseId && courseList.length > 0) {
-      // Default to first non-free course
+    if (selectedCourseIds.length === 0 && courseList.length > 0) {
       const nonFree = courseList.find(c => !c.is_free);
-      setSelectedCourseId(nonFree?.id || courseList[0].id);
+      if (nonFree) setSelectedCourseIds([nonFree.id]);
     }
   };
 
@@ -699,13 +698,19 @@ function InviteCodesTab() {
     return profiles.find(p => p.user_id === uid)?.email || uid;
   };
 
-  const getCourseName = (cid: string | null) => {
-    if (!cid) return '—';
-    return courses.find(c => c.id === cid)?.title || '—';
+  const getCourseNames = (cids: string[]) => {
+    if (!cids || cids.length === 0) return '—';
+    return cids.map(id => courses.find(c => c.id === id)?.title || '—').join(', ');
+  };
+
+  const toggleCourseSelection = (id: string) => {
+    setSelectedCourseIds(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
   };
 
   const generateCode = async () => {
-    if (!user || !selectedCourseId) return;
+    if (!user || selectedCourseIds.length === 0) return;
     setGenerating(true);
     const code = Math.random().toString(36).substring(2, 10).toUpperCase();
     await supabase.from('invite_codes').insert({
@@ -713,8 +718,8 @@ function InviteCodesTab() {
       created_by: user.id,
       is_single_use: true,
       expires_in_days: expiresDays || null,
-      course_id: selectedCourseId,
-    });
+      course_ids: selectedCourseIds,
+    } as any);
     setGenerating(false);
     load();
   };
@@ -732,17 +737,24 @@ function InviteCodesTab() {
 
       <div className="rounded-lg border p-4 mb-4 flex flex-wrap items-end gap-3" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
         <div>
-          <label className="block text-[10px] mb-1" style={{ color: '#666', fontFamily: font.mono }}>Программа</label>
-          <select
-            value={selectedCourseId}
-            onChange={e => setSelectedCourseId(e.target.value)}
-            className="px-3 py-2 rounded border text-sm"
-            style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
-          >
+          <label className="block text-[10px] mb-1" style={{ color: '#666', fontFamily: font.mono }}>Программы</label>
+          <div className="flex flex-wrap gap-2">
             {courses.filter(c => !c.is_free).map(c => (
-              <option key={c.id} value={c.id}>{c.title}</option>
+              <button
+                key={c.id}
+                onClick={() => toggleCourseSelection(c.id)}
+                className="px-3 py-1.5 rounded border text-xs transition-all"
+                style={{
+                  backgroundColor: selectedCourseIds.includes(c.id) ? '#4a8a4a' : '#111',
+                  borderColor: selectedCourseIds.includes(c.id) ? '#4a8a4a' : '#222',
+                  color: '#e8e0d0',
+                  fontFamily: font.mono,
+                }}
+              >
+                {c.title}
+              </button>
             ))}
-          </select>
+          </div>
         </div>
         <div>
           <label className="block text-[10px] mb-1" style={{ color: '#666', fontFamily: font.mono }}>Срок (дней)</label>
@@ -756,7 +768,7 @@ function InviteCodesTab() {
         </div>
         <button
           onClick={generateCode}
-          disabled={generating || !selectedCourseId}
+          disabled={generating || selectedCourseIds.length === 0}
           className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg"
           style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono, opacity: generating ? 0.6 : 1 }}
         >
@@ -794,7 +806,7 @@ function InviteCodesTab() {
                       {copiedId === c.id && <span className="ml-2 text-[10px]" style={{ color: '#4a8a4a' }}>Скопировано</span>}
                     </span>
                   </td>
-                  <td className="py-2.5 pr-4" style={{ color: '#999' }}>{getCourseName(c.course_id)}</td>
+                  <td className="py-2.5 pr-4" style={{ color: '#999' }}>{getCourseNames(c.course_ids)}</td>
                   <td className="py-2.5 pr-4" style={{ color: '#666' }}>{new Date(c.created_at).toLocaleDateString('ru')}</td>
                   <td className="py-2.5 pr-4" style={{ color: '#666' }}>{c.expires_in_days ? `${c.expires_in_days} дн.` : '∞'}</td>
                   <td className="py-2.5 pr-4" style={{ color: c.used ? '#666' : expired ? '#e85d3a' : '#4a8a4a' }}>
