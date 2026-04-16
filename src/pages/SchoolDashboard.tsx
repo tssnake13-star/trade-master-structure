@@ -449,11 +449,19 @@ export default function SchoolDashboard() {
                       </button>
                     )}
 
-                    {!activeNextLesson && ap && ap.completed > 0 && (
-                      <p className="text-sm" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
-                        Все занятия завершены ✓
-                      </p>
-                    )}
+                    {!activeNextLesson && activeCourse && (() => {
+                      const cLessons = allLessons.filter(l => l.course_id === activeCourse!.id).sort((a, b) => a.sort_order - b.sort_order);
+                      const isAdmin = role === 'admin';
+                      const isFree = activeCourse!.is_free;
+                      const cUnlocked = accessMap.get(activeCourse!.id)?.unlocked || [1];
+                      const unlockedList = cLessons.filter((_, i) => isAdmin || isFree || cUnlocked.includes(i + 1));
+                      const allDone = unlockedList.length > 0 && unlockedList.every(l => completedIds.has(l.id));
+                      return allDone ? (
+                        <p className="text-sm" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
+                          Все занятия завершены ✓
+                        </p>
+                      ) : null;
+                    })()}
                   </div>
                 )}
               </div>
