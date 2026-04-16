@@ -982,6 +982,7 @@ function InviteCodesTab() {
               return (
                 <tr key={c.id} style={{ borderBottom: '1px solid #111' }}>
                   <td className="py-2.5 pr-4" style={{ color: '#e8e0d0', fontFamily: "'JetBrains Mono', monospace" }}>{c.code}</td>
+                  <td className="py-2.5 pr-4" style={{ color: '#999' }}>{getCourseName(c.course_id)}</td>
                   <td className="py-2.5 pr-4" style={{ color: '#666' }}>{new Date(c.created_at).toLocaleDateString('ru')}</td>
                   <td className="py-2.5 pr-4" style={{ color: '#666' }}>{c.expires_in_days ? `${c.expires_in_days} дн.` : '∞'}</td>
                   <td className="py-2.5 pr-4" style={{ color: c.used ? '#666' : expired ? '#e85d3a' : '#4a8a4a' }}>
