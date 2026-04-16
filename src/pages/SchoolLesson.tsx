@@ -235,7 +235,7 @@ export default function SchoolLesson() {
               color: nextLessonId && isNextUnlocked && isCompleted ? '#e8e0d0' : '#333', border: '1px solid',
               cursor: nextLessonId && isNextUnlocked && isCompleted ? 'pointer' : 'default',
               opacity: !nextLessonId ? 0.4 : (isNextUnlocked && isCompleted) ? 1 : 0.5,
-            }
+            }}
           >
             Следующее <ArrowRight size={14} />
           </button>
