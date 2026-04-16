@@ -20,6 +20,7 @@ export type Database = {
           expires_at: string | null
           granted_at: string
           id: string
+          unlocked_lessons: number[]
           user_id: string
         }
         Insert: {
@@ -27,6 +28,7 @@ export type Database = {
           expires_at?: string | null
           granted_at?: string
           id?: string
+          unlocked_lessons?: number[]
           user_id: string
         }
         Update: {
@@ -34,6 +36,7 @@ export type Database = {
           expires_at?: string | null
           granted_at?: string
           id?: string
+          unlocked_lessons?: number[]
           user_id?: string
         }
         Relationships: [
