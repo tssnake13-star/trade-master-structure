@@ -108,9 +108,16 @@ export default function SchoolDashboard() {
   const selectedCourseData = courses.find(c => c.id === selectedCourse);
   const selectedAccessible = selectedCourseData ? hasAccess(selectedCourseData) : false;
 
-  // Find first incomplete lesson for "Продолжить"
+  // Unlocked lessons for selected course
+  const selectedUnlocked = selectedCourse
+    ? (role === 'admin' ? selectedLessons.map((_, i) => i + 1) : (accessMap.get(selectedCourse)?.unlocked || (selectedCourseData?.is_free ? selectedLessons.map((_, i) => i + 1) : [1])))
+    : [];
+
+  const isLessonUnlocked = (index: number) => selectedUnlocked.includes(index + 1);
+
+  // Find first incomplete AND unlocked lesson for "Продолжить"
   const nextLesson = selectedAccessible
-    ? selectedLessons.find(l => !completedIds.has(l.id))
+    ? selectedLessons.find((l, i) => isLessonUnlocked(i) && !completedIds.has(l.id))
     : null;
   const allCompleted = selectedAccessible && selectedLessons.length > 0 && !nextLesson;
 
