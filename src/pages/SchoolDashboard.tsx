@@ -126,6 +126,10 @@ export default function SchoolDashboard() {
 
   const hasAccess = (c: Course) => role === 'admin' || c.is_free || accessMap.has(c.id);
 
+  // Show "Начните здесь" hint only for users with only free courses
+  const hasPaidAccess = role === 'admin' || courses.some((c) => !c.is_free && accessMap.has(c.id));
+  const showMenuHint = !hasPaidAccess;
+
   const getCourseLessons = (courseId: string) =>
     allLessons.filter((l) => l.course_id === courseId).sort((a, b) => a.sort_order - b.sort_order);
 
@@ -275,9 +279,19 @@ export default function SchoolDashboard() {
 
       <main className="flex-1 min-h-screen">
         <header className="sm:hidden border-b px-3 py-3 flex items-center justify-between" style={{ borderColor: '#1a1a1a' }}>
-          <button onClick={() => setMobileSidebarOpen(true)} className="p-1.5 hover:bg-white/5 rounded-lg transition">
-            <Menu size={20} style={{ color: '#e8e0d0' }} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setMobileSidebarOpen(true)} className="p-1.5 hover:bg-white/5 rounded-lg transition">
+              <Menu size={20} style={{ color: '#e8e0d0' }} />
+            </button>
+            {showMenuHint && (
+              <span
+                className="flex items-center gap-1 text-[11px] animate-pulse"
+                style={{ color: '#4a8a4a', fontFamily: font.mono }}
+              >
+                ← Начните здесь
+              </span>
+            )}
+          </div>
           <div className="cursor-pointer" onClick={() => { selectCourse(null); navigate('/school/dashboard'); }}>
             <video src={logoVideo} autoPlay loop muted playsInline className="w-9 h-9 rounded-lg object-cover" />
           </div>
