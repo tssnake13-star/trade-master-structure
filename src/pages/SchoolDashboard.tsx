@@ -72,9 +72,21 @@ export default function SchoolDashboard() {
       for (const c of courseList) {
         const courseLessons = lessons.filter((l) => l.course_id === c.id).sort((a, b) => a.sort_order - b.sort_order);
         const isAdmin = role === 'admin';
-        const unlockedSortOrders = isAdmin || c.is_free
-          ? courseLessons.map((_, i) => i + 1)
-          : (aMap.get(c.id)?.unlocked || [1]);
+        let unlockedSortOrders: number[];
+        if (isAdmin) {
+          unlockedSortOrders = courseLessons.map((_, i) => i + 1);
+        } else if (c.is_free) {
+          unlockedSortOrders = [1];
+          for (let i = 1; i < courseLessons.length; i++) {
+            if (completedSet.has(courseLessons[i - 1].id)) {
+              unlockedSortOrders.push(i + 1);
+            } else {
+              break;
+            }
+          }
+        } else {
+          unlockedSortOrders = aMap.get(c.id)?.unlocked || [1];
+        }
         const unlockedLessons = courseLessons.filter((_, i) => unlockedSortOrders.includes(i + 1));
         const completedUnlockedCount = unlockedLessons.filter((l) => completedSet.has(l.id)).length;
 
@@ -118,8 +130,20 @@ export default function SchoolDashboard() {
     allLessons.filter((l) => l.course_id === courseId).sort((a, b) => a.sort_order - b.sort_order);
 
   const getUnlockedSortOrders = (course: Course, courseLessons: Lesson[]) => {
-    if (role === 'admin' || course.is_free) {
+    if (role === 'admin') {
       return courseLessons.map((_, i) => i + 1);
+    }
+    if (course.is_free) {
+      // Sequential: first lesson always open, others require previous completed
+      const unlocked: number[] = [1];
+      for (let i = 1; i < courseLessons.length; i++) {
+        if (completedIds.has(courseLessons[i - 1].id)) {
+          unlocked.push(i + 1);
+        } else {
+          break;
+        }
+      }
+      return unlocked;
     }
     return accessMap.get(course.id)?.unlocked || [1];
   };
