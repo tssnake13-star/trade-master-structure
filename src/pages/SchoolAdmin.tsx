@@ -456,30 +456,34 @@ function CoursesTab() {
 
                   {expandedCourse === c.id && (
                     <div className="border-t px-4 pb-4 pt-3 space-y-2" style={{ borderColor: '#1a1a1a' }}>
-                      {lessons.filter(l => l.course_id === c.id).map(l => (
-                        <div key={l.id}>
-                          <div className="flex items-center justify-between text-xs py-1.5" style={{ fontFamily: font.mono, color: '#999' }}>
-                            <span>{l.sort_order + 1}. {l.title}</span>
-                            <div className="flex items-center gap-1">
-                              <button onClick={() => startEditLesson(l)} className="hover:opacity-70"><Pencil size={12} style={{ color: '#444' }} /></button>
-                              <button onClick={() => deleteLesson(l.id)} className="hover:opacity-70"><Trash2 size={12} style={{ color: '#444' }} /></button>
-                            </div>
-                          </div>
-                          {editingLessonId === l.id && (
-                            <div className="space-y-2 pt-2 pb-3 pl-4 border-l" style={{ borderColor: '#1a1a1a' }}>
-                              <input placeholder="Название занятия" value={editLessonForm.title} onChange={e => setEditLessonForm({ ...editLessonForm, title: e.target.value })}
-                                className="w-full px-3 py-2 rounded border text-xs" style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
-                              <textarea placeholder="Описание" value={editLessonForm.description} onChange={e => setEditLessonForm({ ...editLessonForm, description: e.target.value })}
-                                className="w-full px-3 py-2 rounded border text-xs" rows={2} style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
-                              <VideoBlockEditor videos={editLessonVideos} onChange={setEditLessonVideos} />
-                              <div className="flex gap-2">
-                                <button onClick={saveEditLesson} className="text-xs px-3 py-1.5 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}>Сохранить</button>
-                                <button onClick={() => setEditingLessonId(null)} className="text-xs px-3 py-1.5" style={{ color: '#666', fontFamily: font.mono }}>Отмена</button>
+                      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(e) => handleLessonDragEnd(c.id, e)}>
+                        <SortableContext items={lessons.filter(l => l.course_id === c.id).map(l => l.id)} strategy={verticalListSortingStrategy}>
+                          {lessons.filter(l => l.course_id === c.id).map(l => (
+                            <SortableLessonItem key={l.id} lesson={l}>
+                              <div className="flex items-center justify-between text-xs py-1.5" style={{ fontFamily: font.mono, color: '#999' }}>
+                                <span>{l.sort_order + 1}. {l.title}</span>
+                                <div className="flex items-center gap-1">
+                                  <button onClick={() => startEditLesson(l)} className="hover:opacity-70"><Pencil size={12} style={{ color: '#444' }} /></button>
+                                  <button onClick={() => deleteLesson(l.id)} className="hover:opacity-70"><Trash2 size={12} style={{ color: '#444' }} /></button>
+                                </div>
                               </div>
-                            </div>
-                          )}
-                        </div>
-                      ))}
+                              {editingLessonId === l.id && (
+                                <div className="space-y-2 pt-2 pb-3 pl-4 border-l" style={{ borderColor: '#1a1a1a' }}>
+                                  <input placeholder="Название занятия" value={editLessonForm.title} onChange={e => setEditLessonForm({ ...editLessonForm, title: e.target.value })}
+                                    className="w-full px-3 py-2 rounded border text-xs" style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
+                                  <textarea placeholder="Описание" value={editLessonForm.description} onChange={e => setEditLessonForm({ ...editLessonForm, description: e.target.value })}
+                                    className="w-full px-3 py-2 rounded border text-xs" rows={2} style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
+                                  <VideoBlockEditor videos={editLessonVideos} onChange={setEditLessonVideos} />
+                                  <div className="flex gap-2">
+                                    <button onClick={saveEditLesson} className="text-xs px-3 py-1.5 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}>Сохранить</button>
+                                    <button onClick={() => setEditingLessonId(null)} className="text-xs px-3 py-1.5" style={{ color: '#666', fontFamily: font.mono }}>Отмена</button>
+                                  </div>
+                                </div>
+                              )}
+                            </SortableLessonItem>
+                          ))}
+                        </SortableContext>
+                      </DndContext>
 
                       {showAddLesson === c.id ? (
                         <div className="space-y-2 pt-2">
