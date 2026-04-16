@@ -66,9 +66,24 @@ export default function SchoolAuth() {
         });
         if (signUpError) throw signUpError;
 
-        // Mark invite code as used
+        // Mark invite code as used and create course access
         if (signUpData.user) {
           await supabase.rpc('use_invite_code', { _code: inviteCode, _user_id: signUpData.user.id });
+          
+          // Get the course_id from the invite code and create course_access
+          const { data: codeData } = await supabase
+            .from('invite_codes')
+            .select('course_id')
+            .eq('code', inviteCode)
+            .single();
+          
+          if (codeData?.course_id) {
+            await supabase.from('course_access').insert({
+              user_id: signUpData.user.id,
+              course_id: codeData.course_id,
+              unlocked_lessons: [1],
+            });
+          }
         }
       }
     } catch (err: any) {

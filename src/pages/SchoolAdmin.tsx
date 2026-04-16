@@ -860,22 +860,33 @@ interface InviteCode {
   used_by: string | null;
   created_at: string;
   used_at: string | null;
+  course_id: string | null;
 }
 
 function InviteCodesTab() {
   const { user } = useAuth();
   const [codes, setCodes] = useState<InviteCode[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [expiresDays, setExpiresDays] = useState(30);
+  const [selectedCourseId, setSelectedCourseId] = useState('');
   const [generating, setGenerating] = useState(false);
 
   const load = async () => {
-    const [c, p] = await Promise.all([
+    const [c, p, cr] = await Promise.all([
       supabase.from('invite_codes').select('*').order('created_at', { ascending: false }),
       supabase.from('profiles').select('*'),
+      supabase.from('courses').select('*').order('sort_order'),
     ]);
     setCodes((c.data || []) as InviteCode[]);
     setProfiles(p.data || []);
+    const courseList = (cr.data || []) as Course[];
+    setCourses(courseList);
+    if (!selectedCourseId && courseList.length > 0) {
+      // Default to first non-free course
+      const nonFree = courseList.find(c => !c.is_free);
+      setSelectedCourseId(nonFree?.id || courseList[0].id);
+    }
   };
 
   useEffect(() => { load(); }, []);
@@ -885,8 +896,13 @@ function InviteCodesTab() {
     return profiles.find(p => p.user_id === uid)?.email || uid;
   };
 
+  const getCourseName = (cid: string | null) => {
+    if (!cid) return '—';
+    return courses.find(c => c.id === cid)?.title || '—';
+  };
+
   const generateCode = async () => {
-    if (!user) return;
+    if (!user || !selectedCourseId) return;
     setGenerating(true);
     const code = Math.random().toString(36).substring(2, 10).toUpperCase();
     await supabase.from('invite_codes').insert({
@@ -894,6 +910,7 @@ function InviteCodesTab() {
       created_by: user.id,
       is_single_use: true,
       expires_in_days: expiresDays || null,
+      course_id: selectedCourseId,
     });
     setGenerating(false);
     load();
@@ -912,6 +929,19 @@ function InviteCodesTab() {
 
       <div className="rounded-lg border p-4 mb-4 flex flex-wrap items-end gap-3" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
         <div>
+          <label className="block text-[10px] mb-1" style={{ color: '#666', fontFamily: font.mono }}>Программа</label>
+          <select
+            value={selectedCourseId}
+            onChange={e => setSelectedCourseId(e.target.value)}
+            className="px-3 py-2 rounded border text-sm"
+            style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
+          >
+            {courses.filter(c => !c.is_free).map(c => (
+              <option key={c.id} value={c.id}>{c.title}</option>
+            ))}
+          </select>
+        </div>
+        <div>
           <label className="block text-[10px] mb-1" style={{ color: '#666', fontFamily: font.mono }}>Срок (дней)</label>
           <input
             type="number"
@@ -923,7 +953,7 @@ function InviteCodesTab() {
         </div>
         <button
           onClick={generateCode}
-          disabled={generating}
+          disabled={generating || !selectedCourseId}
           className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg"
           style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono, opacity: generating ? 0.6 : 1 }}
         >
@@ -936,6 +966,7 @@ function InviteCodesTab() {
           <thead>
             <tr style={{ borderBottom: '1px solid #1a1a1a' }}>
               <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Код</th>
+              <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Программа</th>
               <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Создан</th>
               <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Срок</th>
               <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Статус</th>
@@ -951,6 +982,7 @@ function InviteCodesTab() {
               return (
                 <tr key={c.id} style={{ borderBottom: '1px solid #111' }}>
                   <td className="py-2.5 pr-4" style={{ color: '#e8e0d0', fontFamily: "'JetBrains Mono', monospace" }}>{c.code}</td>
+                  <td className="py-2.5 pr-4" style={{ color: '#999' }}>{getCourseName(c.course_id)}</td>
                   <td className="py-2.5 pr-4" style={{ color: '#666' }}>{new Date(c.created_at).toLocaleDateString('ru')}</td>
                   <td className="py-2.5 pr-4" style={{ color: '#666' }}>{c.expires_in_days ? `${c.expires_in_days} дн.` : '∞'}</td>
                   <td className="py-2.5 pr-4" style={{ color: c.used ? '#666' : expired ? '#e85d3a' : '#4a8a4a' }}>
@@ -966,7 +998,7 @@ function InviteCodesTab() {
               );
             })}
             {codes.length === 0 && (
-              <tr><td colSpan={6} className="py-4 text-center" style={{ color: '#444' }}>Нет инвайт-кодов</td></tr>
+              <tr><td colSpan={7} className="py-4 text-center" style={{ color: '#444' }}>Нет инвайт-кодов</td></tr>
             )}
           </tbody>
         </table>
