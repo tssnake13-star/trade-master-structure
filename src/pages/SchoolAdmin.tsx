@@ -39,7 +39,7 @@ interface Lesson { id: string; course_id: string; title: string; description: st
 interface LessonVideo { id?: string; title: string; video_url: string; video_url_alt: string; sort_order: number; }
 interface Profile { user_id: string; email: string; full_name: string | null; created_at: string; }
 interface UserRole { user_id: string; role: string; }
-interface Access { id: string; user_id: string; course_id: string; granted_at: string; expires_at: string | null; }
+interface Access { id: string; user_id: string; course_id: string; granted_at: string; expires_at: string | null; unlocked_lessons: number[]; }
 
 export default function SchoolAdmin() {
   const { session, role, loading: authLoading, signOut } = useAuth();
