@@ -303,8 +303,9 @@ export default function SchoolDashboard() {
                   return (
                     <div
                       key={l.id}
+                      onClick={() => unlocked && navigate(`/school/lesson/${l.id}`)}
                       className="rounded-lg px-4 py-3 flex items-start gap-3 transition-all"
-                      style={{ opacity: unlocked ? 1 : 0.5 }}
+                      style={{ opacity: unlocked ? 1 : 0.5, cursor: unlocked ? 'pointer' : 'default' }}
                     >
                       <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: done ? '#4a8a4a' : '#555', fontFamily: font.mono, minWidth: '1.5rem' }}>
                         {i + 1}
