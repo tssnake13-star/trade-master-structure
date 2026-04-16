@@ -486,8 +486,10 @@ export default function SchoolDashboard() {
             );
           })()}
 
-          {/* Activate invite code section */}
-          <ActivateCodeSection userId={user?.id} onActivated={() => window.location.reload()} />
+          {/* Activate invite code section — only on home or free course */}
+          {(!selectedCourseData || selectedCourseData.is_free) && (
+            <ActivateCodeSection userId={user?.id} onActivated={() => window.location.reload()} />
+          )}
         </div>
       </main>
     </div>
