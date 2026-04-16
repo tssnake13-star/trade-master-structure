@@ -287,14 +287,7 @@ export default function SchoolDashboard() {
                       key={l.id}
                       className="rounded-lg px-4 py-3 flex items-start gap-3 transition-all hover:bg-white/[0.03]"
                     >
-                      <div className="mt-0.5 flex-shrink-0">
-                        {done ? (
-                          <CheckCircle size={16} style={{ color: '#4a8a4a' }} />
-                        ) : (
-                          <Circle size={16} style={{ color: '#333' }} />
-                        )}
-                      </div>
-                      <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: '#555', fontFamily: font.mono, minWidth: '1.5rem' }}>
+                      <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: done ? '#4a8a4a' : '#555', fontFamily: font.mono, minWidth: '1.5rem' }}>
                         {i + 1}
                       </span>
                       <div className="flex-1 min-w-0">
