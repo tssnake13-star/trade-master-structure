@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, ArrowRight, CheckCircle, MessageCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle, MessageCircle, Download } from 'lucide-react';
 import YouTubePlayer from '@/components/school/YouTubePlayer';
 import FloatingWatermark from '@/components/school/FloatingWatermark';
 
@@ -204,6 +204,24 @@ export default function SchoolLesson() {
               );
             })}
           </div>
+        )}
+
+        {id === '5ff94d3a-0174-46be-b1ee-e8ff73b13b07' && (
+          <a
+            href="/files/checklist-top10.pdf"
+            download="Чек-лист ТОП-10 ошибок трейдеров.pdf"
+            className="flex items-center justify-center gap-3 w-full py-4 mb-6 rounded-lg text-sm font-semibold transition-all hover:brightness-110"
+            style={{
+              background: 'linear-gradient(135deg, #3a6a9a, #2a5a8a)',
+              color: '#e8e0d0',
+              fontFamily: font.mono,
+              fontSize: '15px',
+              boxShadow: '0 0 20px rgba(58, 106, 154, 0.3)',
+            }}
+          >
+            <Download size={18} />
+            Скачать чек-лист: ТОП-10 ошибок трейдеров
+          </a>
         )}
 
         {isFreeCourse && (
