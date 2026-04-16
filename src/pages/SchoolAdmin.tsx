@@ -715,7 +715,9 @@ function InviteCodesTab() {
   const generateCode = async () => {
     if (!user || selectedCourseIds.length === 0) return;
     setGenerating(true);
-    const code = Math.random().toString(36).substring(2, 10).toUpperCase();
+    const array = new Uint8Array(6);
+    crypto.getRandomValues(array);
+    const code = Array.from(array).map(b => b.toString(36).padStart(2, '0')).join('').toUpperCase().substring(0, 8);
     await supabase.from('invite_codes').insert({
       code,
       created_by: user.id,
