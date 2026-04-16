@@ -67,8 +67,16 @@ export default function SchoolDashboard() {
 
       const pm: ProgressMap = {};
       for (const c of courseList) {
-        const total = lessons.filter(l => l.course_id === c.id).length;
-        const completed = lessons.filter(l => l.course_id === c.id && completedSet.has(l.id)).length;
+        const courseLessons = lessons.filter(l => l.course_id === c.id).sort((a, b) => a.sort_order - b.sort_order);
+        const total = courseLessons.length;
+        const isAdmin = role === 'admin';
+        const isFree = c.is_free;
+        const unlocked = aMap.get(c.id)?.unlocked || [1];
+        // Only count completed lessons that are actually unlocked
+        const completed = courseLessons.filter((l, i) => {
+          const lessonUnlocked = isAdmin || isFree || unlocked.includes(i + 1);
+          return lessonUnlocked && completedSet.has(l.id);
+        }).length;
         pm[c.id] = { completed, total };
       }
       setProgress(pm);
