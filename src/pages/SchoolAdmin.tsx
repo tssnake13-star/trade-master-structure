@@ -37,7 +37,7 @@ const tabStyle = (active: boolean) => ({
 interface Course { id: string; title: string; subtitle: string | null; is_free: boolean; sort_order: number; }
 interface Lesson { id: string; course_id: string; title: string; description: string | null; sort_order: number; }
 interface LessonVideo { id?: string; title: string; video_url: string; video_url_alt: string; sort_order: number; }
-interface Profile { user_id: string; email: string; full_name: string | null; created_at: string; }
+interface Profile { user_id: string; email: string; full_name: string | null; created_at: string; is_blocked: boolean; }
 interface UserRole { user_id: string; role: string; }
 interface Access { id: string; user_id: string; course_id: string; granted_at: string; expires_at: string | null; unlocked_lessons: number[]; }
 
