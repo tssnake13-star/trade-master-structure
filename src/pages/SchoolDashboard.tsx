@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Lock, Settings, LogOut, ArrowRight, CheckCircle, Menu } from 'lucide-react';
+import { Lock, Settings, LogOut, ArrowRight, CheckCircle, Menu, Ticket } from 'lucide-react';
 import logoVideo from '@/assets/logo-dashboard.mp4';
 
 interface Course {
@@ -483,8 +483,75 @@ export default function SchoolDashboard() {
               </div>
             );
           })()}
+
+          {/* Activate invite code section */}
+          <ActivateCodeSection userId={user?.id} onActivated={() => window.location.reload()} />
         </div>
       </main>
+    </div>
+  );
+}
+
+function ActivateCodeSection({ userId, onActivated }: { userId?: string; onActivated: () => void }) {
+  const [code, setCode] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState<{ text: string; success: boolean } | null>(null);
+
+  const activate = async () => {
+    if (!code.trim() || !userId) return;
+    setLoading(true);
+    setMessage(null);
+    try {
+      const { data: isValid, error: err } = await supabase.rpc('validate_invite_code', { _code: code.trim() });
+      if (err) throw err;
+      if (!isValid) {
+        setMessage({ text: 'Код недействителен или уже использован', success: false });
+        setLoading(false);
+        return;
+      }
+      await supabase.rpc('use_invite_code', { _code: code.trim(), _user_id: userId });
+      setMessage({ text: 'Доступ открыт', success: true });
+      setCode('');
+      setTimeout(onActivated, 1500);
+    } catch {
+      setMessage({ text: 'Произошла ошибка', success: false });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="mt-10 rounded-xl border p-5" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
+      <div className="flex items-center gap-2 mb-3">
+        <Ticket size={14} style={{ color: '#666' }} />
+        <span className="text-xs uppercase tracking-wider" style={{ color: '#666', fontFamily: "'Inter', sans-serif" }}>
+          Активировать инвайт-код
+        </span>
+      </div>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          value={code}
+          onChange={e => setCode(e.target.value)}
+          placeholder="Введите код"
+          className="flex-1 px-3 py-2 rounded-lg border text-sm"
+          style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: "'Inter', sans-serif" }}
+          onKeyDown={e => e.key === 'Enter' && activate()}
+        />
+        <button
+          onClick={activate}
+          disabled={loading || !code.trim()}
+          className="px-4 py-2 rounded-lg text-xs whitespace-nowrap"
+          style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: "'Inter', sans-serif", opacity: loading ? 0.6 : 1 }}
+        >
+          {loading ? '...' : 'Активировать код'}
+        </button>
+      </div>
+      {message && (
+        <p className="text-xs mt-2" style={{ color: message.success ? '#4a8a4a' : '#e85d3a', fontFamily: "'Inter', sans-serif" }}>
+          {message.text}
+        </p>
+      )}
     </div>
   );
 }
