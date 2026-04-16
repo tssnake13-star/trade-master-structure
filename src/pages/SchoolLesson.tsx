@@ -123,7 +123,7 @@ export default function SchoolLesson() {
         setPrevLessonId(prev?.id || null);
         setNextLessonId(next?.id || null);
         // Next lesson is navigable only if it's unlocked via admin or free course
-        setIsNextUnlocked(next ? (isAdmin || isFree || unlocked.includes(currentIdx + 2)) : false);
+        setIsNextUnlocked(next ? (isAdmin || unlocked.includes(currentIdx + 2) || isFree) : false);
         setVideos((videosRes.data || []) as VideoData[]);
       }
       setLoading(false);
