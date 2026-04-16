@@ -66,7 +66,7 @@ function renderPlayer(val: string, watermark?: React.ReactNode) {
 
 export default function SchoolLesson() {
   const { id } = useParams<{ id: string }>();
-  const { session, user, loading: authLoading } = useAuth();
+  const { session, user, role, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [lesson, setLesson] = useState<LessonData | null>(null);
   const [videos, setVideos] = useState<VideoData[]>([]);
