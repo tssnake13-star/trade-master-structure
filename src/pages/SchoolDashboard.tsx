@@ -303,8 +303,9 @@ export default function SchoolDashboard() {
                   return (
                     <div
                       key={l.id}
+                      onClick={() => unlocked && navigate(`/school/lesson/${l.id}`)}
                       className="rounded-lg px-4 py-3 flex items-start gap-3 transition-all"
-                      style={{ opacity: unlocked ? 1 : 0.5 }}
+                      style={{ opacity: unlocked ? 1 : 0.5, cursor: unlocked ? 'pointer' : 'default' }}
                     >
                       <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: done ? '#4a8a4a' : '#555', fontFamily: font.mono, minWidth: '1.5rem' }}>
                         {i + 1}
@@ -322,9 +323,13 @@ export default function SchoolDashboard() {
                       {!unlocked ? (
                         <Lock size={14} className="flex-shrink-0 mt-0.5" style={{ color: '#333' }} />
                       ) : done ? (
-                        <span className="flex-shrink-0 flex items-center gap-1 text-xs py-1.5" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
+                        <button
+                          onClick={() => navigate(`/school/lesson/${l.id}`)}
+                          className="flex-shrink-0 flex items-center gap-1 text-xs py-1.5 hover:opacity-70 transition"
+                          style={{ color: '#4a8a4a', fontFamily: font.mono }}
+                        >
                           <CheckCircle size={14} />
-                        </span>
+                        </button>
                       ) : (
                         <button
                           onClick={() => navigate(`/school/lesson/${l.id}`)}
@@ -365,7 +370,13 @@ export default function SchoolDashboard() {
             
             for (const c of accessibleCourses) {
               const cLessons = allLessons.filter(l => l.course_id === c.id).sort((a, b) => a.sort_order - b.sort_order);
-              const next = cLessons.find(l => !completedIds.has(l.id));
+              const isAdmin = role === 'admin';
+              const isFree = c.is_free;
+              const cUnlocked = accessMap.get(c.id)?.unlocked || [1];
+              const next = cLessons.find((l, i) => {
+                const lessonUnlocked = isAdmin || isFree || cUnlocked.includes(i + 1);
+                return lessonUnlocked && !completedIds.has(l.id);
+              });
               if (next) {
                 activeCourse = c;
                 activeNextLesson = next;
