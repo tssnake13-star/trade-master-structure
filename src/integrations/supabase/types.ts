@@ -73,6 +73,42 @@ export type Database = {
         }
         Relationships: []
       }
+      invite_codes: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string
+          expires_in_days: number | null
+          id: string
+          is_single_use: boolean
+          used: boolean
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by: string
+          expires_in_days?: number | null
+          id?: string
+          is_single_use?: boolean
+          used?: boolean
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string
+          expires_in_days?: number | null
+          id?: string
+          is_single_use?: boolean
+          used?: boolean
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: []
+      }
       lesson_progress: {
         Row: {
           completed_at: string
@@ -253,6 +289,11 @@ export type Database = {
         }
         Returns: boolean
       }
+      use_invite_code: {
+        Args: { _code: string; _user_id: string }
+        Returns: undefined
+      }
+      validate_invite_code: { Args: { _code: string }; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "student"
