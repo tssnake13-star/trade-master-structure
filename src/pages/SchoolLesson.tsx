@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle, MessageCircle } from 'lucide-react';
 import YouTubePlayer from '@/components/school/YouTubePlayer';
 import FloatingWatermark from '@/components/school/FloatingWatermark';
 
@@ -74,6 +74,7 @@ export default function SchoolLesson() {
   const [nextLessonId, setNextLessonId] = useState<string | null>(null);
   const [isNextUnlocked, setIsNextUnlocked] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isFreeCourse, setIsFreeCourse] = useState(false);
   const [marking, setMarking] = useState(false);
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState<{ email: string; full_name: string | null }>({ email: '', full_name: null });
@@ -114,6 +115,7 @@ export default function SchoolLesson() {
         const prev = currentIdx > 0 ? allSorted[currentIdx - 1] : null;
         const next = currentIdx < allSorted.length - 1 ? allSorted[currentIdx + 1] : null;
         const isFree = courseRes.data?.is_free || false;
+        setIsFreeCourse(isFree);
         const unlocked = accessRes.data?.unlocked_lessons || [1];
         const isAdmin = role === 'admin';
 
@@ -202,6 +204,25 @@ export default function SchoolLesson() {
               );
             })}
           </div>
+        )}
+
+        {isFreeCourse && (
+          <a
+            href="http://t.me/tradeliketyo"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-center gap-3 w-full py-4 mb-6 rounded-lg text-sm font-semibold transition-all hover:brightness-110"
+            style={{
+              background: 'linear-gradient(135deg, #4a8a4a, #3a7a3a)',
+              color: '#e8e0d0',
+              fontFamily: font.mono,
+              fontSize: '15px',
+              boxShadow: '0 0 20px rgba(74, 138, 74, 0.3)',
+            }}
+          >
+            <MessageCircle size={18} />
+            Написать автору в Telegram
+          </a>
         )}
 
         <div className="flex gap-2">
