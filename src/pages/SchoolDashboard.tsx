@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Lock, Settings, LogOut, ArrowRight, CheckCircle, Menu, X } from 'lucide-react';
+import { Lock, Settings, LogOut, ArrowRight, CheckCircle, Menu } from 'lucide-react';
 import logoVideo from '@/assets/logo-dashboard.mp4';
 
 interface Course {
@@ -46,6 +46,7 @@ export default function SchoolDashboard() {
 
   useEffect(() => {
     if (!user) return;
+
     const load = async () => {
       const [coursesRes, accessRes, lessonsRes, progressRes] = await Promise.all([
         supabase.from('courses').select('*').order('sort_order'),
@@ -56,10 +57,10 @@ export default function SchoolDashboard() {
 
       const courseList = (coursesRes.data || []) as Course[];
       const accessData = (accessRes.data || []) as { course_id: string; unlocked_lessons: number[] }[];
-      const accessSet = new Set(accessData.map(a => a.course_id));
-      const aMap = new Map(accessData.map(a => [a.course_id, { courseId: a.course_id, unlocked: a.unlocked_lessons || [1] }]));
+      const accessSet = new Set(accessData.map((a) => a.course_id));
+      const aMap = new Map(accessData.map((a) => [a.course_id, { courseId: a.course_id, unlocked: a.unlocked_lessons || [1] }]));
       const lessons = (lessonsRes.data || []) as Lesson[];
-      const completedSet = new Set((progressRes.data || []).map(p => p.lesson_id));
+      const completedSet = new Set((progressRes.data || []).map((p) => p.lesson_id));
 
       setCourses(courseList);
       setAccessMap(aMap);
@@ -67,28 +68,31 @@ export default function SchoolDashboard() {
       setCompletedIds(completedSet);
 
       const pm: ProgressMap = {};
+
       for (const c of courseList) {
-        const courseLessons = lessons.filter(l => l.course_id === c.id).sort((a, b) => a.sort_order - b.sort_order);
-        const total = courseLessons.length;
+        const courseLessons = lessons.filter((l) => l.course_id === c.id).sort((a, b) => a.sort_order - b.sort_order);
         const isAdmin = role === 'admin';
-        const isFree = c.is_free;
-        const unlocked = aMap.get(c.id)?.unlocked || [1];
-        // Only count completed lessons that are actually unlocked
-        const completed = courseLessons.filter((l, i) => {
-          const lessonUnlocked = isAdmin || isFree || unlocked.includes(i + 1);
-          return lessonUnlocked && completedSet.has(l.id);
-        }).length;
-        pm[c.id] = { completed, total };
+        const unlockedSortOrders = isAdmin || c.is_free
+          ? courseLessons.map((_, i) => i + 1)
+          : (aMap.get(c.id)?.unlocked || [1]);
+        const unlockedLessons = courseLessons.filter((_, i) => unlockedSortOrders.includes(i + 1));
+        const completedUnlockedCount = unlockedLessons.filter((l) => completedSet.has(l.id)).length;
+
+        // Transparent progress rule:
+        // compare completed unlocked lessons vs unlocked lessons count from course_access.unlocked_lessons
+        pm[c.id] = {
+          completed: completedUnlockedCount,
+          total: unlockedLessons.length,
+        };
       }
+
       setProgress(pm);
 
-      // Auto-select course from navigation state only (not by default — home screen shown)
       const canAccess = (c: Course) => role === 'admin' || c.is_free || accessSet.has(c.id);
       const stateId = (location.state as any)?.selectedCourse;
       if (stateId) {
-        const fromState = courseList.find(c => c.id === stateId && canAccess(c));
+        const fromState = courseList.find((c) => c.id === stateId && canAccess(c));
         if (fromState) setSelectedCourse(fromState.id);
-        // Clear state so returning to dashboard shows home screen
         window.history.replaceState({}, '');
       } else {
         setSelectedCourse(null);
@@ -96,8 +100,9 @@ export default function SchoolDashboard() {
 
       setLoading(false);
     };
+
     load();
-  }, [user, role]);
+  }, [user, role, location.state]);
 
   if (authLoading || loading) {
     return (
@@ -109,39 +114,56 @@ export default function SchoolDashboard() {
 
   const hasAccess = (c: Course) => role === 'admin' || c.is_free || accessMap.has(c.id);
 
-  // Lessons for selected course
-  const selectedLessons = selectedCourse
-    ? allLessons.filter(l => l.course_id === selectedCourse).sort((a, b) => a.sort_order - b.sort_order)
-    : [];
+  const getCourseLessons = (courseId: string) =>
+    allLessons.filter((l) => l.course_id === courseId).sort((a, b) => a.sort_order - b.sort_order);
 
-  const selectedCourseData = courses.find(c => c.id === selectedCourse);
-  const selectedAccessible = selectedCourseData ? hasAccess(selectedCourseData) : false;
+  const getUnlockedSortOrders = (course: Course, courseLessons: Lesson[]) => {
+    if (role === 'admin' || course.is_free) {
+      return courseLessons.map((_, i) => i + 1);
+    }
+    return accessMap.get(course.id)?.unlocked || [1];
+  };
 
-  // Unlocked lessons for selected course
-  const selectedUnlocked = selectedCourse
-    ? (role === 'admin' ? selectedLessons.map((_, i) => i + 1) : (accessMap.get(selectedCourse)?.unlocked || (selectedCourseData?.is_free ? selectedLessons.map((_, i) => i + 1) : [1])))
-    : [];
+  const getUnlockedLessons = (course: Course, courseLessons: Lesson[]) => {
+    const unlockedSortOrders = getUnlockedSortOrders(course, courseLessons);
+    return courseLessons.filter((_, i) => unlockedSortOrders.includes(i + 1));
+  };
 
-  const isLessonUnlocked = (index: number) => selectedUnlocked.includes(index + 1);
+  const getCompletedUnlockedCount = (course: Course, courseLessons: Lesson[]) => {
+    const unlockedLessons = getUnlockedLessons(course, courseLessons);
+    return unlockedLessons.filter((lesson) => completedIds.has(lesson.id)).length;
+  };
 
-  // Find first incomplete AND unlocked lesson for "Продолжить"
-  const nextLesson = selectedAccessible
-    ? selectedLessons.find((l, i) => isLessonUnlocked(i) && !completedIds.has(l.id))
-    : null;
-  const unlockedSelectedLessons = selectedLessons.filter((_, i) => isLessonUnlocked(i));
-  const allCompleted = selectedAccessible && unlockedSelectedLessons.length > 0 && unlockedSelectedLessons.every(l => completedIds.has(l.id));
-
-  const p = selectedCourse ? (progress[selectedCourse] || { completed: 0, total: 0 }) : { completed: 0, total: 0 };
-  const pct = p.total > 0 ? Math.round((p.completed / p.total) * 100) : 0;
+  const getFirstUnlockedIncompleteLesson = (course: Course, courseLessons: Lesson[]) => {
+    const unlockedLessons = getUnlockedLessons(course, courseLessons);
+    return unlockedLessons.find((lesson) => !completedIds.has(lesson.id)) || null;
+  };
 
   const selectCourse = (id: string | null) => {
     setSelectedCourse(id);
     setMobileSidebarOpen(false);
   };
 
+  const selectedCourseData = courses.find((c) => c.id === selectedCourse);
+  const selectedAccessible = selectedCourseData ? hasAccess(selectedCourseData) : false;
+  const selectedLessons = selectedCourseData ? getCourseLessons(selectedCourseData.id) : [];
+  const selectedUnlockedSortOrders = selectedCourseData ? getUnlockedSortOrders(selectedCourseData, selectedLessons) : [];
+  const selectedUnlockedLessons = selectedCourseData ? getUnlockedLessons(selectedCourseData, selectedLessons) : [];
+  const selectedCompletedUnlockedCount = selectedCourseData ? getCompletedUnlockedCount(selectedCourseData, selectedLessons) : 0;
+  const nextLesson = selectedCourseData ? getFirstUnlockedIncompleteLesson(selectedCourseData, selectedLessons) : null;
+
+  // Transparent completion rule for selected course:
+  // compare selectedCompletedUnlockedCount vs selectedUnlockedLessons.length
+  // all completed only when completed unlocked >= unlocked count AND unlocked count > 0
+  const allCompleted = selectedAccessible
+    && selectedUnlockedLessons.length > 0
+    && selectedCompletedUnlockedCount >= selectedUnlockedLessons.length;
+
+  const p = selectedCourse ? (progress[selectedCourse] || { completed: 0, total: 0 }) : { completed: 0, total: 0 };
+  const pct = p.total > 0 ? Math.round((p.completed / p.total) * 100) : 0;
+
   return (
     <div className="min-h-screen flex flex-col sm:flex-row" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
-      {/* Mobile sidebar overlay */}
       {mobileSidebarOpen && (
         <div
           className="sm:hidden fixed inset-0 z-40"
@@ -150,7 +172,6 @@ export default function SchoolDashboard() {
         />
       )}
 
-      {/* Sidebar — always visible on sm+, slide-in on mobile */}
       <aside
         className={`
           fixed sm:relative top-0 left-0 h-full z-50
@@ -160,17 +181,12 @@ export default function SchoolDashboard() {
         `}
         style={{ borderColor: '#1a1a1a', backgroundColor: '#0a0a0a' }}
       >
-        <div className="border-b cursor-pointer relative overflow-hidden flex items-center justify-between" style={{ borderColor: '#1a1a1a' }}>
-          <div className="flex-1" onClick={() => selectCourse(null)}>
-            <video src={logoVideo} autoPlay loop muted playsInline className="w-full object-cover block" />
-          </div>
-          <button className="sm:hidden p-3" onClick={() => setMobileSidebarOpen(false)}>
-            <X size={18} style={{ color: '#666' }} />
-          </button>
+        <div className="border-b cursor-pointer relative overflow-hidden" style={{ borderColor: '#1a1a1a' }} onClick={() => selectCourse(null)}>
+          <video src={logoVideo} autoPlay loop muted playsInline className="w-full object-cover block" />
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
-          {courses.map(c => {
+          {courses.map((c) => {
             const accessible = hasAccess(c);
             const cp = progress[c.id] || { completed: 0, total: 0 };
             const cpct = cp.total > 0 ? Math.round((cp.completed / cp.total) * 100) : 0;
@@ -234,9 +250,7 @@ export default function SchoolDashboard() {
         </div>
       </aside>
 
-      {/* Main content */}
       <main className="flex-1 min-h-screen">
-        {/* Mobile header */}
         <header className="sm:hidden border-b px-3 py-3 flex items-center justify-between" style={{ borderColor: '#1a1a1a' }}>
           <button onClick={() => setMobileSidebarOpen(true)} className="p-1.5 hover:bg-white/5 rounded-lg transition">
             <Menu size={20} style={{ color: '#e8e0d0' }} />
@@ -259,7 +273,6 @@ export default function SchoolDashboard() {
         <div className="max-w-3xl mx-auto p-4 sm:p-8">
           {selectedCourseData && selectedAccessible && (
             <>
-              {/* Program header with progress */}
               <div className="mb-6">
                 <h1 className="text-2xl sm:text-3xl mb-1" style={{ fontFamily: font.heading }}>
                   {selectedCourseData.title}
@@ -277,8 +290,7 @@ export default function SchoolDashboard() {
                 </div>
               </div>
 
-              {/* Continue button */}
-              {nextLesson && (
+              {!allCompleted && nextLesson && (
                 <button
                   onClick={() => navigate(`/school/lesson/${nextLesson.id}`)}
                   className="w-full rounded-xl border p-4 mb-6 flex items-center justify-between transition-all hover:border-[#2a2a2a]"
@@ -296,11 +308,10 @@ export default function SchoolDashboard() {
                 </button>
               )}
 
-              {/* Lesson list */}
               <div className="space-y-1">
                 {selectedLessons.map((l, i) => {
                   const done = completedIds.has(l.id);
-                  const unlocked = isLessonUnlocked(i);
+                  const unlocked = selectedUnlockedSortOrders.includes(i + 1);
                   return (
                     <div
                       key={l.id}
@@ -361,50 +372,45 @@ export default function SchoolDashboard() {
           )}
 
           {!selectedCourse && (() => {
-            // Find the program with most recent progress (or first accessible)
             const canAccess = (c: Course) => role === 'admin' || c.is_free || accessMap.has(c.id);
             const accessibleCourses = courses.filter(canAccess);
-            
-            // Find course with incomplete progress (last active)
+
             let activeCourse: Course | null = null;
             let activeNextLesson: Lesson | null = null;
-            
+
             for (const c of accessibleCourses) {
-              const cLessons = allLessons.filter(l => l.course_id === c.id).sort((a, b) => a.sort_order - b.sort_order);
-              const isAdmin = role === 'admin';
-              const isFree = c.is_free;
-              const cUnlocked = accessMap.get(c.id)?.unlocked || [1];
-              const next = cLessons.find((l, i) => {
-                const lessonUnlocked = isAdmin || isFree || cUnlocked.includes(i + 1);
-                return lessonUnlocked && !completedIds.has(l.id);
-              });
+              const cLessons = getCourseLessons(c.id);
+              const next = getFirstUnlockedIncompleteLesson(c, cLessons);
               if (next) {
                 activeCourse = c;
                 activeNextLesson = next;
                 break;
               }
             }
-            
-            // Fallback: first accessible course where all unlocked lessons are completed
+
             if (!activeCourse) {
               for (const c of accessibleCourses) {
-                const cLessons = allLessons.filter(l => l.course_id === c.id).sort((a, b) => a.sort_order - b.sort_order);
-                if (cLessons.length === 0) continue;
-                const isAdminF = role === 'admin';
-                const isFreeF = c.is_free;
-                const cUnlockedF = accessMap.get(c.id)?.unlocked || [1];
-                const unlockedListF = cLessons.filter((_, i) => isAdminF || isFreeF || cUnlockedF.includes(i + 1));
-                const allDoneF = unlockedListF.length > 0 && unlockedListF.every(l => completedIds.has(l.id));
-                if (allDoneF) {
+                const cLessons = getCourseLessons(c.id);
+                const unlockedLessons = getUnlockedLessons(c, cLessons);
+                const completedUnlockedCount = getCompletedUnlockedCount(c, cLessons);
+
+                // Transparent completion rule for home card:
+                // compare completedUnlockedCount vs unlockedLessons.length
+                if (unlockedLessons.length > 0 && completedUnlockedCount >= unlockedLessons.length) {
                   activeCourse = c;
                   break;
                 }
               }
             }
-            
+
             const ap = activeCourse ? (progress[activeCourse.id] || { completed: 0, total: 0 }) : null;
             const apct = ap && ap.total > 0 ? Math.round((ap.completed / ap.total) * 100) : 0;
-            const activeLessons = activeCourse ? allLessons.filter(l => l.course_id === activeCourse!.id).sort((a, b) => a.sort_order - b.sort_order) : [];
+            const activeLessons = activeCourse ? getCourseLessons(activeCourse.id) : [];
+            const activeUnlockedLessons = activeCourse ? getUnlockedLessons(activeCourse, activeLessons) : [];
+            const activeCompletedUnlockedCount = activeCourse ? getCompletedUnlockedCount(activeCourse, activeLessons) : 0;
+            const activeAllCompleted = !!activeCourse
+              && activeUnlockedLessons.length > 0
+              && activeCompletedUnlockedCount >= activeUnlockedLessons.length;
 
             return (
               <div className="py-8 sm:py-12">
@@ -440,9 +446,9 @@ export default function SchoolDashboard() {
                       </div>
                     )}
 
-                    {activeNextLesson && (
+                    {!activeAllCompleted && activeNextLesson && (
                       <button
-                        onClick={() => navigate(`/school/lesson/${activeNextLesson!.id}`)}
+                        onClick={() => navigate(`/school/lesson/${activeNextLesson.id}`)}
                         className="w-full rounded-lg border p-3 flex items-center justify-between transition-all hover:border-[#2a2a2a]"
                         style={{ borderColor: '#1a1a1a', backgroundColor: '#111' }}
                       >
@@ -451,26 +457,18 @@ export default function SchoolDashboard() {
                             {ap && ap.completed === 0 ? 'Начать' : 'Продолжить'}
                           </p>
                           <p className="text-sm truncate" style={{ fontFamily: font.mono, color: '#e8e0d0' }}>
-                            Занятие {activeLessons.indexOf(activeNextLesson!) + 1}. {activeNextLesson!.title}
+                            Занятие {activeLessons.indexOf(activeNextLesson) + 1}. {activeNextLesson.title}
                           </p>
                         </div>
                         <ArrowRight size={16} style={{ color: '#4a8a4a' }} className="flex-shrink-0 ml-3" />
                       </button>
                     )}
 
-                    {!activeNextLesson && activeCourse && (() => {
-                      const cLessons = allLessons.filter(l => l.course_id === activeCourse!.id).sort((a, b) => a.sort_order - b.sort_order);
-                      const isAdmin = role === 'admin';
-                      const isFree = activeCourse!.is_free;
-                      const cUnlocked = accessMap.get(activeCourse!.id)?.unlocked || [1];
-                      const unlockedList = cLessons.filter((_, i) => isAdmin || isFree || cUnlocked.includes(i + 1));
-                      const allDone = unlockedList.length > 0 && unlockedList.every(l => completedIds.has(l.id));
-                      return allDone ? (
-                        <p className="text-sm" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
-                          Все занятия завершены ✓
-                        </p>
-                      ) : null;
-                    })()}
+                    {activeAllCompleted && (
+                      <p className="text-sm" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
+                        Все занятия завершены ✓
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
