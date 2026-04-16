@@ -522,6 +522,7 @@ function CoursesTab() {
 
 /* ========= STUDENTS TAB ========= */
 function StudentsTab() {
+  const { user } = useAuth();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
@@ -532,6 +533,7 @@ function StudentsTab() {
   const [grantCourseId, setGrantCourseId] = useState('');
   const [grantDays, setGrantDays] = useState(30);
   const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
+  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   const load = async () => {
     const [p, r, c, l, a, pr] = await Promise.all([
@@ -585,9 +587,40 @@ function StudentsTab() {
     load();
   };
 
+  const toggleBlock = async (uid: string, currentlyBlocked: boolean) => {
+    await supabase.from('profiles').update({ is_blocked: !currentlyBlocked }).eq('user_id', uid);
+    load();
+  };
+
+  const deleteStudent = async (uid: string) => {
+    await supabase.rpc('delete_student', { _user_id: uid });
+    setDeleteConfirm(null);
+    load();
+  };
+
+  const isSelf = (uid: string) => user?.id === uid;
+
   return (
     <div>
       <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Ученики</h2>
+
+      {/* Delete confirmation dialog */}
+      {deleteConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
+          <div className="rounded-xl border p-6 w-full max-w-sm space-y-4" style={{ backgroundColor: '#0d0d0d', borderColor: '#1a1a1a' }}>
+            <h3 className="text-base" style={{ fontFamily: font.heading }}>Удалить студента?</h3>
+            <p className="text-sm" style={{ color: '#888', fontFamily: font.mono }}>Это действие необратимо.</p>
+            <div className="flex gap-2">
+              <button onClick={() => deleteStudent(deleteConfirm)} className="text-xs px-4 py-2 rounded" style={{ backgroundColor: '#8a4a4a', color: '#e8e0d0', fontFamily: font.mono }}>
+                Удалить
+              </button>
+              <button onClick={() => setDeleteConfirm(null)} className="text-xs px-4 py-2" style={{ color: '#666', fontFamily: font.mono }}>
+                Отмена
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {grantModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
@@ -626,6 +659,7 @@ function StudentsTab() {
         {profiles.map(p => {
           const studentAccesses = accesses.filter(a => a.user_id === p.user_id);
           const isExpanded = expandedStudent === p.user_id;
+          const self = isSelf(p.user_id);
 
           return (
             <div key={p.user_id} className="rounded-lg border" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
@@ -634,8 +668,13 @@ function StudentsTab() {
                 onClick={() => setExpandedStudent(isExpanded ? null : p.user_id)}
               >
                 <div className="min-w-0">
-                  <span className="text-sm block" style={{ fontFamily: font.mono, color: '#e8e0d0' }}>
+                  <span className="text-sm flex items-center gap-2" style={{ fontFamily: font.mono, color: '#e8e0d0' }}>
                     {p.full_name || p.email}
+                    {p.is_blocked && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ backgroundColor: '#8a4a4a22', color: '#c45050', fontFamily: font.mono }}>
+                        заблокирован
+                      </span>
+                    )}
                   </span>
                   {p.full_name && (
                     <span className="text-[11px] block" style={{ fontFamily: font.mono, color: '#555' }}>{p.email}</span>
@@ -645,6 +684,26 @@ function StudentsTab() {
                   <span className="text-[11px]" style={{ fontFamily: font.mono, color: getRole(p.user_id) === 'admin' ? '#4a8a4a' : '#555' }}>
                     {getRole(p.user_id)}
                   </span>
+                  {!self && (
+                    <>
+                      <button
+                        onClick={e => { e.stopPropagation(); toggleBlock(p.user_id, p.is_blocked); }}
+                        className="text-[11px] px-2 py-1 rounded flex items-center gap-1"
+                        style={{ color: p.is_blocked ? '#4a8a4a' : '#c45050', border: '1px solid #1a1a1a', fontFamily: font.mono }}
+                        title={p.is_blocked ? 'Разблокировать' : 'Заблокировать'}
+                      >
+                        {p.is_blocked ? <ShieldCheck size={11} /> : <ShieldOff size={11} />}
+                        {p.is_blocked ? 'Разблокировать' : 'Заблокировать'}
+                      </button>
+                      <button
+                        onClick={e => { e.stopPropagation(); setDeleteConfirm(p.user_id); }}
+                        className="text-[11px] px-2 py-1 rounded flex items-center gap-1"
+                        style={{ color: '#c45050', border: '1px solid #1a1a1a', fontFamily: font.mono }}
+                      >
+                        <Trash2 size={11} /> Удалить
+                      </button>
+                    </>
+                  )}
                   <button
                     onClick={e => { e.stopPropagation(); setGrantModal(p.user_id); setGrantCourseId(''); }}
                     className="text-[11px] px-2 py-1 rounded"
@@ -665,7 +724,6 @@ function StudentsTab() {
                     const unlockedCount = unlocked.length;
                     const totalLessons = courseLessons.length;
 
-                    // Find current lesson (first unlocked but not completed)
                     const studentProgress = progressData.filter(pr => pr.user_id === p.user_id);
                     const completedLessonIds = new Set(studentProgress.map(pr => pr.lesson_id));
                     const currentLesson = courseLessons.find((l, i) => unlocked.includes(i + 1) && !completedLessonIds.has(l.id));
