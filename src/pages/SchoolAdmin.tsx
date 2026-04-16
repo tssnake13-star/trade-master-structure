@@ -998,7 +998,7 @@ function InviteCodesTab() {
               );
             })}
             {codes.length === 0 && (
-              <tr><td colSpan={6} className="py-4 text-center" style={{ color: '#444' }}>Нет инвайт-кодов</td></tr>
+              <tr><td colSpan={7} className="py-4 text-center" style={{ color: '#444' }}>Нет инвайт-кодов</td></tr>
             )}
           </tbody>
         </table>
