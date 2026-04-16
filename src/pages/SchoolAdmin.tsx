@@ -871,6 +871,13 @@ function InviteCodesTab() {
   const [expiresDays, setExpiresDays] = useState(30);
   const [selectedCourseId, setSelectedCourseId] = useState('');
   const [generating, setGenerating] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const copyCode = (code: string, id: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 1200);
+  };
 
   const load = async () => {
     const [c, p, cr] = await Promise.all([
@@ -981,7 +988,16 @@ function InviteCodesTab() {
                 : false;
               return (
                 <tr key={c.id} style={{ borderBottom: '1px solid #111' }}>
-                  <td className="py-2.5 pr-4" style={{ color: '#e8e0d0', fontFamily: "'JetBrains Mono', monospace" }}>{c.code}</td>
+                  <td className="py-2.5 pr-4">
+                    <span
+                      onClick={() => copyCode(c.code, c.id)}
+                      className="cursor-pointer hover:opacity-70 transition-opacity"
+                      style={{ color: '#e8e0d0', fontFamily: "'JetBrains Mono', monospace" }}
+                    >
+                      {c.code}
+                      {copiedId === c.id && <span className="ml-2 text-[10px]" style={{ color: '#4a8a4a' }}>Скопировано</span>}
+                    </span>
+                  </td>
                   <td className="py-2.5 pr-4" style={{ color: '#999' }}>{getCourseName(c.course_id)}</td>
                   <td className="py-2.5 pr-4" style={{ color: '#666' }}>{new Date(c.created_at).toLocaleDateString('ru')}</td>
                   <td className="py-2.5 pr-4" style={{ color: '#666' }}>{c.expires_in_days ? `${c.expires_in_days} дн.` : '∞'}</td>

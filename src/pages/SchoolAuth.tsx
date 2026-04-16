@@ -70,18 +70,22 @@ export default function SchoolAuth() {
         if (signUpData.user) {
           await supabase.rpc('use_invite_code', { _code: inviteCode, _user_id: signUpData.user.id });
           
-          // Get the course_id from the invite code and create course_access
+          // Get the course_id and expires_in_days from the invite code and create course_access
           const { data: codeData } = await supabase
             .from('invite_codes')
-            .select('course_id')
+            .select('course_id, expires_in_days')
             .eq('code', inviteCode)
             .single();
           
           if (codeData?.course_id) {
+            const expiresAt = codeData.expires_in_days
+              ? new Date(Date.now() + codeData.expires_in_days * 86400000).toISOString()
+              : null;
             await supabase.from('course_access').insert({
               user_id: signUpData.user.id,
               course_id: codeData.course_id,
               unlocked_lessons: [1],
+              expires_at: expiresAt,
             });
           }
         }
