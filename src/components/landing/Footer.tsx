@@ -33,6 +33,12 @@ const Footer = () => {
         </div>
         
         <div className="mt-8 pt-8 border-t border-border text-center">
+          <Link
+            to="/school"
+            className="inline-block text-sm text-muted-foreground/60 hover:text-foreground transition-colors mb-4"
+          >
+            Уже в системе? Войти в школу →
+          </Link>
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} TRADELIKETYO. Все права защищены.
           </p>
