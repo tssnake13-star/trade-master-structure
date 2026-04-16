@@ -228,14 +228,14 @@ export default function SchoolLesson() {
           )}
 
           <button
-            onClick={() => nextLessonId && isNextUnlocked && navigate(`/school/lesson/${nextLessonId}`)}
-            disabled={!nextLessonId || !isNextUnlocked}
+            onClick={() => nextLessonId && isNextUnlocked && isCompleted && navigate(`/school/lesson/${nextLessonId}`)}
+            disabled={!nextLessonId || !isNextUnlocked || !isCompleted}
             style={{
-              ...btnBase, borderColor: nextLessonId && isNextUnlocked ? '#1a1a1a' : '#111',
-              color: nextLessonId && isNextUnlocked ? '#e8e0d0' : '#333', border: '1px solid',
-              cursor: nextLessonId && isNextUnlocked ? 'pointer' : 'default',
-              opacity: !nextLessonId ? 0.4 : isNextUnlocked ? 1 : 0.5,
-            }}
+              ...btnBase, borderColor: nextLessonId && isNextUnlocked && isCompleted ? '#1a1a1a' : '#111',
+              color: nextLessonId && isNextUnlocked && isCompleted ? '#e8e0d0' : '#333', border: '1px solid',
+              cursor: nextLessonId && isNextUnlocked && isCompleted ? 'pointer' : 'default',
+              opacity: !nextLessonId ? 0.4 : (isNextUnlocked && isCompleted) ? 1 : 0.5,
+            }
           >
             Следующее <ArrowRight size={14} />
           </button>
