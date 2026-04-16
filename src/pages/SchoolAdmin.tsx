@@ -138,6 +138,31 @@ function SettingsTab() {
   );
 }
 
+/* ========= SORTABLE LESSON ITEM ========= */
+function SortableLessonItem({ lesson, children }: { lesson: Lesson; children: React.ReactNode }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: lesson.id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div ref={setNodeRef} style={style}>
+      <div className="flex items-center">
+        <button
+          className="px-1 py-1 cursor-grab active:cursor-grabbing hover:bg-white/5 rounded"
+          {...attributes}
+          {...listeners}
+        >
+          <GripVertical size={12} style={{ color: '#444' }} />
+        </button>
+        <div className="flex-1">{children}</div>
+      </div>
+    </div>
+  );
+}
+
 /* ========= SORTABLE COURSE ITEM ========= */
 function SortableCourseItem({ course, children }: { course: Course; children: React.ReactNode }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: course.id });
