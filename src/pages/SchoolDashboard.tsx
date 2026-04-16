@@ -237,17 +237,14 @@ export default function SchoolDashboard() {
       {/* Main content */}
       <main className="flex-1 min-h-screen">
         {/* Mobile header */}
-        <header className="sm:hidden border-b px-4 py-3 flex items-center justify-between" style={{ borderColor: '#1a1a1a' }}>
-          <div className="flex items-center gap-2">
-            <button onClick={() => setMobileSidebarOpen(true)} className="p-1 hover:bg-white/5 rounded-lg transition">
-              <Menu size={20} style={{ color: '#e8e0d0' }} />
-            </button>
-            <div className="flex items-center gap-2 cursor-pointer" onClick={() => { selectCourse(null); navigate('/school/dashboard'); }}>
-              <video src={logoVideo} autoPlay loop muted playsInline className="w-8 h-8 rounded-lg object-cover" />
-              <span className="text-sm" style={{ fontFamily: font.heading }}>Кабинет трейдера</span>
-            </div>
+        <header className="sm:hidden border-b px-3 py-3 flex items-center justify-between" style={{ borderColor: '#1a1a1a' }}>
+          <button onClick={() => setMobileSidebarOpen(true)} className="p-1.5 hover:bg-white/5 rounded-lg transition">
+            <Menu size={20} style={{ color: '#e8e0d0' }} />
+          </button>
+          <div className="cursor-pointer" onClick={() => { selectCourse(null); navigate('/school/dashboard'); }}>
+            <video src={logoVideo} autoPlay loop muted playsInline className="w-9 h-9 rounded-lg object-cover" />
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {role === 'admin' && (
               <button onClick={() => navigate('/school/admin')} className="p-2 hover:bg-white/5 rounded-lg transition">
                 <Settings size={16} style={{ color: '#4a8a4a' }} />
@@ -388,9 +385,21 @@ export default function SchoolDashboard() {
               }
             }
             
-            // Fallback: first accessible course with lessons
+            // Fallback: first accessible course where all unlocked lessons are completed
             if (!activeCourse) {
-              activeCourse = accessibleCourses.find(c => allLessons.some(l => l.course_id === c.id)) || null;
+              for (const c of accessibleCourses) {
+                const cLessons = allLessons.filter(l => l.course_id === c.id).sort((a, b) => a.sort_order - b.sort_order);
+                if (cLessons.length === 0) continue;
+                const isAdminF = role === 'admin';
+                const isFreeF = c.is_free;
+                const cUnlockedF = accessMap.get(c.id)?.unlocked || [1];
+                const unlockedListF = cLessons.filter((_, i) => isAdminF || isFreeF || cUnlockedF.includes(i + 1));
+                const allDoneF = unlockedListF.length > 0 && unlockedListF.every(l => completedIds.has(l.id));
+                if (allDoneF) {
+                  activeCourse = c;
+                  break;
+                }
+              }
             }
             
             const ap = activeCourse ? (progress[activeCourse.id] || { completed: 0, total: 0 }) : null;
