@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle, MessageCircle } from 'lucide-react';
 import YouTubePlayer from '@/components/school/YouTubePlayer';
 import FloatingWatermark from '@/components/school/FloatingWatermark';
 
