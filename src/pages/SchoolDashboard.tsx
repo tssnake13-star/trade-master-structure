@@ -32,7 +32,7 @@ export default function SchoolDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const [courses, setCourses] = useState<Course[]>([]);
-  const [accessIds, setAccessIds] = useState<Set<string>>(new Set());
+  const [accessMap, setAccessMap] = useState<Map<string, { courseId: string; unlocked: number[] }>>(new Map());
   const [progress, setProgress] = useState<ProgressMap>({});
   const [allLessons, setAllLessons] = useState<Lesson[]>([]);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
@@ -48,18 +48,20 @@ export default function SchoolDashboard() {
     const load = async () => {
       const [coursesRes, accessRes, lessonsRes, progressRes] = await Promise.all([
         supabase.from('courses').select('*').order('sort_order'),
-        supabase.from('course_access').select('course_id').eq('user_id', user.id),
+        supabase.from('course_access').select('course_id, unlocked_lessons').eq('user_id', user.id),
         supabase.from('lessons').select('id, course_id, title, description, sort_order').order('sort_order'),
         supabase.from('lesson_progress').select('lesson_id').eq('user_id', user.id),
       ]);
 
       const courseList = (coursesRes.data || []) as Course[];
-      const accessSet = new Set((accessRes.data || []).map(a => a.course_id));
+      const accessData = (accessRes.data || []) as { course_id: string; unlocked_lessons: number[] }[];
+      const accessSet = new Set(accessData.map(a => a.course_id));
+      const aMap = new Map(accessData.map(a => [a.course_id, { courseId: a.course_id, unlocked: a.unlocked_lessons || [1] }]));
       const lessons = (lessonsRes.data || []) as Lesson[];
       const completedSet = new Set((progressRes.data || []).map(p => p.lesson_id));
 
       setCourses(courseList);
-      setAccessIds(accessSet);
+      setAccessMap(aMap);
       setAllLessons(lessons);
       setCompletedIds(completedSet);
 
@@ -96,7 +98,7 @@ export default function SchoolDashboard() {
     );
   }
 
-  const hasAccess = (c: Course) => role === 'admin' || c.is_free || accessIds.has(c.id);
+  const hasAccess = (c: Course) => role === 'admin' || c.is_free || accessMap.has(c.id);
 
   // Lessons for selected course
   const selectedLessons = selectedCourse
@@ -106,9 +108,16 @@ export default function SchoolDashboard() {
   const selectedCourseData = courses.find(c => c.id === selectedCourse);
   const selectedAccessible = selectedCourseData ? hasAccess(selectedCourseData) : false;
 
-  // Find first incomplete lesson for "Продолжить"
+  // Unlocked lessons for selected course
+  const selectedUnlocked = selectedCourse
+    ? (role === 'admin' ? selectedLessons.map((_, i) => i + 1) : (accessMap.get(selectedCourse)?.unlocked || (selectedCourseData?.is_free ? selectedLessons.map((_, i) => i + 1) : [1])))
+    : [];
+
+  const isLessonUnlocked = (index: number) => selectedUnlocked.includes(index + 1);
+
+  // Find first incomplete AND unlocked lesson for "Продолжить"
   const nextLesson = selectedAccessible
-    ? selectedLessons.find(l => !completedIds.has(l.id))
+    ? selectedLessons.find((l, i) => isLessonUnlocked(i) && !completedIds.has(l.id))
     : null;
   const allCompleted = selectedAccessible && selectedLessons.length > 0 && !nextLesson;
 
@@ -282,25 +291,29 @@ export default function SchoolDashboard() {
               <div className="space-y-1">
                 {selectedLessons.map((l, i) => {
                   const done = completedIds.has(l.id);
+                  const unlocked = isLessonUnlocked(i);
                   return (
                     <div
                       key={l.id}
-                      className="rounded-lg px-4 py-3 flex items-start gap-3 transition-all hover:bg-white/[0.03]"
+                      className="rounded-lg px-4 py-3 flex items-start gap-3 transition-all"
+                      style={{ opacity: unlocked ? 1 : 0.5 }}
                     >
                       <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: done ? '#4a8a4a' : '#555', fontFamily: font.mono, minWidth: '1.5rem' }}>
                         {i + 1}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <span className="text-sm block" style={{ fontFamily: font.mono, color: done ? '#666' : '#e8e0d0' }}>
+                        <span className="text-sm block" style={{ fontFamily: font.mono, color: unlocked ? (done ? '#666' : '#e8e0d0') : '#444' }}>
                           {l.title}
                         </span>
                         {l.description && (
-                          <p className="text-xs mt-1 line-clamp-2" style={{ color: '#555', fontFamily: font.mono }}>
+                          <p className="text-xs mt-1 line-clamp-2" style={{ color: unlocked ? '#555' : '#333', fontFamily: font.mono }}>
                             {l.description}
                           </p>
                         )}
                       </div>
-                      {done ? (
+                      {!unlocked ? (
+                        <Lock size={14} className="flex-shrink-0 mt-0.5" style={{ color: '#333' }} />
+                      ) : done ? (
                         <span className="flex-shrink-0 flex items-center gap-1 text-xs py-1.5" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
                           <CheckCircle size={14} />
                         </span>
@@ -335,7 +348,7 @@ export default function SchoolDashboard() {
 
           {!selectedCourse && (() => {
             // Find the program with most recent progress (or first accessible)
-            const canAccess = (c: Course) => role === 'admin' || c.is_free || accessIds.has(c.id);
+            const canAccess = (c: Course) => role === 'admin' || c.is_free || accessMap.has(c.id);
             const accessibleCourses = courses.filter(canAccess);
             
             // Find course with incomplete progress (last active)
