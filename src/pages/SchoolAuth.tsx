@@ -197,6 +197,12 @@ export default function SchoolAuth() {
           </button>
         </form>
 
+        {!isLogin && (
+          <p className="mt-3 text-center text-[10px] leading-snug px-2" style={{ color: '#555', fontFamily: "'Inter', sans-serif" }}>
+            Регистрируясь, вы соглашаетесь с обработкой персональных данных в соответствии с политикой конфиденциальности и принимаете пользовательское соглашение.
+          </p>
+        )}
+
         {isLogin && (
           <p
             className="mt-4 text-center text-sm cursor-pointer"
