@@ -867,16 +867,26 @@ function InviteCodesTab() {
   const { user } = useAuth();
   const [codes, setCodes] = useState<InviteCode[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [courses, setCourses] = useState<Course[]>([]);
   const [expiresDays, setExpiresDays] = useState(30);
+  const [selectedCourseId, setSelectedCourseId] = useState('');
   const [generating, setGenerating] = useState(false);
 
   const load = async () => {
-    const [c, p] = await Promise.all([
+    const [c, p, cr] = await Promise.all([
       supabase.from('invite_codes').select('*').order('created_at', { ascending: false }),
       supabase.from('profiles').select('*'),
+      supabase.from('courses').select('*').order('sort_order'),
     ]);
     setCodes((c.data || []) as InviteCode[]);
     setProfiles(p.data || []);
+    const courseList = (cr.data || []) as Course[];
+    setCourses(courseList);
+    if (!selectedCourseId && courseList.length > 0) {
+      // Default to first non-free course
+      const nonFree = courseList.find(c => !c.is_free);
+      setSelectedCourseId(nonFree?.id || courseList[0].id);
+    }
   };
 
   useEffect(() => { load(); }, []);
@@ -886,8 +896,13 @@ function InviteCodesTab() {
     return profiles.find(p => p.user_id === uid)?.email || uid;
   };
 
+  const getCourseName = (cid: string | null) => {
+    if (!cid) return '—';
+    return courses.find(c => c.id === cid)?.title || '—';
+  };
+
   const generateCode = async () => {
-    if (!user) return;
+    if (!user || !selectedCourseId) return;
     setGenerating(true);
     const code = Math.random().toString(36).substring(2, 10).toUpperCase();
     await supabase.from('invite_codes').insert({
@@ -895,6 +910,7 @@ function InviteCodesTab() {
       created_by: user.id,
       is_single_use: true,
       expires_in_days: expiresDays || null,
+      course_id: selectedCourseId,
     });
     setGenerating(false);
     load();
