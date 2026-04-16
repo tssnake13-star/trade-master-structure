@@ -860,6 +860,7 @@ interface InviteCode {
   used_by: string | null;
   created_at: string;
   used_at: string | null;
+  course_id: string | null;
 }
 
 function InviteCodesTab() {
