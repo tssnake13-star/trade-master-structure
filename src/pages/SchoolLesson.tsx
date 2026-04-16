@@ -127,7 +127,7 @@ export default function SchoolLesson() {
       setLoading(false);
     };
     load();
-  }, [userId, id]);
+  }, [userId, id, role]);
 
   const markComplete = async () => {
     if (!user || !lesson || isCompleted) return;
