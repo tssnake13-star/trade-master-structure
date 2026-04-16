@@ -49,7 +49,7 @@ export default function SchoolDashboard() {
       const [coursesRes, accessRes, lessonsRes, progressRes] = await Promise.all([
         supabase.from('courses').select('*').order('sort_order'),
         supabase.from('course_access').select('course_id').eq('user_id', user.id),
-        supabase.from('lessons').select('id, course_id, title, sort_order').order('sort_order'),
+        supabase.from('lessons').select('id, course_id, title, description, sort_order').order('sort_order'),
         supabase.from('lesson_progress').select('lesson_id').eq('user_id', user.id),
       ]);
 
