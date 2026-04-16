@@ -291,25 +291,29 @@ export default function SchoolDashboard() {
               <div className="space-y-1">
                 {selectedLessons.map((l, i) => {
                   const done = completedIds.has(l.id);
+                  const unlocked = isLessonUnlocked(i);
                   return (
                     <div
                       key={l.id}
-                      className="rounded-lg px-4 py-3 flex items-start gap-3 transition-all hover:bg-white/[0.03]"
+                      className="rounded-lg px-4 py-3 flex items-start gap-3 transition-all"
+                      style={{ opacity: unlocked ? 1 : 0.5 }}
                     >
                       <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: done ? '#4a8a4a' : '#555', fontFamily: font.mono, minWidth: '1.5rem' }}>
                         {i + 1}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <span className="text-sm block" style={{ fontFamily: font.mono, color: done ? '#666' : '#e8e0d0' }}>
+                        <span className="text-sm block" style={{ fontFamily: font.mono, color: unlocked ? (done ? '#666' : '#e8e0d0') : '#444' }}>
                           {l.title}
                         </span>
                         {l.description && (
-                          <p className="text-xs mt-1 line-clamp-2" style={{ color: '#555', fontFamily: font.mono }}>
+                          <p className="text-xs mt-1 line-clamp-2" style={{ color: unlocked ? '#555' : '#333', fontFamily: font.mono }}>
                             {l.description}
                           </p>
                         )}
                       </div>
-                      {done ? (
+                      {!unlocked ? (
+                        <Lock size={14} className="flex-shrink-0 mt-0.5" style={{ color: '#333' }} />
+                      ) : done ? (
                         <span className="flex-shrink-0 flex items-center gap-1 text-xs py-1.5" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
                           <CheckCircle size={14} />
                         </span>
@@ -320,6 +324,8 @@ export default function SchoolDashboard() {
                           style={{ borderColor: '#222', color: '#4a8a4a', fontFamily: font.mono }}
                         >
                           Открыть
+                        </button>
+                      )}
                         </button>
                       )}
                     </div>
