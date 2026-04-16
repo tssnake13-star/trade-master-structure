@@ -523,82 +523,22 @@ function CoursesTab() {
 /* ========= STUDENTS TAB ========= */
 function StudentsTab() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [roles, setRoles] = useState<UserRole[]>([]);
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [lessons, setLessons] = useState<Lesson[]>([]);
-  const [accesses, setAccesses] = useState<Access[]>([]);
-  const [progressData, setProgressData] = useState<{ user_id: string; lesson_id: string }[]>([]);
-  const [grantModal, setGrantModal] = useState<string | null>(null);
-  const [grantCourseId, setGrantCourseId] = useState('');
-  const [grantDays, setGrantDays] = useState(30);
-  const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
 
   const load = async () => {
-    const [p, r, c, l, a, pr] = await Promise.all([
+    const [p, r] = await Promise.all([
       supabase.from('profiles').select('*').order('created_at', { ascending: false }),
       supabase.from('user_roles').select('*'),
-      supabase.from('courses').select('*').order('sort_order'),
-      supabase.from('lessons').select('*').order('sort_order'),
-      supabase.from('course_access').select('*'),
-      supabase.from('lesson_progress').select('user_id, lesson_id'),
     ]);
     setProfiles(p.data || []);
     setRoles(r.data || []);
-    setCourses(c.data || []);
-    setLessons(l.data || []);
-    setAccesses((a.data || []) as Access[]);
-    setProgressData(pr.data || []);
   };
 
   useEffect(() => { load(); }, []);
 
   const getRole = (uid: string) => roles.find(r => r.user_id === uid)?.role || 'student';
-
-  const grantAccess = async () => {
-    if (!grantModal || !grantCourseId) return;
-    const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + grantDays);
-    await supabase.from('course_access').insert({
-      user_id: grantModal,
-      course_id: grantCourseId,
-      expires_at: expiresAt.toISOString(),
-      unlocked_lessons: [1],
-    });
-    setGrantModal(null);
-    setGrantCourseId('');
-    load();
-  };
-
-  const unlockNext = async (access: Access, courseLessons: Lesson[]) => {
-    const current = access.unlocked_lessons || [1];
-    const maxUnlocked = Math.max(...current, 0);
-    const nextOrder = maxUnlocked + 1;
-    if (nextOrder > courseLessons.length) return;
-    const updated = [...current, nextOrder];
-    await supabase.from('course_access').update({ unlocked_lessons: updated }).eq('id', access.id);
-    load();
-  };
-
-  const unlockAll = async (access: Access, courseLessons: Lesson[]) => {
-    const all = courseLessons.map((_, i) => i + 1);
-    await supabase.from('course_access').update({ unlocked_lessons: all }).eq('id', access.id);
-    load();
-  };
-
-  const toggleBlock = async (uid: string, currentlyBlocked: boolean) => {
-    await supabase.from('profiles').update({ is_blocked: !currentlyBlocked }).eq('user_id', uid);
-    load();
-  };
-
-  const deleteStudent = async (uid: string) => {
-    await supabase.rpc('delete_student', { _user_id: uid });
-    setDeleteConfirm(null);
-    load();
-  };
-
-  const isSelf = (uid: string) => user?.id === uid;
 
   return (
     <div>
