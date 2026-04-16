@@ -525,19 +525,29 @@ function StudentsTab() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
+  const [lessons, setLessons] = useState<Lesson[]>([]);
+  const [accesses, setAccesses] = useState<Access[]>([]);
+  const [progressData, setProgressData] = useState<{ user_id: string; lesson_id: string }[]>([]);
   const [grantModal, setGrantModal] = useState<string | null>(null);
   const [grantCourseId, setGrantCourseId] = useState('');
   const [grantDays, setGrantDays] = useState(30);
+  const [expandedStudent, setExpandedStudent] = useState<string | null>(null);
 
   const load = async () => {
-    const [p, r, c] = await Promise.all([
+    const [p, r, c, l, a, pr] = await Promise.all([
       supabase.from('profiles').select('*').order('created_at', { ascending: false }),
       supabase.from('user_roles').select('*'),
       supabase.from('courses').select('*').order('sort_order'),
+      supabase.from('lessons').select('*').order('sort_order'),
+      supabase.from('course_access').select('*'),
+      supabase.from('lesson_progress').select('user_id, lesson_id'),
     ]);
     setProfiles(p.data || []);
     setRoles(r.data || []);
     setCourses(c.data || []);
+    setLessons(l.data || []);
+    setAccesses((a.data || []) as Access[]);
+    setProgressData(pr.data || []);
   };
 
   useEffect(() => { load(); }, []);
@@ -552,9 +562,27 @@ function StudentsTab() {
       user_id: grantModal,
       course_id: grantCourseId,
       expires_at: expiresAt.toISOString(),
+      unlocked_lessons: [1],
     });
     setGrantModal(null);
     setGrantCourseId('');
+    load();
+  };
+
+  const unlockNext = async (access: Access, courseLessons: Lesson[]) => {
+    const current = access.unlocked_lessons || [1];
+    const maxUnlocked = Math.max(...current, 0);
+    const nextOrder = maxUnlocked + 1;
+    if (nextOrder > courseLessons.length) return;
+    const updated = [...current, nextOrder];
+    await supabase.from('course_access').update({ unlocked_lessons: updated }).eq('id', access.id);
+    load();
+  };
+
+  const unlockAll = async (access: Access, courseLessons: Lesson[]) => {
+    const all = courseLessons.map((_, i) => i + 1);
+    await supabase.from('course_access').update({ unlocked_lessons: all }).eq('id', access.id);
+    load();
   };
 
   return (
@@ -594,35 +622,102 @@ function StudentsTab() {
         </div>
       )}
 
-      <div className="overflow-x-auto">
-        <table className="w-full text-xs" style={{ fontFamily: font.mono }}>
-          <thead>
-            <tr style={{ borderBottom: '1px solid #1a1a1a' }}>
-              <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Email</th>
-              <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Дата</th>
-              <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Роль</th>
-              <th className="text-left py-2" style={{ color: '#666' }}>Действия</th>
-            </tr>
-          </thead>
-          <tbody>
-            {profiles.map(p => (
-              <tr key={p.user_id} style={{ borderBottom: '1px solid #111' }}>
-                <td className="py-2.5 pr-4" style={{ color: '#e8e0d0' }}>{p.email}</td>
-                <td className="py-2.5 pr-4" style={{ color: '#666' }}>{new Date(p.created_at).toLocaleDateString('ru')}</td>
-                <td className="py-2.5 pr-4" style={{ color: getRole(p.user_id) === 'admin' ? '#4a8a4a' : '#666' }}>{getRole(p.user_id)}</td>
-                <td className="py-2.5">
+      <div className="space-y-2">
+        {profiles.map(p => {
+          const studentAccesses = accesses.filter(a => a.user_id === p.user_id);
+          const isExpanded = expandedStudent === p.user_id;
+
+          return (
+            <div key={p.user_id} className="rounded-lg border" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
+              <div
+                className="flex items-center justify-between px-4 py-3 cursor-pointer hover:bg-white/[0.02] transition"
+                onClick={() => setExpandedStudent(isExpanded ? null : p.user_id)}
+              >
+                <div className="min-w-0">
+                  <span className="text-sm block" style={{ fontFamily: font.mono, color: '#e8e0d0' }}>
+                    {p.full_name || p.email}
+                  </span>
+                  {p.full_name && (
+                    <span className="text-[11px] block" style={{ fontFamily: font.mono, color: '#555' }}>{p.email}</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-2 flex-shrink-0">
+                  <span className="text-[11px]" style={{ fontFamily: font.mono, color: getRole(p.user_id) === 'admin' ? '#4a8a4a' : '#555' }}>
+                    {getRole(p.user_id)}
+                  </span>
                   <button
-                    onClick={() => { setGrantModal(p.user_id); setGrantCourseId(''); }}
-                    className="text-xs px-2 py-1 rounded"
+                    onClick={e => { e.stopPropagation(); setGrantModal(p.user_id); setGrantCourseId(''); }}
+                    className="text-[11px] px-2 py-1 rounded"
                     style={{ color: '#4a8a4a', border: '1px solid #1a1a1a' }}
                   >
-                    Доступ
+                    + Доступ
                   </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </div>
+              </div>
+
+              {isExpanded && studentAccesses.length > 0 && (
+                <div className="border-t px-4 pb-3 pt-2 space-y-2" style={{ borderColor: '#1a1a1a' }}>
+                  {studentAccesses.map(acc => {
+                    const course = courses.find(c => c.id === acc.course_id);
+                    if (!course) return null;
+                    const courseLessons = lessons.filter(l => l.course_id === acc.course_id).sort((a, b) => a.sort_order - b.sort_order);
+                    const unlocked = acc.unlocked_lessons || [1];
+                    const unlockedCount = unlocked.length;
+                    const totalLessons = courseLessons.length;
+
+                    // Find current lesson (first unlocked but not completed)
+                    const studentProgress = progressData.filter(pr => pr.user_id === p.user_id);
+                    const completedLessonIds = new Set(studentProgress.map(pr => pr.lesson_id));
+                    const currentLesson = courseLessons.find((l, i) => unlocked.includes(i + 1) && !completedLessonIds.has(l.id));
+                    const currentIndex = currentLesson ? courseLessons.indexOf(currentLesson) + 1 : null;
+                    const allDone = unlockedCount > 0 && courseLessons.filter((l, i) => unlocked.includes(i + 1)).every(l => completedLessonIds.has(l.id));
+
+                    return (
+                      <div key={acc.id} className="rounded border px-3 py-2.5" style={{ borderColor: '#1a1a1a', backgroundColor: '#111' }}>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-xs" style={{ fontFamily: font.mono, color: '#e8e0d0' }}>{course.title}</span>
+                          <span className="text-[11px]" style={{ fontFamily: font.mono, color: '#555' }}>
+                            {unlockedCount}/{totalLessons} открыто
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px]" style={{ fontFamily: font.mono, color: allDone ? '#4a8a4a' : '#888' }}>
+                            {allDone ? 'Все пройдено ✓' : currentIndex ? `Сейчас на занятии ${currentIndex}` : 'Не начато'}
+                          </span>
+                          <div className="flex gap-1.5">
+                            {unlockedCount < totalLessons && (
+                              <button
+                                onClick={() => unlockNext(acc, courseLessons)}
+                                className="text-[11px] px-2 py-1 rounded"
+                                style={{ color: '#4a8a4a', border: '1px solid #1a1a1a', fontFamily: font.mono }}
+                              >
+                                + Следующее
+                              </button>
+                            )}
+                            {unlockedCount < totalLessons && (
+                              <button
+                                onClick={() => unlockAll(acc, courseLessons)}
+                                className="text-[11px] px-2 py-1 rounded"
+                                style={{ color: '#888', border: '1px solid #1a1a1a', fontFamily: font.mono }}
+                              >
+                                Все
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {isExpanded && studentAccesses.length === 0 && (
+                <div className="border-t px-4 py-3" style={{ borderColor: '#1a1a1a' }}>
+                  <span className="text-[11px]" style={{ fontFamily: font.mono, color: '#444' }}>Нет доступов к программам</span>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </div>
   );
