@@ -626,7 +626,10 @@ function AccessTab() {
                 <td className="py-2.5 pr-4" style={{ color: '#e8e0d0' }}>{getCourse(a.course_id)}</td>
                 <td className="py-2.5 pr-4" style={{ color: '#666' }}>{new Date(a.granted_at).toLocaleDateString('ru')}</td>
                 <td className="py-2.5 pr-4" style={{ color: a.expires_at ? '#999' : '#444' }}>
-                  {a.expires_at ? new Date(a.expires_at).toLocaleDateString('ru') : '∞'}
+                  {a.expires_at ? (() => {
+                    const daysLeft = Math.ceil((new Date(a.expires_at).getTime() - Date.now()) / 86400000);
+                    return `${new Date(a.expires_at).toLocaleDateString('ru')} (${daysLeft > 0 ? `${daysLeft} дн.` : 'истёк'})`;
+                  })() : '∞'}
                 </td>
                 <td className="py-2.5">
                   <button onClick={() => removeAccess(a.id)} className="hover:opacity-70">

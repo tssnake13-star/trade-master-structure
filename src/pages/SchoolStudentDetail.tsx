@@ -199,11 +199,14 @@ export default function SchoolStudentDetail() {
                       <span className="text-[11px]" style={{ fontFamily: font.mono, color: allDone ? '#4a8a4a' : '#888' }}>
                         {allDone ? 'Все пройдено ✓' : currentIndex ? `Сейчас на занятии ${currentIndex}` : 'Не начато'}
                       </span>
-                      {acc.expires_at && (
-                        <span className="text-[11px]" style={{ fontFamily: font.mono, color: '#555' }}>
-                          до {new Date(acc.expires_at).toLocaleDateString('ru')}
-                        </span>
-                      )}
+                      {acc.expires_at && (() => {
+                        const daysLeft = Math.ceil((new Date(acc.expires_at).getTime() - Date.now()) / 86400000);
+                        return (
+                          <span className="text-[11px]" style={{ fontFamily: font.mono, color: daysLeft <= 3 ? '#a04040' : '#555' }}>
+                            до {new Date(acc.expires_at).toLocaleDateString('ru')} ({daysLeft > 0 ? `${daysLeft} дн.` : 'истёк'})
+                          </span>
+                        );
+                      })()}
                     </div>
                     <div className="flex flex-wrap gap-1.5">
                       {unlockedCount < totalLessons && (
