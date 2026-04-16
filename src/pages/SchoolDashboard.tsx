@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Lock, Settings, LogOut, ArrowRight, CheckCircle, Circle } from 'lucide-react';
-import logoVideo from '@/assets/logo-video.mp4';
+import logoVideo from '@/assets/logo-dashboard.mp4';
 
 interface Course {
   id: string;
