@@ -15,11 +15,13 @@ const font = { heading: "'Inter', sans-serif", mono: "'Inter', sans-serif" };
 
 export default function SchoolCourse() {
   const { id } = useParams<{ id: string }>();
-  const { session, user, loading: authLoading } = useAuth();
+  const { session, user, role, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [courseTitle, setCourseTitle] = useState('');
+  const [isFree, setIsFree] = useState(false);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
+  const [unlockedSortOrders, setUnlockedSortOrders] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,14 +31,17 @@ export default function SchoolCourse() {
   useEffect(() => {
     if (!user || !id) return;
     const load = async () => {
-      const [courseRes, lessonsRes, progressRes] = await Promise.all([
-        supabase.from('courses').select('title').eq('id', id).single(),
+      const [courseRes, lessonsRes, progressRes, accessRes] = await Promise.all([
+        supabase.from('courses').select('title, is_free').eq('id', id).single(),
         supabase.from('lessons').select('id, title, description, sort_order').eq('course_id', id).order('sort_order'),
         supabase.from('lesson_progress').select('lesson_id').eq('user_id', user.id),
+        supabase.from('course_access').select('unlocked_lessons').eq('user_id', user.id).eq('course_id', id).single(),
       ]);
       setCourseTitle(courseRes.data?.title || '');
+      setIsFree(courseRes.data?.is_free || false);
       setLessons(lessonsRes.data || []);
       setCompletedIds(new Set((progressRes.data || []).map(p => p.lesson_id)));
+      setUnlockedSortOrders(accessRes.data?.unlocked_lessons || [1]);
       setLoading(false);
     };
     load();
@@ -51,8 +56,8 @@ export default function SchoolCourse() {
   }
 
   const isUnlocked = (index: number) => {
-    if (index === 0) return true;
-    return completedIds.has(lessons[index - 1]?.id);
+    if (role === 'admin' || isFree) return true;
+    return unlockedSortOrders.includes(index + 1);
   };
 
   return (

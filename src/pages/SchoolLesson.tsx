@@ -72,6 +72,7 @@ export default function SchoolLesson() {
   const [videos, setVideos] = useState<VideoData[]>([]);
   const [prevLessonId, setPrevLessonId] = useState<string | null>(null);
   const [nextLessonId, setNextLessonId] = useState<string | null>(null);
+  const [isNextUnlocked, setIsNextUnlocked] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [marking, setMarking] = useState(false);
   const [loading, setLoading] = useState(true);
