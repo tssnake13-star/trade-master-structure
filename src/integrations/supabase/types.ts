@@ -226,6 +226,7 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
+          is_blocked: boolean
           user_id: string
         }
         Insert: {
@@ -233,6 +234,7 @@ export type Database = {
           email: string
           full_name?: string | null
           id?: string
+          is_blocked?: boolean
           user_id: string
         }
         Update: {
@@ -240,6 +242,7 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          is_blocked?: boolean
           user_id?: string
         }
         Relationships: []
@@ -285,6 +288,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      delete_student: { Args: { _user_id: string }; Returns: undefined }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
