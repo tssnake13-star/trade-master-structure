@@ -78,11 +78,11 @@ export default function SchoolDashboard() {
         const unlockedLessons = courseLessons.filter((_, i) => unlockedSortOrders.includes(i + 1));
         const completedUnlockedCount = unlockedLessons.filter((l) => completedSet.has(l.id)).length;
 
-        // Transparent progress rule:
-        // compare completed unlocked lessons vs unlocked lessons count from course_access.unlocked_lessons
+        // Progress bar: completed unlocked / total lessons in course
+        // Completion check uses unlockedLessons.length (done elsewhere)
         pm[c.id] = {
           completed: completedUnlockedCount,
-          total: unlockedLessons.length,
+          total: courseLessons.length,
         };
       }
 
