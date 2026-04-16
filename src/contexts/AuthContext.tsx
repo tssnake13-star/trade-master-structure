@@ -37,12 +37,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (session?.user) {
           // Fetch role with setTimeout to avoid Supabase auth deadlock
           setTimeout(async () => {
-            const { data } = await supabase
-              .from('user_roles')
-              .select('role')
-              .eq('user_id', session.user.id)
-              .single();
-            setRole((data?.role as UserRole) ?? 'student');
+            const [{ data: roleData }, { data: profileData }] = await Promise.all([
+              supabase
+                .from('user_roles')
+                .select('role')
+                .eq('user_id', session.user.id)
+                .single(),
+              supabase
+                .from('profiles')
+                .select('is_blocked')
+                .eq('user_id', session.user.id)
+                .single(),
+            ]);
+
+            if (profileData?.is_blocked) {
+              await supabase.auth.signOut();
+              setSession(null);
+              setUser(null);
+              setRole(null);
+              setLoading(false);
+              alert('Доступ приостановлен. Обратитесь к наставнику.');
+              return;
+            }
+
+            setRole((roleData?.role as UserRole) ?? 'student');
             setLoading(false);
           }, 0);
         } else {
