@@ -152,12 +152,11 @@ export default function SchoolDashboard() {
   const selectedCompletedUnlockedCount = selectedCourseData ? getCompletedUnlockedCount(selectedCourseData, selectedLessons) : 0;
   const nextLesson = selectedCourseData ? getFirstUnlockedIncompleteLesson(selectedCourseData, selectedLessons) : null;
 
-  // Transparent completion rule for selected course:
-  // compare selectedCompletedUnlockedCount vs selectedUnlockedLessons.length
-  // all completed only when completed unlocked >= unlocked count AND unlocked count > 0
+  // "All completed" only when every lesson in the course is unlocked AND completed
   const allCompleted = selectedAccessible
-    && selectedUnlockedLessons.length > 0
-    && selectedCompletedUnlockedCount >= selectedUnlockedLessons.length;
+    && selectedLessons.length > 0
+    && selectedUnlockedLessons.length >= selectedLessons.length
+    && selectedCompletedUnlockedCount >= selectedLessons.length;
 
   const p = selectedCourse ? (progress[selectedCourse] || { completed: 0, total: 0 }) : { completed: 0, total: 0 };
   const pct = p.total > 0 ? Math.round((p.completed / p.total) * 100) : 0;
@@ -409,8 +408,9 @@ export default function SchoolDashboard() {
             const activeUnlockedLessons = activeCourse ? getUnlockedLessons(activeCourse, activeLessons) : [];
             const activeCompletedUnlockedCount = activeCourse ? getCompletedUnlockedCount(activeCourse, activeLessons) : 0;
             const activeAllCompleted = !!activeCourse
-              && activeUnlockedLessons.length > 0
-              && activeCompletedUnlockedCount >= activeUnlockedLessons.length;
+              && activeLessons.length > 0
+              && activeUnlockedLessons.length >= activeLessons.length
+              && activeCompletedUnlockedCount >= activeLessons.length;
 
             return (
               <div className="py-8 sm:py-12">
