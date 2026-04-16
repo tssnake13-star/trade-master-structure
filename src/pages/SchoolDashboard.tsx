@@ -325,9 +325,9 @@ export default function SchoolDashboard() {
                         >
                           Открыть
                         </button>
-                      )}
-                        </button>
-                      )}
+                    </div>
+                  );
+                })}
                     </div>
                   );
                 })}
