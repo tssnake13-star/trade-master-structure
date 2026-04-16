@@ -115,6 +115,7 @@ export default function SchoolLesson() {
         const prev = currentIdx > 0 ? allSorted[currentIdx - 1] : null;
         const next = currentIdx < allSorted.length - 1 ? allSorted[currentIdx + 1] : null;
         const isFree = courseRes.data?.is_free || false;
+        setIsFreeCourse(isFree);
         const unlocked = accessRes.data?.unlocked_lessons || [1];
         const isAdmin = role === 'admin';
 
