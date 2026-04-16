@@ -1,4 +1,5 @@
 import { TELEGRAM_LINKS } from '@/lib/constants';
+import { Link } from 'react-router-dom';
 
 const Footer = () => {
   return (
