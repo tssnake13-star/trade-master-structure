@@ -695,3 +695,129 @@ function AccessTab() {
     </div>
   );
 }
+
+/* ========= INVITE CODES TAB ========= */
+interface InviteCode {
+  id: string;
+  code: string;
+  created_by: string;
+  is_single_use: boolean;
+  expires_in_days: number | null;
+  used: boolean;
+  used_by: string | null;
+  created_at: string;
+  used_at: string | null;
+}
+
+function InviteCodesTab() {
+  const { user } = useAuth();
+  const [codes, setCodes] = useState<InviteCode[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
+  const [expiresDays, setExpiresDays] = useState(30);
+  const [generating, setGenerating] = useState(false);
+
+  const load = async () => {
+    const [c, p] = await Promise.all([
+      supabase.from('invite_codes').select('*').order('created_at', { ascending: false }),
+      supabase.from('profiles').select('*'),
+    ]);
+    setCodes((c.data || []) as InviteCode[]);
+    setProfiles(p.data || []);
+  };
+
+  useEffect(() => { load(); }, []);
+
+  const getEmail = (uid: string | null) => {
+    if (!uid) return '—';
+    return profiles.find(p => p.user_id === uid)?.email || uid;
+  };
+
+  const generateCode = async () => {
+    if (!user) return;
+    setGenerating(true);
+    const code = Math.random().toString(36).substring(2, 10).toUpperCase();
+    await supabase.from('invite_codes').insert({
+      code,
+      created_by: user.id,
+      is_single_use: true,
+      expires_in_days: expiresDays || null,
+    });
+    setGenerating(false);
+    load();
+  };
+
+  const deleteCode = async (id: string) => {
+    await supabase.from('invite_codes').delete().eq('id', id);
+    setCodes(prev => prev.filter(c => c.id !== id));
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg" style={{ fontFamily: font.heading }}>Инвайт-коды</h2>
+      </div>
+
+      <div className="rounded-lg border p-4 mb-4 flex flex-wrap items-end gap-3" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
+        <div>
+          <label className="block text-[10px] mb-1" style={{ color: '#666', fontFamily: font.mono }}>Срок (дней)</label>
+          <input
+            type="number"
+            value={expiresDays}
+            onChange={e => setExpiresDays(Number(e.target.value))}
+            className="px-3 py-2 rounded border text-sm w-24"
+            style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
+          />
+        </div>
+        <button
+          onClick={generateCode}
+          disabled={generating}
+          className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg"
+          style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono, opacity: generating ? 0.6 : 1 }}
+        >
+          <Plus size={14} /> Сгенерировать код
+        </button>
+      </div>
+
+      <div className="overflow-x-auto">
+        <table className="w-full text-xs" style={{ fontFamily: font.mono }}>
+          <thead>
+            <tr style={{ borderBottom: '1px solid #1a1a1a' }}>
+              <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Код</th>
+              <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Создан</th>
+              <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Срок</th>
+              <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Статус</th>
+              <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Использован</th>
+              <th className="text-left py-2" style={{ color: '#666' }}></th>
+            </tr>
+          </thead>
+          <tbody>
+            {codes.map(c => {
+              const expired = c.expires_in_days
+                ? new Date(c.created_at).getTime() + c.expires_in_days * 86400000 < Date.now()
+                : false;
+              return (
+                <tr key={c.id} style={{ borderBottom: '1px solid #111' }}>
+                  <td className="py-2.5 pr-4" style={{ color: '#e8e0d0', fontFamily: "'JetBrains Mono', monospace" }}>{c.code}</td>
+                  <td className="py-2.5 pr-4" style={{ color: '#666' }}>{new Date(c.created_at).toLocaleDateString('ru')}</td>
+                  <td className="py-2.5 pr-4" style={{ color: '#666' }}>{c.expires_in_days ? `${c.expires_in_days} дн.` : '∞'}</td>
+                  <td className="py-2.5 pr-4" style={{ color: c.used ? '#666' : expired ? '#e85d3a' : '#4a8a4a' }}>
+                    {c.used ? 'Использован' : expired ? 'Истёк' : 'Активен'}
+                  </td>
+                  <td className="py-2.5 pr-4" style={{ color: '#666' }}>{getEmail(c.used_by)}</td>
+                  <td className="py-2.5">
+                    <button onClick={() => deleteCode(c.id)} className="hover:opacity-70">
+                      <Trash2 size={12} style={{ color: '#666' }} />
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+            {codes.length === 0 && (
+              <tr><td colSpan={6} className="py-4 text-center" style={{ color: '#444' }}>Нет инвайт-кодов</td></tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
