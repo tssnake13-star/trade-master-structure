@@ -79,6 +79,7 @@ export type Database = {
       invite_codes: {
         Row: {
           code: string
+          course_id: string | null
           created_at: string
           created_by: string
           expires_in_days: number | null
@@ -90,6 +91,7 @@ export type Database = {
         }
         Insert: {
           code: string
+          course_id?: string | null
           created_at?: string
           created_by: string
           expires_in_days?: number | null
@@ -101,6 +103,7 @@ export type Database = {
         }
         Update: {
           code?: string
+          course_id?: string | null
           created_at?: string
           created_by?: string
           expires_in_days?: number | null
@@ -110,7 +113,15 @@ export type Database = {
           used_at?: string | null
           used_by?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "invite_codes_course_id_fkey"
+            columns: ["course_id"]
+            isOneToOne: false
+            referencedRelation: "courses"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       lesson_progress: {
         Row: {
