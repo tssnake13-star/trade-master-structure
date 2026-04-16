@@ -337,7 +337,7 @@ export default function SchoolDashboard() {
 
           {!selectedCourse && (() => {
             // Find the program with most recent progress (or first accessible)
-            const canAccess = (c: Course) => role === 'admin' || c.is_free || accessIds.has(c.id);
+            const canAccess = (c: Course) => role === 'admin' || c.is_free || accessMap.has(c.id);
             const accessibleCourses = courses.filter(canAccess);
             
             // Find course with incomplete progress (last active)
