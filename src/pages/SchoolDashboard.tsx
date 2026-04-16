@@ -32,7 +32,7 @@ export default function SchoolDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const [courses, setCourses] = useState<Course[]>([]);
-  const [accessIds, setAccessIds] = useState<Set<string>>(new Set());
+  const [accessMap, setAccessMap] = useState<Map<string, { courseId: string; unlocked: number[] }>>(new Map());
   const [progress, setProgress] = useState<ProgressMap>({});
   const [allLessons, setAllLessons] = useState<Lesson[]>([]);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
