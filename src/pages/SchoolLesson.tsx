@@ -66,12 +66,13 @@ function renderPlayer(val: string, watermark?: React.ReactNode) {
 
 export default function SchoolLesson() {
   const { id } = useParams<{ id: string }>();
-  const { session, user, loading: authLoading } = useAuth();
+  const { session, user, role, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const [lesson, setLesson] = useState<LessonData | null>(null);
   const [videos, setVideos] = useState<VideoData[]>([]);
   const [prevLessonId, setPrevLessonId] = useState<string | null>(null);
   const [nextLessonId, setNextLessonId] = useState<string | null>(null);
+  const [isNextUnlocked, setIsNextUnlocked] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [marking, setMarking] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -100,21 +101,33 @@ export default function SchoolLesson() {
       setLesson(l);
 
       if (l) {
-        const [progressRes, nextRes, prevRes, videosRes] = await Promise.all([
+        const [progressRes, allLessonsRes, videosRes, accessRes, courseRes] = await Promise.all([
           supabase.from('lesson_progress').select('id').eq('user_id', userId).eq('lesson_id', l.id),
-          supabase.from('lessons').select('id').eq('course_id', l.course_id).gt('sort_order', l.sort_order).order('sort_order').limit(1),
-          supabase.from('lessons').select('id').eq('course_id', l.course_id).lt('sort_order', l.sort_order).order('sort_order', { ascending: false }).limit(1),
+          supabase.from('lessons').select('id, sort_order').eq('course_id', l.course_id).order('sort_order'),
           supabase.from('lesson_videos').select('*').eq('lesson_id', l.id).order('sort_order'),
+          supabase.from('course_access').select('unlocked_lessons').eq('user_id', userId).eq('course_id', l.course_id).single(),
+          supabase.from('courses').select('is_free').eq('id', l.course_id).single(),
         ]);
+
+        const allSorted = allLessonsRes.data || [];
+        const currentIdx = allSorted.findIndex(x => x.id === l.id);
+        const prev = currentIdx > 0 ? allSorted[currentIdx - 1] : null;
+        const next = currentIdx < allSorted.length - 1 ? allSorted[currentIdx + 1] : null;
+        const isFree = courseRes.data?.is_free || false;
+        const unlocked = accessRes.data?.unlocked_lessons || [1];
+        const isAdmin = role === 'admin';
+
         setIsCompleted((progressRes.data || []).length > 0);
-        setNextLessonId(nextRes.data?.[0]?.id || null);
-        setPrevLessonId(prevRes.data?.[0]?.id || null);
+        setPrevLessonId(prev?.id || null);
+        setNextLessonId(next?.id || null);
+        // Next lesson is navigable only if it's unlocked via admin or free course
+        setIsNextUnlocked(next ? (isAdmin || isFree || unlocked.includes(currentIdx + 2)) : false);
         setVideos((videosRes.data || []) as VideoData[]);
       }
       setLoading(false);
     };
     load();
-  }, [userId, id]);
+  }, [userId, id, role]);
 
   const markComplete = async () => {
     if (!user || !lesson || isCompleted) return;
@@ -215,13 +228,13 @@ export default function SchoolLesson() {
           )}
 
           <button
-            onClick={() => nextLessonId && isCompleted && navigate(`/school/lesson/${nextLessonId}`)}
-            disabled={!nextLessonId || !isCompleted}
+            onClick={() => nextLessonId && isNextUnlocked && navigate(`/school/lesson/${nextLessonId}`)}
+            disabled={!nextLessonId || !isNextUnlocked}
             style={{
-              ...btnBase, borderColor: nextLessonId && isCompleted ? '#1a1a1a' : '#111',
-              color: nextLessonId && isCompleted ? '#e8e0d0' : '#333', border: '1px solid',
-              cursor: nextLessonId && isCompleted ? 'pointer' : 'default',
-              opacity: !nextLessonId ? 0.4 : isCompleted ? 1 : 0.5,
+              ...btnBase, borderColor: nextLessonId && isNextUnlocked ? '#1a1a1a' : '#111',
+              color: nextLessonId && isNextUnlocked ? '#e8e0d0' : '#333', border: '1px solid',
+              cursor: nextLessonId && isNextUnlocked ? 'pointer' : 'default',
+              opacity: !nextLessonId ? 0.4 : isNextUnlocked ? 1 : 0.5,
             }}
           >
             Следующее <ArrowRight size={14} />
