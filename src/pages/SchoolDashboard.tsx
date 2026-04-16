@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Lock, Settings, LogOut, ArrowRight, CheckCircle } from 'lucide-react';
+import { Lock, Settings, LogOut, ArrowRight, CheckCircle, Menu, X } from 'lucide-react';
 import logoVideo from '@/assets/logo-dashboard.mp4';
 
 interface Course {
@@ -38,6 +38,7 @@ export default function SchoolDashboard() {
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !session) navigate('/school', { replace: true });
@@ -127,20 +128,45 @@ export default function SchoolDashboard() {
   const nextLesson = selectedAccessible
     ? selectedLessons.find((l, i) => isLessonUnlocked(i) && !completedIds.has(l.id))
     : null;
-  const allCompleted = selectedAccessible && selectedLessons.length > 0 && !nextLesson;
+  const unlockedSelectedLessons = selectedLessons.filter((_, i) => isLessonUnlocked(i));
+  const allCompleted = selectedAccessible && unlockedSelectedLessons.length > 0 && unlockedSelectedLessons.every(l => completedIds.has(l.id));
 
   const p = selectedCourse ? (progress[selectedCourse] || { completed: 0, total: 0 }) : { completed: 0, total: 0 };
   const pct = p.total > 0 ? Math.round((p.completed / p.total) * 100) : 0;
 
+  const selectCourse = (id: string | null) => {
+    setSelectedCourse(id);
+    setMobileSidebarOpen(false);
+  };
+
   return (
     <div className="min-h-screen flex flex-col sm:flex-row" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
-      {/* Sidebar */}
+      {/* Mobile sidebar overlay */}
+      {mobileSidebarOpen && (
+        <div
+          className="sm:hidden fixed inset-0 z-40"
+          style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar — always visible on sm+, slide-in on mobile */}
       <aside
-        className="hidden sm:flex flex-col w-64 flex-shrink-0 border-r"
+        className={`
+          fixed sm:relative top-0 left-0 h-full z-50
+          flex flex-col w-64 flex-shrink-0 border-r
+          transition-transform duration-300 ease-in-out
+          ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0
+        `}
         style={{ borderColor: '#1a1a1a', backgroundColor: '#0a0a0a' }}
       >
-        <div className="border-b cursor-pointer relative overflow-hidden" style={{ borderColor: '#1a1a1a' }} onClick={() => setSelectedCourse(null)}>
-          <video src={logoVideo} autoPlay loop muted playsInline className="w-full object-cover block" />
+        <div className="border-b cursor-pointer relative overflow-hidden flex items-center justify-between" style={{ borderColor: '#1a1a1a' }}>
+          <div className="flex-1" onClick={() => selectCourse(null)}>
+            <video src={logoVideo} autoPlay loop muted playsInline className="w-full object-cover block" />
+          </div>
+          <button className="sm:hidden p-3" onClick={() => setMobileSidebarOpen(false)}>
+            <X size={18} style={{ color: '#666' }} />
+          </button>
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
@@ -153,7 +179,7 @@ export default function SchoolDashboard() {
             return (
               <button
                 key={c.id}
-                onClick={() => accessible && setSelectedCourse(c.id)}
+                onClick={() => accessible && selectCourse(c.id)}
                 className="w-full text-left rounded-lg px-3 py-2.5 transition-all"
                 style={{
                   backgroundColor: isSelected ? '#141414' : 'transparent',
@@ -213,8 +239,13 @@ export default function SchoolDashboard() {
         {/* Mobile header */}
         <header className="sm:hidden border-b px-4 py-3 flex items-center justify-between" style={{ borderColor: '#1a1a1a' }}>
           <div className="flex items-center gap-2">
-            <video src={logoVideo} autoPlay loop muted playsInline className="w-8 h-8 rounded-lg object-cover" />
-            <span className="text-sm" style={{ fontFamily: font.heading }}>Кабинет трейдера</span>
+            <button onClick={() => setMobileSidebarOpen(true)} className="p-1 hover:bg-white/5 rounded-lg transition">
+              <Menu size={20} style={{ color: '#e8e0d0' }} />
+            </button>
+            <div className="flex items-center gap-2 cursor-pointer" onClick={() => { selectCourse(null); navigate('/school/dashboard'); }}>
+              <video src={logoVideo} autoPlay loop muted playsInline className="w-8 h-8 rounded-lg object-cover" />
+              <span className="text-sm" style={{ fontFamily: font.heading }}>Кабинет трейдера</span>
+            </div>
           </div>
           <div className="flex items-center gap-2">
             {role === 'admin' && (
@@ -227,33 +258,6 @@ export default function SchoolDashboard() {
             </button>
           </div>
         </header>
-
-        {/* Mobile course selector */}
-        <div className="sm:hidden border-b overflow-x-auto" style={{ borderColor: '#1a1a1a' }}>
-          <div className="flex p-2 gap-1">
-            {courses.map(c => {
-              const accessible = hasAccess(c);
-              const isSelected = selectedCourse === c.id;
-              return (
-                <button
-                  key={c.id}
-                  onClick={() => accessible && setSelectedCourse(c.id)}
-                  className="flex-shrink-0 px-3 py-1.5 rounded-lg text-xs whitespace-nowrap transition-all"
-                  style={{
-                    fontFamily: font.mono,
-                    backgroundColor: isSelected ? '#141414' : 'transparent',
-                    color: accessible ? (isSelected ? '#e8e0d0' : '#888') : '#444',
-                    opacity: accessible ? 1 : 0.5,
-                    cursor: accessible ? 'pointer' : 'default',
-                  }}
-                >
-                  {!accessible && <Lock size={10} className="inline mr-1" style={{ color: '#444' }} />}
-                  {c.title}
-                </button>
-              );
-            })}
-          </div>
-        </div>
 
         <div className="max-w-3xl mx-auto p-4 sm:p-8">
           {selectedCourseData && selectedAccessible && (
