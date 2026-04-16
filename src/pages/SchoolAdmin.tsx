@@ -326,6 +326,28 @@ function CoursesTab() {
     load();
   };
 
+  const handleLessonDragEnd = async (courseId: string, event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const courseLessons = lessons.filter(l => l.course_id === courseId);
+    const oldIndex = courseLessons.findIndex(l => l.id === active.id);
+    const newIndex = courseLessons.findIndex(l => l.id === over.id);
+    const reordered = arrayMove(courseLessons, oldIndex, newIndex);
+
+    // Update local state
+    setLessons(prev => [
+      ...prev.filter(l => l.course_id !== courseId),
+      ...reordered.map((l, i) => ({ ...l, sort_order: i })),
+    ].sort((a, b) => a.sort_order - b.sort_order));
+
+    await Promise.all(
+      reordered.map((l, i) =>
+        supabase.from('lessons').update({ sort_order: i }).eq('id', l.id)
+      )
+    );
+  };
+
   const deleteLesson = async (id: string) => {
     await supabase.from('lessons').delete().eq('id', id);
     load();
