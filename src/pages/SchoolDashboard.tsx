@@ -37,6 +37,8 @@ export default function SchoolDashboard() {
   const [allLessons, setAllLessons] = useState<Lesson[]>([]);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
+  const [welcomeTitle, setWelcomeTitle] = useState('Добро пожаловать в систему');
+  const [welcomeSubtitle, setWelcomeSubtitle] = useState('Кабинет трейдера');
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
