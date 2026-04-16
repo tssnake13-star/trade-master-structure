@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Lock, Settings, LogOut, ArrowRight, CheckCircle, Circle } from 'lucide-react';
+import { Lock, Settings, LogOut, ArrowRight, CheckCircle } from 'lucide-react';
 import logoVideo from '@/assets/logo-dashboard.mp4';
 
 interface Course {
@@ -300,13 +300,19 @@ export default function SchoolDashboard() {
                           </p>
                         )}
                       </div>
-                      <button
-                        onClick={() => navigate(`/school/lesson/${l.id}`)}
-                        className="flex-shrink-0 text-xs px-3 py-1.5 rounded-lg border transition-all hover:bg-white/5"
-                        style={{ borderColor: '#222', color: '#4a8a4a', fontFamily: font.mono }}
-                      >
-                        Открыть
-                      </button>
+                      {done ? (
+                        <span className="flex-shrink-0 flex items-center gap-1 text-xs py-1.5" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
+                          <CheckCircle size={14} />
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => navigate(`/school/lesson/${l.id}`)}
+                          className="flex-shrink-0 text-xs px-3 py-1.5 rounded-lg border transition-all hover:bg-white/5"
+                          style={{ borderColor: '#222', color: '#4a8a4a', fontFamily: font.mono }}
+                        >
+                          Открыть
+                        </button>
+                      )}
                     </div>
                   );
                 })}
