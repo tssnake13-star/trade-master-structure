@@ -209,7 +209,7 @@ export default function SchoolDashboard() {
                   </span>
                   {!accessible && <Lock size={12} style={{ color: '#444' }} />}
                 </div>
-                {accessible && cp.total > 0 && (
+                {accessible && cp.total > 0 && c.title === 'TRADE MASTER 4.5' && (
                   <div className="mt-1.5">
                     <div className="h-1 rounded-full overflow-hidden" style={{ backgroundColor: '#1a1a1a' }}>
                       <div className="h-full rounded-full" style={{ width: `${cpct}%`, backgroundColor: '#4a8a4a' }} />
@@ -279,14 +279,16 @@ export default function SchoolDashboard() {
                 {selectedCourseData.subtitle && (
                   <p className="text-sm mb-3" style={{ color: '#666', fontFamily: font.mono }}>{selectedCourseData.subtitle}</p>
                 )}
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#1a1a1a' }}>
-                    <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: '#4a8a4a' }} />
+                {selectedCourseData.title === 'TRADE MASTER 4.5' && (
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#1a1a1a' }}>
+                      <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: '#4a8a4a' }} />
+                    </div>
+                    <span className="text-xs flex-shrink-0" style={{ color: '#666', fontFamily: font.mono }}>
+                      {p.completed}/{p.total} · {pct}%
+                    </span>
                   </div>
-                  <span className="text-xs flex-shrink-0" style={{ color: '#666', fontFamily: font.mono }}>
-                    {p.completed}/{p.total} · {pct}%
-                  </span>
-                </div>
+                )}
               </div>
 
               {!allCompleted && (() => {
@@ -426,7 +428,7 @@ export default function SchoolDashboard() {
                   Кабинет трейдера
                 </p>
 
-                {activeCourse && (
+                {activeCourse && activeCourse.title === 'TRADE MASTER 4.5' && (
                   <div className="rounded-xl border p-5 sm:p-6" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
                     <p className="text-[11px] uppercase tracking-wider mb-3" style={{ color: '#555', fontFamily: font.mono }}>
                       {ap && ap.completed > 0 ? 'Текущая программа' : 'Начните подготовку'}
