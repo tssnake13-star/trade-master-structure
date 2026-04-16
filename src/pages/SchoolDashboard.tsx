@@ -480,10 +480,10 @@ export default function SchoolDashboard() {
             return (
               <div className="py-8 sm:py-12">
                 <h1 className="text-3xl sm:text-4xl mb-2" style={{ fontFamily: font.heading }}>
-                  Добро пожаловать в систему
+                  {welcomeTitle}
                 </h1>
                 <p className="text-sm mb-8" style={{ color: '#666', fontFamily: font.mono }}>
-                  Кабинет трейдера
+                  {welcomeSubtitle}
                 </p>
 
                 {tmCourse && (
