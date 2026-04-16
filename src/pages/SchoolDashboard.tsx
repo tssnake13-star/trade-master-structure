@@ -289,23 +289,28 @@ export default function SchoolDashboard() {
                 </div>
               </div>
 
-              {!allCompleted && nextLesson && (
-                <button
-                  onClick={() => navigate(`/school/lesson/${nextLesson.id}`)}
-                  className="w-full rounded-xl border p-4 mb-6 flex items-center justify-between transition-all hover:border-[#2a2a2a]"
-                  style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}
-                >
-                  <div className="text-left min-w-0">
-                    <p className="text-[11px] uppercase tracking-wider mb-1" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
-                      {p.completed === 0 ? 'Начать' : 'Продолжить'}
-                    </p>
-                    <p className="text-sm truncate" style={{ fontFamily: font.mono, color: '#e8e0d0' }}>
-                      Занятие {selectedLessons.indexOf(nextLesson) + 1}. {nextLesson.title}
-                    </p>
-                  </div>
-                  <ArrowRight size={16} style={{ color: '#4a8a4a' }} className="flex-shrink-0 ml-3" />
-                </button>
-              )}
+              {!allCompleted && (() => {
+                // If there's an incomplete unlocked lesson, point to it; otherwise point to the first unlocked lesson for review
+                const target = nextLesson || (selectedUnlockedLessons.length > 0 ? selectedUnlockedLessons[0] : null);
+                if (!target) return null;
+                return (
+                  <button
+                    onClick={() => navigate(`/school/lesson/${target.id}`)}
+                    className="w-full rounded-xl border p-4 mb-6 flex items-center justify-between transition-all hover:border-[#2a2a2a]"
+                    style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}
+                  >
+                    <div className="text-left min-w-0">
+                      <p className="text-[11px] uppercase tracking-wider mb-1" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
+                        {p.completed === 0 ? 'Начать' : 'Продолжить'}
+                      </p>
+                      <p className="text-sm truncate" style={{ fontFamily: font.mono, color: '#e8e0d0' }}>
+                        Занятие {selectedLessons.indexOf(target) + 1}. {target.title}
+                      </p>
+                    </div>
+                    <ArrowRight size={16} style={{ color: '#4a8a4a' }} className="flex-shrink-0 ml-3" />
+                  </button>
+                );
+              })()}
 
               <div className="space-y-1">
                 {selectedLessons.map((l, i) => {
@@ -446,23 +451,27 @@ export default function SchoolDashboard() {
                       </div>
                     )}
 
-                    {!activeAllCompleted && activeNextLesson && (
-                      <button
-                        onClick={() => navigate(`/school/lesson/${activeNextLesson.id}`)}
-                        className="w-full rounded-lg border p-3 flex items-center justify-between transition-all hover:border-[#2a2a2a]"
-                        style={{ borderColor: '#1a1a1a', backgroundColor: '#111' }}
-                      >
-                        <div className="text-left min-w-0">
-                          <p className="text-[11px] uppercase tracking-wider mb-0.5" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
-                            {ap && ap.completed === 0 ? 'Начать' : 'Продолжить'}
-                          </p>
-                          <p className="text-sm truncate" style={{ fontFamily: font.mono, color: '#e8e0d0' }}>
-                            Занятие {activeLessons.indexOf(activeNextLesson) + 1}. {activeNextLesson.title}
-                          </p>
-                        </div>
-                        <ArrowRight size={16} style={{ color: '#4a8a4a' }} className="flex-shrink-0 ml-3" />
-                      </button>
-                    )}
+                    {!activeAllCompleted && (() => {
+                      const target = activeNextLesson || (activeUnlockedLessons.length > 0 ? activeUnlockedLessons[0] : null);
+                      if (!target) return null;
+                      return (
+                        <button
+                          onClick={() => navigate(`/school/lesson/${target.id}`)}
+                          className="w-full rounded-lg border p-3 flex items-center justify-between transition-all hover:border-[#2a2a2a]"
+                          style={{ borderColor: '#1a1a1a', backgroundColor: '#111' }}
+                        >
+                          <div className="text-left min-w-0">
+                            <p className="text-[11px] uppercase tracking-wider mb-0.5" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
+                              {ap && ap.completed === 0 ? 'Начать' : 'Продолжить'}
+                            </p>
+                            <p className="text-sm truncate" style={{ fontFamily: font.mono, color: '#e8e0d0' }}>
+                              Занятие {activeLessons.indexOf(target) + 1}. {target.title}
+                            </p>
+                          </div>
+                          <ArrowRight size={16} style={{ color: '#4a8a4a' }} className="flex-shrink-0 ml-3" />
+                        </button>
+                      );
+                    })()}
 
                     {activeAllCompleted && (
                       <p className="text-sm" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
