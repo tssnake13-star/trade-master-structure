@@ -929,6 +929,19 @@ function InviteCodesTab() {
 
       <div className="rounded-lg border p-4 mb-4 flex flex-wrap items-end gap-3" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
         <div>
+          <label className="block text-[10px] mb-1" style={{ color: '#666', fontFamily: font.mono }}>Программа</label>
+          <select
+            value={selectedCourseId}
+            onChange={e => setSelectedCourseId(e.target.value)}
+            className="px-3 py-2 rounded border text-sm"
+            style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
+          >
+            {courses.filter(c => !c.is_free).map(c => (
+              <option key={c.id} value={c.id}>{c.title}</option>
+            ))}
+          </select>
+        </div>
+        <div>
           <label className="block text-[10px] mb-1" style={{ color: '#666', fontFamily: font.mono }}>Срок (дней)</label>
           <input
             type="number"
@@ -940,7 +953,7 @@ function InviteCodesTab() {
         </div>
         <button
           onClick={generateCode}
-          disabled={generating}
+          disabled={generating || !selectedCourseId}
           className="flex items-center gap-1.5 text-xs px-4 py-2 rounded-lg"
           style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono, opacity: generating ? 0.6 : 1 }}
         >
@@ -953,6 +966,7 @@ function InviteCodesTab() {
           <thead>
             <tr style={{ borderBottom: '1px solid #1a1a1a' }}>
               <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Код</th>
+              <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Программа</th>
               <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Создан</th>
               <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Срок</th>
               <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Статус</th>
