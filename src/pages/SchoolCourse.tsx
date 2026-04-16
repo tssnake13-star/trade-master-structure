@@ -59,7 +59,11 @@ export default function SchoolCourse() {
     const lesson = lessons[index];
     if (!lesson) return false;
     if (completedIds.has(lesson.id)) return true;
-    if (role === 'admin' || isFree) return true;
+    if (role === 'admin') return true;
+    if (isFree) {
+      // First lesson always open; others require previous completed
+      return index === 0 || (lessons[index - 1] && completedIds.has(lessons[index - 1].id));
+    }
     return unlockedSortOrders.includes(index + 1);
   };
 
