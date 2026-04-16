@@ -381,6 +381,10 @@ export default function SchoolDashboard() {
             const canAccess = (c: Course) => role === 'admin' || c.is_free || accessMap.has(c.id);
             const accessibleCourses = courses.filter(canAccess);
 
+            // Always find TRADE MASTER 4.5 for the progress card
+            const tmCourse = accessibleCourses.find(c => c.title === 'TRADE MASTER 4.5') || null;
+
+            // Find any active course with incomplete lessons for the CTA
             let activeCourse: Course | null = null;
             let activeNextLesson: Lesson | null = null;
 
@@ -400,8 +404,6 @@ export default function SchoolDashboard() {
                 const unlockedLessons = getUnlockedLessons(c, cLessons);
                 const completedUnlockedCount = getCompletedUnlockedCount(c, cLessons);
 
-                // Transparent completion rule for home card:
-                // compare completedUnlockedCount vs unlockedLessons.length
                 if (unlockedLessons.length > 0 && completedUnlockedCount >= unlockedLessons.length) {
                   activeCourse = c;
                   break;
@@ -409,8 +411,19 @@ export default function SchoolDashboard() {
               }
             }
 
+            // Progress data for TM4.5 specifically
+            const tmLessons = tmCourse ? getCourseLessons(tmCourse.id) : [];
+            const tmUnlockedLessons = tmCourse ? getUnlockedLessons(tmCourse, tmLessons) : [];
+            const tmCompletedCount = tmCourse ? getCompletedUnlockedCount(tmCourse, tmLessons) : 0;
+            const tmProgress = tmCourse ? (progress[tmCourse.id] || { completed: 0, total: 0 }) : null;
+            const tmPct = tmProgress && tmProgress.total > 0 ? Math.round((tmProgress.completed / tmProgress.total) * 100) : 0;
+            const tmNextLesson = tmCourse ? getFirstUnlockedIncompleteLesson(tmCourse, tmLessons) : null;
+            const tmAllCompleted = !!tmCourse
+              && tmLessons.length > 0
+              && tmUnlockedLessons.length >= tmLessons.length
+              && tmCompletedCount >= tmLessons.length;
+
             const ap = activeCourse ? (progress[activeCourse.id] || { completed: 0, total: 0 }) : null;
-            const apct = ap && ap.total > 0 ? Math.round((ap.completed / ap.total) * 100) : 0;
             const activeLessons = activeCourse ? getCourseLessons(activeCourse.id) : [];
             const activeUnlockedLessons = activeCourse ? getUnlockedLessons(activeCourse, activeLessons) : [];
             const activeCompletedUnlockedCount = activeCourse ? getCompletedUnlockedCount(activeCourse, activeLessons) : 0;
@@ -428,33 +441,33 @@ export default function SchoolDashboard() {
                   Кабинет трейдера
                 </p>
 
-                {activeCourse && activeCourse.title === 'TRADE MASTER 4.5' && (
+                {tmCourse && (
                   <div className="rounded-xl border p-5 sm:p-6" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
                     <p className="text-[11px] uppercase tracking-wider mb-3" style={{ color: '#555', fontFamily: font.mono }}>
-                      {ap && ap.completed > 0 ? 'Текущая программа' : 'Начните подготовку'}
+                      {tmProgress && tmProgress.completed > 0 ? 'Текущая программа' : 'Начните подготовку'}
                     </p>
                     <h2 className="text-xl sm:text-2xl mb-1" style={{ fontFamily: font.heading }}>
-                      {activeCourse.title}
+                      {tmCourse.title}
                     </h2>
-                    {activeCourse.subtitle && (
-                      <p className="text-xs mb-4" style={{ color: '#666', fontFamily: font.mono }}>{activeCourse.subtitle}</p>
+                    {tmCourse.subtitle && (
+                      <p className="text-xs mb-4" style={{ color: '#666', fontFamily: font.mono }}>{tmCourse.subtitle}</p>
                     )}
 
-                    {ap && ap.total > 0 && (
+                    {tmProgress && tmProgress.total > 0 && (
                       <div className="mb-4">
                         <div className="flex items-center gap-3 mb-1">
                           <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#1a1a1a' }}>
-                            <div className="h-full rounded-full transition-all" style={{ width: `${apct}%`, backgroundColor: '#4a8a4a' }} />
+                            <div className="h-full rounded-full transition-all" style={{ width: `${tmPct}%`, backgroundColor: '#4a8a4a' }} />
                           </div>
                           <span className="text-xs flex-shrink-0" style={{ color: '#666', fontFamily: font.mono }}>
-                            {ap.completed}/{ap.total} · {apct}%
+                            {tmProgress.completed}/{tmProgress.total} · {tmPct}%
                           </span>
                         </div>
                       </div>
                     )}
 
-                    {!activeAllCompleted && (() => {
-                      const target = activeNextLesson || (activeUnlockedLessons.length > 0 ? activeUnlockedLessons[0] : null);
+                    {!tmAllCompleted && (() => {
+                      const target = tmNextLesson || (tmUnlockedLessons.length > 0 ? tmUnlockedLessons[0] : null);
                       if (!target) return null;
                       return (
                         <button
@@ -464,10 +477,10 @@ export default function SchoolDashboard() {
                         >
                           <div className="text-left min-w-0">
                             <p className="text-[11px] uppercase tracking-wider mb-0.5" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
-                              {ap && ap.completed === 0 ? 'Начать' : 'Продолжить'}
+                              {tmProgress && tmProgress.completed === 0 ? 'Начать' : 'Продолжить'}
                             </p>
                             <p className="text-sm truncate" style={{ fontFamily: font.mono, color: '#e8e0d0' }}>
-                              Занятие {activeLessons.indexOf(target) + 1}. {target.title}
+                              Занятие {tmLessons.indexOf(target) + 1}. {target.title}
                             </p>
                           </div>
                           <ArrowRight size={16} style={{ color: '#4a8a4a' }} className="flex-shrink-0 ml-3" />
@@ -475,7 +488,7 @@ export default function SchoolDashboard() {
                       );
                     })()}
 
-                    {activeAllCompleted && (
+                    {tmAllCompleted && (
                       <p className="text-sm" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
                         Все занятия завершены ✓
                       </p>
