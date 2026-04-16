@@ -37,6 +37,8 @@ export default function SchoolDashboard() {
   const [allLessons, setAllLessons] = useState<Lesson[]>([]);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
+  const [welcomeTitle, setWelcomeTitle] = useState('Добро пожаловать в систему');
+  const [welcomeSubtitle, setWelcomeSubtitle] = useState('Кабинет трейдера');
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
@@ -48,12 +50,17 @@ export default function SchoolDashboard() {
     if (!user) return;
 
     const load = async () => {
-      const [coursesRes, accessRes, lessonsRes, progressRes] = await Promise.all([
+      const [coursesRes, accessRes, lessonsRes, progressRes, titleRes, subtitleRes] = await Promise.all([
         supabase.from('courses').select('*').order('sort_order'),
         supabase.from('course_access').select('course_id, unlocked_lessons').eq('user_id', user.id),
         supabase.from('lessons').select('id, course_id, title, description, sort_order').order('sort_order'),
         supabase.from('lesson_progress').select('lesson_id').eq('user_id', user.id),
+        supabase.from('site_settings').select('value').eq('key', 'dashboard_welcome_title').single(),
+        supabase.from('site_settings').select('value').eq('key', 'dashboard_welcome_subtitle').single(),
       ]);
+
+      if (titleRes.data?.value) setWelcomeTitle(titleRes.data.value);
+      if (subtitleRes.data?.value) setWelcomeSubtitle(subtitleRes.data.value);
 
       const courseList = (coursesRes.data || []) as Course[];
       const accessData = (accessRes.data || []) as { course_id: string; unlocked_lessons: number[] }[];
@@ -473,10 +480,10 @@ export default function SchoolDashboard() {
             return (
               <div className="py-8 sm:py-12">
                 <h1 className="text-3xl sm:text-4xl mb-2" style={{ fontFamily: font.heading }}>
-                  Добро пожаловать в систему
+                  {welcomeTitle}
                 </h1>
                 <p className="text-sm mb-8" style={{ color: '#666', fontFamily: font.mono }}>
-                  Кабинет трейдера
+                  {welcomeSubtitle}
                 </p>
 
                 {tmCourse && (

@@ -98,18 +98,28 @@ export default function SchoolAdmin() {
 
 /* ========= SETTINGS TAB ========= */
 function SettingsTab() {
-  const [welcomeVideo, setWelcomeVideo] = useState('');
+  const [welcomeTitle, setWelcomeTitle] = useState('');
+  const [welcomeSubtitle, setWelcomeSubtitle] = useState('');
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    supabase.from('site_settings').select('value').eq('key', 'dashboard_welcome_video').single()
-      .then(({ data }) => setWelcomeVideo(data?.value || ''));
+    Promise.all([
+      supabase.from('site_settings').select('value').eq('key', 'dashboard_welcome_title').single(),
+      supabase.from('site_settings').select('value').eq('key', 'dashboard_welcome_subtitle').single(),
+    ]).then(([titleRes, subtitleRes]) => {
+      setWelcomeTitle(titleRes.data?.value || '');
+      setWelcomeSubtitle(subtitleRes.data?.value || '');
+    });
   }, []);
 
   const save = async () => {
     setSaving(true);
-    await supabase.from('site_settings').update({ value: welcomeVideo, updated_at: new Date().toISOString() }).eq('key', 'dashboard_welcome_video');
+    const now = new Date().toISOString();
+    await Promise.all([
+      supabase.from('site_settings').upsert({ key: 'dashboard_welcome_title', value: welcomeTitle, updated_at: now }, { onConflict: 'key' }),
+      supabase.from('site_settings').upsert({ key: 'dashboard_welcome_subtitle', value: welcomeSubtitle, updated_at: now }, { onConflict: 'key' }),
+    ]);
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -118,17 +128,31 @@ function SettingsTab() {
   return (
     <div>
       <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Настройки</h2>
-      <div className="rounded-lg border p-4 space-y-3" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
-        <label className="block text-xs mb-1" style={{ color: '#999', fontFamily: font.mono }}>
-          Приветственное видео dashboard (YouTube URL)
-        </label>
-        <input
-          value={welcomeVideo}
-          onChange={e => setWelcomeVideo(e.target.value)}
-          placeholder="https://www.youtube.com/watch?v=..."
-          className="w-full px-3 py-2 rounded border text-sm"
-          style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
-        />
+      <div className="rounded-lg border p-4 space-y-4" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
+        <div>
+          <label className="block text-xs mb-1" style={{ color: '#999', fontFamily: font.mono }}>
+            Заголовок главной страницы
+          </label>
+          <input
+            value={welcomeTitle}
+            onChange={e => setWelcomeTitle(e.target.value)}
+            placeholder="Добро пожаловать в систему"
+            className="w-full px-3 py-2 rounded border text-sm"
+            style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
+          />
+        </div>
+        <div>
+          <label className="block text-xs mb-1" style={{ color: '#999', fontFamily: font.mono }}>
+            Подзаголовок главной страницы
+          </label>
+          <input
+            value={welcomeSubtitle}
+            onChange={e => setWelcomeSubtitle(e.target.value)}
+            placeholder="Кабинет трейдера"
+            className="w-full px-3 py-2 rounded border text-sm"
+            style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
+          />
+        </div>
         <div className="flex items-center gap-3">
           <button onClick={save} disabled={saving} className="text-xs px-4 py-2 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono, opacity: saving ? 0.6 : 1 }}>
             {saving ? '...' : 'Сохранить'}
