@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, Plus, Trash2, Pencil, GripVertical, ShieldOff, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Pencil, GripVertical } from 'lucide-react';
 import VideoBlockEditor from '@/components/school/VideoBlockEditor';
 import {
   DndContext,
