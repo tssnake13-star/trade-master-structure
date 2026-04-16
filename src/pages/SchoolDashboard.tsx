@@ -48,18 +48,20 @@ export default function SchoolDashboard() {
     const load = async () => {
       const [coursesRes, accessRes, lessonsRes, progressRes] = await Promise.all([
         supabase.from('courses').select('*').order('sort_order'),
-        supabase.from('course_access').select('course_id').eq('user_id', user.id),
+        supabase.from('course_access').select('course_id, unlocked_lessons').eq('user_id', user.id),
         supabase.from('lessons').select('id, course_id, title, description, sort_order').order('sort_order'),
         supabase.from('lesson_progress').select('lesson_id').eq('user_id', user.id),
       ]);
 
       const courseList = (coursesRes.data || []) as Course[];
-      const accessSet = new Set((accessRes.data || []).map(a => a.course_id));
+      const accessData = (accessRes.data || []) as { course_id: string; unlocked_lessons: number[] }[];
+      const accessSet = new Set(accessData.map(a => a.course_id));
+      const aMap = new Map(accessData.map(a => [a.course_id, { courseId: a.course_id, unlocked: a.unlocked_lessons || [1] }]));
       const lessons = (lessonsRes.data || []) as Lesson[];
       const completedSet = new Set((progressRes.data || []).map(p => p.lesson_id));
 
       setCourses(courseList);
-      setAccessIds(accessSet);
+      setAccessMap(aMap);
       setAllLessons(lessons);
       setCompletedIds(completedSet);
 
