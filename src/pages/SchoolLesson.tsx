@@ -228,13 +228,13 @@ export default function SchoolLesson() {
           )}
 
           <button
-            onClick={() => nextLessonId && isCompleted && navigate(`/school/lesson/${nextLessonId}`)}
-            disabled={!nextLessonId || !isCompleted}
+            onClick={() => nextLessonId && isNextUnlocked && navigate(`/school/lesson/${nextLessonId}`)}
+            disabled={!nextLessonId || !isNextUnlocked}
             style={{
-              ...btnBase, borderColor: nextLessonId && isCompleted ? '#1a1a1a' : '#111',
-              color: nextLessonId && isCompleted ? '#e8e0d0' : '#333', border: '1px solid',
-              cursor: nextLessonId && isCompleted ? 'pointer' : 'default',
-              opacity: !nextLessonId ? 0.4 : isCompleted ? 1 : 0.5,
+              ...btnBase, borderColor: nextLessonId && isNextUnlocked ? '#1a1a1a' : '#111',
+              color: nextLessonId && isNextUnlocked ? '#e8e0d0' : '#333', border: '1px solid',
+              cursor: nextLessonId && isNextUnlocked ? 'pointer' : 'default',
+              opacity: !nextLessonId ? 0.4 : isNextUnlocked ? 1 : 0.5,
             }}
           >
             Следующее <ArrowRight size={14} />
