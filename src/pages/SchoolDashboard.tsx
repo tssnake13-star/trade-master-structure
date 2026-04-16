@@ -283,24 +283,38 @@ export default function SchoolDashboard() {
                 {selectedLessons.map((l, i) => {
                   const done = completedIds.has(l.id);
                   return (
-                    <button
+                    <div
                       key={l.id}
-                      onClick={() => navigate(`/school/lesson/${l.id}`)}
-                      className="w-full text-left rounded-lg px-4 py-3 flex items-center gap-3 transition-all hover:bg-white/[0.03]"
-                      style={{ backgroundColor: 'transparent' }}
+                      className="rounded-lg px-4 py-3 flex items-start gap-3 transition-all hover:bg-white/[0.03]"
                     >
-                      {done ? (
-                        <CheckCircle size={16} style={{ color: '#4a8a4a' }} className="flex-shrink-0" />
-                      ) : (
-                        <Circle size={16} style={{ color: '#333' }} className="flex-shrink-0" />
-                      )}
-                      <span className="text-xs flex-shrink-0" style={{ color: '#555', fontFamily: font.mono, minWidth: '1.5rem' }}>
+                      <div className="mt-0.5 flex-shrink-0">
+                        {done ? (
+                          <CheckCircle size={16} style={{ color: '#4a8a4a' }} />
+                        ) : (
+                          <Circle size={16} style={{ color: '#333' }} />
+                        )}
+                      </div>
+                      <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: '#555', fontFamily: font.mono, minWidth: '1.5rem' }}>
                         {i + 1}
                       </span>
-                      <span className="text-sm truncate" style={{ fontFamily: font.mono, color: done ? '#666' : '#e8e0d0' }}>
-                        {l.title}
-                      </span>
-                    </button>
+                      <div className="flex-1 min-w-0">
+                        <span className="text-sm block" style={{ fontFamily: font.mono, color: done ? '#666' : '#e8e0d0' }}>
+                          {l.title}
+                        </span>
+                        {l.description && (
+                          <p className="text-xs mt-1 line-clamp-2" style={{ color: '#555', fontFamily: font.mono }}>
+                            {l.description}
+                          </p>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => navigate(`/school/lesson/${l.id}`)}
+                        className="flex-shrink-0 text-xs px-3 py-1.5 rounded-lg border transition-all hover:bg-white/5"
+                        style={{ borderColor: '#222', color: '#4a8a4a', fontFamily: font.mono }}
+                      >
+                        Открыть
+                      </button>
+                    </div>
                   );
                 })}
               </div>
