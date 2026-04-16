@@ -74,6 +74,7 @@ export default function SchoolLesson() {
   const [nextLessonId, setNextLessonId] = useState<string | null>(null);
   const [isNextUnlocked, setIsNextUnlocked] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [isFreeCourse, setIsFreeCourse] = useState(false);
   const [marking, setMarking] = useState(false);
   const [loading, setLoading] = useState(true);
   const [profileData, setProfileData] = useState<{ email: string; full_name: string | null }>({ email: '', full_name: null });
