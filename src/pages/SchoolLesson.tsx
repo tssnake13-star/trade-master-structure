@@ -50,9 +50,10 @@ function renderPlayer(val: string, watermark?: React.ReactNode) {
 
   if (val.trimStart().startsWith('<iframe')) {
     const styled = val.replace(/<iframe/i, '<iframe style="position:absolute;top:0;left:0;width:100%;height:100%"');
+    const clean = DOMPurify.sanitize(styled, { ADD_TAGS: ['iframe'], ADD_ATTR: ['allow', 'allowfullscreen', 'src', 'style', 'frameborder'] });
     return (
       <div className="rounded-xl overflow-hidden" style={containerStyle}
-        dangerouslySetInnerHTML={{ __html: styled }} />
+        dangerouslySetInnerHTML={{ __html: clean }} />
     );
   }
 
