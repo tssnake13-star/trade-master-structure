@@ -10,6 +10,8 @@ export const SITE_ASSET_KEYS = {
   promoVideo: 'asset_promo_video_url',
   heroAuthor: 'asset_hero_author_url',
   favicon: 'asset_favicon_url',
+  schoolAuthLogo: 'asset_school_auth_logo_url',
+  schoolDashboardLogo: 'asset_school_dashboard_logo_url',
 } as const;
 
 export type SiteAssetKey = (typeof SITE_ASSET_KEYS)[keyof typeof SITE_ASSET_KEYS];

@@ -3,7 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Lock, Settings, LogOut, ArrowRight, CheckCircle, Menu, Ticket } from 'lucide-react';
-import logoVideo from '@/assets/logo-dashboard.mp4';
+import logoVideoFallback from '@/assets/logo-dashboard.mp4';
+import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 
 interface Course {
   id: string;
@@ -41,6 +42,7 @@ export default function SchoolDashboard() {
   const [welcomeSubtitle, setWelcomeSubtitle] = useState('Кабинет трейдера');
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const logoVideo = useSiteAsset(SITE_ASSET_KEYS.schoolDashboardLogo, logoVideoFallback);
 
   useEffect(() => {
     if (!authLoading && !session) navigate('/school', { replace: true });

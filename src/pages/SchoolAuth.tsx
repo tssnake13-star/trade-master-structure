@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect } from 'react';
-import logo from '@/assets/logo-tradeliketyo.png';
+import logoFallback from '@/assets/logo-tradeliketyo.png';
+import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 
 export default function SchoolAuth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -17,6 +18,7 @@ export default function SchoolAuth() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { session } = useAuth();
+  const logo = useSiteAsset(SITE_ASSET_KEYS.schoolAuthLogo, logoFallback);
 
   useEffect(() => {
     if (session) navigate('/school/dashboard', { replace: true });
