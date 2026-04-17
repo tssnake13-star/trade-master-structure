@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, Send } from 'lucide-react';
 import { NAV_ITEMS, TELEGRAM_LINKS } from '@/lib/constants';
-import logoVideo from '@/assets/logo-video.mp4';
+import logoVideoFallback from '@/assets/logo-video.mp4';
+import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
