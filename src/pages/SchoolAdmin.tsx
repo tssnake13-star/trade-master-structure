@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, Plus, Trash2, Pencil, GripVertical } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Pencil, GripVertical, Upload, X } from 'lucide-react';
 import VideoBlockEditor from '@/components/school/VideoBlockEditor';
+import { SITE_ASSET_KEYS, notifySiteAssetChange } from '@/hooks/useSiteAsset';
 import {
   DndContext,
   closestCenter,
@@ -127,7 +128,7 @@ function SettingsTab() {
   return (
     <div>
       <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Настройки</h2>
-      <div className="rounded-lg border p-4 space-y-4" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
+      <div className="rounded-lg border p-4 space-y-4 mb-6" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
         <div>
           <label className="block text-xs mb-1" style={{ color: '#999', fontFamily: font.mono }}>
             Заголовок главной страницы
@@ -157,6 +158,142 @@ function SettingsTab() {
             {saving ? '...' : 'Сохранить'}
           </button>
           {saved && <span className="text-xs" style={{ color: '#4a8a4a', fontFamily: font.mono }}>Сохранено ✓</span>}
+        </div>
+      </div>
+
+      <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Логотипы и медиа сайта</h2>
+      <div className="space-y-3">
+        <AssetUploader
+          settingKey={SITE_ASSET_KEYS.headerLogo}
+          label="Логотип в шапке лендинга (видео)"
+          hint="MP4 / WEBM. Отображается в верхнем меню"
+          accept="video/mp4,video/webm"
+          previewType="video"
+        />
+        <AssetUploader
+          settingKey={SITE_ASSET_KEYS.promoVideo}
+          label="Промо-видео на лендинге"
+          hint="MP4 / WEBM. Большой блок-видео в секции LogoSection"
+          accept="video/mp4,video/webm"
+          previewType="video"
+        />
+        <AssetUploader
+          settingKey={SITE_ASSET_KEYS.heroAuthor}
+          label="Фото автора в Hero"
+          hint="JPG / PNG / WEBP. Главная фотография первого экрана"
+          accept="image/jpeg,image/png,image/webp"
+          previewType="image"
+        />
+        <AssetUploader
+          settingKey={SITE_ASSET_KEYS.favicon}
+          label="Favicon и OG-изображение"
+          hint="PNG / JPG. Иконка вкладки и превью при шеринге ссылки"
+          accept="image/png,image/jpeg,image/x-icon,image/webp"
+          previewType="image"
+        />
+      </div>
+    </div>
+  );
+}
+
+/* ========= ASSET UPLOADER ========= */
+function AssetUploader({
+  settingKey,
+  label,
+  hint,
+  accept,
+  previewType,
+}: {
+  settingKey: string;
+  label: string;
+  hint: string;
+  accept: string;
+  previewType: 'image' | 'video';
+}) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    supabase.from('site_settings').select('value').eq('key', settingKey).maybeSingle()
+      .then(({ data }) => setUrl(data?.value || null));
+  }, [settingKey]);
+
+  const onFile = async (file: File) => {
+    setError(null);
+    setUploading(true);
+    try {
+      const ext = file.name.split('.').pop() || 'bin';
+      const path = `${settingKey}/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from('site-assets')
+        .upload(path, file, { cacheControl: '3600', upsert: true, contentType: file.type });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from('site-assets').getPublicUrl(path);
+      const publicUrl = pub.publicUrl;
+      const now = new Date().toISOString();
+      const { error: dbErr } = await supabase
+        .from('site_settings')
+        .upsert({ key: settingKey, value: publicUrl, updated_at: now }, { onConflict: 'key' });
+      if (dbErr) throw dbErr;
+      setUrl(publicUrl);
+      notifySiteAssetChange(settingKey, publicUrl);
+    } catch (e: any) {
+      setError(e.message || 'Ошибка загрузки');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const clear = async () => {
+    setError(null);
+    const { error: dbErr } = await supabase.from('site_settings').delete().eq('key', settingKey);
+    if (dbErr) { setError(dbErr.message); return; }
+    setUrl(null);
+    notifySiteAssetChange(settingKey, null);
+  };
+
+  return (
+    <div className="rounded-lg border p-4" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex-1 min-w-0">
+          <div className="text-sm mb-0.5" style={{ color: '#e8e0d0', fontFamily: font.heading }}>{label}</div>
+          <div className="text-xs mb-3" style={{ color: '#666', fontFamily: font.mono }}>{hint}</div>
+
+          {url ? (
+            <div className="flex items-center gap-3 mb-3">
+              {previewType === 'image' ? (
+                <img src={url} alt="" className="w-16 h-16 object-cover rounded border" style={{ borderColor: '#222' }} />
+              ) : (
+                <video src={url} muted playsInline className="w-24 h-16 object-cover rounded border bg-black" style={{ borderColor: '#222' }} />
+              )}
+              <a href={url} target="_blank" rel="noreferrer" className="text-xs underline truncate" style={{ color: '#4a8a4a', fontFamily: font.mono, maxWidth: 240 }}>
+                Открыть текущий файл
+              </a>
+            </div>
+          ) : (
+            <div className="text-xs mb-3" style={{ color: '#555', fontFamily: font.mono }}>Используется значение по умолчанию</div>
+          )}
+
+          <div className="flex flex-wrap items-center gap-2">
+            <label className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded cursor-pointer" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono, opacity: uploading ? 0.6 : 1 }}>
+              <Upload size={12} />
+              {uploading ? 'Загрузка...' : url ? 'Заменить' : 'Загрузить файл'}
+              <input
+                type="file"
+                accept={accept}
+                disabled={uploading}
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) onFile(f); e.target.value = ''; }}
+                className="hidden"
+              />
+            </label>
+            {url && (
+              <button onClick={clear} className="inline-flex items-center gap-1.5 text-xs px-3 py-1.5 rounded border" style={{ borderColor: '#333', color: '#999', fontFamily: font.mono }}>
+                <X size={12} /> Сбросить к умолчанию
+              </button>
+            )}
+          </div>
+          {error && <div className="text-xs mt-2" style={{ color: '#c14a4a', fontFamily: font.mono }}>{error}</div>}
         </div>
       </div>
     </div>
