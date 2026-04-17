@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, ShieldOff, ShieldCheck, Trash2, Plus, ChevronRight, Unlock } from 'lucide-react';
+import { ArrowLeft, ShieldOff, ShieldCheck, Trash2, Plus, ChevronRight, Unlock, ShieldPlus, ShieldMinus } from 'lucide-react';
+
+const SUPER_ADMIN_EMAIL = 'tssnake13@gmail.com';
 
 const font = { heading: "'Inter', sans-serif", mono: "'Inter', sans-serif" };
 
@@ -111,6 +113,22 @@ export default function SchoolStudentDetail() {
     load();
   };
 
+  const toggleAdminRole = async () => {
+    if (!studentId || isSelf || profile?.email === SUPER_ADMIN_EMAIL) return;
+    const newRole = studentRole === 'admin' ? 'student' : 'admin';
+    const { data: existing } = await supabase
+      .from('user_roles')
+      .select('id')
+      .eq('user_id', studentId)
+      .maybeSingle();
+    if (existing) {
+      await supabase.from('user_roles').update({ role: newRole }).eq('user_id', studentId);
+    } else {
+      await supabase.from('user_roles').insert({ user_id: studentId, role: newRole });
+    }
+    load();
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
@@ -147,7 +165,27 @@ export default function SchoolStudentDetail() {
             <Field label="Имя" value={profile.full_name || '—'} />
             <Field label="Email" value={profile.email} />
             <Field label="Дата регистрации" value={new Date(profile.created_at).toLocaleDateString('ru')} />
-            <Field label="Роль" value={studentRole} color={studentRole === 'admin' ? '#4a8a4a' : undefined} />
+            <div>
+              <span className="text-[10px] block mb-0.5" style={{ color: '#555', fontFamily: font.mono }}>Роль</span>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-xs" style={{ color: studentRole === 'admin' ? '#4a8a4a' : '#e8e0d0', fontFamily: font.mono }}>
+                  {studentRole}
+                </span>
+                {!isSelf && profile.email !== SUPER_ADMIN_EMAIL && (
+                  <button
+                    onClick={toggleAdminRole}
+                    className="text-[11px] px-2.5 py-1 rounded flex items-center gap-1 hover:opacity-80 transition"
+                    style={{
+                      color: studentRole === 'admin' ? '#c45050' : '#4a8a4a',
+                      border: '1px solid #1a1a1a',
+                      fontFamily: font.mono,
+                    }}
+                  >
+                    {studentRole === 'admin' ? <><ShieldMinus size={11} /> Снять права администратора</> : <><ShieldPlus size={11} /> Назначить администратором</>}
+                  </button>
+                )}
+              </div>
+            </div>
             <Field
               label="Статус"
               value={profile.is_blocked ? 'Заблокирован' : 'Активен'}
