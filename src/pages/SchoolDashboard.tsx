@@ -366,9 +366,8 @@ export default function SchoolDashboard() {
                   return (
                     <div
                       key={l.id}
-                      onClick={() => unlocked && navigate(`/school/lesson/${l.id}`)}
                       className="rounded-lg px-4 py-3 flex items-start gap-3 transition-all"
-                      style={{ opacity: unlocked ? 1 : 0.5, cursor: unlocked ? 'pointer' : 'default' }}
+                      style={{ opacity: unlocked ? 1 : 0.5 }}
                     >
                       <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: done ? '#4a8a4a' : '#555', fontFamily: font.mono, minWidth: '1.5rem' }}>
                         {i + 1}
@@ -389,7 +388,7 @@ export default function SchoolDashboard() {
                         <button
                           onClick={() => navigate(`/school/lesson/${l.id}`)}
                           className="flex-shrink-0 flex items-center gap-1 text-xs py-1.5 hover:opacity-70 transition"
-                          style={{ color: '#4a8a4a', fontFamily: font.mono }}
+                          style={{ color: '#4a8a4a', fontFamily: font.mono, cursor: 'pointer' }}
                         >
                           <CheckCircle size={14} />
                         </button>
@@ -397,7 +396,7 @@ export default function SchoolDashboard() {
                         <button
                           onClick={() => navigate(`/school/lesson/${l.id}`)}
                           className="flex-shrink-0 text-xs px-3 py-1.5 rounded-lg border transition-all hover:bg-white/5"
-                          style={{ borderColor: '#222', color: '#4a8a4a', fontFamily: font.mono }}
+                          style={{ borderColor: '#222', color: '#4a8a4a', fontFamily: font.mono, cursor: 'pointer' }}
                         >
                           Открыть
                         </button>
