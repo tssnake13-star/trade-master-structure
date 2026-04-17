@@ -259,22 +259,32 @@ export default function SchoolLesson() {
         )}
 
         {isFreeCourse && (
-          <a
-            href="http://t.me/tradeliketyo"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-3 w-full py-4 mb-6 rounded-lg text-sm font-semibold transition-all hover:brightness-110"
-            style={{
-              background: 'linear-gradient(135deg, #4a8a4a, #3a7a3a)',
-              color: '#e8e0d0',
-              fontFamily: font.mono,
-              fontSize: '15px',
-              boxShadow: '0 0 20px rgba(74, 138, 74, 0.3)',
-            }}
-          >
-            <MessageCircle size={18} />
-            Написать автору в Telegram
-          </a>
+          <>
+            {id === '5ff94d3a-0174-46be-b1ee-e8ff73b13b07' && (
+              <p
+                className="text-center text-sm mb-3"
+                style={{ color: '#999', fontFamily: font.mono }}
+              >
+                Допуск получают <span style={{ color: '#4a8a4a' }}>не все</span>. Если узнали себя — напишите.
+              </p>
+            )}
+            <a
+              href="http://t.me/tradeliketyo"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-3 w-full py-4 mb-6 rounded-lg text-sm font-semibold transition-all hover:brightness-110"
+              style={{
+                background: 'linear-gradient(135deg, #4a8a4a, #3a7a3a)',
+                color: '#e8e0d0',
+                fontFamily: font.mono,
+                fontSize: '15px',
+                boxShadow: '0 0 20px rgba(74, 138, 74, 0.3)',
+              }}
+            >
+              <MessageCircle size={18} />
+              Написать автору в Telegram
+            </a>
+          </>
         )}
 
         <div className="flex gap-2">
