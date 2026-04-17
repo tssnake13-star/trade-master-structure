@@ -67,6 +67,9 @@ export default function YouTubePlayer({ url, watermark }: Props) {
   const [duration, setDuration] = useState(0);
   const [speed, setSpeed] = useState(1);
   const [showSpeed, setShowSpeed] = useState(false);
+  const [volume, setVolume] = useState(100);
+  const [muted, setMuted] = useState(false);
+  const [showVolume, setShowVolume] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [fakeFullscreen, setFakeFullscreen] = useState(false);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout>>();
