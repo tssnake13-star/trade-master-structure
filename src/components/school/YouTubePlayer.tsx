@@ -67,6 +67,9 @@ export default function YouTubePlayer({ url, watermark }: Props) {
   const [duration, setDuration] = useState(0);
   const [speed, setSpeed] = useState(1);
   const [showSpeed, setShowSpeed] = useState(false);
+  const [volume, setVolume] = useState(100);
+  const [muted, setMuted] = useState(false);
+  const [showVolume, setShowVolume] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [fakeFullscreen, setFakeFullscreen] = useState(false);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout>>();
@@ -169,7 +172,11 @@ export default function YouTubePlayer({ url, watermark }: Props) {
             }
             const d = player.getDuration();
             if (d > 0) setDuration(d);
-            // Resume from saved position if player was reinitialized
+            try {
+              const v = player.getVolume?.();
+              if (typeof v === 'number') setVolume(v);
+              setMuted(!!player.isMuted?.());
+            } catch {}
             if (savedPositionRef.current > 1) {
               player.seekTo(savedPositionRef.current, true);
             }
@@ -220,6 +227,31 @@ export default function YouTubePlayer({ url, watermark }: Props) {
     setShowSpeed(false);
     scheduleHide();
   }, [scheduleHide]);
+
+  const changeVolume = useCallback((v: number) => {
+    const p = playerRef.current;
+    const clamped = Math.max(0, Math.min(100, v));
+    if (p?.setVolume) p.setVolume(clamped);
+    if (clamped > 0 && muted && p?.unMute) {
+      p.unMute();
+      setMuted(false);
+    }
+    setVolume(clamped);
+    scheduleHide();
+  }, [scheduleHide, muted]);
+
+  const toggleMute = useCallback(() => {
+    const p = playerRef.current;
+    if (!p) return;
+    if (muted) {
+      p.unMute?.();
+      setMuted(false);
+    } else {
+      p.mute?.();
+      setMuted(true);
+    }
+    scheduleHide();
+  }, [muted, scheduleHide]);
 
   const toggleFullscreen = useCallback(() => {
     const el = containerRef.current;
@@ -351,6 +383,61 @@ export default function YouTubePlayer({ url, watermark }: Props) {
             </span>
 
             <div style={{ flex: 1 }} />
+
+            {/* Volume */}
+            <div
+              style={{ position: 'relative', display: 'flex', alignItems: 'center' }}
+              onMouseEnter={() => setShowVolume(true)}
+              onMouseLeave={() => setShowVolume(false)}
+            >
+              <button
+                onClick={toggleMute}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex' }}
+                aria-label={muted ? 'Unmute' : 'Mute'}
+              >
+                {muted || volume === 0 ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="#fff" strokeWidth="1.8" strokeLinejoin="round" fill="#fff" />
+                    <path d="M22 9l-6 6M16 9l6 6" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                ) : volume < 50 ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="#fff" strokeWidth="1.8" strokeLinejoin="round" fill="#fff" />
+                    <path d="M15.5 8.5a5 5 0 010 7" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="#fff" strokeWidth="1.8" strokeLinejoin="round" fill="#fff" />
+                    <path d="M15.5 8.5a5 5 0 010 7M19 5a9 9 0 010 14" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                )}
+              </button>
+              <div
+                style={{
+                  width: showVolume ? '70px' : '0px',
+                  overflow: 'hidden',
+                  transition: 'width 0.2s',
+                  marginLeft: showVolume ? '6px' : '0',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={muted ? 0 : volume}
+                  onChange={(e) => changeVolume(Number(e.target.value))}
+                  style={{
+                    width: '70px',
+                    height: '4px',
+                    accentColor: '#fff',
+                    cursor: 'pointer',
+                  }}
+                  aria-label="Volume"
+                />
+              </div>
+            </div>
 
             {/* Speed */}
             <div style={{ position: 'relative' }}>
