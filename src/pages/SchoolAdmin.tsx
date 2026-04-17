@@ -80,7 +80,6 @@ export default function SchoolAdmin() {
       <div className="border-b flex overflow-x-auto" style={{ borderColor: '#1a1a1a' }}>
         <button style={tabStyle(tab === 'courses')} onClick={() => setTab('courses')}>Программы</button>
         <button style={tabStyle(tab === 'students')} onClick={() => setTab('students')}>Ученики</button>
-        <button style={tabStyle(tab === 'access')} onClick={() => setTab('access')}>Доступы</button>
         <button style={tabStyle(tab === 'invites')} onClick={() => setTab('invites')}>Инвайт-коды</button>
         <button style={tabStyle(tab === 'settings')} onClick={() => setTab('settings')}>Настройки</button>
       </div>
