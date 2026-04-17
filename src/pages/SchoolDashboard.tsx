@@ -116,7 +116,12 @@ export default function SchoolDashboard() {
         if (fromState) setSelectedCourse(fromState.id);
         window.history.replaceState({}, '');
       } else {
-        setSelectedCourse(null);
+        // Preserve current selection across reloads (e.g. tab refocus). Only clear if it became invalid.
+        setSelectedCourse((prev) => {
+          if (!prev) return null;
+          const stillValid = courseList.find((c) => c.id === prev && canAccess(c));
+          return stillValid ? prev : null;
+        });
       }
 
       setLoading(false);
