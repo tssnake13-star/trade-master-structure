@@ -113,6 +113,22 @@ export default function SchoolStudentDetail() {
     load();
   };
 
+  const toggleAdminRole = async () => {
+    if (!studentId || isSelf || profile?.email === SUPER_ADMIN_EMAIL) return;
+    const newRole = studentRole === 'admin' ? 'student' : 'admin';
+    const { data: existing } = await supabase
+      .from('user_roles')
+      .select('id')
+      .eq('user_id', studentId)
+      .maybeSingle();
+    if (existing) {
+      await supabase.from('user_roles').update({ role: newRole }).eq('user_id', studentId);
+    } else {
+      await supabase.from('user_roles').insert({ user_id: studentId, role: newRole });
+    }
+    load();
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
