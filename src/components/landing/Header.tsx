@@ -41,6 +41,7 @@ const Header = () => {
             {/* Logo */}
             <a href="#" className="flex items-center">
               <video
+                key={logoVideo}
                 src={logoVideo}
                 autoPlay
                 muted
