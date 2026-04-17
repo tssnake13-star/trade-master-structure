@@ -224,6 +224,31 @@ export default function YouTubePlayer({ url, watermark }: Props) {
     scheduleHide();
   }, [scheduleHide]);
 
+  const changeVolume = useCallback((v: number) => {
+    const p = playerRef.current;
+    const clamped = Math.max(0, Math.min(100, v));
+    if (p?.setVolume) p.setVolume(clamped);
+    if (clamped > 0 && muted && p?.unMute) {
+      p.unMute();
+      setMuted(false);
+    }
+    setVolume(clamped);
+    scheduleHide();
+  }, [scheduleHide, muted]);
+
+  const toggleMute = useCallback(() => {
+    const p = playerRef.current;
+    if (!p) return;
+    if (muted) {
+      p.unMute?.();
+      setMuted(false);
+    } else {
+      p.mute?.();
+      setMuted(true);
+    }
+    scheduleHide();
+  }, [muted, scheduleHide]);
+
   const toggleFullscreen = useCallback(() => {
     const el = containerRef.current;
     if (!el) return;
