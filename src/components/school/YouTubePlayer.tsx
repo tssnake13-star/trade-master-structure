@@ -172,7 +172,11 @@ export default function YouTubePlayer({ url, watermark }: Props) {
             }
             const d = player.getDuration();
             if (d > 0) setDuration(d);
-            // Resume from saved position if player was reinitialized
+            try {
+              const v = player.getVolume?.();
+              if (typeof v === 'number') setVolume(v);
+              setMuted(!!player.isMuted?.());
+            } catch {}
             if (savedPositionRef.current > 1) {
               player.seekTo(savedPositionRef.current, true);
             }
