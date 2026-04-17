@@ -3,7 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Lock, Settings, LogOut, ArrowRight, CheckCircle, Menu, Ticket } from 'lucide-react';
-import logoVideo from '@/assets/logo-dashboard.mp4';
+import logoVideoFallback from '@/assets/logo-dashboard.mp4';
+import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 
 interface Course {
   id: string;
@@ -41,6 +42,7 @@ export default function SchoolDashboard() {
   const [welcomeSubtitle, setWelcomeSubtitle] = useState('Кабинет трейдера');
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const logoVideo = useSiteAsset(SITE_ASSET_KEYS.schoolDashboardLogo, logoVideoFallback);
 
   useEffect(() => {
     if (!authLoading && !session) navigate('/school', { replace: true });
@@ -216,7 +218,7 @@ export default function SchoolDashboard() {
         style={{ borderColor: '#1a1a1a', backgroundColor: '#0a0a0a' }}
       >
         <div className="border-b cursor-pointer relative overflow-hidden" style={{ borderColor: '#1a1a1a' }} onClick={() => selectCourse(null)}>
-          <video src={logoVideo} autoPlay loop muted playsInline className="w-full object-cover block" />
+          <video key={logoVideo} src={logoVideo} autoPlay loop muted playsInline className="w-full object-cover block" />
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
@@ -300,7 +302,7 @@ export default function SchoolDashboard() {
             )}
           </div>
           <div className="cursor-pointer" onClick={() => { selectCourse(null); navigate('/school/dashboard'); }}>
-            <video src={logoVideo} autoPlay loop muted playsInline className="w-9 h-9 rounded-lg object-cover" />
+            <video key={logoVideo} src={logoVideo} autoPlay loop muted playsInline className="w-9 h-9 rounded-lg object-cover" />
           </div>
           <div className="flex items-center gap-1">
             {role === 'admin' && (

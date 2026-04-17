@@ -191,6 +191,20 @@ function SettingsTab() {
           accept="image/png,image/jpeg,image/x-icon,image/webp"
           previewType="image"
         />
+        <AssetUploader
+          settingKey={SITE_ASSET_KEYS.schoolAuthLogo}
+          label="Логотип на странице входа в школу"
+          hint="PNG / JPG / WEBP. Большая иконка над формой входа /school"
+          accept="image/png,image/jpeg,image/webp"
+          previewType="image"
+        />
+        <AssetUploader
+          settingKey={SITE_ASSET_KEYS.schoolDashboardLogo}
+          label="Логотип в кабинете школы (видео)"
+          hint="MP4 / WEBM. Логотип в сайдбаре и шапке личного кабинета"
+          accept="video/mp4,video/webm"
+          previewType="video"
+        />
       </div>
     </div>
   );
