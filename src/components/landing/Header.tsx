@@ -7,6 +7,7 @@ import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const logoVideo = useSiteAsset(SITE_ASSET_KEYS.headerLogo, logoVideoFallback);
 
   useEffect(() => {
     const handleScroll = () => {
