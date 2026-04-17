@@ -375,7 +375,7 @@ export default function SchoolDashboard() {
                         {i + 1}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <span className="text-sm block" style={{ fontFamily: font.mono, color: unlocked ? (done ? '#666' : '#e8e0d0') : '#444' }}>
+                        <span className="text-sm block" style={{ fontFamily: font.mono, color: unlocked ? '#e8e0d0' : '#444' }}>
                           {l.title}
                         </span>
                         {l.description && (
