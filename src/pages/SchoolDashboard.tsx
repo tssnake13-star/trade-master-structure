@@ -218,7 +218,7 @@ export default function SchoolDashboard() {
         style={{ borderColor: '#1a1a1a', backgroundColor: '#0a0a0a' }}
       >
         <div className="border-b cursor-pointer relative overflow-hidden" style={{ borderColor: '#1a1a1a' }} onClick={() => selectCourse(null)}>
-          <video src={logoVideo} autoPlay loop muted playsInline className="w-full object-cover block" />
+          <video key={logoVideo} src={logoVideo} autoPlay loop muted playsInline className="w-full object-cover block" />
         </div>
 
         <nav className="flex-1 overflow-y-auto p-3 space-y-1">
@@ -302,7 +302,7 @@ export default function SchoolDashboard() {
             )}
           </div>
           <div className="cursor-pointer" onClick={() => { selectCourse(null); navigate('/school/dashboard'); }}>
-            <video src={logoVideo} autoPlay loop muted playsInline className="w-9 h-9 rounded-lg object-cover" />
+            <video key={logoVideo} src={logoVideo} autoPlay loop muted playsInline className="w-9 h-9 rounded-lg object-cover" />
           </div>
           <div className="flex items-center gap-1">
             {role === 'admin' && (
