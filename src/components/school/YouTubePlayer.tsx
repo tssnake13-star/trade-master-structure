@@ -380,6 +380,61 @@ export default function YouTubePlayer({ url, watermark }: Props) {
 
             <div style={{ flex: 1 }} />
 
+            {/* Volume */}
+            <div
+              style={{ position: 'relative', display: 'flex', alignItems: 'center' }}
+              onMouseEnter={() => setShowVolume(true)}
+              onMouseLeave={() => setShowVolume(false)}
+            >
+              <button
+                onClick={toggleMute}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '2px', display: 'flex' }}
+                aria-label={muted ? 'Unmute' : 'Mute'}
+              >
+                {muted || volume === 0 ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="#fff" strokeWidth="1.8" strokeLinejoin="round" fill="#fff" />
+                    <path d="M22 9l-6 6M16 9l6 6" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                ) : volume < 50 ? (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="#fff" strokeWidth="1.8" strokeLinejoin="round" fill="#fff" />
+                    <path d="M15.5 8.5a5 5 0 010 7" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                ) : (
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                    <path d="M11 5L6 9H2v6h4l5 4V5z" stroke="#fff" strokeWidth="1.8" strokeLinejoin="round" fill="#fff" />
+                    <path d="M15.5 8.5a5 5 0 010 7M19 5a9 9 0 010 14" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" />
+                  </svg>
+                )}
+              </button>
+              <div
+                style={{
+                  width: showVolume ? '70px' : '0px',
+                  overflow: 'hidden',
+                  transition: 'width 0.2s',
+                  marginLeft: showVolume ? '6px' : '0',
+                  display: 'flex',
+                  alignItems: 'center',
+                }}
+              >
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={muted ? 0 : volume}
+                  onChange={(e) => changeVolume(Number(e.target.value))}
+                  style={{
+                    width: '70px',
+                    height: '4px',
+                    accentColor: '#fff',
+                    cursor: 'pointer',
+                  }}
+                  aria-label="Volume"
+                />
+              </div>
+            </div>
+
             {/* Speed */}
             <div style={{ position: 'relative' }}>
               <button
