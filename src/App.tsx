@@ -13,6 +13,7 @@ import SchoolLesson from "./pages/SchoolLesson";
 import SchoolAdmin from "./pages/SchoolAdmin";
 import SchoolStudentDetail from "./pages/SchoolStudentDetail";
 import SchoolResetPassword from "./pages/SchoolResetPassword";
+import SiteAssetsApplier from "./components/SiteAssetsApplier";
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <SiteAssetsApplier />
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Index />} />
