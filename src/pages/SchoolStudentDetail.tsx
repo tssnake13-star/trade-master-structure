@@ -347,6 +347,13 @@ export default function SchoolStudentDetail() {
                 {profile.is_blocked ? 'Разблокировать' : 'Заблокировать'}
               </button>
               <button
+                onClick={() => { setPwModal(true); setNewPassword(''); setShowPw(false); setPwError(null); setPwSuccess(false); }}
+                className="text-xs px-4 py-2 rounded flex items-center gap-1.5"
+                style={{ color: '#e8e0d0', border: '1px solid #1a1a1a', fontFamily: font.mono }}
+              >
+                <KeyRound size={13} /> Сменить пароль
+              </button>
+              <button
                 onClick={() => setDeleteConfirm(true)}
                 className="text-xs px-4 py-2 rounded flex items-center gap-1.5"
                 style={{ color: '#c45050', border: '1px solid #1a1a1a', fontFamily: font.mono }}
