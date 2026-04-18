@@ -136,7 +136,47 @@ export default function SchoolStudentDetail() {
     load();
   };
 
-  if (authLoading || loading) {
+  const generatePassword = () => {
+    const chars = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let pw = '';
+    for (let i = 0; i < 12; i++) pw += chars[Math.floor(Math.random() * chars.length)];
+    setNewPassword(pw);
+    setShowPw(true);
+    setPwError(null);
+  };
+
+  const submitPasswordChange = async () => {
+    if (!studentId || newPassword.length < 6) {
+      setPwError('Пароль должен быть не короче 6 символов');
+      return;
+    }
+    setPwLoading(true);
+    setPwError(null);
+    const { error } = await supabase.functions.invoke('admin-reset-password', {
+      body: { user_id: studentId, new_password: newPassword },
+    });
+    setPwLoading(false);
+    if (error) {
+      setPwError(error.message || 'Не удалось изменить пароль');
+      return;
+    }
+    setPwSuccess(true);
+  };
+
+  const closePwModal = () => {
+    setPwModal(false);
+    setNewPassword('');
+    setShowPw(false);
+    setPwError(null);
+    setPwSuccess(false);
+    setPwCopied(false);
+  };
+
+  const copyPassword = async () => {
+    await navigator.clipboard.writeText(newPassword);
+    setPwCopied(true);
+    setTimeout(() => setPwCopied(false), 1500);
+  };
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
         <p style={{ fontFamily: font.mono }}>Загрузка...</p>
