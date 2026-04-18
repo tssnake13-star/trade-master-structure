@@ -177,6 +177,8 @@ export default function SchoolStudentDetail() {
     setPwCopied(true);
     setTimeout(() => setPwCopied(false), 1500);
   };
+
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
         <p style={{ fontFamily: font.mono }}>Загрузка...</p>
