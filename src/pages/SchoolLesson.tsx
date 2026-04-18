@@ -241,9 +241,9 @@ export default function SchoolLesson() {
         )}
 
         {id === '5ff94d3a-0174-46be-b1ee-e8ff73b13b07' && (
-          <a
-            href="/files/checklist-top10.pdf"
-            download="Чек-лист ТОП-10 ошибок трейдеров.pdf"
+            <a
+              href="/files/checklist-top10.pdf"
+              download="Professional Trading Blueprint.pdf"
             className="flex items-center justify-center gap-3 w-full py-4 mb-6 rounded-lg text-sm font-semibold transition-all hover:brightness-110"
             style={{
               background: 'linear-gradient(135deg, #3a6a9a, #2a5a8a)',
