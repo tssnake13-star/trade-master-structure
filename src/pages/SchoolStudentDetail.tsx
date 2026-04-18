@@ -33,6 +33,13 @@ export default function SchoolStudentDetail() {
   const [grantCourseId, setGrantCourseId] = useState('');
   const [grantDays, setGrantDays] = useState(30);
   const [removeAccessConfirm, setRemoveAccessConfirm] = useState<string | null>(null);
+  const [pwModal, setPwModal] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwError, setPwError] = useState<string | null>(null);
+  const [pwSuccess, setPwSuccess] = useState(false);
+  const [pwCopied, setPwCopied] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !session) navigate('/school', { replace: true });
