@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, ShieldOff, ShieldCheck, Trash2, Plus, ChevronRight, Unlock, ShieldPlus, ShieldMinus } from 'lucide-react';
+import { ArrowLeft, ShieldOff, ShieldCheck, Trash2, Plus, ChevronRight, Unlock, ShieldPlus, ShieldMinus, KeyRound, Eye, EyeOff, RefreshCw, Copy, Check } from 'lucide-react';
 
 const SUPER_ADMIN_EMAIL = 'tssnake13@gmail.com';
 
@@ -33,6 +33,13 @@ export default function SchoolStudentDetail() {
   const [grantCourseId, setGrantCourseId] = useState('');
   const [grantDays, setGrantDays] = useState(30);
   const [removeAccessConfirm, setRemoveAccessConfirm] = useState<string | null>(null);
+  const [pwModal, setPwModal] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [showPw, setShowPw] = useState(false);
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwError, setPwError] = useState<string | null>(null);
+  const [pwSuccess, setPwSuccess] = useState(false);
+  const [pwCopied, setPwCopied] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !session) navigate('/school', { replace: true });
@@ -127,6 +134,48 @@ export default function SchoolStudentDetail() {
       await supabase.from('user_roles').insert({ user_id: studentId, role: newRole });
     }
     load();
+  };
+
+  const generatePassword = () => {
+    const chars = 'abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let pw = '';
+    for (let i = 0; i < 12; i++) pw += chars[Math.floor(Math.random() * chars.length)];
+    setNewPassword(pw);
+    setShowPw(true);
+    setPwError(null);
+  };
+
+  const submitPasswordChange = async () => {
+    if (!studentId || newPassword.length < 6) {
+      setPwError('Пароль должен быть не короче 6 символов');
+      return;
+    }
+    setPwLoading(true);
+    setPwError(null);
+    const { error } = await supabase.functions.invoke('admin-reset-password', {
+      body: { user_id: studentId, new_password: newPassword },
+    });
+    setPwLoading(false);
+    if (error) {
+      setPwError(error.message || 'Не удалось изменить пароль');
+      return;
+    }
+    setPwSuccess(true);
+  };
+
+  const closePwModal = () => {
+    setPwModal(false);
+    setNewPassword('');
+    setShowPw(false);
+    setPwError(null);
+    setPwSuccess(false);
+    setPwCopied(false);
+  };
+
+  const copyPassword = async () => {
+    await navigator.clipboard.writeText(newPassword);
+    setPwCopied(true);
+    setTimeout(() => setPwCopied(false), 1500);
   };
 
   if (authLoading || loading) {
@@ -298,6 +347,13 @@ export default function SchoolStudentDetail() {
                 {profile.is_blocked ? 'Разблокировать' : 'Заблокировать'}
               </button>
               <button
+                onClick={() => { setPwModal(true); setNewPassword(''); setShowPw(false); setPwError(null); setPwSuccess(false); }}
+                className="text-xs px-4 py-2 rounded flex items-center gap-1.5"
+                style={{ color: '#e8e0d0', border: '1px solid #1a1a1a', fontFamily: font.mono }}
+              >
+                <KeyRound size={13} /> Сменить пароль
+              </button>
+              <button
                 onClick={() => setDeleteConfirm(true)}
                 className="text-xs px-4 py-2 rounded flex items-center gap-1.5"
                 style={{ color: '#c45050', border: '1px solid #1a1a1a', fontFamily: font.mono }}
@@ -375,6 +431,86 @@ export default function SchoolStudentDetail() {
                 Отмена
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Password change modal */}
+      {pwModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
+          <div className="rounded-xl border p-6 w-full max-w-sm space-y-4" style={{ backgroundColor: '#0d0d0d', borderColor: '#1a1a1a' }}>
+            <h3 className="text-base" style={{ fontFamily: font.heading }}>Сменить пароль</h3>
+            <p className="text-xs" style={{ color: '#888', fontFamily: font.mono }}>
+              Установите новый пароль для <span style={{ color: '#e8e0d0' }}>{profile.email}</span>. Сообщите его студенту любым удобным способом.
+            </p>
+
+            {!pwSuccess ? (
+              <>
+                <div className="relative">
+                  <input
+                    type={showPw ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={e => { setNewPassword(e.target.value); setPwError(null); }}
+                    placeholder="Новый пароль (мин. 6 символов)"
+                    className="w-full px-3 py-2 pr-20 rounded border text-sm"
+                    style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
+                  />
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setShowPw(s => !s)}
+                      className="p-1 hover:opacity-70"
+                      style={{ color: '#666' }}
+                      title={showPw ? 'Скрыть' : 'Показать'}
+                    >
+                      {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={generatePassword}
+                      className="p-1 hover:opacity-70"
+                      style={{ color: '#666' }}
+                      title="Сгенерировать"
+                    >
+                      <RefreshCw size={14} />
+                    </button>
+                  </div>
+                </div>
+
+                {pwError && (
+                  <p className="text-[11px]" style={{ color: '#c45050', fontFamily: font.mono }}>{pwError}</p>
+                )}
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={submitPasswordChange}
+                    disabled={pwLoading || newPassword.length < 6}
+                    className="text-xs px-4 py-2 rounded disabled:opacity-50"
+                    style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}
+                  >
+                    {pwLoading ? 'Сохранение...' : 'Сохранить'}
+                  </button>
+                  <button onClick={closePwModal} className="text-xs px-4 py-2" style={{ color: '#666', fontFamily: font.mono }}>
+                    Отмена
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="rounded border px-3 py-2 flex items-center justify-between gap-2" style={{ borderColor: '#1a1a1a', backgroundColor: '#111' }}>
+                  <span className="text-sm break-all" style={{ color: '#e8e0d0', fontFamily: font.mono }}>{newPassword}</span>
+                  <button onClick={copyPassword} className="p-1 shrink-0 hover:opacity-70" style={{ color: pwCopied ? '#4a8a4a' : '#666' }}>
+                    {pwCopied ? <Check size={14} /> : <Copy size={14} />}
+                  </button>
+                </div>
+                <p className="text-[11px]" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
+                  Пароль успешно изменён. Скопируйте и передайте студенту — повторно посмотреть его не получится.
+                </p>
+                <button onClick={closePwModal} className="text-xs px-4 py-2 rounded" style={{ backgroundColor: '#1a1a1a', color: '#e8e0d0', fontFamily: font.mono }}>
+                  Готово
+                </button>
+              </>
+            )}
           </div>
         </div>
       )}
