@@ -302,7 +302,7 @@ export default function SchoolLesson() {
           {!isCompleted ? (
             <button onClick={markComplete} disabled={marking}
               style={{ ...btnBase, backgroundColor: '#4a8a4a', color: '#e8e0d0', opacity: marking ? 0.6 : 1 }}>
-              <CheckCircle size={14} /> {marking ? '...' : 'Занятие завершено'}
+              <CheckCircle size={14} /> {marking ? '...' : 'Завершить урок'}
             </button>
           ) : (
             <span style={{ ...btnBase, backgroundColor: '#1a2e1a', color: '#4a8a4a' }}>
