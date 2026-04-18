@@ -434,6 +434,86 @@ export default function SchoolStudentDetail() {
           </div>
         </div>
       )}
+
+      {/* Password change modal */}
+      {pwModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.8)' }}>
+          <div className="rounded-xl border p-6 w-full max-w-sm space-y-4" style={{ backgroundColor: '#0d0d0d', borderColor: '#1a1a1a' }}>
+            <h3 className="text-base" style={{ fontFamily: font.heading }}>Сменить пароль</h3>
+            <p className="text-xs" style={{ color: '#888', fontFamily: font.mono }}>
+              Установите новый пароль для <span style={{ color: '#e8e0d0' }}>{profile.email}</span>. Сообщите его студенту любым удобным способом.
+            </p>
+
+            {!pwSuccess ? (
+              <>
+                <div className="relative">
+                  <input
+                    type={showPw ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={e => { setNewPassword(e.target.value); setPwError(null); }}
+                    placeholder="Новый пароль (мин. 6 символов)"
+                    className="w-full px-3 py-2 pr-20 rounded border text-sm"
+                    style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
+                  />
+                  <div className="absolute right-2 top-1/2 -translate-y-1/2 flex gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setShowPw(s => !s)}
+                      className="p-1 hover:opacity-70"
+                      style={{ color: '#666' }}
+                      title={showPw ? 'Скрыть' : 'Показать'}
+                    >
+                      {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={generatePassword}
+                      className="p-1 hover:opacity-70"
+                      style={{ color: '#666' }}
+                      title="Сгенерировать"
+                    >
+                      <RefreshCw size={14} />
+                    </button>
+                  </div>
+                </div>
+
+                {pwError && (
+                  <p className="text-[11px]" style={{ color: '#c45050', fontFamily: font.mono }}>{pwError}</p>
+                )}
+
+                <div className="flex gap-2">
+                  <button
+                    onClick={submitPasswordChange}
+                    disabled={pwLoading || newPassword.length < 6}
+                    className="text-xs px-4 py-2 rounded disabled:opacity-50"
+                    style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}
+                  >
+                    {pwLoading ? 'Сохранение...' : 'Сохранить'}
+                  </button>
+                  <button onClick={closePwModal} className="text-xs px-4 py-2" style={{ color: '#666', fontFamily: font.mono }}>
+                    Отмена
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="rounded border px-3 py-2 flex items-center justify-between gap-2" style={{ borderColor: '#1a1a1a', backgroundColor: '#111' }}>
+                  <span className="text-sm break-all" style={{ color: '#e8e0d0', fontFamily: font.mono }}>{newPassword}</span>
+                  <button onClick={copyPassword} className="p-1 shrink-0 hover:opacity-70" style={{ color: pwCopied ? '#4a8a4a' : '#666' }}>
+                    {pwCopied ? <Check size={14} /> : <Copy size={14} />}
+                  </button>
+                </div>
+                <p className="text-[11px]" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
+                  Пароль успешно изменён. Скопируйте и передайте студенту — повторно посмотреть его не получится.
+                </p>
+                <button onClick={closePwModal} className="text-xs px-4 py-2 rounded" style={{ backgroundColor: '#1a1a1a', color: '#e8e0d0', fontFamily: font.mono }}>
+                  Готово
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
