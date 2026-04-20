@@ -80,7 +80,7 @@ export default function SchoolAdmin() {
 
       <div className="border-b flex overflow-x-auto" style={{ borderColor: '#1a1a1a' }}>
         <button style={tabStyle(tab === 'courses')} onClick={() => setTab('courses')}>Программы</button>
-        <button style={tabStyle(tab === 'students')} onClick={() => setTab('students')}>Ученики</button>
+        <button style={tabStyle(tab === 'students')} onClick={() => setTab('students')}>Аккаунты</button>
         <button style={tabStyle(tab === 'invites')} onClick={() => setTab('invites')}>Инвайт-коды</button>
         <button style={tabStyle(tab === 'settings')} onClick={() => setTab('settings')}>Настройки</button>
       </div>
@@ -716,7 +716,7 @@ function StudentsTab() {
 
   return (
     <div>
-      <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Ученики</h2>
+      <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Аккаунты</h2>
 
       <div className="space-y-2">
         {profiles.map(p => (
