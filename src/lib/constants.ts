@@ -10,6 +10,5 @@ export const NAV_ITEMS = [
   { label: 'Как работает', href: '#what-goes-wrong' },
   { label: 'Доказательства', href: '#proof' },
   { label: 'Этапы', href: '#stages' },
-  { label: 'Сотрудничество', href: '#formats' },
   { label: 'Автор', href: '#author' },
 ] as const;
