@@ -89,6 +89,82 @@ const ArrowDown = () => (
   </svg>
 );
 
+const TacticCard = ({
+  tactic,
+  accentColor,
+}: {
+  tactic: (typeof tactics)[number];
+  accentColor: string;
+}) => (
+  <div
+    className="rounded-[10px] px-4 py-4 md:px-5 md:py-5 relative overflow-hidden"
+    style={{
+      backgroundColor: schemePalette.surface,
+      border: `1px solid ${schemePalette.border}`,
+    }}
+  >
+    <div
+      className="absolute left-0 right-0 top-0 h-px"
+      style={{
+        background: `linear-gradient(90deg, ${accentColor}, transparent)`,
+      }}
+    />
+    <div
+      className="text-mono text-[10px] uppercase tracking-[0.3em] mb-2"
+      style={{ color: accentColor }}
+    >
+      {tactic.step}
+    </div>
+    <h3 className="text-lg md:text-xl font-semibold leading-tight" style={{ color: schemePalette.text }}>
+      {tactic.name}
+    </h3>
+    <p className="mt-2 text-sm leading-relaxed max-w-md" style={{ color: schemePalette.muted }}>
+      {tactic.description}
+    </p>
+  </div>
+);
+
+const FlowCard = ({
+  node,
+  accentColor,
+}: {
+  node: (typeof flows)[number]['nodes'][number];
+  accentColor: string;
+}) => (
+  <div
+    className="w-full rounded-[10px] p-4 md:p-5"
+    style={{
+      backgroundColor: schemePalette.surface,
+      border: `1px solid ${schemePalette.border}`,
+    }}
+  >
+    <div
+      className="text-mono text-[10px] uppercase tracking-[0.24em] mb-2"
+      style={{ color: accentColor }}
+    >
+      {node.step}
+    </div>
+    <h4 className="text-base md:text-lg font-semibold leading-tight" style={{ color: schemePalette.text }}>
+      {node.name}
+    </h4>
+    <p className="mt-2 text-sm leading-relaxed" style={{ color: schemePalette.muted }}>
+      {node.description}
+    </p>
+    {node.badge && (
+      <span
+        className="mt-3 inline-flex rounded-full px-3 py-1 text-[11px]"
+        style={{
+          color: schemePalette.accentGold,
+          border: `1px solid ${schemePalette.accentGold}40`,
+          backgroundColor: `${schemePalette.accentGold}14`,
+        }}
+      >
+        {node.badge}
+      </span>
+    )}
+  </div>
+);
+
 const TradingSystemSection = () => {
 
   return (
@@ -126,75 +202,54 @@ const TradingSystemSection = () => {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-6 md:mb-8">
+              <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-6 md:mb-8">
                 {tactics.map((tactic, index) => (
-                  <div
+                  <TacticCard
                     key={tactic.id}
-                    className="rounded-[10px] px-4 py-4 md:px-5 md:py-5 relative overflow-hidden"
-                    style={{
-                      backgroundColor: schemePalette.surface,
-                      border: `1px solid ${schemePalette.border}`,
-                    }}
-                  >
-                    <div
-                      className="absolute left-0 right-0 top-0 h-px"
-                      style={{
-                        background: `linear-gradient(90deg, ${index === 0 ? schemePalette.accentBlue : schemePalette.accentGold}, transparent)`,
-                      }}
+                    tactic={tactic}
+                    accentColor={index === 0 ? schemePalette.accentBlue : schemePalette.accentGold}
+                  />
+                ))}
+              </div>
+
+              <div className="md:hidden space-y-4">
+                {flows.map((flow, flowIndex) => (
+                  <div key={flow.id} className="flex flex-col items-center">
+                    <TacticCard
+                      tactic={tactics[flowIndex]}
+                      accentColor={flowIndex === 0 ? schemePalette.accentBlue : schemePalette.accentGold}
                     />
-                    <div
-                      className="text-mono text-[10px] uppercase tracking-[0.3em] mb-2"
-                      style={{ color: index === 0 ? schemePalette.accentBlue : schemePalette.accentGold }}
-                    >
-                      {tactic.step}
+                    <div className="flex h-8 items-center justify-center">
+                      <ArrowDown />
                     </div>
-                    <h3 className="text-lg md:text-xl font-semibold leading-tight" style={{ color: schemePalette.text }}>
-                      {tactic.name}
-                    </h3>
-                    <p className="mt-2 text-sm leading-relaxed max-w-md" style={{ color: schemePalette.muted }}>
-                      {tactic.description}
-                    </p>
+                    <div className="w-full flex flex-col items-center">
+                      {flow.nodes.map((node, index) => (
+                        <div key={node.name} className="w-full flex flex-col items-center">
+                          <FlowCard
+                            node={node}
+                            accentColor={flowIndex === 0 ? schemePalette.accentBlue : schemePalette.accentGold}
+                          />
+                          {index < flow.nodes.length - 1 && (
+                            <div className="flex h-8 items-center justify-center">
+                              <ArrowDown />
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 ))}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+              <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 {flows.map((flow, flowIndex) => (
                   <div key={flow.id} className="flex flex-col items-center">
                     {flow.nodes.map((node, index) => (
                       <div key={node.name} className="w-full flex flex-col items-center">
-                        <div
-                          className="w-full rounded-[10px] p-4 md:p-5"
-                          style={{
-                            backgroundColor: schemePalette.surface,
-                            border: `1px solid ${schemePalette.border}`,
-                          }}
-                        >
-                          <div
-                            className="text-mono text-[10px] uppercase tracking-[0.24em] mb-2"
-                            style={{ color: flowIndex === 0 ? schemePalette.accentBlue : schemePalette.accentGold }}
-                          >
-                            {node.step}
-                          </div>
-                          <h4 className="text-base md:text-lg font-semibold leading-tight" style={{ color: schemePalette.text }}>
-                            {node.name}
-                          </h4>
-                          <p className="mt-2 text-sm leading-relaxed" style={{ color: schemePalette.muted }}>
-                            {node.description}
-                          </p>
-                          {node.badge && (
-                            <span
-                              className="mt-3 inline-flex rounded-full px-3 py-1 text-[11px]"
-                              style={{
-                                color: schemePalette.accentGold,
-                                border: `1px solid ${schemePalette.accentGold}40`,
-                                backgroundColor: `${schemePalette.accentGold}14`,
-                              }}
-                            >
-                              {node.badge}
-                            </span>
-                          )}
-                        </div>
+                        <FlowCard
+                          node={node}
+                          accentColor={flowIndex === 0 ? schemePalette.accentBlue : schemePalette.accentGold}
+                        />
                         {index < flow.nodes.length - 1 && (
                           <div className="flex h-8 items-center justify-center">
                             <ArrowDown />
