@@ -24,7 +24,7 @@ const flows = [
       },
       {
         step: 'Шаг 2',
-        name: 'Echo Gate',
+        name: 'TradeLikeTyo',
         description: 'Фильтрует триггер по архиву сделок, геометрии и контексту W1 / D1. Результат: допуск или отказ.',
       },
       {
@@ -116,10 +116,10 @@ const TradingSystemSection = () => {
             <div className="relative z-10">
               <div className="mb-8 md:mb-10 text-center">
                 <div className="text-mono text-[11px] uppercase tracking-[0.4em] mb-2" style={{ color: schemePalette.accentBlue }}>
-                  Echo Gate
+                  TradeLikeTyo
                 </div>
                 <div className="text-3xl md:text-5xl font-semibold leading-none" style={{ color: schemePalette.text }}>
-                  Echo Gate <span style={{ color: schemePalette.accentCyan }}>Ecosystem</span>
+                  TradeLikeTyo <span style={{ color: schemePalette.accentCyan }}>Ecosystem</span>
                 </div>
                 <p className="mt-3 text-sm md:text-[13px] tracking-[0.04em]" style={{ color: schemePalette.muted }}>
                   Две тактики — одна экосистема — единый риск-менеджмент
