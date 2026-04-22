@@ -1,71 +1,83 @@
-import { useState } from 'react';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { ChevronDown } from 'lucide-react';
-
-const modules = [
+const tactics = [
   {
-    id: 'trend-hunter',
-    name: 'TrendHunter',
-    shortDesc: 'Сигналы',
-    tooltip: 'Отслеживает рынок на нескольких таймфреймах. Сообщает о ключевых моментах.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-        <path d="M2 12h4l3-9 4 18 3-9h6" />
-      </svg>
-    ),
+    id: 'archive',
+    step: 'Тактика 1',
+    name: 'Архив / H4',
+    description: 'Вход через память рынка. Геометрическое совпадение с паттернами архива.',
   },
   {
-    id: 'echo-gate',
-    name: 'Echo-Gate Prototype',
-    shortDesc: 'Фильтрация',
-    tooltip: 'Каждый сигнал сравнивается с архивом прошлых сделок. Фильтрация через данные.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-        <rect x="3" y="3" width="7" height="7" rx="1" />
-        <rect x="14" y="3" width="7" height="7" rx="1" />
-        <rect x="3" y="14" width="7" height="7" rx="1" />
-        <rect x="14" y="14" width="7" height="7" rx="1" />
-      </svg>
-    ),
-  },
-  {
-    id: 'risk-sentinel',
-    name: 'Risk Sentinel',
-    shortDesc: 'Контроль риска',
-    tooltip: 'Ограничивает торговлю при превышении лимитов. Защита капитала.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-        <path d="M12 2l8 4v6c0 5.25-3.5 9.74-8 11-4.5-1.26-8-5.75-8-11V6l8-4z" />
-      </svg>
-    ),
-  },
-  {
-    id: 'hunter-bot',
-    name: 'HunterBot',
-    shortDesc: 'Исполнение',
-    tooltip: 'Автоматическое выставление ордеров, сопровождение позиции и управление сделкой.',
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5">
-        <path d="M12 2v4m0 12v4M2 12h4m12 0h4" />
-        <circle cx="12" cy="12" r="4" />
-        <circle cx="12" cy="12" r="1" fill="currentColor" />
-      </svg>
-    ),
+    id: 'resonance',
+    step: 'Тактика 2',
+    name: 'Резонанс / H1',
+    description: 'Вход через состояние рынка. Сканирование валютного резонанса на импульс.',
   },
 ];
 
-const ArrowIcon = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-5 h-5 text-foreground/20 shrink-0">
-    <path d="M5 12h14M13 6l6 6-6 6" />
+const flows = [
+  {
+    id: 'archive-path',
+    nodes: [
+      {
+        step: 'Шаг 1',
+        name: 'Trend Hunter',
+        description: 'Сканирует H4, ищет триггер точки входа и отправляет сигнал дальше.',
+      },
+      {
+        step: 'Шаг 2',
+        name: 'Echo Gate',
+        description: 'Фильтрует триггер по архиву сделок, геометрии и контексту W1 / D1. Результат: допуск или отказ.',
+      },
+      {
+        step: 'Шаг 3',
+        name: 'Трейдер',
+        description: 'Получает допуск и принимает финальное решение по сделке.',
+      },
+    ],
+  },
+  {
+    id: 'resonance-path',
+    nodes: [
+      {
+        step: 'Шаг 1',
+        name: 'Resonance Scanner',
+        description: 'Сканирует инструменты и формирует топ по резонансу W1 / D1.',
+        badge: '1.5x — 4.6x импульс',
+      },
+      {
+        step: 'Шаг 2',
+        name: 'Трейдер',
+        description: 'Изучает топ инструментов, проверяет их по стратегии на H1 и выбирает сценарий.',
+      },
+    ],
+  },
+];
+
+const sharedNodes = [
+  {
+    step: 'Автоисполнение',
+    name: 'HunterBot v12.3',
+    description: 'Открывает сделку по распоряжению трейдера.',
+  },
+  {
+    step: 'Защита счёта',
+    name: 'Risk Sentinel',
+    description: 'Контроль лимитов, Pyramid Gate и блокировка при превышении риска.',
+  },
+];
+
+const stats = [
+  { value: 'H4', label: 'Таймфрейм сигнала', sublabel: 'Тактика 1 — Архив' },
+  { value: 'H1', label: 'Таймфрейм триггера', sublabel: 'Тактика 2 — Резонанс' },
+  { value: '8:1+', label: 'R:R резонансных сделок', sublabel: 'наблюдение апрель 2026' },
+];
+
+const ArrowDown = () => (
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4 text-muted-foreground/40">
+    <path d="M12 5v14M6 13l6 6 6-6" />
   </svg>
 );
 
 const TradingSystemSection = () => {
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-
-  const toggleExpand = (id: string) => {
-    setExpandedId(prev => prev === id ? null : id);
-  };
 
   return (
     <section className="py-16 md:py-24 section-animate">
@@ -74,107 +86,124 @@ const TradingSystemSection = () => {
           <h2 className="heading-section text-foreground mb-4">
             Как работает система изнутри
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground mb-10 md:mb-14">
-            Каждое решение проходит через систему
-          </p>
+          <div className="mt-10 md:mt-14 rounded-2xl border border-border bg-card p-5 md:p-8 relative overflow-hidden">
+            <div
+              className="absolute inset-0 opacity-[0.03]"
+              style={{
+                backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
+                backgroundSize: '36px 36px',
+              }}
+            />
 
-          {/* Desktop — horizontal flow */}
-          <TooltipProvider delayDuration={200}>
-            <div className="hidden md:flex items-start justify-between gap-2 bg-card border border-border rounded-2xl p-8 overflow-hidden relative">
-              <div
-                className="absolute inset-0 opacity-[0.03]"
-                style={{
-                  backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
-                  backgroundSize: '32px 32px',
-                }}
-              />
-              <div className="absolute inset-0 opacity-[0.04]" style={{ background: 'radial-gradient(circle at center, hsl(210 60% 60%), transparent 70%)' }} />
+            <div className="relative z-10">
+              <p className="text-sm md:text-base text-muted-foreground mb-8 md:mb-10">
+                Две тактики, одна экосистема и единый контур контроля риска.
+              </p>
 
-              <div className="relative z-10 flex items-center justify-between w-full gap-3">
-                {modules.map((mod, i) => (
-                  <div key={mod.id} className="contents">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <div className="flex flex-col items-center gap-3 p-5 border border-foreground/[0.08] rounded-xl bg-background/30 hover:border-foreground/20 transition-colors cursor-default flex-1 min-w-0">
-                          <div className="w-10 h-10 rounded-lg border border-foreground/10 bg-foreground/[0.04] flex items-center justify-center text-foreground/50">
-                            {mod.icon}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-6 md:mb-8">
+                {tactics.map((tactic) => (
+                  <div key={tactic.id} className="rounded-xl border border-border bg-background/40 px-4 py-4 md:px-5 md:py-5">
+                    <div className="text-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground/70 mb-2">
+                      {tactic.step}
+                    </div>
+                    <h3 className="text-lg md:text-xl font-semibold text-foreground leading-tight">
+                      {tactic.name}
+                    </h3>
+                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed max-w-md">
+                      {tactic.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                {flows.map((flow) => (
+                  <div key={flow.id} className="flex flex-col items-center">
+                    {flow.nodes.map((node, index) => (
+                      <div key={node.name} className="w-full flex flex-col items-center">
+                        <div className="w-full rounded-xl border border-border bg-background/40 p-4 md:p-5">
+                          <div className="text-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground/70 mb-2">
+                            {node.step}
                           </div>
-                          <div className="text-center">
-                            <span className="text-sm font-semibold text-foreground block">{mod.name}</span>
-                            <span className="text-mono text-[10px] text-muted-foreground/60">{mod.shortDesc}</span>
-                          </div>
+                          <h4 className="text-base md:text-lg font-semibold text-foreground leading-tight">
+                            {node.name}
+                          </h4>
+                          <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                            {node.description}
+                          </p>
+                          {node.badge && (
+                            <span className="mt-3 inline-flex rounded-full border border-border px-3 py-1 text-[11px] text-foreground/70">
+                              {node.badge}
+                            </span>
+                          )}
                         </div>
-                      </TooltipTrigger>
-                      <TooltipContent side="bottom" className="max-w-[220px]">
-                        <p className="text-xs">{mod.tooltip}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    {i < modules.length - 1 && (
-                      <div className="flex items-center pt-6">
-                        <ArrowIcon />
+                        {index < flow.nodes.length - 1 && (
+                          <div className="flex h-8 items-center justify-center">
+                            <ArrowDown />
+                          </div>
+                        )}
                       </div>
-                    )}
+                    ))}
+                    {flow.nodes.length < 3 && <div className="hidden md:block h-[132px]" />}
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 md:mt-8 hidden md:grid grid-cols-2 gap-6 h-8">
+                <div className="ml-[50%] border-r border-b border-border" />
+                <div className="mr-[50%] border-l border-b border-border" />
+              </div>
+
+              <div className="mt-4 md:mt-0 flex flex-col items-center">
+                <div className="flex h-8 items-center justify-center">
+                  <ArrowDown />
+                </div>
+                <div className="mb-4 flex items-center justify-center gap-3 text-center text-mono text-[10px] uppercase tracking-[0.28em] text-foreground/70">
+                  <span className="h-px w-10 bg-border md:w-28" />
+                  Единый путь исполнения
+                  <span className="h-px w-10 bg-border md:w-28" />
+                </div>
+
+                <div className="w-full max-w-2xl space-y-3">
+                  {sharedNodes.map((node, index) => (
+                    <div key={node.name} className="flex flex-col items-center">
+                      <div className="w-full rounded-xl border border-border bg-background/40 p-4 md:p-5">
+                        <div className="text-mono text-[10px] uppercase tracking-[0.24em] text-muted-foreground/70 mb-2">
+                          {node.step}
+                        </div>
+                        <h4 className="text-base md:text-lg font-semibold text-foreground leading-tight">
+                          {node.name}
+                        </h4>
+                        <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
+                          {node.description}
+                        </p>
+                      </div>
+                      {index < sharedNodes.length - 1 && (
+                        <div className="flex h-8 items-center justify-center">
+                          <ArrowDown />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-8 md:mt-10 grid grid-cols-1 md:grid-cols-3 gap-3">
+                {stats.map((stat) => (
+                  <div key={stat.value} className="rounded-xl border border-border bg-background/40 p-4 text-center">
+                    <div className="text-2xl md:text-3xl font-semibold text-foreground leading-none">
+                      {stat.value}
+                    </div>
+                    <div className="mt-2 text-sm text-foreground/80 leading-snug">
+                      {stat.label}
+                    </div>
+                    <div className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                      {stat.sublabel}
+                    </div>
                   </div>
                 ))}
               </div>
             </div>
-
-            {/* Mobile — accordion */}
-            <div className="md:hidden bg-card border border-border rounded-2xl p-5 space-y-2 relative overflow-hidden">
-              <div
-                className="absolute inset-0 opacity-[0.03]"
-                style={{
-                  backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
-                  backgroundSize: '32px 32px',
-                }}
-              />
-              <div className="relative z-10 space-y-2">
-                {modules.map((mod, i) => (
-                  <div key={mod.id}>
-                    <button
-                      onClick={() => toggleExpand(mod.id)}
-                      className="w-full p-4 border border-foreground/[0.08] rounded-xl bg-background/30 text-left transition-colors"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg border border-foreground/10 bg-foreground/[0.04] flex items-center justify-center text-foreground/50">
-                            {mod.icon}
-                          </div>
-                          <div>
-                            <span className="text-sm font-semibold text-foreground block leading-tight">{mod.name}</span>
-                            <span className="text-mono text-[10px] text-muted-foreground/60">{mod.shortDesc}</span>
-                          </div>
-                        </div>
-                        <ChevronDown className={`w-4 h-4 text-muted-foreground transition-transform duration-200 ${expandedId === mod.id ? 'rotate-180' : ''}`} />
-                      </div>
-                      <div
-                        className={`overflow-hidden transition-all duration-300 ${
-                          expandedId === mod.id ? 'max-h-24 opacity-100 mt-3' : 'max-h-0 opacity-0 mt-0'
-                        }`}
-                      >
-                        <p className="text-xs text-muted-foreground/70 leading-relaxed">{mod.tooltip}</p>
-                      </div>
-                    </button>
-                    {i < modules.length - 1 && (
-                      <div className="flex justify-center py-1">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-4 h-4 text-foreground/15">
-                          <path d="M12 5v14M6 13l6 6 6-6" />
-                        </svg>
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-          </TooltipProvider>
-
-          <div className="mt-8 md:mt-10 max-w-2xl">
-            <p className="text-base md:text-lg text-foreground font-medium leading-relaxed">
-              Я не вхожу, если нет допуска
-            </p>
-            <p className="mt-2 text-base md:text-lg text-muted-foreground leading-relaxed">
-              Даже если рынок "кажется очевидным"
-            </p>
           </div>
         </div>
       </div>
