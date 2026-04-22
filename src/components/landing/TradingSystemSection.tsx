@@ -119,7 +119,7 @@ const TradingSystemSection = () => {
                   TradeLikeTyo
                 </div>
                 <div className="text-3xl md:text-5xl font-semibold leading-none" style={{ color: schemePalette.text }}>
-                  Echo Gate <span style={{ color: schemePalette.accentCyan }}>Ecosystem</span>
+                  <span style={{ color: schemePalette.accentCyan }}>Ecosystem</span>
                 </div>
                 <p className="mt-3 text-sm md:text-[13px] tracking-[0.04em]" style={{ color: schemePalette.muted }}>
                   Две тактики — одна экосистема — единый риск-менеджмент
