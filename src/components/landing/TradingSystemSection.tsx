@@ -55,7 +55,7 @@ const flows = [
 const sharedNodes = [
   {
     step: 'Автоисполнение',
-    name: 'HunterBot v12.3',
+    name: 'Hunter Bot',
     description: 'Открывает сделку по распоряжению трейдера.',
   },
   {
