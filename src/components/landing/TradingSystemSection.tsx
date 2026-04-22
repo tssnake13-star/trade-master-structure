@@ -24,7 +24,7 @@ const flows = [
       },
       {
         step: 'Шаг 2',
-        name: 'TradeLikeTyo',
+        name: 'Echo Gate',
         description: 'Фильтрует триггер по архиву сделок, геометрии и контексту W1 / D1. Результат: допуск или отказ.',
       },
       {
