@@ -638,7 +638,7 @@ function ActivateCodeSection({ userId, onActivated }: { userId?: string; onActiv
       <div className="flex items-center gap-2 mb-3">
         <Ticket size={14} style={{ color: '#666' }} />
         <span className="text-xs uppercase tracking-wider" style={{ color: '#666', fontFamily: "'Inter', sans-serif" }}>
-          Активировать инвайт-код
+          Есть код доступа? Активируй здесь!
         </span>
       </div>
       <div className="flex gap-2">
