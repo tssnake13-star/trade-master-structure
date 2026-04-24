@@ -297,14 +297,7 @@ export default function SchoolDashboard() {
             <button onClick={() => setMobileSidebarOpen(true)} className="p-1.5 hover:bg-white/5 rounded-lg transition">
               <Menu size={20} style={{ color: '#e8e0d0' }} />
             </button>
-            {showMenuHint && (
-              <span
-                className="flex items-center gap-1 text-[11px] animate-pulse"
-                style={{ color: '#4a8a4a', fontFamily: font.mono }}
-              >
-                ← Начните здесь
-              </span>
-            )}
+            {/* Mobile hint removed in favor of prominent home banner */}
           </div>
           <div className="cursor-pointer" onClick={() => { selectCourse(null); navigate('/school/dashboard'); }}>
             <video key={logoVideo} src={logoVideo} autoPlay loop muted playsInline className="w-9 h-9 rounded-lg object-cover" />
