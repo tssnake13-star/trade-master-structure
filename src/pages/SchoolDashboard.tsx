@@ -485,6 +485,59 @@ export default function SchoolDashboard() {
                   {welcomeSubtitle}
                 </p>
 
+                {showMenuHint && (() => {
+                  const freeCourse = accessibleCourses.find((c) => c.is_free);
+                  if (!freeCourse) return null;
+                  return (
+                    <div
+                      className="mb-8 rounded-2xl border-2 p-6 sm:p-10 text-center relative overflow-hidden"
+                      style={{
+                        borderColor: '#4a8a4a',
+                        background: 'linear-gradient(135deg, #0f1a0f 0%, #122012 50%, #0d160d 100%)',
+                        boxShadow: '0 0 0 1px rgba(74,138,74,0.15), 0 20px 60px -20px rgba(74,138,74,0.4)',
+                      }}
+                    >
+                      <div
+                        aria-hidden
+                        className="absolute inset-0 pointer-events-none animate-pulse"
+                        style={{ boxShadow: 'inset 0 0 80px rgba(74,138,74,0.15)' }}
+                      />
+                      <p
+                        className="text-[11px] sm:text-xs uppercase tracking-[0.2em] mb-4"
+                        style={{ color: '#4a8a4a', fontFamily: font.mono }}
+                      >
+                        ● Доступ открыт
+                      </p>
+                      <h2
+                        className="text-2xl sm:text-4xl mb-3 leading-tight"
+                        style={{ fontFamily: font.heading, color: '#e8e0d0' }}
+                      >
+                        Начните здесь — бесплатная программа открыта
+                      </h2>
+                      <p
+                        className="text-sm sm:text-base mb-7 max-w-xl mx-auto"
+                        style={{ color: '#a8a090', fontFamily: font.mono }}
+                      >
+                        {freeCourse.title}
+                        {freeCourse.subtitle ? ` — ${freeCourse.subtitle}` : ''}
+                      </p>
+                      <button
+                        onClick={() => selectCourse(freeCourse.id)}
+                        className="inline-flex items-center gap-3 px-8 sm:px-10 py-4 sm:py-5 rounded-xl text-base sm:text-lg font-semibold transition-all hover:scale-[1.02] hover:shadow-2xl active:scale-[0.99]"
+                        style={{
+                          backgroundColor: '#4a8a4a',
+                          color: '#0a0a0a',
+                          fontFamily: font.mono,
+                          boxShadow: '0 10px 40px -10px rgba(74,138,74,0.6)',
+                        }}
+                      >
+                        Перейти к программе
+                        <ArrowRight size={20} />
+                      </button>
+                    </div>
+                  );
+                })()}
+
                 {tmCourse && (
                   <div className="rounded-xl border p-5 sm:p-6" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
                     <p className="text-[11px] uppercase tracking-wider mb-3" style={{ color: '#555', fontFamily: font.mono }}>
