@@ -512,14 +512,13 @@ export default function SchoolDashboard() {
                         className="text-2xl sm:text-4xl mb-3 leading-tight"
                         style={{ fontFamily: font.heading, color: '#e8e0d0' }}
                       >
-                        Начните здесь — бесплатная программа открыта
+                        Ваш допуск открыт
                       </h2>
                       <p
                         className="text-sm sm:text-base mb-7 max-w-xl mx-auto"
                         style={{ color: '#a8a090', fontFamily: font.mono }}
                       >
-                        {freeCourse.title}
-                        {freeCourse.subtitle ? ` — ${freeCourse.subtitle}` : ''}
+                        Допуск к сделке — начните с первого занятия
                       </p>
                       <button
                         onClick={() => selectCourse(freeCourse.id)}
