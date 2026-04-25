@@ -13,6 +13,7 @@ interface Course { id: string; title: string; subtitle: string | null; is_free: 
 interface Lesson { id: string; course_id: string; title: string; sort_order: number; }
 interface Access { id: string; user_id: string; course_id: string; granted_at: string; expires_at: string | null; unlocked_lessons: number[]; }
 interface InviteCode { id: string; code: string; course_id: string | null; used_by: string | null; }
+interface AuthMeta { created_at: string | null; last_sign_in_at: string | null; last_ip: string | null; signup_ip: string | null; }
 
 export default function SchoolStudentDetail() {
   const { id: studentId } = useParams<{ id: string }>();
@@ -27,6 +28,8 @@ export default function SchoolStudentDetail() {
   const [progressIds, setProgressIds] = useState<Set<string>>(new Set());
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [authMeta, setAuthMeta] = useState<AuthMeta | null>(null);
+  const [copiedField, setCopiedField] = useState<string | null>(null);
 
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const [grantModal, setGrantModal] = useState(false);
@@ -65,6 +68,12 @@ export default function SchoolStudentDetail() {
     setProgressIds(new Set((prRes.data || []).map((p: any) => p.lesson_id)));
     setInviteCode(icRes.data?.[0]?.code || null);
     setLoading(false);
+
+    // Fetch auth metadata via edge function (admin only)
+    supabase.functions.invoke('admin-get-user-meta', { body: { user_id: studentId } })
+      .then(({ data, error }) => {
+        if (!error && data) setAuthMeta(data as AuthMeta);
+      });
   };
 
   useEffect(() => { load(); }, [studentId]);
@@ -178,6 +187,20 @@ export default function SchoolStudentDetail() {
     setTimeout(() => setPwCopied(false), 1500);
   };
 
+  const copyValue = async (key: string, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedField(key);
+      setTimeout(() => setCopiedField((k) => (k === key ? null : k)), 1500);
+    } catch (_) { /* ignore */ }
+  };
+
+  const formatDateTime = (iso: string | null) => {
+    if (!iso) return '—';
+    const d = new Date(iso);
+    return d.toLocaleString('ru', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  };
+
   if (authLoading || loading) {
     return (
       <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
@@ -213,7 +236,34 @@ export default function SchoolStudentDetail() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Field label="Имя" value={profile.full_name || '—'} />
             <Field label="Email" value={profile.email} />
-            <Field label="Дата регистрации" value={new Date(profile.created_at).toLocaleDateString('ru')} />
+            <CopyField
+              label="Дата регистрации"
+              value={formatDateTime(authMeta?.created_at ?? profile.created_at)}
+              copyValue={authMeta?.created_at ?? profile.created_at}
+              copied={copiedField === 'created_at'}
+              onCopy={() => copyValue('created_at', authMeta?.created_at ?? profile.created_at)}
+            />
+            <CopyField
+              label="Последняя активность"
+              value={formatDateTime(authMeta?.last_sign_in_at ?? null)}
+              copyValue={authMeta?.last_sign_in_at ?? ''}
+              copied={copiedField === 'last_sign_in'}
+              onCopy={() => authMeta?.last_sign_in_at && copyValue('last_sign_in', authMeta.last_sign_in_at)}
+            />
+            <CopyField
+              label="IP последнего входа"
+              value={authMeta?.last_ip || '—'}
+              copyValue={authMeta?.last_ip || ''}
+              copied={copiedField === 'last_ip'}
+              onCopy={() => authMeta?.last_ip && copyValue('last_ip', authMeta.last_ip)}
+            />
+            <CopyField
+              label="IP регистрации"
+              value={authMeta?.signup_ip || '—'}
+              copyValue={authMeta?.signup_ip || ''}
+              copied={copiedField === 'signup_ip'}
+              onCopy={() => authMeta?.signup_ip && copyValue('signup_ip', authMeta.signup_ip)}
+            />
             <div>
               <span className="text-[10px] block mb-0.5" style={{ color: '#555', fontFamily: font.mono }}>Роль</span>
               <div className="flex items-center gap-2 flex-wrap">
@@ -523,6 +573,41 @@ function Field({ label, value, color }: { label: string; value: string; color?: 
     <div>
       <span className="text-[10px] block mb-0.5" style={{ color: '#555', fontFamily: font.mono }}>{label}</span>
       <span className="text-xs" style={{ color: color || '#e8e0d0', fontFamily: font.mono }}>{value}</span>
+    </div>
+  );
+}
+
+function CopyField({
+  label,
+  value,
+  copyValue,
+  copied,
+  onCopy,
+}: {
+  label: string;
+  value: string;
+  copyValue: string;
+  copied: boolean;
+  onCopy: () => void;
+}) {
+  const disabled = !copyValue;
+  return (
+    <div>
+      <span className="text-[10px] block mb-0.5" style={{ color: '#555', fontFamily: font.mono }}>{label}</span>
+      <div className="flex items-center gap-2 flex-wrap">
+        <span className="text-xs break-all" style={{ color: '#e8e0d0', fontFamily: font.mono }}>{value}</span>
+        {!disabled && (
+          <button
+            onClick={onCopy}
+            className="text-[10px] px-2 py-0.5 rounded flex items-center gap-1 hover:opacity-80 transition"
+            style={{ color: copied ? '#4a8a4a' : '#888', border: '1px solid #1a1a1a', fontFamily: font.mono }}
+            title="Скопировать"
+          >
+            {copied ? <Check size={10} /> : <Copy size={10} />}
+            {copied ? 'Скопировано' : 'Скопировать'}
+          </button>
+        )}
+      </div>
     </div>
   );
 }
