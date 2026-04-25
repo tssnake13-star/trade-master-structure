@@ -269,7 +269,7 @@ export default function SchoolLesson() {
               </p>
             )}
             <a
-              href="http://t.me/tradeliketyo"
+              href="https://t.me/rav_999"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-3 w-full py-4 mb-6 rounded-lg text-sm font-semibold transition-all hover:brightness-110"
@@ -282,7 +282,7 @@ export default function SchoolLesson() {
               }}
             >
               <MessageCircle size={18} />
-              Написать автору в Telegram
+              ПОЛУЧИТЬ КОНСУЛЬТАЦИЮ
             </a>
           </>
         )}
