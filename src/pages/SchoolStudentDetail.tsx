@@ -250,20 +250,6 @@ export default function SchoolStudentDetail() {
               copied={copiedField === 'last_sign_in'}
               onCopy={() => authMeta?.last_sign_in_at && copyValue('last_sign_in', authMeta.last_sign_in_at)}
             />
-            <CopyField
-              label="IP последнего входа"
-              value={authMeta?.last_ip || '—'}
-              copyValue={authMeta?.last_ip || ''}
-              copied={copiedField === 'last_ip'}
-              onCopy={() => authMeta?.last_ip && copyValue('last_ip', authMeta.last_ip)}
-            />
-            <CopyField
-              label="IP регистрации"
-              value={authMeta?.signup_ip || '—'}
-              copyValue={authMeta?.signup_ip || ''}
-              copied={copiedField === 'signup_ip'}
-              onCopy={() => authMeta?.signup_ip && copyValue('signup_ip', authMeta.signup_ip)}
-            />
             <div>
               <span className="text-[10px] block mb-0.5" style={{ color: '#555', fontFamily: font.mono }}>Роль</span>
               <div className="flex items-center gap-2 flex-wrap">
