@@ -700,26 +700,42 @@ function StudentsTab() {
   const navigate = useNavigate();
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [roles, setRoles] = useState<UserRole[]>([]);
+  const [accesses, setAccesses] = useState<Access[]>([]);
 
   const load = async () => {
-    const [p, r] = await Promise.all([
+    const [p, r, a] = await Promise.all([
       supabase.from('profiles').select('*').order('created_at', { ascending: false }),
       supabase.from('user_roles').select('*'),
+      supabase.from('course_access').select('*'),
     ]);
     setProfiles(p.data || []);
     setRoles(r.data || []);
+    setAccesses((a.data as Access[]) || []);
   };
 
   useEffect(() => { load(); }, []);
 
   const getRole = (uid: string) => roles.find(r => r.user_id === uid)?.role || 'student';
 
+  const getAccessDaysLeft = (uid: string): { days: number | null; hasAccess: boolean } => {
+    const userAccesses = accesses.filter(a => a.user_id === uid);
+    if (userAccesses.length === 0) return { days: null, hasAccess: false };
+    const withExpiry = userAccesses.filter(a => a.expires_at);
+    if (withExpiry.length === 0) return { days: null, hasAccess: true };
+    const minDays = Math.min(
+      ...withExpiry.map(a => Math.ceil((new Date(a.expires_at!).getTime() - Date.now()) / 86400000))
+    );
+    return { days: minDays, hasAccess: true };
+  };
+
   return (
     <div>
       <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Аккаунты</h2>
 
       <div className="space-y-2">
-        {profiles.map(p => (
+        {profiles.map(p => {
+          const access = getAccessDaysLeft(p.user_id);
+          return (
           <div
             key={p.user_id}
             className="rounded-lg border px-4 py-3 cursor-pointer hover:bg-white/[0.02] transition"
@@ -735,6 +751,21 @@ function StudentsTab() {
                       заблокирован
                     </span>
                   )}
+                  {access.hasAccess && (
+                    access.days === null ? (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ backgroundColor: '#4a8a4a22', color: '#4a8a4a', fontFamily: font.mono }}>
+                        бессрочно
+                      </span>
+                    ) : access.days > 0 ? (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ backgroundColor: access.days <= 7 ? '#8a6a4a22' : '#4a8a4a22', color: access.days <= 7 ? '#c4904a' : '#4a8a4a', fontFamily: font.mono }}>
+                        {access.days} дн.
+                      </span>
+                    ) : (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ backgroundColor: '#8a4a4a22', color: '#c45050', fontFamily: font.mono }}>
+                        истёк
+                      </span>
+                    )
+                  )}
                 </span>
                 {p.full_name && (
                   <span className="text-[11px] block" style={{ fontFamily: font.mono, color: '#555' }}>{p.email}</span>
@@ -745,7 +776,8 @@ function StudentsTab() {
               </span>
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
