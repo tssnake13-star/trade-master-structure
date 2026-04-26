@@ -156,7 +156,18 @@ export default function SchoolLesson() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
-      <header className="sticky top-0 z-50 border-b px-4 py-3 backdrop-blur" style={{ borderColor: '#1a1a1a', backgroundColor: 'rgba(8,8,8,0.85)' }}>
+      <header
+        className="border-b px-4 py-3 backdrop-blur"
+        style={{
+          position: 'sticky',
+          top: 0,
+          zIndex: 100,
+          borderColor: '#1a1a1a',
+          backgroundColor: 'rgba(8,8,8,0.92)',
+          WebkitBackdropFilter: 'blur(8px)',
+          backdropFilter: 'blur(8px)',
+        }}
+      >
         <button
           onClick={() => navigate('/school/dashboard', { state: { selectedCourse: lesson.course_id } })}
           className="flex items-center gap-2 hover:opacity-70 transition text-sm"
