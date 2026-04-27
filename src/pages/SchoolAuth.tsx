@@ -85,9 +85,7 @@ export default function SchoolAuth() {
   const LogoBlock = () => (
     <div className="flex flex-col items-center mb-6">
       <img src={logo} alt="TRADELIKETYO" className="rounded-xl object-cover" style={{ width: '11.7rem', height: '11.7rem' }} />
-      <p className="mt-3 text-xs tracking-[0.3em] uppercase" style={{ color: '#666', fontFamily: "'Inter', sans-serif" }}>
-        Вход в систему
-      </p>
+      <span className="tly-section-tag mt-4">Вход в систему</span>
     </div>
   );
 
@@ -96,8 +94,8 @@ export default function SchoolAuth() {
       <div data-school-skin className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#080808' }}>
         <div className="w-full max-w-md">
           <LogoBlock />
-          <h1 className="text-3xl mb-8 text-center" style={{ fontFamily: "'Inter', sans-serif", color: '#e8e0d0' }}>
-            Сброс пароля
+          <h1 className="text-4xl mb-8 text-center tly-display" style={{ color: '#e8e0d0' }}>
+            Сброс <em>пароля</em>
           </h1>
           <form onSubmit={handleForgotPassword} className="space-y-4">
             <input
@@ -137,11 +135,8 @@ export default function SchoolAuth() {
       <div className="w-full max-w-md">
         <LogoBlock />
         {!isLogin && (
-          <h1
-            className="text-3xl mb-8 text-center"
-            style={{ fontFamily: "'Inter', sans-serif", color: '#e8e0d0' }}
-          >
-            Регистрация
+          <h1 className="text-4xl mb-8 text-center tly-display" style={{ color: '#e8e0d0' }}>
+            Регис<em>трация</em>
           </h1>
         )}
 
