@@ -1,0 +1,425 @@
+/* =====================================================================
+   TRADELIKETYO — School cabinet skin
+   Token system extracted from the print-dark design document and
+   scoped to elements under [data-school-skin].
+   ===================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..600,30..100;1,9..144,300..600,30..100&display=swap');
+
+[data-school-skin] {
+  /* Surfaces */
+  --tly-bg:        oklch(0.16 0.005 240);
+  --tly-bg-elev:   oklch(0.19 0.005 240);
+  --tly-bg-soft:   oklch(0.21 0.005 240);
+  --tly-bg-deep:   oklch(0.13 0.005 240);
+
+  /* Text */
+  --tly-fg:        oklch(0.94 0.005 90);
+  --tly-fg-mute:   oklch(0.72 0.005 90);
+  --tly-fg-dim:    oklch(0.52 0.005 90);
+  --tly-fg-faint:  oklch(0.40 0.005 90);
+
+  /* Lines */
+  --tly-line:      oklch(0.30 0.005 240);
+  --tly-line-soft: oklch(0.24 0.005 240);
+
+  /* Accent — warm gold */
+  --tly-accent:        oklch(0.82 0.09 78);
+  --tly-accent-dim:    oklch(0.55 0.06 78);
+  --tly-accent-soft:   oklch(0.82 0.09 78 / 0.16);
+
+  /* Status */
+  --tly-success:   oklch(0.78 0.10 150);
+  --tly-warn:      oklch(0.78 0.12 70);
+  --tly-danger:    oklch(0.66 0.18 25);
+
+  /* Type */
+  --tly-font-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+  --tly-font-sans:    'Inter', system-ui, -apple-system, sans-serif;
+  --tly-font-mono:    'JetBrains Mono', ui-monospace, monospace;
+
+  --tly-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  background: var(--tly-bg);
+  color: var(--tly-fg);
+  font-family: var(--tly-font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'ss01', 'cv11';
+}
+
+/* ----- Inline-style hex remapping --------------------------------------
+   The school pages render with hardcoded hex colors in inline styles.
+   We remap each one to the new token via attribute selectors so the whole
+   cabinet inherits the document's palette without touching 3700+ lines.
+   --------------------------------------------------------------------- */
+
+/* Backgrounds */
+[data-school-skin] [style*="background-color: #080808"],
+[data-school-skin] [style*="background-color:#080808"],
+[data-school-skin] [style*="backgroundColor: '#080808'"] {
+  background-color: var(--tly-bg) !important;
+}
+[data-school-skin] [style*="background-color: #0a0a0a"],
+[data-school-skin] [style*="background-color:#0a0a0a"] {
+  background-color: var(--tly-bg-deep) !important;
+}
+[data-school-skin] [style*="background-color: #0d0d0d"],
+[data-school-skin] [style*="background-color:#0d0d0d"] {
+  background-color: var(--tly-bg-elev) !important;
+}
+[data-school-skin] [style*="background-color: #111"],
+[data-school-skin] [style*="background-color:#111"] {
+  background-color: var(--tly-bg-elev) !important;
+}
+[data-school-skin] [style*="background-color: #141414"],
+[data-school-skin] [style*="background-color:#141414"] {
+  background-color: var(--tly-bg-soft) !important;
+}
+[data-school-skin] [style*="background-color: #1a1a1a"],
+[data-school-skin] [style*="background-color:#1a1a1a"] {
+  background-color: var(--tly-bg-soft) !important;
+}
+[data-school-skin] [style*="background-color: #4a8a4a"],
+[data-school-skin] [style*="background-color:#4a8a4a"] {
+  background-color: var(--tly-accent) !important;
+}
+[data-school-skin] [style*="background-color: #4a8a4a22"],
+[data-school-skin] [style*="background-color:#4a8a4a22"] {
+  background-color: var(--tly-accent-soft) !important;
+}
+[data-school-skin] [style*="background-color: #8a4a4a22"],
+[data-school-skin] [style*="background-color:#8a4a4a22"] {
+  background-color: oklch(0.66 0.18 25 / 0.16) !important;
+}
+[data-school-skin] [style*="background-color: #8a6a4a22"],
+[data-school-skin] [style*="background-color:#8a6a4a22"] {
+  background-color: oklch(0.78 0.12 70 / 0.16) !important;
+}
+
+/* Text colors */
+[data-school-skin] [style*="color: #e8e0d0"],
+[data-school-skin] [style*="color:#e8e0d0"] {
+  color: var(--tly-fg) !important;
+}
+[data-school-skin] [style*="color: #a8a090"],
+[data-school-skin] [style*="color:#a8a090"] {
+  color: var(--tly-fg-mute) !important;
+}
+[data-school-skin] [style*="color: #999"],
+[data-school-skin] [style*="color:#999"] {
+  color: var(--tly-fg-mute) !important;
+}
+[data-school-skin] [style*="color: #888"],
+[data-school-skin] [style*="color:#888"] {
+  color: var(--tly-fg-mute) !important;
+}
+[data-school-skin] [style*="color: #666"],
+[data-school-skin] [style*="color:#666"] {
+  color: var(--tly-fg-dim) !important;
+}
+[data-school-skin] [style*="color: #555"],
+[data-school-skin] [style*="color:#555"] {
+  color: var(--tly-fg-faint) !important;
+}
+[data-school-skin] [style*="color: #444"],
+[data-school-skin] [style*="color:#444"] {
+  color: var(--tly-fg-faint) !important;
+}
+[data-school-skin] [style*="color: #333"],
+[data-school-skin] [style*="color:#333"] {
+  color: oklch(0.34 0.005 90) !important;
+}
+[data-school-skin] [style*="color: #4a8a4a"],
+[data-school-skin] [style*="color:#4a8a4a"] {
+  color: var(--tly-accent) !important;
+}
+[data-school-skin] [style*="color: #c4904a"],
+[data-school-skin] [style*="color:#c4904a"] {
+  color: var(--tly-warn) !important;
+}
+[data-school-skin] [style*="color: #c45050"],
+[data-school-skin] [style*="color:#c45050"],
+[data-school-skin] [style*="color: #c14a4a"],
+[data-school-skin] [style*="color:#c14a4a"],
+[data-school-skin] [style*="color: #a04040"],
+[data-school-skin] [style*="color:#a04040"] {
+  color: var(--tly-danger) !important;
+}
+[data-school-skin] [style*="color: #e85d3a"],
+[data-school-skin] [style*="color:#e85d3a"] {
+  color: var(--tly-accent) !important;
+}
+
+/* Borders */
+[data-school-skin] [style*="border-color: #1a1a1a"],
+[data-school-skin] [style*="border-color:#1a1a1a"],
+[data-school-skin] [style*="borderColor: '#1a1a1a'"] {
+  border-color: var(--tly-line-soft) !important;
+}
+[data-school-skin] [style*="border-color: #222"],
+[data-school-skin] [style*="border-color:#222"] {
+  border-color: var(--tly-line-soft) !important;
+}
+[data-school-skin] [style*="border-color: #2a2a2a"],
+[data-school-skin] [style*="border-color:#2a2a2a"] {
+  border-color: var(--tly-line) !important;
+}
+[data-school-skin] [style*="border-color: #4a8a4a"],
+[data-school-skin] [style*="border-color:#4a8a4a"] {
+  border-color: var(--tly-accent-dim) !important;
+}
+
+/* Sticky lesson header — translucent surface in inline style */
+[data-school-skin] [style*="rgba(8,8,8"],
+[data-school-skin] [style*="rgba(8, 8, 8"] {
+  background-color: color-mix(in oklch, var(--tly-bg) 85%, transparent) !important;
+}
+[data-school-skin] [style*="rgba(0,0,0,0.6)"] {
+  background-color: color-mix(in oklch, var(--tly-bg-deep) 70%, transparent) !important;
+}
+
+/* ----- Typography upgrades --------------------------------------------- */
+
+[data-school-skin] h1,
+[data-school-skin] h2 {
+  font-family: var(--tly-font-display) !important;
+  font-weight: 350;
+  letter-spacing: -0.02em;
+  line-height: 1.02;
+  font-variation-settings: 'opsz' 144, 'SOFT' 30;
+}
+
+[data-school-skin] h3 {
+  font-family: var(--tly-font-display) !important;
+  font-weight: 400;
+  letter-spacing: -0.012em;
+}
+
+/* Italic accents inside display headings */
+[data-school-skin] h1 em,
+[data-school-skin] h2 em,
+[data-school-skin] h3 em {
+  font-style: italic;
+  color: var(--tly-accent);
+  font-weight: 350;
+}
+
+/* Mono labels — small uppercase tracking text rendered with Inter currently */
+[data-school-skin] .uppercase {
+  font-family: var(--tly-font-mono) !important;
+  letter-spacing: 0.18em !important;
+}
+
+/* Selection */
+[data-school-skin] ::selection {
+  background: var(--tly-accent);
+  color: var(--tly-bg);
+}
+
+/* ----- Component primitives -------------------------------------------- */
+
+.tly-eyebrow {
+  font-family: var(--tly-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--tly-fg-dim);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tly-eyebrow::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border: 1px solid var(--tly-accent-dim);
+  transform: rotate(45deg);
+}
+
+.tly-pulse {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--tly-accent);
+  animation: tlyPulse 2.4s ease-out infinite;
+}
+
+@keyframes tlyPulse {
+  0%   { box-shadow: oklch(0.82 0.09 78 / 0.4) 0 0 0 0; }
+  70%  { box-shadow: oklch(0.82 0.09 78 / 0)   0 0 0 12px; }
+  100% { box-shadow: oklch(0.82 0.09 78 / 0)   0 0 0 0; }
+}
+
+.tly-display {
+  font-family: var(--tly-font-display);
+  font-weight: 350;
+  letter-spacing: -0.025em;
+  line-height: 0.95;
+  font-variation-settings: 'opsz' 144, 'SOFT' 30;
+}
+
+.tly-display .it,
+.tly-display em {
+  font-style: italic;
+  color: var(--tly-accent);
+}
+
+.tly-display .mute {
+  color: var(--tly-fg-mute);
+}
+
+.tly-mono {
+  font-family: var(--tly-font-mono);
+  letter-spacing: 0.02em;
+}
+
+.tly-hairline {
+  height: 1px;
+  width: 100%;
+  background: var(--tly-line-soft);
+}
+
+.tly-hairline-v {
+  width: 1px;
+  height: 100%;
+  background: var(--tly-line-soft);
+}
+
+.tly-card {
+  background: var(--tly-bg-elev);
+  border: 1px solid var(--tly-line-soft);
+  padding: 24px;
+  transition: background 0.4s var(--tly-ease), border-color 0.4s var(--tly-ease);
+}
+
+.tly-card:hover {
+  border-color: var(--tly-line);
+}
+
+.tly-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 22px;
+  font-family: var(--tly-font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  border-radius: 999px;
+  transition: all 0.4s var(--tly-ease);
+  white-space: nowrap;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+
+.tly-btn-primary {
+  background: var(--tly-fg);
+  color: var(--tly-bg);
+  border-color: var(--tly-fg);
+}
+
+.tly-btn-primary:hover {
+  background: transparent;
+  color: var(--tly-fg);
+}
+
+.tly-btn-ghost {
+  color: var(--tly-fg-mute);
+  border-color: var(--tly-line);
+  background: transparent;
+}
+
+.tly-btn-ghost:hover {
+  color: var(--tly-fg);
+  border-color: var(--tly-fg-mute);
+}
+
+.tly-btn-accent {
+  background: var(--tly-accent);
+  color: var(--tly-bg);
+  border-color: var(--tly-accent);
+}
+
+.tly-btn-accent:hover {
+  background: transparent;
+  color: var(--tly-accent);
+}
+
+.tly-btn .arr {
+  display: inline-block;
+  transition: transform 0.4s var(--tly-ease);
+}
+
+.tly-btn:hover .arr {
+  transform: translateX(4px);
+}
+
+/* Section tag — diamond + uppercase mono */
+.tly-section-tag {
+  font-family: var(--tly-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--tly-fg-dim);
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tly-section-tag::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  background: var(--tly-accent);
+  transform: rotate(45deg);
+}
+
+/* Stat callout */
+.tly-stat-num {
+  font-family: var(--tly-font-display);
+  font-weight: 350;
+  font-size: clamp(36px, 4.5vw, 56px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.tly-stat-num .suf {
+  color: var(--tly-accent);
+  font-style: italic;
+}
+
+.tly-stat-label {
+  margin-top: 10px;
+  font-family: var(--tly-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--tly-fg-dim);
+}
+
+/* Progress bar */
+[data-school-skin] .h-1[style*="background-color: #1a1a1a"] > div,
+[data-school-skin] .h-1\.5[style*="background-color: #1a1a1a"] > div {
+  background-color: var(--tly-accent) !important;
+}
+
+/* Scrollbar */
+[data-school-skin] *::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+[data-school-skin] *::-webkit-scrollbar-track {
+  background: transparent;
+}
+[data-school-skin] *::-webkit-scrollbar-thumb {
+  background: var(--tly-line);
+  border-radius: 4px;
+}
+[data-school-skin] *::-webkit-scrollbar-thumb:hover {
+  background: var(--tly-fg-faint);
+}
