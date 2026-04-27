@@ -159,8 +159,10 @@ export default function SchoolLesson() {
       <header
         className="border-b px-4 py-3 backdrop-blur"
         style={{
-          position: 'sticky',
+          position: 'fixed',
           top: 0,
+          left: 0,
+          right: 0,
           zIndex: 100,
           borderColor: '#1a1a1a',
           backgroundColor: 'rgba(8,8,8,0.92)',
@@ -178,7 +180,7 @@ export default function SchoolLesson() {
         </button>
       </header>
 
-      <main className="max-w-3xl mx-auto p-4 sm:p-6">
+      <main className="max-w-3xl mx-auto p-4 sm:p-6" style={{ paddingTop: '64px' }}>
         <h1 className="text-2xl mb-3" style={{ fontFamily: font.heading }}>{lesson.title}</h1>
 
         {lesson.description && (
