@@ -2,78 +2,72 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..600,30..100;1,9..144,300..600,30..100&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @layer base {
   :root {
-    --background: 220 15% 8%;
-    --foreground: 220 10% 92%;
-    
-    --card: 220 15% 11%;
-    --card-foreground: 220 10% 92%;
-    
-    --popover: 220 15% 11%;
-    --popover-foreground: 220 10% 92%;
-    
-    --primary: 220 10% 85%;
-    --primary-foreground: 220 15% 8%;
-    
-    --secondary: 220 12% 16%;
-    --secondary-foreground: 220 10% 75%;
-    
-    --muted: 220 12% 18%;
-    --muted-foreground: 220 10% 55%;
-    
-    --accent: 220 12% 22%;
-    --accent-foreground: 220 10% 92%;
-    
-    --destructive: 0 62% 50%;
+    /* TRADELIKETYO design tokens (oklch -> HSL) */
+    --background: 206 14% 5%;
+    --foreground: 44 12% 92%;
+
+    --card: 206 10% 8%;
+    --card-foreground: 44 12% 92%;
+
+    --popover: 206 10% 8%;
+    --popover-foreground: 44 12% 92%;
+
+    --primary: 44 12% 92%;
+    --primary-foreground: 206 14% 5%;
+
+    --secondary: 206 8% 10%;
+    --secondary-foreground: 44 3% 64%;
+
+    --muted: 206 7% 12%;
+    --muted-foreground: 44 3% 64%;
+
+    --accent: 37 65% 70%;
+    --accent-foreground: 206 14% 5%;
+    --accent-dim: 36 29% 40%;
+
+    --destructive: 12 70% 56%;
     --destructive-foreground: 0 0% 100%;
-    
-    --border: 220 12% 18%;
-    --input: 220 12% 18%;
-    --ring: 220 10% 40%;
+
+    --border: 206 7% 12%;
+    --input: 206 5% 18%;
+    --ring: 37 65% 70%;
     
     --radius: 0.5rem;
     
-    --sidebar-background: 220 15% 8%;
-    --sidebar-foreground: 220 10% 92%;
-    --sidebar-primary: 220 10% 85%;
-    --sidebar-primary-foreground: 220 15% 8%;
-    --sidebar-accent: 220 12% 22%;
-    --sidebar-accent-foreground: 220 10% 92%;
-    --sidebar-border: 220 12% 18%;
-    --sidebar-ring: 220 10% 40%;
+    --sidebar-background: 206 14% 5%;
+    --sidebar-foreground: 44 12% 92%;
+    --sidebar-primary: 37 65% 70%;
+    --sidebar-primary-foreground: 206 14% 5%;
+    --sidebar-accent: 206 7% 12%;
+    --sidebar-accent-foreground: 44 12% 92%;
+    --sidebar-border: 206 7% 12%;
+    --sidebar-ring: 37 65% 70%;
   }
 
   .dark {
-    --background: 220 15% 8%;
-    --foreground: 220 10% 92%;
-    
-    --card: 220 15% 11%;
-    --card-foreground: 220 10% 92%;
-    
-    --popover: 220 15% 11%;
-    --popover-foreground: 220 10% 92%;
-    
-    --primary: 220 10% 85%;
-    --primary-foreground: 220 15% 8%;
-    
-    --secondary: 220 12% 16%;
-    --secondary-foreground: 220 10% 75%;
-    
-    --muted: 220 12% 18%;
-    --muted-foreground: 220 10% 55%;
-    
-    --accent: 220 12% 22%;
-    --accent-foreground: 220 10% 92%;
-    
-    --destructive: 0 62% 50%;
+    --background: 206 14% 5%;
+    --foreground: 44 12% 92%;
+    --card: 206 10% 8%;
+    --card-foreground: 44 12% 92%;
+    --popover: 206 10% 8%;
+    --popover-foreground: 44 12% 92%;
+    --primary: 44 12% 92%;
+    --primary-foreground: 206 14% 5%;
+    --secondary: 206 8% 10%;
+    --secondary-foreground: 44 3% 64%;
+    --muted: 206 7% 12%;
+    --muted-foreground: 44 3% 64%;
+    --accent: 37 65% 70%;
+    --accent-foreground: 206 14% 5%;
+    --destructive: 12 70% 56%;
     --destructive-foreground: 0 0% 100%;
-    
-    --border: 220 12% 18%;
-    --input: 220 12% 18%;
-    --ring: 220 10% 40%;
+    --border: 206 7% 12%;
+    --input: 206 5% 18%;
+    --ring: 37 65% 70%;
   }
 }
 
@@ -89,6 +83,23 @@
   
   html {
     scroll-behavior: smooth;
+  }
+
+  /* Display headings on landing pick up Fraunces with italic accents */
+  h1, h2 {
+    font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+    font-variation-settings: 'opsz' 144, 'SOFT' 30;
+    letter-spacing: -0.02em;
+    font-weight: 350;
+  }
+  h1 em, h2 em, h3 em {
+    font-style: italic;
+    color: hsl(var(--accent));
+  }
+
+  ::selection {
+    background: hsl(var(--accent));
+    color: hsl(var(--background));
   }
 }
 
@@ -119,9 +130,8 @@
   }
   
   .btn-primary {
-    @apply inline-flex items-center justify-center px-6 py-3 bg-foreground text-background font-medium 
-           rounded-lg transition-all duration-300 hover:bg-foreground/90 hover:scale-[1.02];
-    animation: ctaGlow 2s ease-in-out infinite;
+    @apply inline-flex items-center justify-center px-7 py-3.5 bg-foreground text-background font-medium 
+           rounded-full border border-foreground transition-all duration-500 hover:bg-transparent hover:text-foreground;
   }
 
   .section-animate {
@@ -140,12 +150,12 @@
   }
   
   .btn-secondary {
-    @apply inline-flex items-center justify-center px-6 py-3 bg-secondary text-foreground font-medium 
-           rounded-lg border border-border transition-all duration-300 hover:bg-accent hover:border-muted-foreground/30;
+    @apply inline-flex items-center justify-center px-7 py-3.5 bg-transparent text-muted-foreground font-medium 
+           rounded-full border border-border transition-all duration-500 hover:text-foreground hover:border-muted-foreground;
   }
   
   .card-dark {
-    @apply bg-card border border-border rounded-xl p-6 md:p-8;
+    @apply bg-card border border-border p-6 md:p-8;
   }
   
   .divider {
