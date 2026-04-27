@@ -1,0 +1,259 @@
+/* =====================================================================
+   TRADELIKETYO — Preview redesign skin
+   Scoped to [data-preview-skin]. Stacks visual upgrades on top of the
+   existing landing without touching its source. Activate by wrapping a
+   subtree with <div data-preview-skin> ... </div>.
+   ===================================================================== */
+
+[data-preview-skin] {
+  --pv-accent: hsl(37 65% 70%);
+  --pv-accent-dim: hsl(36 29% 40%);
+  --pv-line: hsl(206 7% 14%);
+  --pv-line-soft: hsl(206 7% 11%);
+  --pv-fg: hsl(44 12% 92%);
+  --pv-fg-mute: hsl(44 3% 64%);
+  --pv-fg-dim: hsl(44 3% 48%);
+  --pv-bg: hsl(206 14% 5%);
+  --pv-bg-elev: hsl(206 10% 8%);
+  --pv-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --pv-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+  --pv-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* ----- Display typography upgrades ------------------------------------- */
+[data-preview-skin] h1,
+[data-preview-skin] h2 {
+  font-family: var(--pv-display) !important;
+  font-weight: 320 !important;
+  letter-spacing: -0.025em !important;
+  line-height: 1.02 !important;
+  font-variation-settings: 'opsz' 144, 'SOFT' 30 !important;
+}
+
+[data-preview-skin] h3 {
+  font-family: var(--pv-display) !important;
+  font-weight: 380 !important;
+  letter-spacing: -0.015em !important;
+}
+
+[data-preview-skin] h1 em,
+[data-preview-skin] h2 em,
+[data-preview-skin] h3 em {
+  font-style: italic !important;
+  color: var(--pv-accent) !important;
+  font-weight: 320 !important;
+}
+
+/* Mono uppercase labels — wider tracking, JetBrains Mono */
+[data-preview-skin] .text-mono,
+[data-preview-skin] [class*="uppercase"] {
+  font-family: var(--pv-mono) !important;
+  letter-spacing: 0.22em !important;
+  font-weight: 400 !important;
+}
+
+/* Body text rendering */
+[data-preview-skin] {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'ss01', 'cv11';
+}
+
+/* ----- Section delimiter hairlines ------------------------------------- */
+[data-preview-skin] main > section {
+  position: relative;
+  border-top: 1px solid var(--pv-line-soft);
+}
+[data-preview-skin] main > section:first-child {
+  border-top: none;
+}
+
+/* Diamond marker at the start of every section */
+[data-preview-skin] main > section::before {
+  content: '';
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  background: var(--pv-bg);
+  border: 1px solid var(--pv-accent-dim);
+  transform: translateX(-50%) rotate(45deg);
+  z-index: 5;
+  pointer-events: none;
+}
+
+/* ----- Cards / borders — hairline rendering ---------------------------- */
+[data-preview-skin] .card-dark,
+[data-preview-skin] [class*="border-border"] {
+  border-color: var(--pv-line) !important;
+}
+
+[data-preview-skin] .card-dark {
+  background: var(--pv-bg-elev);
+  transition: border-color 0.45s var(--pv-ease), background 0.45s var(--pv-ease);
+}
+[data-preview-skin] .card-dark:hover {
+  border-color: var(--pv-fg-dim) !important;
+}
+
+/* ----- Buttons — pill with arrow accent -------------------------------- */
+[data-preview-skin] .btn-primary,
+[data-preview-skin] .btn-secondary {
+  border-radius: 999px !important;
+  letter-spacing: 0.02em !important;
+  font-weight: 500 !important;
+  transition: all 0.45s var(--pv-ease) !important;
+}
+
+[data-preview-skin] .btn-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+[data-preview-skin] .btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(120deg, transparent 30%, hsl(0 0% 100% / 0.18) 50%, transparent 70%);
+  transform: translateX(-100%);
+  transition: transform 0.7s var(--pv-ease);
+}
+[data-preview-skin] .btn-primary:hover::after {
+  transform: translateX(100%);
+}
+
+/* ----- Stats — display giants ----------------------------------------- */
+[data-preview-skin] [class*="StatsCounter"],
+[data-preview-skin] section [class*="text-4xl"],
+[data-preview-skin] section [class*="text-5xl"],
+[data-preview-skin] section [class*="text-6xl"] {
+  font-variation-settings: 'opsz' 144, 'SOFT' 30 !important;
+}
+
+/* ----- Pulse dot near "Live" / status indicators ----------------------- */
+[data-preview-skin] [data-pv-pulse]::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--pv-accent);
+  margin-right: 8px;
+  vertical-align: middle;
+  box-shadow: 0 0 0 0 hsl(37 65% 70% / 0.5);
+  animation: pvPulse 2.4s ease-out infinite;
+}
+@keyframes pvPulse {
+  0%   { box-shadow: 0 0 0 0 hsl(37 65% 70% / 0.45); }
+  70%  { box-shadow: 0 0 0 12px hsl(37 65% 70% / 0); }
+  100% { box-shadow: 0 0 0 0 hsl(37 65% 70% / 0); }
+}
+
+/* ----- Eyebrow with diamond bullet ------------------------------------ */
+[data-preview-skin] .text-mono::before,
+[data-preview-skin] [data-pv-eyebrow]::before {
+  content: '';
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border: 1px solid var(--pv-accent-dim);
+  transform: rotate(45deg);
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+/* ----- Selection ------------------------------------------------------- */
+[data-preview-skin] ::selection {
+  background: var(--pv-accent);
+  color: var(--pv-bg);
+}
+
+/* ----- Container hairlines (left/right rails on wide screens) --------- */
+@media (min-width: 1280px) {
+  [data-preview-skin] main {
+    position: relative;
+  }
+  [data-preview-skin] main::before,
+  [data-preview-skin] main::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--pv-line-soft);
+    pointer-events: none;
+    z-index: 1;
+  }
+  [data-preview-skin] main::before { left: max(24px, calc((100% - 1280px) / 2)); }
+  [data-preview-skin] main::after  { right: max(24px, calc((100% - 1280px) / 2)); }
+}
+
+/* ----- Preview banner -------------------------------------------------- */
+.pv-banner {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--pv-bg);
+  border-bottom: 1px solid var(--pv-line);
+  font-family: var(--pv-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--pv-fg-mute);
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.pv-banner__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--pv-fg);
+}
+
+.pv-banner__label::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background: var(--pv-accent);
+  transform: rotate(45deg);
+}
+
+.pv-banner__nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.pv-banner__link {
+  color: var(--pv-fg-mute);
+  text-decoration: none;
+  transition: color 0.3s var(--pv-ease);
+  border-bottom: 1px solid transparent;
+  padding-bottom: 2px;
+}
+.pv-banner__link:hover {
+  color: var(--pv-accent);
+  border-bottom-color: var(--pv-accent-dim);
+}
+
+.pv-banner__link--primary {
+  color: var(--pv-fg);
+  background: var(--pv-accent);
+  color: var(--pv-bg);
+  padding: 6px 14px;
+  border-radius: 999px;
+  letter-spacing: 0.18em;
+}
+.pv-banner__link--primary:hover {
+  background: transparent;
+  color: var(--pv-accent);
+  border-bottom-color: transparent;
+  box-shadow: inset 0 0 0 1px var(--pv-accent);
+}
