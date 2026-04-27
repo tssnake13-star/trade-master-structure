@@ -203,7 +203,7 @@ export default function SchoolStudentDetail() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
+      <div data-school-skin className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
         <p style={{ fontFamily: font.mono }}>Загрузка...</p>
       </div>
     );
@@ -211,14 +211,14 @@ export default function SchoolStudentDetail() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
+      <div data-school-skin className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
         <p style={{ fontFamily: font.mono }}>Студент не найден</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
+    <div data-school-skin className="min-h-screen" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
       <header className="border-b px-4 py-3 flex items-center gap-3" style={{ borderColor: '#1a1a1a' }}>
         <button onClick={() => navigate('/school/admin')} className="hover:opacity-70 transition">
           <ArrowLeft size={18} style={{ color: '#666' }} />
