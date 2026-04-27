@@ -318,11 +318,12 @@ export default function SchoolDashboard() {
           {selectedCourseData && selectedAccessible && (
             <>
               <div className="mb-6">
-                <h1 className="text-2xl sm:text-3xl mb-1" style={{ fontFamily: font.heading }}>
+                <span className="tly-section-tag mb-3 block">Курс</span>
+                <h1 className="text-3xl sm:text-5xl mb-2 tly-display">
                   {selectedCourseData.title}
                 </h1>
                 {selectedCourseData.subtitle && (
-                  <p className="text-sm mb-3" style={{ color: '#666', fontFamily: font.mono }}>{selectedCourseData.subtitle}</p>
+                  <p className="text-sm mb-3 tly-mono uppercase tracking-[0.2em]" style={{ color: '#666' }}>{selectedCourseData.subtitle}</p>
                 )}
                 {selectedCourseData.title === 'TRADE MASTER 4.5' && (
                   <div className="flex items-center gap-3">
@@ -478,10 +479,11 @@ export default function SchoolDashboard() {
 
             return (
               <div className="py-8 sm:py-12">
-                <h1 className="text-3xl sm:text-4xl mb-2" style={{ fontFamily: font.heading }}>
+                <span className="tly-section-tag mb-4 inline-flex"><span className="tly-pulse" style={{ marginRight: 8 }} />Кабинет · Live</span>
+                <h1 className="text-4xl sm:text-6xl mb-3 tly-display mt-4">
                   {welcomeTitle}
                 </h1>
-                <p className="text-sm mb-8" style={{ color: '#666', fontFamily: font.mono }}>
+                <p className="text-sm mb-8 tly-mono uppercase tracking-[0.2em]" style={{ color: '#888' }}>
                   {welcomeSubtitle}
                 </p>
 
