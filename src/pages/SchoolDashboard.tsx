@@ -132,7 +132,7 @@ export default function SchoolDashboard() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
+      <div data-school-skin className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
         <p style={{ fontFamily: font.mono }}>Загрузка...</p>
       </div>
     );
@@ -204,7 +204,7 @@ export default function SchoolDashboard() {
   const pct = p.total > 0 ? Math.round((p.completed / p.total) * 100) : 0;
 
   return (
-    <div className="min-h-screen flex flex-col sm:flex-row" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
+    <div data-school-skin className="min-h-screen flex flex-col sm:flex-row" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
       {mobileSidebarOpen && (
         <div
           className="sm:hidden fixed inset-0 z-40"

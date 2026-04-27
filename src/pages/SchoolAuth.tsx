@@ -93,7 +93,7 @@ export default function SchoolAuth() {
 
   if (isForgot) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#080808' }}>
+      <div data-school-skin className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#080808' }}>
         <div className="w-full max-w-md">
           <LogoBlock />
           <h1 className="text-3xl mb-8 text-center" style={{ fontFamily: "'Inter', sans-serif", color: '#e8e0d0' }}>
@@ -133,7 +133,7 @@ export default function SchoolAuth() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#080808' }}>
+    <div data-school-skin className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#080808' }}>
       <div className="w-full max-w-md">
         <LogoBlock />
         {!isLogin && (

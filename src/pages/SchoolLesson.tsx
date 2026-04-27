@@ -143,7 +143,7 @@ export default function SchoolLesson() {
 
   if (authLoading || loading || !lesson) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
+      <div data-school-skin className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
         <p style={{ fontFamily: font.mono }}>Загрузка...</p>
       </div>
     );
@@ -155,7 +155,7 @@ export default function SchoolLesson() {
   };
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
+    <div data-school-skin className="min-h-screen" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
       <header
         className="border-b px-4 py-3 backdrop-blur"
         style={{
