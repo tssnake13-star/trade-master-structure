@@ -11,24 +11,13 @@ const HeroSection = () => {
         <div className="flex flex-col lg:flex-row items-center gap-6 md:gap-12 lg:gap-16">
           {/* Text Content */}
           <div className="w-full lg:basis-[45%] lg:max-w-[45%] order-2 lg:order-1">
+            <div className="section-label mb-4">01 · STRUCTURAL TRADING · СИСТЕМА ДОПУСКА</div>
             <h1 className="leading-tight text-foreground fade-in-up">
-              Вы читаете <em>рынок.</em><br />
-              <span className="mute">Но теряете на решениях.</span>
+              Вы читаете <em>рынок.</em> <span className="mute">Но теряете на решениях.</span>
             </h1>
             <div className="mt-4 md:mt-6 space-y-3 fade-in-up fade-in-up-delay-1">
               <p className="text-base md:text-lg lg:text-xl text-foreground/90 leading-snug">
-                Вы не новичок
-              </p>
-              <p className="text-base md:text-lg lg:text-xl text-muted-foreground leading-snug">
-                Вы видите структуру<br />
-                понимаете направление
-              </p>
-              <p className="text-base md:text-lg lg:text-xl text-foreground/90 leading-snug font-medium">
-                Но в момент входа всё ломается
-              </p>
-              <p className="text-base md:text-lg lg:text-xl text-muted-foreground leading-snug">
-                Решение принимается не системой<br />
-                а состоянием
+                Структура есть. Анализ есть. <strong className="font-bold">В момент входа всё ломается</strong> — потому что решение принимает не система, а состояние.
               </p>
             </div>
             
