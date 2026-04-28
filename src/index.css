@@ -128,10 +128,13 @@
 }
 
 .landing-skin h1 {
-  font-size: clamp(48px, 8vw, 112px);
+  font-size: clamp(40px, 6vw, 96px);
   line-height: 0.96;
   letter-spacing: -0.025em;
   font-weight: 400;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .landing-skin h2,
@@ -153,7 +156,7 @@
 }
 
 .landing-skin .heading-hero {
-  font-size: clamp(48px, 8vw, 112px) !important;
+  font-size: clamp(40px, 6vw, 96px) !important;
   line-height: 0.96 !important;
   font-weight: 400 !important;
   font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif !important;
