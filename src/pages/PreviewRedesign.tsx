@@ -11,8 +11,6 @@ import WhyCoursesFailSection from '@/components/landing/WhyCoursesFailSection';
 import DecisionProcessSection from '@/components/landing/DecisionProcessSection';
 import ProblemSection from '@/components/landing/ProblemSection';
 import WhatGoesWrongSection from '@/components/landing/WhatGoesWrongSection';
-import StructureDiagram from '@/components/landing/StructureDiagram';
-import TradingSystemSection from '@/components/landing/TradingSystemSection';
 import ProofSection from '@/components/landing/ProofSection';
 import TradesSection from '@/components/landing/TradesSection';
 import StagesSection from '@/components/landing/StagesSection';
@@ -26,6 +24,7 @@ import Footer from '@/components/landing/Footer';
 
 import RedesignHero from '@/components/redesign/RedesignHero';
 import SideProgress from '@/components/redesign/SideProgress';
+import RedesignArchitecture from '@/components/redesign/RedesignArchitecture';
 
 /**
  * /preview-redesign
@@ -44,7 +43,7 @@ const PreviewRedesign = () => {
   return (
     <div data-preview-skin className="min-h-screen bg-background text-foreground landing-skin">
       <div className="pv-banner">
-        <span className="pv-banner__label">Preview · Redesign draft · Stage 1/5</span>
+        <span className="pv-banner__label">Preview · Redesign draft · Stage 2/5</span>
         <nav className="pv-banner__nav">
           <Link to="/" className="pv-banner__link">← Боевой сайт</Link>
         </nav>
@@ -68,11 +67,8 @@ const PreviewRedesign = () => {
           <WhatGoesWrongSection />
         </div>
 
-        {/* Будет заменено на RedesignArchitecture с горизонтальным таймлайном + SVG (этап 2) */}
-        <div id="system">
-          <StructureDiagram />
-          <TradingSystemSection />
-        </div>
+        {/* Этап 2 — горизонтальный таймлайн + SVG-схема Trade OS */}
+        <RedesignArchitecture />
 
         {/* Этап 3 */}
         <div id="proof">
