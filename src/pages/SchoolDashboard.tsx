@@ -479,11 +479,11 @@ export default function SchoolDashboard() {
 
             return (
               <div className="py-8 sm:py-12">
-                <span className="tly-section-tag mb-4 inline-flex"><span className="tly-pulse" style={{ marginRight: 8 }} />Кабинет · Live</span>
-                <h1 className="text-4xl sm:text-6xl mb-3 tly-display mt-4">
-                  {welcomeTitle}
+                <div className="tly-section-tag mb-5 inline-flex items-center"><span className="tly-pulse" style={{ marginRight: 10 }} />TLT · КАБИНЕТ · LIVE</div>
+                <h1 className="tly-display leading-[1.02] text-4xl sm:text-5xl lg:text-6xl xl:text-7xl mt-2 mb-5 fade-in-up">
+                  {renderHeroTitle(welcomeTitle)}
                 </h1>
-                <p className="text-sm mb-8 tly-mono uppercase tracking-[0.2em]" style={{ color: '#888' }}>
+                <p className="tly-mono uppercase tracking-[0.22em] text-[11px] sm:text-xs mb-10 fade-in-up fade-in-up-delay-1" style={{ color: 'var(--tly-fg-mute)' }}>
                   {welcomeSubtitle}
                 </p>
 
