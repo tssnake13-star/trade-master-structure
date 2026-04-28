@@ -47,13 +47,13 @@ const HeroSection = () => {
           
           {/* Author Photo */}
           <div className="w-full lg:basis-[55%] lg:max-w-[55%] fade-in-up fade-in-up-delay-1 order-1 lg:order-2">
-            <div className="relative w-full h-56 md:h-[24rem] lg:h-[600px] xl:h-[720px] rounded-xl md:rounded-2xl overflow-hidden">
+            <div className="relative w-full h-[420px] sm:h-[520px] md:h-[640px] lg:h-[600px] xl:h-[720px] rounded-xl md:rounded-2xl overflow-hidden">
               <img
                 src={heroAuthor}
                 alt="Сергей — автор системы TRADELIKETYO"
-                className="w-full h-full object-cover object-top brightness-[0.85]"
+                className="w-full h-full object-cover object-[50%_15%] brightness-[0.85]"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/20 to-background/10" />
+              <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-background via-background/70 to-transparent lg:from-background/70 lg:via-background/20 lg:to-background/10 lg:inset-0 lg:h-full" />
             </div>
           </div>
         </div>
