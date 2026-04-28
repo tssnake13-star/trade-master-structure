@@ -46,6 +46,13 @@
     --sidebar-accent-foreground: 44 12% 92%;
     --sidebar-border: 206 7% 12%;
     --sidebar-ring: 37 65% 70%;
+
+    /* Editorial typography tokens (premium skin) */
+    --rule: 220 6% 22%;
+    --editorial-bg: 220 8% 6%;
+    --editorial-text: 44 12% 95%;
+    --editorial-muted: 220 6% 60%;
+    --editorial-accent: 210 25% 70%;
   }
 
   .dark {
@@ -100,6 +107,132 @@
   ::selection {
     background: hsl(var(--accent));
     color: hsl(var(--background));
+  }
+}
+
+/* =====================================================
+   PREMIUM EDITORIAL TYPOGRAPHY SKIN
+   Scoped to .landing-skin so /school is untouched.
+   ===================================================== */
+
+.landing-skin {
+  --rule-color: hsl(var(--rule));
+}
+
+.landing-skin h1,
+.landing-skin h2 {
+  font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+  font-variation-settings: 'opsz' 144, 'SOFT' 60;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.landing-skin h1 {
+  font-size: clamp(48px, 8vw, 112px);
+  line-height: 0.96;
+  letter-spacing: -0.025em;
+  font-weight: 400;
+}
+
+.landing-skin h2,
+.landing-skin .heading-section {
+  font-size: clamp(36px, 5vw, 68px) !important;
+  line-height: 1.05 !important;
+  font-weight: 400 !important;
+  font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif !important;
+  letter-spacing: -0.02em !important;
+  text-transform: none !important;
+}
+
+.landing-skin h3 {
+  font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(22px, 2.4vw, 34px);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+}
+
+.landing-skin .heading-hero {
+  font-size: clamp(48px, 8vw, 112px) !important;
+  line-height: 0.96 !important;
+  font-weight: 400 !important;
+  font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif !important;
+  letter-spacing: -0.025em !important;
+}
+
+.landing-skin h1 em,
+.landing-skin h2 em,
+.landing-skin h3 em {
+  font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  font-variation-settings: 'opsz' 144, 'SOFT' 100;
+  color: inherit;
+}
+
+.landing-skin .mute {
+  opacity: 0.55;
+  color: hsl(var(--muted-foreground));
+  font-style: normal;
+}
+
+.landing-skin .section-label {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  opacity: 0.5;
+  margin-bottom: 20px;
+  display: block;
+  color: hsl(var(--muted-foreground));
+}
+@media (min-width: 768px) {
+  .landing-skin .section-label {
+    font-size: 12px;
+  }
+}
+
+.landing-skin .stat-number {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 300;
+  font-size: clamp(48px, 6vw, 96px);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variation-settings: 'opsz' 144, 'SOFT' 50;
+}
+
+.landing-skin .stat-label {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  opacity: 0.6;
+  margin-top: 8px;
+}
+
+/* Header nav links: small uppercase mono */
+.landing-skin header nav a {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+/* Lede paragraph helper (optional class) */
+.landing-skin .lede {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(17px, 1.4vw, 20px);
+  line-height: 1.55;
+  opacity: 0.78;
+  max-width: 56ch;
+}
+
+/* Section padding upgrade on landing */
+@media (min-width: 1024px) {
+  .landing-skin section {
+    padding-top: 120px;
+    padding-bottom: 120px;
   }
 }
 

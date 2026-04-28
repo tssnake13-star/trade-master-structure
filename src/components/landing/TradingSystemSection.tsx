@@ -171,8 +171,9 @@ const TradingSystemSection = () => {
     <section id="trading-system" className="py-16 md:py-24 section-animate">
       <div className="container-landing">
         <div className="max-w-4xl mx-auto">
-          <h2 className="heading-section text-foreground mb-4">
-            Как работает система изнутри
+          <span className="section-label">011 · Архитектура</span>
+          <h2 className="text-foreground mb-4">
+            Как работает <em>система</em> <span className="mute">изнутри</span>
           </h2>
           <div
             className="mt-10 md:mt-14 rounded-2xl p-5 md:p-8 relative overflow-hidden"

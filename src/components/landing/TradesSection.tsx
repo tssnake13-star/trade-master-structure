@@ -67,8 +67,9 @@ const TradesSection = () => {
     <section id="trades" className="py-12 md:py-20 section-animate">
       <div className="container-landing">
         <div className="max-w-4xl">
-          <h2 className="heading-section text-foreground">
-            Как выглядит сделка, когда есть система
+          <span className="section-label">007 · Сделки</span>
+          <h2 className="text-foreground">
+            Как выглядит <em>сделка</em>, <span className="mute">когда есть система</span>
           </h2>
           
           <p className="mt-4 text-base md:text-lg text-muted-foreground">

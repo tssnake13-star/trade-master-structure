@@ -10,8 +10,9 @@ const FiltrationSection = () => {
     <section className="py-12 md:py-20 bg-card/50">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <h2 className="heading-section text-foreground">
-            Фильтрация торговых ситуаций
+          <span className="section-label">Фильтрация</span>
+          <h2 className="text-foreground">
+            <em>Фильтрация</em> <span className="mute">торговых ситуаций</span>
           </h2>
           
           <div className="mt-6 md:mt-8 space-y-4">

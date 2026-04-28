@@ -21,8 +21,9 @@ const FitSection = () => {
     <section className="section-animate py-12 md:py-20 bg-card/50">
       <div className="container-landing">
         <div className="max-w-4xl">
-          <h2 className="heading-section text-foreground">
-            Это подойдёт не всем
+          <span className="section-label">009 · Фильтр</span>
+          <h2 className="text-foreground">
+            Это <em>подойдёт</em> <span className="mute">не всем</span>
           </h2>
 
           <p className="mt-4 text-base md:text-lg text-muted-foreground">

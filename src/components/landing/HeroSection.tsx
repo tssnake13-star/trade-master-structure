@@ -11,9 +11,9 @@ const HeroSection = () => {
         <div className="flex flex-col lg:flex-row items-center gap-6 md:gap-12 lg:gap-16">
           {/* Text Content */}
           <div className="flex-1 max-w-2xl order-2 lg:order-1">
-            <h1 className="text-2xl md:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-foreground fade-in-up">
-              Вы уже умеете анализировать рынок<br />
-              Но всё равно теряете на решениях
+            <h1 className="leading-tight text-foreground fade-in-up">
+              Вы уже умеете <em>анализировать</em> рынок<br />
+              <span className="mute">Но всё равно теряете на решениях</span>
             </h1>
             <div className="mt-4 md:mt-6 space-y-3 fade-in-up fade-in-up-delay-1">
               <p className="text-base md:text-lg lg:text-xl text-foreground/90 leading-snug">

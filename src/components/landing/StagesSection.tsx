@@ -51,8 +51,9 @@ const StagesSection = () => {
     <section id="stages" className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-4xl">
-          <h2 className="heading-section text-foreground">
-            Как выстраивается система
+          <span className="section-label">014 · Путь</span>
+          <h2 className="text-foreground">
+            Как <em>выстраивается</em> <span className="mute">система</span>
           </h2>
           <p className="mt-3 text-sm text-muted-foreground">
             Шаг за шагом — от понимания к стабильной работе.
