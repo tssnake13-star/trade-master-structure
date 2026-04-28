@@ -3,6 +3,7 @@ import Header from '@/components/landing/Header';
 import StickyHeader from '@/components/landing/StickyHeader';
 import HeroSection from '@/components/landing/HeroSection';
 import StatsCounter from '@/components/landing/StatsCounter';
+import InstrumentTicker from '@/components/landing/InstrumentTicker';
 import NotBeginnersSection from '@/components/landing/NotBeginnersSection';
 import WhyCoursesFailSection from '@/components/landing/WhyCoursesFailSection';
 import DecisionProcessSection from '@/components/landing/DecisionProcessSection';
@@ -36,6 +37,7 @@ const Index = () => {
       <StickyHeader />
       <main>
         <HeroSection />
+        <InstrumentTicker />
         <StatsCounter />
         <NotBeginnersSection />
         <WhyCoursesFailSection />
