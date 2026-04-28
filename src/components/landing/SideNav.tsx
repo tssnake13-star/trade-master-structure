@@ -7,13 +7,13 @@ const sections = [
   { id: 'rules', num: '003', label: 'Правила' },
   { id: 'errors', num: '004', label: 'Ошибки' },
   { id: 'what-goes-wrong', num: '005', label: 'Фаза' },
+  { id: 'trading-system', num: '011', label: 'Архитектура' },
   { id: 'proof', num: '006', label: 'Доказательства' },
   { id: 'trades', num: '007', label: 'Сделки' },
   { id: 'stages', num: '014', label: 'Путь' },
   { id: 'results', num: '008', label: 'Результат' },
   { id: 'filter', num: '009', label: 'Фильтр' },
   { id: 'formats', num: '010', label: 'Сотрудничество' },
-  { id: 'trading-system', num: '011', label: 'Архитектура' },
   { id: 'author', num: '012', label: 'Автор' },
 ];
 
