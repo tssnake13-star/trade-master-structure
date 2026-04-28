@@ -83,13 +83,14 @@ const HeroSection = () => {
               src={heroAuthor}
               alt="Сергей Тё — автор системы TRADELIKETYO"
               className="absolute inset-0 w-full h-full object-cover object-top"
+              style={{ filter: 'brightness(0.35) contrast(0.9)' }}
             />
             {/* Heavy dark veil — silhouette barely visible */}
             <div
               className="absolute inset-0 pointer-events-none"
               style={{
                 background:
-                  'linear-gradient(135deg, hsl(var(--background) / 0.96) 0%, hsl(var(--background) / 0.85) 35%, hsl(var(--background) / 0.7) 65%, hsl(var(--background) / 0.55) 100%)',
+                  'linear-gradient(135deg, hsl(var(--background) / 0.98) 0%, hsl(var(--background) / 0.92) 40%, hsl(var(--background) / 0.85) 75%, hsl(var(--background) / 0.78) 100%)',
               }}
             />
             {/* Warm glow top-left for depth (как на референсе) */}
@@ -97,7 +98,7 @@ const HeroSection = () => {
               className="absolute inset-0 pointer-events-none mix-blend-screen opacity-50"
               style={{
                 background:
-                  'radial-gradient(circle at 25% 20%, hsl(36 35% 35% / 0.55), transparent 55%)',
+                  'radial-gradient(circle at 30% 25%, hsl(36 40% 40% / 0.7), transparent 60%)',
               }}
             />
             {/* Left edge fade into text column */}
