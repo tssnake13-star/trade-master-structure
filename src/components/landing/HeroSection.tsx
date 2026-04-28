@@ -12,8 +12,8 @@ const HeroSection = () => {
           {/* Text Content */}
           <div className="w-full lg:basis-[45%] lg:max-w-[45%] order-2 lg:order-1">
             <h1 className="leading-tight text-foreground fade-in-up">
-              Вы уже умеете <em>анализировать</em> рынок<br />
-              <span className="mute">Но всё равно теряете на решениях</span>
+              Вы читаете <em>рынок.</em><br />
+              <span className="mute">Но теряете на решениях.</span>
             </h1>
             <div className="mt-4 md:mt-6 space-y-3 fade-in-up fade-in-up-delay-1">
               <p className="text-base md:text-lg lg:text-xl text-foreground/90 leading-snug">
