@@ -6,7 +6,7 @@ const FormatsSection = () => {
     <section id="formats" className="section-animate py-12 md:py-20 bg-card/50">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <span className="section-label">010 · Форматы</span>
+          <span className="section-label">010 · Сотрудничество</span>
           <h2 className="text-foreground">
             Как можно <em>работать</em> <span className="mute">дальше</span>
           </h2>
