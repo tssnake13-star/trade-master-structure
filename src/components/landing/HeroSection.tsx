@@ -11,7 +11,7 @@ const HeroSection = () => {
         <div className="flex flex-col lg:flex-row items-center gap-6 md:gap-12 lg:gap-16">
           {/* Text Content */}
           <div className="w-full lg:basis-[45%] lg:max-w-[45%] order-2 lg:order-1">
-            <div className="section-label mb-4">01 · STRUCTURAL TRADING · СИСТЕМА ДОПУСКА</div>
+            <div className="section-label mb-4">TLT · STRUCTURAL TRADING · ADMISSION SYSTEM</div>
             <h1 className="leading-tight text-foreground fade-in-up">
               Вы читаете <em>рынок.</em> <span className="mute">Но теряете на решениях.</span>
             </h1>
