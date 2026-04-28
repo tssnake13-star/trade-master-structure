@@ -7,31 +7,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..600,30..100;1,9..144,300..600,30..100&display=swap');
 
 [data-school-skin] {
+  /* Mapped to landing tokens (src/index.css) for full palette parity */
   /* Surfaces */
-  --tly-bg:        oklch(0.16 0.005 240);
-  --tly-bg-elev:   oklch(0.19 0.005 240);
-  --tly-bg-soft:   oklch(0.21 0.005 240);
-  --tly-bg-deep:   oklch(0.13 0.005 240);
+  --tly-bg:        hsl(var(--background));
+  --tly-bg-elev:   hsl(var(--card));
+  --tly-bg-soft:   hsl(var(--secondary));
+  --tly-bg-deep:   hsl(206 14% 4%);
 
   /* Text */
-  --tly-fg:        oklch(0.94 0.005 90);
-  --tly-fg-mute:   oklch(0.72 0.005 90);
-  --tly-fg-dim:    oklch(0.52 0.005 90);
-  --tly-fg-faint:  oklch(0.40 0.005 90);
+  --tly-fg:        hsl(var(--foreground));
+  --tly-fg-mute:   hsl(var(--muted-foreground));
+  --tly-fg-dim:    hsl(var(--muted-foreground) / 0.6);
+  --tly-fg-faint:  hsl(var(--muted-foreground) / 0.4);
 
   /* Lines */
-  --tly-line:      oklch(0.30 0.005 240);
-  --tly-line-soft: oklch(0.24 0.005 240);
+  --tly-line:      hsl(var(--border));
+  --tly-line-soft: hsl(var(--rule-soft));
 
-  /* Accent — warm gold */
-  --tly-accent:        oklch(0.82 0.09 78);
-  --tly-accent-dim:    oklch(0.55 0.06 78);
-  --tly-accent-soft:   oklch(0.82 0.09 78 / 0.16);
+  /* Accent — warm (matches landing --warm / --accent) */
+  --tly-accent:        hsl(var(--accent));
+  --tly-accent-dim:    hsl(var(--accent-dim));
+  --tly-accent-soft:   hsl(var(--accent) / 0.16);
 
   /* Status */
-  --tly-success:   oklch(0.78 0.10 150);
-  --tly-warn:      oklch(0.78 0.12 70);
-  --tly-danger:    oklch(0.66 0.18 25);
+  --tly-success:   hsl(150 35% 55%);
+  --tly-warn:      hsl(37 65% 60%);
+  --tly-danger:    hsl(var(--destructive));
 
   /* Type */
   --tly-font-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
