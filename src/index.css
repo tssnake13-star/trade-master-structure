@@ -179,7 +179,7 @@
   font-style: italic;
   font-weight: 400;
   font-variation-settings: 'opsz' 144, 'SOFT' 100;
-  color: inherit;
+  color: hsl(36 29% 40%);
 }
 
 .landing-skin .mute {
