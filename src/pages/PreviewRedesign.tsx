@@ -13,10 +13,7 @@ import WhatGoesWrongSection from '@/components/landing/WhatGoesWrongSection';
 import StagesSection from '@/components/landing/StagesSection';
 import ResultsSection from '@/components/landing/ResultsSection';
 import FitSection from '@/components/landing/FitSection';
-import AuthorSection from '@/components/landing/AuthorSection';
-import DualCTASection from '@/components/landing/DualCTASection';
 import LogoSection from '@/components/landing/LogoSection';
-import Footer from '@/components/landing/Footer';
 
 import RedesignHero from '@/components/redesign/RedesignHero';
 import SideProgress from '@/components/redesign/SideProgress';
@@ -25,6 +22,10 @@ import RedesignStats from '@/components/redesign/RedesignStats';
 import RedesignProof from '@/components/redesign/RedesignProof';
 import RedesignTrades from '@/components/redesign/RedesignTrades';
 import RedesignFormats from '@/components/redesign/RedesignFormats';
+import RedesignAuthor from '@/components/redesign/RedesignAuthor';
+import RedesignFinalCTA from '@/components/redesign/RedesignFinalCTA';
+import RedesignFooter from '@/components/redesign/RedesignFooter';
+import WordmarkDivider from '@/components/redesign/WordmarkDivider';
 
 /**
  * /preview-redesign
@@ -43,7 +44,7 @@ const PreviewRedesign = () => {
   return (
     <div data-preview-skin className="min-h-screen bg-background text-foreground landing-skin">
       <div className="pv-banner">
-        <span className="pv-banner__label">Preview · Redesign draft · Stage 3/5</span>
+        <span className="pv-banner__label">Preview · Redesign draft · Stage 5/5</span>
         <nav className="pv-banner__nav">
           <Link to="/" className="pv-banner__link">← Боевой сайт</Link>
         </nav>
@@ -67,6 +68,9 @@ const PreviewRedesign = () => {
           <WhatGoesWrongSection />
         </div>
 
+        {/* Wordmark divider 01 — переход к системе */}
+        <WordmarkDivider text="Структура" emphasis="важнее сигнала" />
+
         {/* Этап 2 — горизонтальный таймлайн + SVG-схема Trade OS */}
         <RedesignArchitecture />
 
@@ -80,14 +84,16 @@ const PreviewRedesign = () => {
         <FitSection />
         <RedesignFormats />
 
-        {/* Этап 5 */}
-        <div id="author">
-          <AuthorSection />
-        </div>
-        <DualCTASection />
+        {/* Этап 5 — Author / CTA / Footer */}
+        <RedesignAuthor />
+
+        {/* Wordmark divider 02 — переход к допуску */}
+        <WordmarkDivider text="Допуск," emphasis="не сигнал" />
+
+        <RedesignFinalCTA />
         <LogoSection />
       </main>
-      <Footer />
+      <RedesignFooter />
     </div>
   );
 };
