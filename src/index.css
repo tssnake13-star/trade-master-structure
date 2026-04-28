@@ -53,6 +53,15 @@
     --editorial-text: 44 12% 95%;
     --editorial-muted: 220 6% 60%;
     --editorial-accent: 210 25% 70%;
+
+    /* Two-accent system (redesign) */
+    --warm: 37 65% 70%;
+    --warm-dim: 36 29% 40%;
+    --cool: 220 35% 65%;
+    --cool-dim: 220 25% 45%;
+
+    /* Editorial soft rule */
+    --rule-soft: 220 6% 14%;
   }
 
   .dark {
@@ -402,4 +411,91 @@
 .ticker-track {
   animation: ticker-scroll 40s linear infinite;
   will-change: transform;
+}
+
+/* =====================================================
+   REDESIGN UTILITIES
+   Used by /preview-redesign components.
+   ===================================================== */
+
+.landing-skin .kicker {
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground) / 0.6);
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.landing-skin .kicker .num {
+  color: hsl(var(--cool));
+}
+.landing-skin .kicker .dot {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  background: hsl(var(--rule-soft));
+  border-radius: 50%;
+  margin: 0 10px;
+  vertical-align: middle;
+}
+
+.wordmark {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: clamp(80px, 18vw, 280px);
+  line-height: 0.9;
+  font-weight: 320;
+  letter-spacing: -0.04em;
+  color: hsl(var(--secondary));
+  text-align: center;
+  padding: 60px 0;
+  user-select: none;
+  font-variation-settings: 'opsz' 144, 'SOFT' 60;
+}
+.wordmark em {
+  color: hsl(var(--warm) / 0.4);
+  font-style: italic;
+}
+
+.drop-cap::first-letter {
+  font-family: 'Fraunces', Georgia, serif;
+  font-size: 86px;
+  line-height: 0.85;
+  float: left;
+  color: hsl(var(--warm));
+  padding: 6px 14px 0 0;
+  font-weight: 400;
+  font-variation-settings: 'opsz' 144, 'SOFT' 60;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Accent line reveal (hover) */
+.accent-line {
+  position: relative;
+}
+.accent-line::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  width: 100%;
+  background: hsl(var(--warm));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s ease;
+}
+.accent-line:hover::after {
+  transform: scaleX(1);
 }
