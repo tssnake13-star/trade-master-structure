@@ -246,11 +246,17 @@ const ArchitectureSVG = () => {
   ];
 
   // Module rectangles in corners
-  const corners = [
-    { ...modules[0], x: 40, y: 40, anchor: 'start' as const },
-    { ...modules[1], x: W - 40, y: 40, anchor: 'end' as const },
-    { ...modules[2], x: 40, y: H - 40, anchor: 'start' as const, bottom: true },
-    { ...modules[3], x: W - 40, y: H - 40, anchor: 'end' as const, bottom: true },
+  type Corner = (typeof modules)[number] & {
+    x: number;
+    y: number;
+    anchor: 'start' | 'end';
+    bottom: boolean;
+  };
+  const corners: Corner[] = [
+    { ...modules[0], x: 40, y: 40, anchor: 'start', bottom: false },
+    { ...modules[1], x: W - 40, y: 40, anchor: 'end', bottom: false },
+    { ...modules[2], x: 40, y: H - 40, anchor: 'start', bottom: true },
+    { ...modules[3], x: W - 40, y: H - 40, anchor: 'end', bottom: true },
   ];
 
   return (
