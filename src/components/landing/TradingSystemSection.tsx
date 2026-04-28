@@ -78,7 +78,7 @@ const ArrowDown = () => (
 );
 
 const TacticCard = ({ tactic }: { tactic: (typeof tactics)[number] }) => (
-  <div className="rounded-xl px-4 py-5 md:px-5 md:py-5 relative overflow-hidden bg-card border border-border shadow-[0_4px_24px_-12px_rgba(0,0,0,0.6)] md:shadow-none border-l-2 border-l-accent/60 md:border-l md:border-l-border">
+  <div className="rounded-xl px-4 py-5 md:px-5 md:py-5 relative overflow-hidden bg-card border border-border shadow-[0_8px_28px_-10px_hsl(36_29%_40%/0.45)] border-l-2 border-l-accent/60 md:border-l md:border-l-border">
     <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-foreground/30 to-transparent" />
     <div className="text-mono text-[10px] uppercase tracking-[0.3em] mb-2 text-accent/80 md:text-muted-foreground">
       {tactic.step}
