@@ -1,6 +1,7 @@
 import useScrollAnimate from '@/hooks/useScrollAnimate';
 import Header from '@/components/landing/Header';
 import StickyHeader from '@/components/landing/StickyHeader';
+import SideNav from '@/components/landing/SideNav';
 import HeroSection from '@/components/landing/HeroSection';
 import StatsCounter from '@/components/landing/StatsCounter';
 import InstrumentTicker from '@/components/landing/InstrumentTicker';
@@ -35,6 +36,7 @@ const Index = () => {
     <div className="min-h-screen bg-background landing-skin">
       <Header />
       <StickyHeader />
+      <SideNav />
       <main>
         <HeroSection />
         <InstrumentTicker />

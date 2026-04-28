@@ -6,7 +6,7 @@ import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 const HeroSection = () => {
   const heroAuthor = useSiteAsset(SITE_ASSET_KEYS.heroAuthor, heroAuthorFallback);
   return (
-    <section className="min-h-[100svh] lg:min-h-screen flex items-center pt-16 md:pt-20 pb-8 md:pb-16 lg:pb-24">
+    <section id="hero" className="min-h-[100svh] lg:min-h-screen flex items-center pt-16 md:pt-20 pb-8 md:pb-16 lg:pb-24">
       <div className="container-landing">
         <div className="flex flex-col lg:flex-row items-center gap-6 md:gap-12 lg:gap-16">
           {/* Text Content */}
