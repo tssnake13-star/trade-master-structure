@@ -23,7 +23,7 @@ const ProblemSection = () => {
     <section id="errors" className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-4xl">
-          <span className="section-label">004 · Ошибки</span>
+          <span className="section-label">04 · Ошибки</span>
           <h2 className="text-foreground">
             3 <em>ошибки</em>, <span className="mute">которые сливают результат</span>
           </h2>

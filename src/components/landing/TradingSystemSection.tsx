@@ -117,7 +117,7 @@ const TradingSystemSection = () => {
     <section id="trading-system" className="py-16 md:py-24 section-animate">
       <div className="container-landing">
         <div className="max-w-4xl mx-auto">
-          <span className="section-label">011 · Архитектура</span>
+          <span className="section-label">06 · Архитектура</span>
           <h2 className="text-foreground mb-4">
             Как работает <em>система</em> <span className="mute">изнутри</span>
           </h2>
