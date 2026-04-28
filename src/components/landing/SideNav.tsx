@@ -1,17 +1,24 @@
 import { useEffect, useState } from 'react';
 
+// In page-flow order, using each section's real section-label
 const sections = [
-  { id: 'hero', num: '01', label: 'ОТКРЫТИЕ' },
-  { id: 'what-goes-wrong', num: '02', label: 'ПРОБЛЕМА' },
-  { id: 'trading-system', num: '03', label: 'СИСТЕМА' },
-  { id: 'trades', num: '04', label: 'СДЕЛКИ' },
-  { id: 'proof', num: '05', label: 'ГОЛОСА' },
-  { id: 'author', num: '06', label: 'АВТОР' },
-  { id: 'formats', num: '07', label: 'ФОРМАТЫ' },
+  { id: 'experience', num: '001', label: 'Опыт' },
+  { id: 'learning', num: '002', label: 'Обучение' },
+  { id: 'rules', num: '003', label: 'Правила' },
+  { id: 'errors', num: '004', label: 'Ошибки' },
+  { id: 'what-goes-wrong', num: '005', label: 'Фаза' },
+  { id: 'proof', num: '006', label: 'Доказательства' },
+  { id: 'trades', num: '007', label: 'Сделки' },
+  { id: 'stages', num: '014', label: 'Путь' },
+  { id: 'results', num: '008', label: 'Результат' },
+  { id: 'filter', num: '009', label: 'Фильтр' },
+  { id: 'formats', num: '010', label: 'Сотрудничество' },
+  { id: 'trading-system', num: '011', label: 'Архитектура' },
+  { id: 'author', num: '012', label: 'Автор' },
 ];
 
 const SideNav = () => {
-  const [active, setActive] = useState<string>('hero');
+  const [active, setActive] = useState<string>(sections[0].id);
 
   useEffect(() => {
     const targets = sections
@@ -26,7 +33,7 @@ const SideNav = () => {
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
         if (visible[0]) setActive(visible[0].target.id);
       },
-      { threshold: [0.2, 0.5, 0.8], rootMargin: '-30% 0px -40% 0px' }
+      { threshold: [0.2, 0.5, 0.8], rootMargin: '-30% 0px -50% 0px' }
     );
     targets.forEach((el) => io.observe(el));
     return () => io.disconnect();
@@ -35,7 +42,7 @@ const SideNav = () => {
   return (
     <nav
       aria-label="Навигация по разделам"
-      className="hidden xl:flex fixed left-8 top-1/2 -translate-y-1/2 z-40 flex-col gap-3"
+      className="hidden xl:flex fixed left-8 top-1/2 -translate-y-1/2 z-40 flex-col gap-2.5"
       style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}
     >
       {sections.map((s) => {

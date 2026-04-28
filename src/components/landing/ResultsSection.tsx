@@ -9,7 +9,7 @@ const results = [
 
 const ResultsSection = () => {
   return (
-    <section className="section-animate py-12 md:py-20">
+    <section id="results" className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-3xl">
           <span className="section-label">008 · Результат</span>
