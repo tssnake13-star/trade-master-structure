@@ -10,7 +10,7 @@ const HeroSection = () => {
       <div className="container-landing">
         <div className="flex flex-col lg:flex-row items-center gap-6 md:gap-12 lg:gap-16">
           {/* Text Content */}
-          <div className="flex-1 max-w-2xl order-2 lg:order-1">
+          <div className="w-full lg:basis-[45%] lg:max-w-[45%] order-2 lg:order-1">
             <h1 className="leading-tight text-foreground fade-in-up">
               Вы уже умеете <em>анализировать</em> рынок<br />
               <span className="mute">Но всё равно теряете на решениях</span>
@@ -57,8 +57,8 @@ const HeroSection = () => {
           </div>
           
           {/* Author Photo */}
-          <div className="flex-shrink-0 fade-in-up fade-in-up-delay-1 order-1 lg:order-2">
-            <div className="relative w-48 h-56 md:w-72 md:h-[24rem] lg:w-[28rem] lg:h-[36rem] xl:w-[32rem] xl:h-[44rem] rounded-xl md:rounded-2xl overflow-hidden">
+          <div className="w-full lg:basis-[55%] lg:max-w-[55%] fade-in-up fade-in-up-delay-1 order-1 lg:order-2">
+            <div className="relative w-full h-56 md:h-[24rem] lg:h-[600px] xl:h-[720px] rounded-xl md:rounded-2xl overflow-hidden">
               <img
                 src={heroAuthor}
                 alt="Сергей — автор системы TRADELIKETYO"
