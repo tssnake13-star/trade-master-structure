@@ -5,6 +5,7 @@ import SideNav from '@/components/landing/SideNav';
 import HeroSection from '@/components/landing/HeroSection';
 import StatsCounter from '@/components/landing/StatsCounter';
 import InstrumentTicker from '@/components/landing/InstrumentTicker';
+import TwoStagesSection from '@/components/landing/TwoStagesSection';
 import NotBeginnersSection from '@/components/landing/NotBeginnersSection';
 import WhyCoursesFailSection from '@/components/landing/WhyCoursesFailSection';
 import DecisionProcessSection from '@/components/landing/DecisionProcessSection';
@@ -41,6 +42,7 @@ const Index = () => {
         <HeroSection />
         <InstrumentTicker />
         <StatsCounter />
+        <TwoStagesSection />
         <NotBeginnersSection />
         <WhyCoursesFailSection />
         <DecisionProcessSection />
