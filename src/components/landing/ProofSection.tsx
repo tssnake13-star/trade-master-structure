@@ -96,7 +96,7 @@ const ProofSection = () => {
     <section id="proof" className="py-12 md:py-20 bg-card/50 section-animate">
       <div className="container-landing">
         <div className="max-w-4xl">
-          <span className="section-label">006 · Доказательства</span>
+          <span className="section-label">07 · Доказательства</span>
           <h2 className="text-foreground">
             Что происходит, когда <em>появляется</em> <span className="mute">система</span>
           </h2>

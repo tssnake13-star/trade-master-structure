@@ -1,20 +1,19 @@
 import { useEffect, useState } from 'react';
 
-// In page-flow order, using each section's real section-label
 const sections = [
-  { id: 'experience', num: '001', label: 'Опыт' },
-  { id: 'learning', num: '002', label: 'Обучение' },
-  { id: 'rules', num: '003', label: 'Правила' },
-  { id: 'errors', num: '004', label: 'Ошибки' },
-  { id: 'what-goes-wrong', num: '005', label: 'Фаза' },
-  { id: 'trading-system', num: '011', label: 'Архитектура' },
-  { id: 'proof', num: '006', label: 'Доказательства' },
-  { id: 'trades', num: '007', label: 'Сделки' },
-  { id: 'stages', num: '014', label: 'Путь' },
-  { id: 'results', num: '008', label: 'Результат' },
-  { id: 'filter', num: '009', label: 'Фильтр' },
-  { id: 'formats', num: '010', label: 'Сотрудничество' },
-  { id: 'author', num: '012', label: 'Автор' },
+  { id: 'experience', num: '01', label: 'Опыт' },
+  { id: 'learning', num: '02', label: 'Обучение' },
+  { id: 'rules', num: '03', label: 'Правила' },
+  { id: 'errors', num: '04', label: 'Ошибки' },
+  { id: 'what-goes-wrong', num: '05', label: 'Фаза' },
+  { id: 'trading-system', num: '06', label: 'Архитектура' },
+  { id: 'proof', num: '07', label: 'Доказательства' },
+  { id: 'trades', num: '08', label: 'Сделки' },
+  { id: 'stages', num: '09', label: 'Путь' },
+  { id: 'results', num: '10', label: 'Результат' },
+  { id: 'filter', num: '11', label: 'Фильтр' },
+  { id: 'formats', num: '12', label: 'Сотрудничество' },
+  { id: 'author', num: '13', label: 'Автор' },
 ];
 
 const SideNav = () => {
