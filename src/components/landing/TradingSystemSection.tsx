@@ -71,94 +71,40 @@ const stats = [
   { value: '8:1+', label: 'R:R резонансных сделок', sublabel: 'наблюдение с июня 2020' },
 ];
 
-const schemePalette = {
-  bg: 'hsl(225 36% 4%)',
-  surface: 'hsl(226 42% 9%)',
-  border: 'hsl(220 37% 19%)',
-  accentBlue: 'hsl(216 100% 58%)',
-  accentCyan: 'hsl(186 100% 50%)',
-  accentGold: 'hsl(50 100% 50%)',
-  accentGreen: 'hsl(151 100% 45%)',
-  text: 'hsl(233 40% 94%)',
-  muted: 'hsl(214 25% 44%)',
-};
-
 const ArrowDown = () => (
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4 text-muted-foreground/40">
     <path d="M12 5v14M6 13l6 6 6-6" />
   </svg>
 );
 
-const TacticCard = ({
-  tactic,
-  accentColor,
-}: {
-  tactic: (typeof tactics)[number];
-  accentColor: string;
-}) => (
-  <div
-    className="rounded-[10px] px-4 py-4 md:px-5 md:py-5 relative overflow-hidden"
-    style={{
-      backgroundColor: schemePalette.surface,
-      border: `1px solid ${schemePalette.border}`,
-    }}
-  >
-    <div
-      className="absolute left-0 right-0 top-0 h-px"
-      style={{
-        background: `linear-gradient(90deg, ${accentColor}, transparent)`,
-      }}
-    />
-    <div
-      className="text-mono text-[10px] uppercase tracking-[0.3em] mb-2"
-      style={{ color: accentColor }}
-    >
+const TacticCard = ({ tactic }: { tactic: (typeof tactics)[number] }) => (
+  <div className="rounded-xl px-4 py-4 md:px-5 md:py-5 relative overflow-hidden bg-card border border-border">
+    <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-foreground/30 to-transparent" />
+    <div className="text-mono text-[10px] uppercase tracking-[0.3em] mb-2 text-muted-foreground">
       {tactic.step}
     </div>
-    <h3 className="text-lg md:text-xl font-semibold leading-tight" style={{ color: schemePalette.text }}>
+    <h3 className="text-lg md:text-xl font-semibold leading-tight text-foreground">
       {tactic.name}
     </h3>
-    <p className="mt-2 text-sm leading-relaxed max-w-md" style={{ color: schemePalette.muted }}>
+    <p className="mt-2 text-sm leading-relaxed max-w-md text-muted-foreground">
       {tactic.description}
     </p>
   </div>
 );
 
-const FlowCard = ({
-  node,
-  accentColor,
-}: {
-  node: (typeof flows)[number]['nodes'][number];
-  accentColor: string;
-}) => (
-  <div
-    className="w-full rounded-[10px] p-4 md:p-5"
-    style={{
-      backgroundColor: schemePalette.surface,
-      border: `1px solid ${schemePalette.border}`,
-    }}
-  >
-    <div
-      className="text-mono text-[10px] uppercase tracking-[0.24em] mb-2"
-      style={{ color: accentColor }}
-    >
+const FlowCard = ({ node }: { node: (typeof flows)[number]['nodes'][number] }) => (
+  <div className="w-full rounded-xl p-4 md:p-5 bg-card border border-border">
+    <div className="text-mono text-[10px] uppercase tracking-[0.24em] mb-2 text-muted-foreground">
       {node.step}
     </div>
-    <h4 className="text-base md:text-lg font-semibold leading-tight" style={{ color: schemePalette.text }}>
+    <h4 className="text-base md:text-lg font-semibold leading-tight text-foreground">
       {node.name}
     </h4>
-    <p className="mt-2 text-sm leading-relaxed" style={{ color: schemePalette.muted }}>
+    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
       {node.description}
     </p>
     {node.badge && (
-      <span
-        className="mt-3 inline-flex rounded-full px-3 py-1 text-[11px]"
-        style={{
-          color: schemePalette.accentGold,
-          border: `1px solid ${schemePalette.accentGold}40`,
-          backgroundColor: `${schemePalette.accentGold}14`,
-        }}
-      >
+      <span className="mt-3 inline-flex rounded-full px-3 py-1 text-mono text-[10px] text-foreground/70 border border-foreground/15 bg-foreground/[0.04]">
         {node.badge}
       </span>
     )}
@@ -175,61 +121,45 @@ const TradingSystemSection = () => {
           <h2 className="text-foreground mb-4">
             Как работает <em>система</em> <span className="mute">изнутри</span>
           </h2>
-          <div
-            className="mt-10 md:mt-14 rounded-2xl p-5 md:p-8 relative overflow-hidden"
-            style={{
-              backgroundColor: schemePalette.bg,
-              border: `1px solid ${schemePalette.border}`,
-            }}
-          >
+          <div className="mt-10 md:mt-14 rounded-2xl p-5 md:p-8 relative overflow-hidden bg-card/50 border border-border">
             <div
               className="absolute inset-0 opacity-[0.03]"
               style={{
-                backgroundImage: `linear-gradient(${schemePalette.accentBlue}12 1px, transparent 1px), linear-gradient(90deg, ${schemePalette.accentBlue}12 1px, transparent 1px)`,
+                backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
                 backgroundSize: '40px 40px',
               }}
             />
 
             <div className="relative z-10">
               <div className="mb-8 md:mb-10 text-center">
-                <div className="text-mono text-[11px] uppercase tracking-[0.4em] mb-2" style={{ color: schemePalette.accentBlue }}>
+                <div className="text-mono text-[11px] uppercase tracking-[0.4em] mb-2 text-muted-foreground">
                   TradeLikeTyo
                 </div>
-                <div className="text-3xl md:text-5xl font-semibold leading-none" style={{ color: schemePalette.text }}>
-                  <span style={{ color: schemePalette.accentCyan }}>Ecosystem</span>
+                <div className="font-serif text-4xl md:text-6xl font-normal italic leading-none text-foreground">
+                  Ecosystem
                 </div>
-                <p className="mt-3 text-sm md:text-[13px] tracking-[0.04em]" style={{ color: schemePalette.muted }}>
+                <p className="mt-3 text-sm md:text-[13px] tracking-[0.04em] text-muted-foreground">
                   Две тактики — одна экосистема — единый риск-менеджмент
                 </p>
               </div>
 
               <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-6 md:mb-8">
-                {tactics.map((tactic, index) => (
-                  <TacticCard
-                    key={tactic.id}
-                    tactic={tactic}
-                    accentColor={index === 0 ? schemePalette.accentBlue : schemePalette.accentGold}
-                  />
+                {tactics.map((tactic) => (
+                  <TacticCard key={tactic.id} tactic={tactic} />
                 ))}
               </div>
 
               <div className="md:hidden space-y-4">
                 {flows.map((flow, flowIndex) => (
                   <div key={flow.id} className="flex flex-col items-center">
-                    <TacticCard
-                      tactic={tactics[flowIndex]}
-                      accentColor={flowIndex === 0 ? schemePalette.accentBlue : schemePalette.accentGold}
-                    />
+                    <TacticCard tactic={tactics[flowIndex]} />
                     <div className="flex h-8 items-center justify-center">
                       <ArrowDown />
                     </div>
                     <div className="w-full flex flex-col items-center">
                       {flow.nodes.map((node, index) => (
                         <div key={node.name} className="w-full flex flex-col items-center">
-                          <FlowCard
-                            node={node}
-                            accentColor={flowIndex === 0 ? schemePalette.accentBlue : schemePalette.accentGold}
-                          />
+                          <FlowCard node={node} />
                           {index < flow.nodes.length - 1 && (
                             <div className="flex h-8 items-center justify-center">
                               <ArrowDown />
@@ -243,14 +173,11 @@ const TradingSystemSection = () => {
               </div>
 
               <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                {flows.map((flow, flowIndex) => (
+                {flows.map((flow) => (
                   <div key={flow.id} className="flex flex-col items-center">
                     {flow.nodes.map((node, index) => (
                       <div key={node.name} className="w-full flex flex-col items-center">
-                        <FlowCard
-                          node={node}
-                          accentColor={flowIndex === 0 ? schemePalette.accentBlue : schemePalette.accentGold}
-                        />
+                        <FlowCard node={node} />
                         {index < flow.nodes.length - 1 && (
                           <div className="flex h-8 items-center justify-center">
                             <ArrowDown />
@@ -272,30 +199,23 @@ const TradingSystemSection = () => {
                 <div className="flex h-8 items-center justify-center">
                   <ArrowDown />
                 </div>
-                <div className="mb-4 flex items-center justify-center gap-3 text-center text-mono text-[10px] uppercase tracking-[0.28em]" style={{ color: schemePalette.accentGreen }}>
-                  <span className="h-px w-10 md:w-28" style={{ background: `linear-gradient(90deg, transparent, ${schemePalette.accentGreen}59, transparent)` }} />
+                <div className="mb-4 flex items-center justify-center gap-3 text-center text-mono text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
+                  <span className="h-px w-10 md:w-28 bg-gradient-to-r from-transparent via-foreground/30 to-transparent" />
                   Единый путь исполнения
-                  <span className="h-px w-10 md:w-28" style={{ background: `linear-gradient(90deg, transparent, ${schemePalette.accentGreen}59, transparent)` }} />
+                  <span className="h-px w-10 md:w-28 bg-gradient-to-r from-transparent via-foreground/30 to-transparent" />
                 </div>
 
                 <div className="w-full max-w-2xl space-y-3">
                   {sharedNodes.map((node, index) => (
                     <div key={node.name} className="flex flex-col items-center">
-                      <div
-                        className="w-full rounded-[10px] p-4 md:p-5"
-                        style={{
-                          backgroundColor: schemePalette.surface,
-                          border: `1px solid ${index === 0 ? schemePalette.accentGreen : `${schemePalette.accentGreen}59`}`,
-                          boxShadow: index === 0 ? `0 0 24px ${schemePalette.accentGreen}1f` : 'none',
-                        }}
-                      >
-                        <div className="text-mono text-[10px] uppercase tracking-[0.24em] mb-2" style={{ color: schemePalette.accentGreen }}>
+                      <div className="w-full rounded-xl p-4 md:p-5 bg-card border border-foreground/20">
+                        <div className="text-mono text-[10px] uppercase tracking-[0.24em] mb-2 text-muted-foreground">
                           {node.step}
                         </div>
-                        <h4 className="text-base md:text-lg font-semibold leading-tight" style={{ color: schemePalette.text }}>
+                        <h4 className="text-base md:text-lg font-semibold leading-tight text-foreground">
                           {node.name}
                         </h4>
-                        <p className="mt-2 text-sm leading-relaxed" style={{ color: schemePalette.muted }}>
+                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
                           {node.description}
                         </p>
                       </div>
@@ -310,25 +230,15 @@ const TradingSystemSection = () => {
               </div>
 
               <div className="mt-8 md:mt-10 grid grid-cols-1 md:grid-cols-3 gap-3">
-                {stats.map((stat, index) => (
-                  <div
-                    key={stat.value}
-                    className="rounded-[10px] p-4 text-center"
-                    style={{
-                      backgroundColor: schemePalette.surface,
-                      border: `1px solid ${schemePalette.border}`,
-                    }}
-                  >
-                    <div
-                      className="text-2xl md:text-3xl font-semibold leading-none"
-                      style={{ color: index === 2 ? schemePalette.accentGreen : schemePalette.accentCyan }}
-                    >
+                {stats.map((stat) => (
+                  <div key={stat.value} className="rounded-xl p-4 text-center bg-card border border-border">
+                    <div className="font-serif text-3xl md:text-4xl font-normal italic leading-none text-foreground">
                       {stat.value}
                     </div>
-                    <div className="mt-2 text-sm leading-snug" style={{ color: schemePalette.text }}>
+                    <div className="mt-2 text-sm leading-snug text-foreground">
                       {stat.label}
                     </div>
-                    <div className="mt-1 text-xs leading-relaxed" style={{ color: schemePalette.muted }}>
+                    <div className="mt-1 text-xs leading-relaxed text-muted-foreground">
                       {stat.sublabel}
                     </div>
                   </div>
