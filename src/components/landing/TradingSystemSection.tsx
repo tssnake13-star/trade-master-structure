@@ -135,7 +135,7 @@ const TradingSystemSection = () => {
                 <div className="text-mono text-[11px] uppercase tracking-[0.4em] mb-2 text-muted-foreground">
                   TradeLikeTyo
                 </div>
-                <div className="font-serif text-4xl md:text-6xl font-normal italic leading-none text-foreground">
+                <div className="font-serif text-4xl md:text-6xl font-normal italic leading-none" style={{ color: 'hsl(36 29% 40%)' }}>
                   Ecosystem
                 </div>
                 <p className="mt-3 text-sm md:text-[13px] tracking-[0.04em] text-muted-foreground">
