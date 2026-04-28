@@ -8,7 +8,7 @@ const FormatsSection = () => {
         <div className="max-w-3xl">
           <span className="section-label">12 · Сотрудничество</span>
           <h2 className="text-foreground">
-            Как можно <em>работать</em> <span className="mute">дальше</span>
+            Как можно <em>работать</em> <span className="mute">вместе</span>
           </h2>
 
           <div className="mt-6 md:mt-8 space-y-4">
