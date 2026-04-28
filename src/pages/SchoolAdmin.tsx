@@ -140,6 +140,10 @@ function SettingsTab() {
             className="w-full px-3 py-2 rounded border text-sm"
             style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
           />
+          <p className="text-[11px] mt-1.5 leading-relaxed" style={{ color: '#666', fontFamily: font.mono }}>
+            Разметка: <code>*слово*</code> — акцент-италик, <code>~фраза~</code> — приглушённый цвет.
+            Пример: <code>Добро пожаловать в *систему*</code> или <code>*Допуск* ~открыт~</code>.
+          </p>
         </div>
         <div>
           <label className="block text-xs mb-1" style={{ color: '#999', fontFamily: font.mono }}>
