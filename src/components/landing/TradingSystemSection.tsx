@@ -83,7 +83,7 @@ const TacticCard = ({ tactic }: { tactic: (typeof tactics)[number] }) => (
     <div className="text-mono text-[10px] uppercase tracking-[0.3em] mb-2 text-accent/80 md:text-muted-foreground">
       {tactic.step}
     </div>
-    <h3 className="text-lg md:text-xl font-semibold leading-tight text-foreground">
+    <h3 className="text-lg md:text-xl font-semibold leading-tight" style={{ color: 'hsl(36 29% 40%)' }}>
       {tactic.name}
     </h3>
     <p className="mt-2 text-sm leading-relaxed max-w-md text-muted-foreground">
