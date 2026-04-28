@@ -3,8 +3,9 @@ const DecisionProcessSection = () => {
     <section className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <h2 className="heading-section text-foreground">
-            Без жёстких правил рынок сильнее вас
+          <span className="section-label">003 · Правила</span>
+          <h2 className="text-foreground">
+            Без <em>жёстких правил</em> <span className="mute">рынок сильнее вас</span>
           </h2>
           
           <div className="mt-6 md:mt-8 space-y-4">

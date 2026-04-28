@@ -43,8 +43,9 @@ const AlgorithmSection = () => {
     <section id="algorithm" className="py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-4xl">
-          <h2 className="heading-section text-foreground">
-            Архитектура Core Protocol
+          <span className="section-label">Архитектура</span>
+          <h2 className="text-foreground">
+            <em>Архитектура</em> <span className="mute">Core Protocol</span>
           </h2>
           <p className="mt-3 text-sm text-muted-foreground">
             Каждый шаг — фильтр безопасности. Сделка открывается только после прохождения всех уровней.

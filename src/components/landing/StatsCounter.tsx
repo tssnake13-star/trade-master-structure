@@ -27,10 +27,10 @@ const StatItem = ({ value, suffix, label, animate }: { value: number; suffix: st
   const count = useCountUp(value, 1500, animate);
   return (
     <div className="text-center py-4 md:py-0">
-      <div className="text-2xl md:text-4xl font-bold text-foreground">
+      <div className="stat-number text-foreground">
         {count}{suffix}
       </div>
-      <div className="mt-1 text-xs md:text-sm text-muted-foreground">{label}</div>
+      <div className="stat-label text-muted-foreground">{label}</div>
     </div>
   );
 };

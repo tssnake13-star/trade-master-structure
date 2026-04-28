@@ -23,8 +23,9 @@ const ProblemSection = () => {
     <section className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-4xl">
-          <h2 className="heading-section text-foreground">
-            3 ошибки, которые сливают результат
+          <span className="section-label">004 · Ошибки</span>
+          <h2 className="text-foreground">
+            3 <em>ошибки</em>, <span className="mute">которые сливают результат</span>
           </h2>
           
           <div className="mt-8 md:mt-10 grid md:grid-cols-3 gap-4">

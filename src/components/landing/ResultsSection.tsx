@@ -12,8 +12,9 @@ const ResultsSection = () => {
     <section className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <h2 className="heading-section text-foreground">
-            Что вы начинаете видеть
+          <span className="section-label">008 · Результат</span>
+          <h2 className="text-foreground">
+            Что вы <em>начинаете</em> <span className="mute">видеть</span>
           </h2>
           
           <ul className="mt-6 md:mt-8 space-y-3">

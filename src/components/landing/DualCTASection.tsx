@@ -5,8 +5,9 @@ const DualCTASection = () => {
   return (
     <section className="py-12 md:py-20">
       <div className="container-landing">
-        <h2 className="heading-section text-foreground text-center mb-8 md:mb-12">
-          Следующий шаг — за вами
+        <span className="section-label text-center block">013 · Шаг</span>
+        <h2 className="text-foreground text-center mb-8 md:mb-12">
+          Следующий шаг <em>—</em> <span className="mute">за вами</span>
         </h2>
 
         <div className="grid md:grid-cols-2 gap-4 md:gap-6 max-w-3xl mx-auto">

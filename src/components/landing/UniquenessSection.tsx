@@ -3,8 +3,9 @@ const UniquenessSection = () => {
     <section className="section-animate py-12 md:py-20 bg-card/50 border-y border-border">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <h2 className="text-xl md:text-2xl lg:text-3xl font-semibold leading-tight text-foreground">
-            Почему даже опыт не спасает
+          <span className="section-label">Опыт</span>
+          <h2 className="text-foreground">
+            Почему <em>даже опыт</em> <span className="mute">не спасает</span>
           </h2>
           
           <div className="mt-6 md:mt-8 space-y-4">

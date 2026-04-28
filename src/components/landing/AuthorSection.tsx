@@ -5,8 +5,9 @@ const AuthorSection = () => {
     <section id="author" className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-4xl">
-          <h2 className="heading-section text-foreground mb-8">
-            Кто за этим стоит
+          <span className="section-label">012 · Автор</span>
+          <h2 className="text-foreground mb-8">
+            Кто <em>за этим</em> <span className="mute">стоит</span>
           </h2>
           
           <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-start">

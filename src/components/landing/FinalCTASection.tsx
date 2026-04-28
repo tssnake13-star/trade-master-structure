@@ -6,8 +6,9 @@ const FinalCTASection = () => {
     <section className="section-animate py-12 md:py-20 bg-card/50">
       <div className="container-landing">
         <div className="max-w-2xl mx-auto text-center">
-          <h2 className="heading-section text-foreground">
-            Заберите систему допуска
+          <span className="section-label block">015 · Допуск</span>
+          <h2 className="text-foreground">
+            Заберите <em>систему</em> <span className="mute">допуска</span>
           </h2>
           
           <div className="mt-4 space-y-3 text-base md:text-lg text-muted-foreground">
