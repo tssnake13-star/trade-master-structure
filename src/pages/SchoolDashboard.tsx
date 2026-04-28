@@ -28,6 +28,28 @@ interface ProgressMap {
 
 const font = { heading: "'Inter', sans-serif", mono: "'Inter', sans-serif" };
 
+// Render a hero title supporting *italic accent* and ~muted tail~ markup,
+// matching the landing hero typography (em → accent, .mute → muted).
+function renderHeroTitle(text: string) {
+  const parts: React.ReactNode[] = [];
+  const regex = /(\*[^*]+\*|~[^~]+~)/g;
+  let last = 0;
+  let i = 0;
+  for (const m of text.matchAll(regex)) {
+    const idx = m.index ?? 0;
+    if (idx > last) parts.push(text.slice(last, idx));
+    const token = m[0];
+    if (token.startsWith('*')) {
+      parts.push(<em key={i++}>{token.slice(1, -1)}</em>);
+    } else {
+      parts.push(<span key={i++} className="mute">{token.slice(1, -1)}</span>);
+    }
+    last = idx + token.length;
+  }
+  if (last < text.length) parts.push(text.slice(last));
+  return parts.length ? parts : text;
+}
+
 export default function SchoolDashboard() {
   const { session, user, role, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
@@ -479,11 +501,11 @@ export default function SchoolDashboard() {
 
             return (
               <div className="py-8 sm:py-12">
-                <span className="tly-section-tag mb-4 inline-flex"><span className="tly-pulse" style={{ marginRight: 8 }} />Кабинет · Live</span>
-                <h1 className="text-4xl sm:text-6xl mb-3 tly-display mt-4">
-                  {welcomeTitle}
+                <div className="tly-section-tag mb-5 inline-flex items-center"><span className="tly-pulse" style={{ marginRight: 10 }} />TLT · КАБИНЕТ · LIVE</div>
+                <h1 className="tly-display leading-[1.02] text-4xl sm:text-5xl lg:text-6xl xl:text-7xl mt-2 mb-5 fade-in-up">
+                  {renderHeroTitle(welcomeTitle)}
                 </h1>
-                <p className="text-sm mb-8 tly-mono uppercase tracking-[0.2em]" style={{ color: '#888' }}>
+                <p className="tly-mono uppercase tracking-[0.22em] text-[11px] sm:text-xs mb-10 fade-in-up fade-in-up-delay-1" style={{ color: 'var(--tly-fg-mute)' }}>
                   {welcomeSubtitle}
                 </p>
 
