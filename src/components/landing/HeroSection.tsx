@@ -1,72 +1,124 @@
-import { ArrowRight, MessageCircle } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import heroAuthorFallback from '@/assets/hero-author.jpg';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 
 const HeroSection = () => {
   const heroAuthor = useSiteAsset(SITE_ASSET_KEYS.heroAuthor, heroAuthorFallback);
+
   return (
-    <section className="min-h-[100svh] lg:min-h-screen flex items-center pt-16 md:pt-20 pb-8 md:pb-16 lg:pb-24">
-      <div className="container-landing">
-        <div className="flex flex-col lg:flex-row items-center gap-6 md:gap-12 lg:gap-16">
-          {/* Text Content */}
-          <div className="w-full lg:basis-[45%] lg:max-w-[45%] order-2 lg:order-1">
-            <h1 className="leading-tight text-foreground fade-in-up">
+    <section className="relative min-h-screen w-full bg-background overflow-hidden">
+      <div className="relative grid grid-cols-1 min-[900px]:grid-cols-[58%_42%] min-h-screen">
+        {/* LEFT — text */}
+        <div className="flex items-center pt-24 pb-16 px-6 md:px-12 lg:px-16">
+          <div className="w-full max-w-[760px]">
+            {/* Section label */}
+            <div
+              className="mb-10 uppercase"
+              style={{
+                fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                fontSize: 12,
+                letterSpacing: '0.18em',
+              }}
+            >
+              <span style={{ color: 'hsl(var(--accent))' }}>01</span>
+              <span style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }}> · STRUCTURAL TRADING · СИСТЕМА ДОПУСКА</span>
+            </div>
+
+            {/* H1 */}
+            <h1
+              className="text-foreground"
+              style={{
+                fontFamily: "'Fraunces', 'Cormorant Garamond', Georgia, serif",
+                fontSize: 'clamp(56px, 7vw, 96px)',
+                lineHeight: 0.95,
+                fontWeight: 380,
+                letterSpacing: '-0.02em',
+              }}
+            >
               Вы читаете <em>рынок.</em><br />
               <span className="mute">Но теряете на решениях.</span>
             </h1>
-            <div className="mt-4 md:mt-6 space-y-3 fade-in-up fade-in-up-delay-1">
-              <p className="text-base md:text-lg lg:text-xl text-foreground/90 leading-snug">
-                Вы не новичок
-              </p>
-              <p className="text-base md:text-lg lg:text-xl text-muted-foreground leading-snug">
-                Вы видите структуру<br />
-                понимаете направление
-              </p>
-              <p className="text-base md:text-lg lg:text-xl text-foreground/90 leading-snug font-medium">
-                Но в момент входа всё ломается
-              </p>
-              <p className="text-base md:text-lg lg:text-xl text-muted-foreground leading-snug">
-                Решение принимается не системой<br />
-                а состоянием
-              </p>
-            </div>
-            
-            {/* CTA */}
-            <div className="mt-8 md:mt-10 flex flex-col gap-3 fade-in-up fade-in-up-delay-2">
+
+            {/* Lede */}
+            <p
+              className="mt-8 text-foreground/85"
+              style={{
+                fontFamily: "'Inter', system-ui, sans-serif",
+                fontWeight: 400,
+                fontSize: 18,
+                lineHeight: 1.55,
+                maxWidth: '52ch',
+              }}
+            >
+              Структура есть. Анализ есть. <strong className="font-semibold text-foreground">В момент входа всё ломается</strong> — потому что решение принимает не система, а состояние.
+            </p>
+
+            {/* CTAs */}
+            <div className="mt-12 flex flex-wrap items-center gap-4">
               <a
                 href={TELEGRAM_LINKS.bot}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-primary group text-base md:text-lg"
+                className="inline-flex items-center gap-2 rounded-full bg-foreground text-background px-6 py-3 text-sm font-medium transition-opacity hover:opacity-90"
               >
-                Получить систему допуска
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                Получить допуск
+                <span aria-hidden>→</span>
               </a>
-              
               <a
                 href={TELEGRAM_LINKS.dm}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm text-muted-foreground font-medium rounded-lg border border-border/50 hover:text-foreground hover:border-border transition-all duration-200"
+                className="inline-flex items-center rounded-full border border-border/60 bg-transparent px-6 py-3 text-sm font-medium text-foreground/90 transition-colors hover:border-foreground/60"
               >
-                <MessageCircle className="w-4 h-4" />
                 Написать Сергею
               </a>
             </div>
           </div>
-          
-          {/* Author Photo */}
-          <div className="w-full lg:basis-[55%] lg:max-w-[55%] fade-in-up fade-in-up-delay-1 order-1 lg:order-2">
-            <div className="relative w-full h-56 md:h-[24rem] lg:h-[600px] xl:h-[720px] rounded-xl md:rounded-2xl overflow-hidden">
-              <img
-                src={heroAuthor}
-                alt="Сергей — автор системы TRADELIKETYO"
-                className="w-full h-full object-cover object-top brightness-[0.85]"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-background/70 via-background/20 to-background/10" />
-            </div>
-          </div>
+        </div>
+
+        {/* RIGHT — photo (hidden under 900px) */}
+        <div className="hidden min-[900px]:block relative">
+          <img
+            src={heroAuthor}
+            alt="Сергей Тё — автор системы TRADELIKETYO"
+            className="absolute inset-0 w-full h-full object-cover object-top"
+          />
+          {/* Left-edge fade into text column */}
+          <div
+            className="absolute inset-y-0 left-0 pointer-events-none"
+            style={{
+              width: 80,
+              background: 'linear-gradient(to right, hsl(var(--background)), transparent)',
+            }}
+          />
+
+          {/* Bottom-left meta */}
+          <span
+            className="absolute bottom-5 left-5 uppercase pointer-events-none"
+            style={{
+              fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+              fontSize: 10,
+              letterSpacing: '0.18em',
+              color: 'hsl(var(--foreground))',
+              opacity: 0.4,
+            }}
+          >
+            Портрет автора
+          </span>
+
+          {/* Bottom-right meta */}
+          <span
+            className="absolute bottom-5 right-5 uppercase pointer-events-none"
+            style={{
+              fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+              fontSize: 10,
+              letterSpacing: '0.18em',
+              color: 'hsl(var(--foreground))',
+              opacity: 0.4,
+            }}
+          >
+            SRG_TYO · 2026
+          </span>
         </div>
       </div>
     </section>
