@@ -3,7 +3,6 @@ const TwoStagesSection = () => {
     <section className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <span className="section-label">003 · Как можно работать вместе</span>
           <h2 className="text-foreground">
             Два этапа.<br />
             <em>Одна траектория.</em>
