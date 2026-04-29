@@ -121,6 +121,31 @@ export default function SchoolDashboard() {
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const logoVideo = useSiteAsset(SITE_ASSET_KEYS.schoolDashboardLogo, logoVideoFallback);
+  const now = useNow(1000);
+
+  // hasAccess needs role/accessMap — compute inline below as well
+  const _hasAccessEarly = (c: Course) => role === 'admin' || c.is_free || accessMap.has(c.id);
+  const _tmCourseEarly = courses.find(c => c.title === 'TRADE MASTER 4.5' && _hasAccessEarly(c)) || null;
+  const _tmAccessEarly = _tmCourseEarly ? accessMap.get(_tmCourseEarly.id) : null;
+
+  const programEnd = useMemo(() => {
+    if (!_tmAccessEarly?.granted_at) return null;
+    const start = new Date(_tmAccessEarly.granted_at);
+    return new Date(start.getTime() + 90 * 86400000);
+  }, [_tmAccessEarly?.granted_at]);
+  const daysInSystem = useMemo(() => {
+    if (!_tmAccessEarly?.granted_at) return 0;
+    const start = new Date(_tmAccessEarly.granted_at).getTime();
+    return Math.max(0, Math.floor((now.getTime() - start) / 86400000));
+  }, [_tmAccessEarly?.granted_at, now]);
+  const upcomingLives = useMemo(() => nextLiveStream(now), [now]);
+  const recentActivity = useMemo(() => {
+    return [...completions]
+      .sort((a, b) => new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime())
+      .slice(0, 5)
+      .map(c => ({ ...c, lesson: allLessons.find(l => l.id === c.lesson_id) }))
+      .filter(x => x.lesson);
+  }, [completions, allLessons]);
 
   useEffect(() => {
     if (!authLoading && !session) navigate('/school', { replace: true });
@@ -247,31 +272,8 @@ export default function SchoolDashboard() {
   const tmAccess = tmCourse ? accessMap.get(tmCourse.id) : null;
 
   // -------- end-of-program countdown: granted_at + 90d --------
-  const now = useNow(1000);
-  const programEnd = useMemo(() => {
-    if (!tmAccess?.granted_at) return null;
-    const start = new Date(tmAccess.granted_at);
-    return new Date(start.getTime() + 90 * 86400000);
-  }, [tmAccess?.granted_at]);
-  const daysInSystem = useMemo(() => {
-    if (!tmAccess?.granted_at) return 0;
-    const start = new Date(tmAccess.granted_at).getTime();
-    return Math.max(0, Math.floor((now.getTime() - start) / 86400000));
-  }, [tmAccess?.granted_at, now]);
   const programCountdown = programEnd ? formatCountdown(programEnd, now) : null;
-
-  // -------- next live streams --------
-  const upcomingLives = useMemo(() => nextLiveStream(now), [now]);
   const liveCountdown = upcomingLives[0] ? formatCountdown(upcomingLives[0], now) : null;
-
-  // -------- recent activity (last 5 completions) --------
-  const recentActivity = useMemo(() => {
-    return [...completions]
-      .sort((a, b) => new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime())
-      .slice(0, 5)
-      .map(c => ({ ...c, lesson: allLessons.find(l => l.id === c.lesson_id) }))
-      .filter(x => x.lesson);
-  }, [completions, allLessons]);
 
   // -------- selected course detail (shown if selectedCourse set) --------
   const selectedCourseData = courses.find(c => c.id === selectedCourse);
