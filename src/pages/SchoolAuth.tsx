@@ -115,7 +115,7 @@ export default function SchoolAuth() {
               type="submit"
               disabled={loading}
               className="w-full py-3 rounded-lg font-medium text-sm transition-all"
-              style={{ backgroundColor: '#caa472', color: '#0a0a0a', fontFamily: "'Inter', sans-serif", opacity: loading ? 0.6 : 1 }}
+              style={{ backgroundColor: '#caa472', color: '#0a0a0a', fontFamily: "'JetBrains Mono', ui-monospace, monospace", fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.18em', fontWeight: 500, opacity: loading ? 0.6 : 1 }}
             >
               {loading ? '...' : 'Отправить ссылку'}
             </button>
@@ -190,7 +190,7 @@ export default function SchoolAuth() {
             type="submit"
             disabled={loading}
             className="w-full py-3 rounded-lg font-medium text-sm transition-all"
-            style={{ backgroundColor: '#caa472', color: '#0a0a0a', fontFamily: "'Inter', sans-serif", opacity: loading ? 0.6 : 1 }}
+            style={{ backgroundColor: '#caa472', color: '#0a0a0a', fontFamily: "'JetBrains Mono', ui-monospace, monospace", fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.18em', fontWeight: 500, opacity: loading ? 0.6 : 1 }}
           >
             {loading ? '...' : isLogin ? 'Войти' : 'Создать аккаунт'}
           </button>
