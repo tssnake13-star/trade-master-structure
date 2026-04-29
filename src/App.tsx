@@ -15,7 +15,6 @@ import SchoolStudentDetail from "./pages/SchoolStudentDetail";
 import SchoolResetPassword from "./pages/SchoolResetPassword";
 import PreviewRedesign from "./pages/PreviewRedesign";
 import SiteAssetsApplier from "./components/SiteAssetsApplier";
-import AdminFloatingButton from "./components/school/AdminFloatingButton";
 
 const queryClient = new QueryClient();
 
@@ -39,7 +38,6 @@ const App = () => (
             <Route path="/school/reset-password" element={<SchoolResetPassword />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
-          <AdminFloatingButton />
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
