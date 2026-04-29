@@ -63,29 +63,28 @@ function renderHeroTitle(text: string) {
 
 // ---------- helpers ----------
 function nextLiveStream(now: Date) {
-  // Mon (1) and Thu (4) at 20:00 GMT+5
-  const offsetMinutes = -now.getTimezoneOffset(); // local offset
-  const targetOffset = 5 * 60; // GMT+5
-  // Длительность эфира — счётчик переключается на следующий эфир
-  // только после окончания текущего, а не в момент его начала.
+  // Эфиры: понедельник (1) и четверг (4), 20:00 GMT+5 (= 15:00 UTC).
+  // Длительность эфира — счётчик удерживает текущий эфир в списке
+  // до его окончания, и только затем переключается на следующий.
   const liveDurationMs = 2 * 60 * 60 * 1000; // 2 часа
   const list: Date[] = [];
-  const base = new Date(now.getTime());
+  // Работаем в UTC, чтобы день недели не смещался в зависимости от
+  // часового пояса пользователя.
+  const startUtcMs = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
   for (let i = 0; i < 14; i++) {
-    const d = new Date(base.getTime() + i * 86400000);
-    // Get day-of-week in GMT+5
-    const utc = d.getTime() + d.getTimezoneOffset() * 60000;
-    const gmt5 = new Date(utc + targetOffset * 60000);
-    const dow = gmt5.getDay(); // in GMT+5
+    const dayUtc = new Date(startUtcMs + i * 86400000);
+    // День недели в GMT+5: добавляем 5 часов к UTC и берём UTC-день.
+    const gmt5 = new Date(dayUtc.getTime() + 5 * 60 * 60 * 1000);
+    const dow = gmt5.getUTCDay();
     if (dow === 1 || dow === 4) {
-      // 20:00 in GMT+5 → convert back to local
-      const ts = Date.UTC(gmt5.getUTCFullYear(), gmt5.getUTCMonth(), gmt5.getUTCDate(), 20 - 5, 0, 0);
-      const event = new Date(ts);
-      // Считаем эфир актуальным, пока не прошла его длительность.
-      // Это удерживает текущий эфир в списке (с обнулённым обратным
-      // отсчётом) до фактического окончания, и только потом счётчик
-      // переключается на следующий день.
-      if (event.getTime() + liveDurationMs > now.getTime()) list.push(event);
+      // 20:00 GMT+5 = 15:00 UTC того же календарного дня по GMT+5.
+      const eventMs = Date.UTC(
+        gmt5.getUTCFullYear(),
+        gmt5.getUTCMonth(),
+        gmt5.getUTCDate(),
+        15, 0, 0
+      );
+      if (eventMs + liveDurationMs > now.getTime()) list.push(new Date(eventMs));
     }
   }
   return list.slice(0, 3);
