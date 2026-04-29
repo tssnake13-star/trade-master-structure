@@ -608,24 +608,6 @@ function SelectedCourseView({
         )}
       </div>
 
-      {nextLesson && (
-        <button
-          onClick={() => onOpen(nextLesson.id)}
-          className="w-full p-5 mb-8 flex items-center justify-between transition-all hover:bg-white/[0.02] group"
-          style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 8 }}
-        >
-          <div className="text-left min-w-0">
-            <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 6 }}>
-              {progress.completed === 0 ? 'Начать' : 'Продолжить'} · занятие {lessons.indexOf(nextLesson) + 1}
-            </div>
-            <div className="truncate" style={{ fontFamily: DISPLAY, fontSize: 22, color: FG, fontWeight: 350 }}>
-              {nextLesson.title}
-            </div>
-          </div>
-          <ArrowRight size={18} style={{ color: ACCENT, flexShrink: 0, marginLeft: 16, transition: 'transform 0.3s' }} className="group-hover:translate-x-1" />
-        </button>
-      )}
-
       <div className="space-y-1">
         {lessons.map((l, i) => {
           const done = completedIds.has(l.id);
@@ -633,7 +615,7 @@ function SelectedCourseView({
           return (
             <div
               key={l.id}
-              className="flex items-center gap-4 px-4 py-3 transition-all"
+              className="flex items-start gap-3 px-0 sm:px-2 py-3 transition-all"
               style={{
                 borderTop: i === 0 ? `1px solid ${BORDER}` : 'none',
                 borderBottom: `1px solid ${BORDER}`,
@@ -653,26 +635,33 @@ function SelectedCourseView({
                 {done ? '✓' : !unlocked ? <Lock size={12} /> : i + 1}
               </div>
               <div className="flex-1 min-w-0">
-                <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 500, color: unlocked ? FG : '#555' }} className="truncate">
+                <div
+                  style={{
+                    fontFamily: SANS,
+                    fontSize: 14,
+                    fontWeight: 500,
+                    color: unlocked ? FG : '#555',
+                    lineHeight: 1.35,
+                    whiteSpace: 'normal',
+                    overflowWrap: 'anywhere',
+                    wordBreak: 'break-word',
+                  }}
+                >
                   {l.title}
                 </div>
-                {l.description && (
-                  <div style={{ fontFamily: SANS, fontSize: 12, color: '#888', marginTop: 2 }} className="truncate">
-                    {l.description}
-                  </div>
-                )}
               </div>
               {!unlocked ? (
-                <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#444' }}>
+                <span className="flex-shrink-0 pt-1" style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#444' }}>
                   Закрыто
                 </span>
               ) : done ? (
-                <button onClick={() => onOpen(l.id)} className="hover:opacity-70 transition" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT }}>
+                <button onClick={() => onOpen(l.id)} className="flex-shrink-0 pt-1 hover:opacity-70 transition" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT }}>
                   Повторить →
                 </button>
               ) : (
                 <button
                   onClick={() => onOpen(l.id)}
+                  className="flex-shrink-0"
                   style={{
                     fontFamily: MONO, fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500,
                     backgroundColor: ACCENT, color: '#0a0a0a',
