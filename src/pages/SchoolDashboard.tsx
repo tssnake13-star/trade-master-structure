@@ -329,10 +329,7 @@ export default function SchoolDashboard() {
           </div>
           <div className="min-w-0">
             <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: FG }}>
-              TRADELIKETYO
-            </div>
-            <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#666', marginTop: 2 }}>
-              Кабинет
+              КАБИНЕТ ТРЕЙДЕРА
             </div>
           </div>
         </button>
