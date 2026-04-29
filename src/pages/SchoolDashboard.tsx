@@ -780,7 +780,7 @@ function PaidHome({
             </>
           ) : (
             <div>
-              {tmCourse && tmLessons.some(l => !completedIds.has(l.id)) ? (
+              {remaining > 0 ? (
                 <>
                   <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
                     Ожидает открытия
