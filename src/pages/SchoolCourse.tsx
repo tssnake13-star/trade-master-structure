@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, ArrowRight, Lock } from 'lucide-react';
+import { ArrowLeft, Lock } from 'lucide-react';
 
 interface Lesson {
   id: string;
@@ -14,7 +14,6 @@ interface Lesson {
 const ACCENT = '#caa472';
 const BG = '#080808';
 const FG = '#e8e0d0';
-const CARD = '#0c0c0c';
 const BORDER = '#1a1a1a';
 const MONO = "'JetBrains Mono', ui-monospace, monospace";
 const SANS = "'Inter', sans-serif";
@@ -76,11 +75,6 @@ export default function SchoolCourse() {
   const completed = lessons.filter(l => completedIds.has(l.id)).length;
   const total = lessons.length;
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
-  const remaining = Math.max(0, total - completed);
-
-  // Find first unlocked incomplete lesson for "Continue"
-  const nextLesson = lessons.find((l, i) => isUnlocked(i) && !completedIds.has(l.id)) || null;
-
   return (
     <div data-school-skin className="min-h-screen" style={{ backgroundColor: BG, color: FG }}>
       {/* Top bar */}
@@ -104,57 +98,28 @@ export default function SchoolCourse() {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 sm:px-8 py-5 sm:py-7">
-        {/* Header grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
-          <div className="lg:col-span-2">
-            <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 10 }}>
-              ◆ Программа
-            </div>
-            <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(28px, 3.6vw, 40px)', lineHeight: 1.05, letterSpacing: '-0.025em', color: FG }}>
-              {courseTitle}
-            </h1>
-            {courseSubtitle && (
-              <p className="mt-2" style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.5, color: '#a8a090', maxWidth: '60ch' }}>
-                {courseSubtitle}
-              </p>
-            )}
+        <div className="mb-6">
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 10 }}>
+            ◆ Программа
           </div>
-
-          <div className="p-4" style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 10 }}>
-            <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 32, lineHeight: 1, color: ACCENT, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
-              {pct}<span style={{ fontSize: 18, color: '#888' }}>%</span>
-            </div>
-            <div style={{ height: 2, backgroundColor: BORDER, marginTop: 10, marginBottom: 12, overflow: 'hidden' }}>
-              <div style={{ width: `${pct}%`, height: '100%', backgroundColor: ACCENT, transition: 'width 0.4s' }} />
-            </div>
-            <div className="grid grid-cols-2 gap-3 mb-3">
-              <div>
-                <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666', marginBottom: 2 }}>
-                  Завершено
-                </div>
-                <div style={{ fontFamily: DISPLAY, fontSize: 18, fontWeight: 350, color: FG, fontVariantNumeric: 'tabular-nums' }}>
-                  {completed}
-                </div>
+          <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(28px, 3.6vw, 40px)', lineHeight: 1.05, letterSpacing: '-0.025em', color: FG }}>
+            {courseTitle}
+          </h1>
+          {courseSubtitle && (
+            <p className="mt-2" style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.5, color: '#a8a090', maxWidth: '60ch' }}>
+              {courseSubtitle}
+            </p>
+          )}
+          {total > 0 && (
+            <div className="mt-5 flex items-center gap-4">
+              <div className="flex-1" style={{ height: 2, backgroundColor: BORDER, overflow: 'hidden' }}>
+                <div style={{ width: `${pct}%`, height: '100%', backgroundColor: ACCENT, transition: 'width 0.4s' }} />
               </div>
-              <div>
-                <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666', marginBottom: 2 }}>
-                  Осталось
-                </div>
-                <div style={{ fontFamily: DISPLAY, fontSize: 18, fontWeight: 350, color: FG, fontVariantNumeric: 'tabular-nums' }}>
-                  {remaining}
-                </div>
-              </div>
+              <span style={{ fontFamily: MONO, fontSize: 11, color: '#666', fontVariantNumeric: 'tabular-nums' }}>
+                {completed}/{total} · {pct}%
+              </span>
             </div>
-            {nextLesson && (
-              <button
-                onClick={() => navigate(`/school/lesson/${nextLesson.id}`)}
-                className="w-full flex items-center justify-center gap-2 py-2.5 transition-all hover:brightness-110"
-                style={{ backgroundColor: ACCENT, color: '#0a0a0a', fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500, borderRadius: 6 }}
-              >
-                Продолжить <ArrowRight size={14} />
-              </button>
-            )}
-          </div>
+          )}
         </div>
 
         {/* Lessons list */}
@@ -166,7 +131,7 @@ export default function SchoolCourse() {
             return (
               <div
                 key={l.id}
-                className="flex items-start gap-3 px-3 py-3 transition-all"
+                className="flex items-start gap-3 px-0 sm:px-2 py-3 transition-all"
                 style={{
                   borderTop: i === 0 ? `1px solid ${BORDER}` : 'none',
                   borderBottom: `1px solid ${BORDER}`,
@@ -188,12 +153,9 @@ export default function SchoolCourse() {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#666', marginBottom: 2 }}>
-                    №{String(i + 1).padStart(2, '0')}
-                  </div>
                   <div
                     style={{
-                      fontFamily: SANS, fontSize: 13, fontWeight: 500,
+                      fontFamily: SANS, fontSize: 14, fontWeight: 500,
                       color: status === 'locked' ? '#555' : FG,
                       lineHeight: 1.35,
                       whiteSpace: 'normal',
@@ -207,9 +169,10 @@ export default function SchoolCourse() {
 
                 {status === 'locked' ? (
                   <span
+                    className="flex-shrink-0 pt-1"
                     style={{
                       fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase',
-                      color: '#666', padding: '4px 8px', backgroundColor: '#141414', borderRadius: 4,
+                      color: '#666',
                     }}
                   >
                     Закрыто
@@ -217,8 +180,8 @@ export default function SchoolCourse() {
                 ) : status === 'done' ? (
                   <button
                     onClick={() => navigate(`/school/lesson/${l.id}`)}
-                    className="hover:opacity-70 transition flex-shrink-0"
-                    style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: ACCENT }}
+                    className="hover:opacity-70 transition flex-shrink-0 pt-1"
+                    style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT }}
                   >
                     Повторить →
                   </button>
@@ -228,8 +191,8 @@ export default function SchoolCourse() {
                     className="flex-shrink-0 hover:brightness-110 transition"
                     style={{
                       backgroundColor: ACCENT, color: '#0a0a0a',
-                      fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500,
-                      padding: '6px 12px', borderRadius: 6,
+                      fontFamily: MONO, fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500,
+                      padding: '8px 16px', borderRadius: 6,
                     }}
                   >
                     Открыть
