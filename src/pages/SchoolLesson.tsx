@@ -163,9 +163,8 @@ export default function SchoolLesson() {
 
   const pct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
 
-  // Use only the primary video URL per spec ("оставить только один плеер — основной video_url")
   const watermark = profileData.email ? <FloatingWatermark email={profileData.email} fullName={profileData.full_name} /> : null;
-  const primaryVideo = videos.find(v => v.video_url) || null;
+  const playableVideos = videos.filter(v => v.video_url);
 
   return (
     <div data-school-skin className="min-h-screen flex flex-col" style={{ backgroundColor: BG, color: FG }}>
@@ -222,10 +221,30 @@ export default function SchoolLesson() {
           </span>
         </div>
 
-        {/* Video player */}
-        {primaryVideo && (
-          <div className="mb-10" style={{ border: `1px solid ${BORDER}`, borderRadius: 8, overflow: 'hidden', backgroundColor: '#000' }}>
-            {renderPlayer(primaryVideo.video_url, watermark)}
+        {/* Video players */}
+        {playableVideos.length > 0 && (
+          <div className="mb-10 space-y-6">
+            {playableVideos.map((v, i) => (
+              <div key={v.id}>
+                {(v.title || playableVideos.length > 1) && (
+                  <div
+                    style={{
+                      fontFamily: MONO,
+                      fontSize: 10,
+                      letterSpacing: '0.22em',
+                      textTransform: 'uppercase',
+                      color: '#888',
+                      marginBottom: 10,
+                    }}
+                  >
+                    ◆ Видео {String(i + 1).padStart(2, '0')}{v.title ? ` · ${v.title}` : ''}
+                  </div>
+                )}
+                <div style={{ border: `1px solid ${BORDER}`, borderRadius: 8, overflow: 'hidden', backgroundColor: '#000' }}>
+                  {renderPlayer(v.video_url, watermark)}
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
