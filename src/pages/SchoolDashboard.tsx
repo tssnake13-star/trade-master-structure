@@ -121,6 +121,7 @@ export default function SchoolDashboard() {
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const logoVideo = useSiteAsset(SITE_ASSET_KEYS.schoolDashboardLogo, logoVideoFallback);
+  const now = useNow(1000);
 
   useEffect(() => {
     if (!authLoading && !session) navigate('/school', { replace: true });
@@ -247,7 +248,6 @@ export default function SchoolDashboard() {
   const tmAccess = tmCourse ? accessMap.get(tmCourse.id) : null;
 
   // -------- end-of-program countdown: granted_at + 90d --------
-  const now = useNow(1000);
   const programEnd = useMemo(() => {
     if (!tmAccess?.granted_at) return null;
     const start = new Date(tmAccess.granted_at);
