@@ -69,6 +69,7 @@ export default function SchoolLesson() {
   const [videos, setVideos] = useState<VideoData[]>([]);
   const [isFreeCourse, setIsFreeCourse] = useState(false);
   const [marking, setMarking] = useState(false);
+  const [showTaskMessage, setShowTaskMessage] = useState(false);
   const [prevLessonId, setPrevLessonId] = useState<string | null>(null);
   const [nextLessonId, setNextLessonId] = useState<string | null>(null);
   const [isNextUnlocked, setIsNextUnlocked] = useState(false);
@@ -307,18 +308,29 @@ export default function SchoolLesson() {
           </button>
 
           {lesson.course_id === 'e2cad7c2-77fe-4159-a860-203eb8695e8d' ? (
-            <a
-              href="https://t.me/rav_999"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 py-3.5 transition hover:brightness-110"
-              style={{
-                backgroundColor: ACCENT, color: '#0a0a0a', borderRadius: 8,
-                fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
-              }}
-            >
-              <MessageCircle size={14} /> Выполнить задание
-            </a>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={() => setShowTaskMessage(true)}
+                className="flex items-center justify-center gap-2 py-3.5 transition hover:brightness-110"
+                style={{
+                  backgroundColor: ACCENT, color: '#0a0a0a', borderRadius: 8,
+                  fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
+                  cursor: 'pointer',
+                }}
+              >
+                <MessageCircle size={14} /> Выполнить задание
+              </button>
+              {showTaskMessage && (
+                <p
+                  style={{
+                    fontFamily: MONO, fontSize: 11, lineHeight: 1.5, color: ACCENT,
+                    textAlign: 'center', letterSpacing: '0.04em',
+                  }}
+                >
+                  Напишите Сергею, чтобы выполнить задание и получить доступ к следующему занятию.
+                </p>
+              )}
+            </div>
           ) : (
             <button
               onClick={async () => {
