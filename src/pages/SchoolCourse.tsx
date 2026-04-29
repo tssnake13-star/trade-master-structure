@@ -196,17 +196,6 @@ export default function SchoolCourse() {
                       {l.title}
                     </span>
                   </div>
-                  {l.description && (
-                    <p
-                      style={{
-                        fontFamily: SANS, fontSize: 12, lineHeight: 1.45,
-                        color: status === 'locked' ? '#444' : '#8a8275',
-                        marginTop: 3, whiteSpace: 'pre-wrap', wordBreak: 'break-word',
-                      }}
-                    >
-                      {l.description}
-                    </p>
-                  )}
                 </div>
 
                 {status === 'locked' ? (
