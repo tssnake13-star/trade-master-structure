@@ -270,14 +270,11 @@ export default function SchoolDashboard() {
   };
 
   const getFirstIncomplete = (course: Course, courseLessons: Lesson[]) => {
-    // Сначала ищем среди разблокированных — это "продолжить"
+    // Только разблокированные незавершённые уроки могут быть "продолжить".
+    // Заблокированные не возвращаем — иначе на дашборде появится "Продолжить занятие N",
+    // которое студент открыть не может.
     const unlocked = getUnlockedLessons(course, courseLessons);
-    const nextUnlocked = unlocked.find(l => !completedIds.has(l.id));
-    if (nextUnlocked) return nextUnlocked;
-    // Если все разблокированные пройдены, но в курсе ещё есть заблокированные уроки —
-    // курс НЕ завершён. Возвращаем следующий заблокированный, чтобы карточка не показывала "Все пройдены".
-    const nextLocked = courseLessons.find(l => !completedIds.has(l.id));
-    return nextLocked || null;
+    return unlocked.find(l => !completedIds.has(l.id)) || null;
   };
 
   const selectCourse = (id: string | null) => {
@@ -783,12 +780,25 @@ function PaidHome({
             </>
           ) : (
             <div>
-              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
-                Программа завершена
-              </div>
-              <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG }}>
-                Все занятия пройдены ✓
-              </h2>
+              {remaining > 0 ? (
+                <>
+                  <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
+                    Ожидает открытия
+                  </div>
+                  <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG }}>
+                    Следующее занятие откроет наставник
+                  </h2>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
+                    Программа завершена
+                  </div>
+                  <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG }}>
+                    Все занятия пройдены ✓
+                  </h2>
+                </>
+              )}
             </div>
           )}
         </button>
