@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 const sections = [
+  { id: 'hero', num: '00', label: 'Главная' },
   { id: 'experience', num: '01', label: 'Опыт' },
   { id: 'learning', num: '02', label: 'Обучение' },
   { id: 'rules', num: '03', label: 'Правила' },
