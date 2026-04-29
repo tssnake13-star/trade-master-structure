@@ -52,9 +52,6 @@ const Header = () => {
                   className="h-full w-full object-cover"
                 />
               </div>
-              <span className="text-sm font-semibold tracking-[0.18em] uppercase text-foreground hidden sm:inline">
-                TRADELIKETYO
-              </span>
             </a>
 
             {/* Desktop Navigation */}
