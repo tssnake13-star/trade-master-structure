@@ -3,7 +3,7 @@ import DOMPurify from 'dompurify';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, ArrowRight, MessageCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, MessageCircle, CheckCircle, Download } from 'lucide-react';
 import YouTubePlayer from '@/components/school/YouTubePlayer';
 import FloatingWatermark from '@/components/school/FloatingWatermark';
 
@@ -67,6 +67,7 @@ export default function SchoolLesson() {
   const [lesson, setLesson] = useState<LessonData | null>(null);
   const [courseTitle, setCourseTitle] = useState('');
   const [videos, setVideos] = useState<VideoData[]>([]);
+  const [isFreeCourse, setIsFreeCourse] = useState(false);
   const [prevLessonId, setPrevLessonId] = useState<string | null>(null);
   const [nextLessonId, setNextLessonId] = useState<string | null>(null);
   const [isNextUnlocked, setIsNextUnlocked] = useState(false);
@@ -116,6 +117,7 @@ export default function SchoolLesson() {
         const isAdmin = role === 'admin';
 
         setCourseTitle(courseRes.data?.title || '');
+        setIsFreeCourse(isFree);
         setTotalLessons(allSorted.length);
         setCurrentIndex(currentIdx);
         setIsCompleted((progressRes.data || []).length > 0);
@@ -219,6 +221,72 @@ export default function SchoolLesson() {
           <div className="mb-10" style={{ border: `1px solid ${BORDER}`, borderRadius: 8, overflow: 'hidden', backgroundColor: '#000' }}>
             {renderPlayer(primaryVideo.video_url, watermark)}
           </div>
+        )}
+
+        {/* Lesson 3 (free course): self-recognition checklist */}
+        {lesson.id === '5ff94d3a-0174-46be-b1ee-e8ff73b13b07' && (
+          <section
+            className="mb-6 p-5 sm:p-6"
+            style={{ border: `1px solid ${BORDER}`, borderRadius: 8, backgroundColor: '#0d0d0d' }}
+          >
+            <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(22px, 2.6vw, 28px)', lineHeight: 1.15, letterSpacing: '-0.02em', color: FG, marginBottom: 18 }}>
+              Узнали себя хотя бы в трёх пунктах?
+            </h2>
+            <ul className="space-y-2" style={{ fontFamily: MONO }}>
+              {[
+                'Закрываете сделки раньше времени',
+                'Сомневаетесь после входа',
+                'Прошли курсы, стабильности нет',
+                'Знаете рынок, но не зарабатываете',
+                'Боитесь нажать кнопку',
+              ].map((item) => (
+                <li key={item} className="text-sm sm:text-[15px] flex gap-2 leading-relaxed" style={{ color: FG }}>
+                  <span style={{ color: '#666' }}>—</span>
+                  <span>{item}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
+        {/* Lesson 3: download checklist PDF */}
+        {lesson.id === '5ff94d3a-0174-46be-b1ee-e8ff73b13b07' && (
+          <a
+            href="/files/checklist-top10.pdf"
+            download="Professional Trading Blueprint.pdf"
+            className="flex items-center justify-center gap-3 w-full py-4 mb-6 transition hover:brightness-110"
+            style={{
+              border: `1px solid ${ACCENT}`, borderRadius: 8, backgroundColor: 'transparent', color: ACCENT,
+              fontFamily: MONO, fontSize: 12, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
+            }}
+          >
+            <Download size={16} />
+            Скачать чек-лист: ТОП-10 ошибок трейдеров
+          </a>
+        )}
+
+        {/* Free course: contact author */}
+        {isFreeCourse && (
+          <>
+            {lesson.id === '5ff94d3a-0174-46be-b1ee-e8ff73b13b07' && (
+              <p className="text-center text-sm mb-3" style={{ color: '#999', fontFamily: MONO, fontSize: 12, letterSpacing: '0.04em' }}>
+                Допуск получают <span style={{ color: ACCENT }}>не все</span>. Если узнали себя — напишите.
+              </p>
+            )}
+            <a
+              href="http://t.me/tradeliketyo"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-3 w-full py-4 mb-6 transition hover:brightness-110"
+              style={{
+                backgroundColor: ACCENT, color: '#0a0a0a', borderRadius: 8,
+                fontFamily: MONO, fontSize: 12, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
+              }}
+            >
+              <MessageCircle size={16} />
+              Написать автору в Telegram
+            </a>
+          </>
         )}
 
         {/* Bottom action bar */}
