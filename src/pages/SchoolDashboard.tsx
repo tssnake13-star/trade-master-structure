@@ -270,14 +270,11 @@ export default function SchoolDashboard() {
   };
 
   const getFirstIncomplete = (course: Course, courseLessons: Lesson[]) => {
-    // Сначала ищем среди разблокированных — это "продолжить"
+    // Только разблокированные незавершённые уроки могут быть "продолжить".
+    // Заблокированные не возвращаем — иначе на дашборде появится "Продолжить занятие N",
+    // которое студент открыть не может.
     const unlocked = getUnlockedLessons(course, courseLessons);
-    const nextUnlocked = unlocked.find(l => !completedIds.has(l.id));
-    if (nextUnlocked) return nextUnlocked;
-    // Если все разблокированные пройдены, но в курсе ещё есть заблокированные уроки —
-    // курс НЕ завершён. Возвращаем следующий заблокированный, чтобы карточка не показывала "Все пройдены".
-    const nextLocked = courseLessons.find(l => !completedIds.has(l.id));
-    return nextLocked || null;
+    return unlocked.find(l => !completedIds.has(l.id)) || null;
   };
 
   const selectCourse = (id: string | null) => {
