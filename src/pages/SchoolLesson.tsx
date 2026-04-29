@@ -68,6 +68,7 @@ export default function SchoolLesson() {
   const [courseTitle, setCourseTitle] = useState('');
   const [videos, setVideos] = useState<VideoData[]>([]);
   const [isFreeCourse, setIsFreeCourse] = useState(false);
+  const [marking, setMarking] = useState(false);
   const [prevLessonId, setPrevLessonId] = useState<string | null>(null);
   const [nextLessonId, setNextLessonId] = useState<string | null>(null);
   const [isNextUnlocked, setIsNextUnlocked] = useState(false);
@@ -305,18 +306,42 @@ export default function SchoolLesson() {
             <ArrowLeft size={14} /> Предыдущее
           </button>
 
-          <a
-            href="https://t.me/rav_999"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 py-3.5 transition hover:brightness-110"
-            style={{
-              backgroundColor: ACCENT, color: '#0a0a0a', borderRadius: 8,
-              fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
-            }}
-          >
-            <MessageCircle size={14} /> Выполнить задание
-          </a>
+          {lesson.course_id === 'e2cad7c2-77fe-4159-a860-203eb8695e8d' ? (
+            <a
+              href="https://t.me/rav_999"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2 py-3.5 transition hover:brightness-110"
+              style={{
+                backgroundColor: ACCENT, color: '#0a0a0a', borderRadius: 8,
+                fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
+              }}
+            >
+              <MessageCircle size={14} /> Выполнить задание
+            </a>
+          ) : (
+            <button
+              onClick={async () => {
+                if (isCompleted || marking) return;
+                setMarking(true);
+                await markCompleteSilent();
+                setMarking(false);
+              }}
+              disabled={isCompleted || marking}
+              className="flex items-center justify-center gap-2 py-3.5 transition hover:brightness-110"
+              style={{
+                backgroundColor: isCompleted ? 'transparent' : ACCENT,
+                border: isCompleted ? `1px solid ${ACCENT}` : 'none',
+                color: isCompleted ? ACCENT : '#0a0a0a',
+                borderRadius: 8,
+                fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
+                cursor: isCompleted ? 'default' : 'pointer',
+                opacity: marking ? 0.6 : 1,
+              }}
+            >
+              <CheckCircle size={14} /> {isCompleted ? 'Урок завершён' : marking ? '...' : 'Завершить урок'}
+            </button>
+          )}
 
           <button
             onClick={handleNext}
