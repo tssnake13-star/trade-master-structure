@@ -721,7 +721,11 @@ function PaidHome({
           {renderHeroTitle(heroText)}
         </h1>
         <p className="mt-4" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '52ch' }}>
-          {welcomeTitle && welcomeTitle !== 'Добро пожаловать в систему' ? welcomeTitle.replace(/[*~]/g, '') : 'Программа открыта. Соблюдайте регламент — он работает за вас.'}
+          {(() => {
+            const t = (welcomeTitle || '').replace(/[*~]/g, '').trim();
+            const isDefault = !t || /добро пожаловать/i.test(t);
+            return isDefault ? 'Программа открыта. Соблюдайте регламент — он работает за вас.' : t;
+          })()}
         </p>
       </div>
 
