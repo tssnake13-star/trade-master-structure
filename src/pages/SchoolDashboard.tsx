@@ -270,8 +270,14 @@ export default function SchoolDashboard() {
   };
 
   const getFirstIncomplete = (course: Course, courseLessons: Lesson[]) => {
-    const u = getUnlockedLessons(course, courseLessons);
-    return u.find(l => !completedIds.has(l.id)) || null;
+    // Сначала ищем среди разблокированных — это "продолжить"
+    const unlocked = getUnlockedLessons(course, courseLessons);
+    const nextUnlocked = unlocked.find(l => !completedIds.has(l.id));
+    if (nextUnlocked) return nextUnlocked;
+    // Если все разблокированные пройдены, но в курсе ещё есть заблокированные уроки —
+    // курс НЕ завершён. Возвращаем следующий заблокированный, чтобы карточка не показывала "Все пройдены".
+    const nextLocked = courseLessons.find(l => !completedIds.has(l.id));
+    return nextLocked || null;
   };
 
   const selectCourse = (id: string | null) => {
