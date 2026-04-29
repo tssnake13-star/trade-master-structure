@@ -188,14 +188,25 @@ export default function SchoolCourse() {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-baseline gap-2 min-w-0">
+                  <div className="flex items-baseline gap-2 flex-wrap">
                     <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#666', flexShrink: 0 }}>
                       №{String(i + 1).padStart(2, '0')}
                     </span>
-                    <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: 500, color: status === 'locked' ? '#555' : FG }} className="truncate">
+                    <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: 500, color: status === 'locked' ? '#555' : FG, wordBreak: 'break-word' }}>
                       {l.title}
                     </span>
                   </div>
+                  {l.description && (
+                    <p
+                      style={{
+                        fontFamily: SANS, fontSize: 12, lineHeight: 1.45,
+                        color: status === 'locked' ? '#444' : '#8a8275',
+                        marginTop: 3, whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+                      }}
+                    >
+                      {l.description}
+                    </p>
+                  )}
                 </div>
 
                 {status === 'locked' ? (
