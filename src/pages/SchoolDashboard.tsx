@@ -714,6 +714,9 @@ function PaidHome({
     <>
       {/* Hero */}
       <div className="mb-12">
+        <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 14 }}>
+          С возвращением
+        </div>
         <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(38px, 5.5vw, 64px)', lineHeight: 1.02, letterSpacing: '-0.025em', color: FG }}>
           {renderHeroTitle(heroText)}
         </h1>
