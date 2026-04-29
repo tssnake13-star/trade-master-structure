@@ -145,12 +145,10 @@ export default function SchoolLesson() {
 
   const handleNext = async () => {
     if (!nextLessonId) return;
-    const isMainCourse = lesson?.course_id === 'e2cad7c2-77fe-4159-a860-203eb8695e8d';
-    const isAdmin = role === 'admin';
-    // В главном курсе следующий урок открывает только админ
-    if (isMainCourse && !isAdmin) return;
+    // Если следующий урок уже открыт (админом или иначе) — переходим
+    if (!isNextUnlocked) return;
     await markCompleteSilent();
-    if (isNextUnlocked) navigate(`/school/lesson/${nextLessonId}`);
+    navigate(`/school/lesson/${nextLessonId}`);
   };
 
   if (authLoading || loading || !lesson) {
