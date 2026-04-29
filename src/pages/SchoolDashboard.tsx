@@ -460,7 +460,7 @@ export default function SchoolDashboard() {
                 animation: isFreeUser ? 'none' : 'tlyPulse 2.4s ease-out infinite',
               }} />
               <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#888' }}>
-                TRADELIKETYO · {isFreeUser ? 'Вводный доступ' : 'Live'}
+                {isFreeUser ? 'Вводный доступ' : 'Live'} · КАБИНЕТ ТРЕЙДЕРА
               </span>
             </div>
             <div className="hidden sm:flex items-center gap-5">
