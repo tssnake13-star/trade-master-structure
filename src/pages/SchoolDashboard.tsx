@@ -758,11 +758,6 @@ function PaidHome({
               <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, lineHeight: 1.2, color: FG, marginBottom: 8 }}>
                 {tmNextLesson.title}
               </h2>
-              {tmNextLesson.description && (
-                <p style={{ fontFamily: SANS, fontSize: 13, color: '#888', lineHeight: 1.55, marginBottom: 16 }} className="line-clamp-2">
-                  {tmNextLesson.description}
-                </p>
-              )}
               <div className="flex items-center justify-between">
                 <div className="flex gap-4" style={{ fontFamily: MONO, fontSize: 11, color: '#666' }}>
                   <span>● Видео</span>
@@ -1007,11 +1002,6 @@ function FreeHome({
               <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG, marginBottom: 8 }}>
                 {freeNext.title}
               </h2>
-              {freeNext.description && (
-                <p style={{ fontFamily: SANS, fontSize: 13, color: '#888', lineHeight: 1.55, marginBottom: 14 }} className="line-clamp-2">
-                  {freeNext.description}
-                </p>
-              )}
               <div className="flex items-center gap-2 transition-transform group-hover:translate-x-1" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: ACCENT }}>
                 Открыть <ArrowRight size={14} />
               </div>
