@@ -129,16 +129,17 @@ export default function SchoolDashboard() {
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      const [coursesRes, accessRes, lessonsRes, progressRes, profileRes, titleRes] = await Promise.all([
-        supabase.from('courses').select('*').order('sort_order'),
-        supabase.from('course_access').select('course_id, unlocked_lessons, granted_at').eq('user_id', user.id),
-        supabase.from('lessons').select('id, course_id, title, description, sort_order').order('sort_order'),
-        supabase.from('lesson_progress').select('lesson_id, completed_at').eq('user_id', user.id),
-        supabase.from('profiles').select('full_name, email').eq('user_id', user.id).single(),
-        supabase.from('site_settings').select('value').eq('key', 'dashboard_welcome_title').single(),
-      ]);
+      try {
+        const [coursesRes, accessRes, lessonsRes, progressRes, profileRes, titleRes] = await Promise.all([
+          supabase.from('courses').select('*').order('sort_order'),
+          supabase.from('course_access').select('course_id, unlocked_lessons, granted_at').eq('user_id', user.id),
+          supabase.from('lessons').select('id, course_id, title, description, sort_order').order('sort_order'),
+          supabase.from('lesson_progress').select('lesson_id, completed_at').eq('user_id', user.id),
+          supabase.from('profiles').select('full_name, email').eq('user_id', user.id).maybeSingle(),
+          supabase.from('site_settings').select('value').eq('key', 'dashboard_welcome_title').maybeSingle(),
+        ]);
 
-      if (titleRes.data?.value) setWelcomeTitle(titleRes.data.value);
+        if (titleRes.data?.value) setWelcomeTitle(titleRes.data.value as string);
       if (profileRes.data) {
         setProfileName(profileRes.data.full_name || '');
         setProfileEmail(profileRes.data.email || '');
@@ -191,7 +192,11 @@ export default function SchoolDashboard() {
           return stillValid ? prev : null;
         });
       }
-      setLoading(false);
+        setLoading(false);
+      } catch (err) {
+        console.error('[SchoolDashboard] load failed', err);
+        setLoading(false);
+      }
     };
     load();
   }, [user, role, location.state]);
