@@ -311,7 +311,7 @@ export default function SchoolDashboard() {
 
       {/* ==================== SIDEBAR ==================== */}
       <aside
-        className={`fixed sm:relative top-0 left-0 h-full sm:h-screen z-50 flex flex-col flex-shrink-0 border-r transition-transform duration-300 ease-in-out
+        className={`fixed sm:sticky top-0 left-0 h-full sm:h-auto sm:min-h-screen z-50 flex flex-col flex-shrink-0 border-r transition-transform duration-300 ease-in-out
           ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0 sm:sticky sm:top-0`}
         style={{ width: 248, borderColor: BORDER, backgroundColor: '#0a0a0a' }}
       >
@@ -356,7 +356,7 @@ export default function SchoolDashboard() {
             Программы
           </div>
         </div>
-        <nav className="flex-1 overflow-y-auto px-3 space-y-1 pb-4">
+        <nav className="flex-1 overflow-y-auto sm:overflow-visible px-3 space-y-1 pb-4">
           {courses.map(c => {
             const accessible = hasAccess(c);
             const cp = progress[c.id] || { completed: 0, total: 0 };
