@@ -780,12 +780,25 @@ function PaidHome({
             </>
           ) : (
             <div>
-              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
-                Программа завершена
-              </div>
-              <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG }}>
-                Все занятия пройдены ✓
-              </h2>
+              {tmCourse && tmLessons.some(l => !completedIds.has(l.id)) ? (
+                <>
+                  <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
+                    Ожидает открытия
+                  </div>
+                  <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG }}>
+                    Следующее занятие откроет наставник
+                  </h2>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
+                    Программа завершена
+                  </div>
+                  <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG }}>
+                    Все занятия пройдены ✓
+                  </h2>
+                </>
+              )}
             </div>
           )}
         </button>
