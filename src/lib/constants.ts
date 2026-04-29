@@ -7,7 +7,6 @@ export const TELEGRAM_LINKS = {
 
 // Navigation items
 export const NAV_ITEMS = [
-  { label: 'Главная', href: '#' },
   { label: 'Как работает', href: '#trading-system' },
   { label: 'Доказательства', href: '#proof' },
   { label: 'Этапы', href: '#stages' },
