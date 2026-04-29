@@ -166,7 +166,7 @@ export default function SchoolCourse() {
             return (
               <div
                 key={l.id}
-                className="flex items-center gap-3 px-3 py-2.5 transition-all"
+                className="flex items-start gap-3 px-3 py-3 transition-all"
                 style={{
                   borderTop: i === 0 ? `1px solid ${BORDER}` : 'none',
                   borderBottom: `1px solid ${BORDER}`,
