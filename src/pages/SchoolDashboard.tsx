@@ -93,12 +93,22 @@ function formatCountdown(target: Date, now: Date) {
   return { d, h, m, s };
 }
 
-function useNow(intervalMs = 1000) {
+// Wall-clock-aligned ticker: fires at the start of each second so every
+// countdown on the page advances on the exact same boundary.
+function useNow(_intervalMs = 1000) {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), intervalMs);
-    return () => clearInterval(id);
-  }, [intervalMs]);
+    let timeoutId: number;
+    const tick = () => {
+      const n = new Date();
+      setNow(n);
+      const delay = 1000 - (n.getTime() % 1000);
+      timeoutId = window.setTimeout(tick, delay);
+    };
+    const first = 1000 - (Date.now() % 1000);
+    timeoutId = window.setTimeout(tick, first);
+    return () => window.clearTimeout(timeoutId);
+  }, []);
   return now;
 }
 
@@ -109,7 +119,7 @@ export default function SchoolDashboard() {
   const location = useLocation();
 
   const [courses, setCourses] = useState<Course[]>([]);
-  const [accessMap, setAccessMap] = useState<Map<string, { courseId: string; unlocked: number[]; granted_at?: string | null }>>(new Map());
+  const [accessMap, setAccessMap] = useState<Map<string, { courseId: string; unlocked: number[]; granted_at?: string | null; expires_at?: string | null }>>(new Map());
   const [progress, setProgress] = useState<ProgressMap>({});
   const [allLessons, setAllLessons] = useState<Lesson[]>([]);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
@@ -129,10 +139,15 @@ export default function SchoolDashboard() {
   const _tmAccessEarly = _tmCourseEarly ? accessMap.get(_tmCourseEarly.id) : null;
 
   const programEnd = useMemo(() => {
-    if (!_tmAccessEarly?.granted_at) return null;
-    const start = new Date(_tmAccessEarly.granted_at);
-    return new Date(start.getTime() + 90 * 86400000);
-  }, [_tmAccessEarly?.granted_at]);
+    // Source of truth: course_access.expires_at (set by invite/admin).
+    // Fallback: granted_at + 90 days for legacy records without an expiry.
+    if (_tmAccessEarly?.expires_at) return new Date(_tmAccessEarly.expires_at);
+    if (_tmAccessEarly?.granted_at) {
+      const start = new Date(_tmAccessEarly.granted_at);
+      return new Date(start.getTime() + 90 * 86400000);
+    }
+    return null;
+  }, [_tmAccessEarly?.expires_at, _tmAccessEarly?.granted_at]);
   const daysInSystem = useMemo(() => {
     if (!_tmAccessEarly?.granted_at) return 0;
     const start = new Date(_tmAccessEarly.granted_at).getTime();
