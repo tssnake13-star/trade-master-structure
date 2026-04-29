@@ -14,7 +14,6 @@ interface Lesson {
 const ACCENT = '#caa472';
 const BG = '#080808';
 const FG = '#e8e0d0';
-const CARD = '#0c0c0c';
 const BORDER = '#1a1a1a';
 const MONO = "'JetBrains Mono', ui-monospace, monospace";
 const SANS = "'Inter', sans-serif";
@@ -132,7 +131,7 @@ export default function SchoolCourse() {
             return (
               <div
                 key={l.id}
-                className="flex items-start gap-3 px-3 py-3 transition-all"
+                className="flex items-start gap-3 px-0 sm:px-2 py-3 transition-all"
                 style={{
                   borderTop: i === 0 ? `1px solid ${BORDER}` : 'none',
                   borderBottom: `1px solid ${BORDER}`,
@@ -154,12 +153,9 @@ export default function SchoolCourse() {
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#666', marginBottom: 2 }}>
-                    №{String(i + 1).padStart(2, '0')}
-                  </div>
                   <div
                     style={{
-                      fontFamily: SANS, fontSize: 13, fontWeight: 500,
+                      fontFamily: SANS, fontSize: 14, fontWeight: 500,
                       color: status === 'locked' ? '#555' : FG,
                       lineHeight: 1.35,
                       whiteSpace: 'normal',
@@ -173,9 +169,10 @@ export default function SchoolCourse() {
 
                 {status === 'locked' ? (
                   <span
+                    className="flex-shrink-0 pt-1"
                     style={{
                       fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase',
-                      color: '#666', padding: '4px 8px', backgroundColor: '#141414', borderRadius: 4,
+                      color: '#666',
                     }}
                   >
                     Закрыто
@@ -183,8 +180,8 @@ export default function SchoolCourse() {
                 ) : status === 'done' ? (
                   <button
                     onClick={() => navigate(`/school/lesson/${l.id}`)}
-                    className="hover:opacity-70 transition flex-shrink-0"
-                    style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: ACCENT }}
+                    className="hover:opacity-70 transition flex-shrink-0 pt-1"
+                    style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT }}
                   >
                     Повторить →
                   </button>
@@ -194,8 +191,8 @@ export default function SchoolCourse() {
                     className="flex-shrink-0 hover:brightness-110 transition"
                     style={{
                       backgroundColor: ACCENT, color: '#0a0a0a',
-                      fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500,
-                      padding: '6px 12px', borderRadius: 6,
+                      fontFamily: MONO, fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500,
+                      padding: '8px 16px', borderRadius: 6,
                     }}
                   >
                     Открыть
