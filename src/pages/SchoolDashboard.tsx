@@ -1038,7 +1038,7 @@ function FreeHome({
                 Вы готовы к <em style={{ color: ACCENT, fontStyle: 'italic' }}>основной</em> программе.
               </h2>
               <p style={{ fontFamily: SANS, fontSize: 14, color: '#a8a090', lineHeight: 1.55, marginBottom: 22, maxWidth: '52ch' }}>
-                Свяжитесь с куратором — он решит, готовы ли вы к допуску. Не все получают.
+                Свяжитесь с автором — он подскажет как получить доступ.
               </p>
               <a
                 href="https://t.me/rav_999"
