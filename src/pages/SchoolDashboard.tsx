@@ -324,12 +324,12 @@ export default function SchoolDashboard() {
           className="border-b flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition"
           style={{ borderColor: BORDER }}
         >
-          <div style={{ width: 40, height: 40, overflow: 'hidden', borderRadius: 6, flexShrink: 0, backgroundColor: '#000' }}>
+          <div style={{ width: 52, height: 52, overflow: 'hidden', borderRadius: 6, flexShrink: 0, backgroundColor: '#000' }}>
             <video key={logoVideo} src={logoVideo} autoPlay loop muted playsInline className="w-full h-full object-cover" />
           </div>
           <div className="min-w-0">
-            <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: FG }}>
-              КАБИНЕТ ТРЕЙДЕРА
+            <div style={{ fontFamily: MONO, fontSize: 14, letterSpacing: '0.18em', textTransform: 'uppercase', color: FG }}>
+              TRADELIKETYO
             </div>
           </div>
         </button>
