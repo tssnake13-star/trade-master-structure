@@ -171,7 +171,7 @@ export default function SchoolDashboard() {
     const load = async () => {
       const [coursesRes, accessRes, lessonsRes, progressRes, profileRes, titleRes] = await Promise.all([
         supabase.from('courses').select('*').order('sort_order'),
-        supabase.from('course_access').select('course_id, unlocked_lessons, granted_at').eq('user_id', user.id),
+        supabase.from('course_access').select('course_id, unlocked_lessons, granted_at, expires_at').eq('user_id', user.id),
         supabase.from('lessons').select('id, course_id, title, description, sort_order').order('sort_order'),
         supabase.from('lesson_progress').select('lesson_id, completed_at').eq('user_id', user.id),
         supabase.from('profiles').select('full_name, email').eq('user_id', user.id).single(),
@@ -185,9 +185,9 @@ export default function SchoolDashboard() {
       }
 
       const courseList = (coursesRes.data || []) as Course[];
-      const accessData = (accessRes.data || []) as { course_id: string; unlocked_lessons: number[]; granted_at: string }[];
+      const accessData = (accessRes.data || []) as { course_id: string; unlocked_lessons: number[]; granted_at: string; expires_at: string | null }[];
       const accessSet = new Set(accessData.map(a => a.course_id));
-      const aMap = new Map(accessData.map(a => [a.course_id, { courseId: a.course_id, unlocked: a.unlocked_lessons || [1], granted_at: a.granted_at }]));
+      const aMap = new Map(accessData.map(a => [a.course_id, { courseId: a.course_id, unlocked: a.unlocked_lessons || [1], granted_at: a.granted_at, expires_at: a.expires_at }]));
       const lessons = (lessonsRes.data || []) as Lesson[];
       const completionList = (progressRes.data || []) as CompletionRecord[];
       const completedSet = new Set(completionList.map(p => p.lesson_id));
