@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { Lock, Settings, LogOut, ArrowRight, CheckCircle, Menu, Ticket } from 'lucide-react';
+import { Lock, Settings, LogOut, ArrowRight, Menu, Ticket, Home as HomeIcon, MessageCircle } from 'lucide-react';
 import logoVideoFallback from '@/assets/logo-dashboard.mp4';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 
@@ -26,10 +26,21 @@ interface ProgressMap {
   [courseId: string]: { completed: number; total: number };
 }
 
-const font = { heading: "'Inter', sans-serif", mono: "'Inter', sans-serif" };
+interface CompletionRecord {
+  lesson_id: string;
+  completed_at: string;
+}
 
-// Render a hero title supporting *italic accent* and ~muted tail~ markup,
-// matching the landing hero typography (em → accent, .mute → muted).
+const ACCENT = '#caa472';
+const BG = '#080808';
+const FG = '#e8e0d0';
+const CARD = '#0c0c0c';
+const BORDER = '#1a1a1a';
+const MONO = "'JetBrains Mono', ui-monospace, monospace";
+const SANS = "'Inter', sans-serif";
+const DISPLAY = "'Fraunces', Georgia, serif";
+
+// Hero title with *italic accent* / ~muted~ markup
 function renderHeroTitle(text: string) {
   const parts: React.ReactNode[] = [];
   const regex = /(\*[^*]+\*|~[^~]+~)/g;
@@ -37,31 +48,76 @@ function renderHeroTitle(text: string) {
   let i = 0;
   for (const m of text.matchAll(regex)) {
     const idx = m.index ?? 0;
-    if (idx > last) parts.push(text.slice(last, idx));
+    if (idx > last) parts.push(<span key={i++} style={{ opacity: 0.55 }}>{text.slice(last, idx)}</span>);
     const token = m[0];
     if (token.startsWith('*')) {
-      parts.push(<em key={i++}>{token.slice(1, -1)}</em>);
+      parts.push(<em key={i++} style={{ color: ACCENT, fontStyle: 'italic' }}>{token.slice(1, -1)}</em>);
     } else {
-      parts.push(<span key={i++} className="mute">{token.slice(1, -1)}</span>);
+      parts.push(<span key={i++} style={{ opacity: 0.55 }}>{token.slice(1, -1)}</span>);
     }
     last = idx + token.length;
   }
-  if (last < text.length) parts.push(text.slice(last));
-  return parts.length ? parts : text;
+  if (last < text.length) parts.push(<span key={i++} style={{ opacity: 0.55 }}>{text.slice(last)}</span>);
+  return parts.length ? parts : <span style={{ opacity: 0.55 }}>{text}</span>;
 }
 
+// ---------- helpers ----------
+function nextLiveStream(now: Date) {
+  // Mon (1) and Thu (4) at 20:00 GMT+5
+  const offsetMinutes = -now.getTimezoneOffset(); // local offset
+  const targetOffset = 5 * 60; // GMT+5
+  const list: Date[] = [];
+  const base = new Date(now.getTime());
+  for (let i = 0; i < 14; i++) {
+    const d = new Date(base.getTime() + i * 86400000);
+    // Get day-of-week in GMT+5
+    const utc = d.getTime() + d.getTimezoneOffset() * 60000;
+    const gmt5 = new Date(utc + targetOffset * 60000);
+    const dow = gmt5.getDay(); // in GMT+5
+    if (dow === 1 || dow === 4) {
+      // 20:00 in GMT+5 → convert back to local
+      const ts = Date.UTC(gmt5.getUTCFullYear(), gmt5.getUTCMonth(), gmt5.getUTCDate(), 20 - 5, 0, 0);
+      const event = new Date(ts);
+      if (event.getTime() > now.getTime()) list.push(event);
+    }
+  }
+  return list.slice(0, 3);
+}
+
+function formatCountdown(target: Date, now: Date) {
+  let diff = Math.max(0, target.getTime() - now.getTime());
+  const d = Math.floor(diff / 86400000); diff -= d * 86400000;
+  const h = Math.floor(diff / 3600000);  diff -= h * 3600000;
+  const m = Math.floor(diff / 60000);    diff -= m * 60000;
+  const s = Math.floor(diff / 1000);
+  return { d, h, m, s };
+}
+
+function useNow(intervalMs = 1000) {
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), intervalMs);
+    return () => clearInterval(id);
+  }, [intervalMs]);
+  return now;
+}
+
+// ---------- main component ----------
 export default function SchoolDashboard() {
   const { session, user, role, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+
   const [courses, setCourses] = useState<Course[]>([]);
-  const [accessMap, setAccessMap] = useState<Map<string, { courseId: string; unlocked: number[] }>>(new Map());
+  const [accessMap, setAccessMap] = useState<Map<string, { courseId: string; unlocked: number[]; granted_at?: string | null }>>(new Map());
   const [progress, setProgress] = useState<ProgressMap>({});
   const [allLessons, setAllLessons] = useState<Lesson[]>([]);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
+  const [completions, setCompletions] = useState<CompletionRecord[]>([]);
+  const [profileName, setProfileName] = useState<string>('');
+  const [profileEmail, setProfileEmail] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [welcomeTitle, setWelcomeTitle] = useState('Добро пожаловать в систему');
-  const [welcomeSubtitle, setWelcomeSubtitle] = useState('Кабинет трейдера');
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const logoVideo = useSiteAsset(SITE_ASSET_KEYS.schoolDashboardLogo, logoVideoFallback);
@@ -72,116 +128,96 @@ export default function SchoolDashboard() {
 
   useEffect(() => {
     if (!user) return;
-
     const load = async () => {
-      const [coursesRes, accessRes, lessonsRes, progressRes, titleRes, subtitleRes] = await Promise.all([
+      const [coursesRes, accessRes, lessonsRes, progressRes, profileRes, titleRes] = await Promise.all([
         supabase.from('courses').select('*').order('sort_order'),
-        supabase.from('course_access').select('course_id, unlocked_lessons').eq('user_id', user.id),
+        supabase.from('course_access').select('course_id, unlocked_lessons, granted_at').eq('user_id', user.id),
         supabase.from('lessons').select('id, course_id, title, description, sort_order').order('sort_order'),
-        supabase.from('lesson_progress').select('lesson_id').eq('user_id', user.id),
+        supabase.from('lesson_progress').select('lesson_id, completed_at').eq('user_id', user.id),
+        supabase.from('profiles').select('full_name, email').eq('user_id', user.id).single(),
         supabase.from('site_settings').select('value').eq('key', 'dashboard_welcome_title').single(),
-        supabase.from('site_settings').select('value').eq('key', 'dashboard_welcome_subtitle').single(),
       ]);
 
       if (titleRes.data?.value) setWelcomeTitle(titleRes.data.value);
-      if (subtitleRes.data?.value) setWelcomeSubtitle(subtitleRes.data.value);
+      if (profileRes.data) {
+        setProfileName(profileRes.data.full_name || '');
+        setProfileEmail(profileRes.data.email || '');
+      }
 
       const courseList = (coursesRes.data || []) as Course[];
-      const accessData = (accessRes.data || []) as { course_id: string; unlocked_lessons: number[] }[];
-      const accessSet = new Set(accessData.map((a) => a.course_id));
-      const aMap = new Map(accessData.map((a) => [a.course_id, { courseId: a.course_id, unlocked: a.unlocked_lessons || [1] }]));
+      const accessData = (accessRes.data || []) as { course_id: string; unlocked_lessons: number[]; granted_at: string }[];
+      const accessSet = new Set(accessData.map(a => a.course_id));
+      const aMap = new Map(accessData.map(a => [a.course_id, { courseId: a.course_id, unlocked: a.unlocked_lessons || [1], granted_at: a.granted_at }]));
       const lessons = (lessonsRes.data || []) as Lesson[];
-      const completedSet = new Set((progressRes.data || []).map((p) => p.lesson_id));
+      const completionList = (progressRes.data || []) as CompletionRecord[];
+      const completedSet = new Set(completionList.map(p => p.lesson_id));
 
       setCourses(courseList);
       setAccessMap(aMap);
       setAllLessons(lessons);
       setCompletedIds(completedSet);
+      setCompletions(completionList);
 
       const pm: ProgressMap = {};
-
       for (const c of courseList) {
-        const courseLessons = lessons.filter((l) => l.course_id === c.id).sort((a, b) => a.sort_order - b.sort_order);
+        const courseLessons = lessons.filter(l => l.course_id === c.id).sort((a, b) => a.sort_order - b.sort_order);
         const isAdmin = role === 'admin';
         let unlockedSortOrders: number[];
-        if (isAdmin) {
-          unlockedSortOrders = courseLessons.map((_, i) => i + 1);
-        } else if (c.is_free) {
+        if (isAdmin) unlockedSortOrders = courseLessons.map((_, i) => i + 1);
+        else if (c.is_free) {
           unlockedSortOrders = [1];
           for (let i = 1; i < courseLessons.length; i++) {
-            if (completedSet.has(courseLessons[i - 1].id)) {
-              unlockedSortOrders.push(i + 1);
-            } else {
-              break;
-            }
+            if (completedSet.has(courseLessons[i - 1].id)) unlockedSortOrders.push(i + 1);
+            else break;
           }
-        } else {
-          unlockedSortOrders = aMap.get(c.id)?.unlocked || [1];
-        }
+        } else unlockedSortOrders = aMap.get(c.id)?.unlocked || [1];
+
         const unlockedLessons = courseLessons.filter((_, i) => unlockedSortOrders.includes(i + 1));
-        const completedUnlockedCount = unlockedLessons.filter((l) => completedSet.has(l.id)).length;
-
-        // Progress bar: completed unlocked / total lessons in course
-        // Completion check uses unlockedLessons.length (done elsewhere)
-        pm[c.id] = {
-          completed: completedUnlockedCount,
-          total: courseLessons.length,
-        };
+        const completedCount = unlockedLessons.filter(l => completedSet.has(l.id)).length;
+        pm[c.id] = { completed: completedCount, total: courseLessons.length };
       }
-
       setProgress(pm);
 
       const canAccess = (c: Course) => role === 'admin' || c.is_free || accessSet.has(c.id);
       const stateId = (location.state as any)?.selectedCourse;
       if (stateId) {
-        const fromState = courseList.find((c) => c.id === stateId && canAccess(c));
+        const fromState = courseList.find(c => c.id === stateId && canAccess(c));
         if (fromState) setSelectedCourse(fromState.id);
         window.history.replaceState({}, '');
       } else {
-        // Preserve current selection across reloads (e.g. tab refocus). Only clear if it became invalid.
-        setSelectedCourse((prev) => {
+        setSelectedCourse(prev => {
           if (!prev) return null;
-          const stillValid = courseList.find((c) => c.id === prev && canAccess(c));
+          const stillValid = courseList.find(c => c.id === prev && canAccess(c));
           return stillValid ? prev : null;
         });
       }
-
       setLoading(false);
     };
-
     load();
   }, [user, role, location.state]);
 
   if (authLoading || loading) {
     return (
-      <div data-school-skin className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
-        <p style={{ fontFamily: font.mono }}>Загрузка...</p>
+      <div data-school-skin className="min-h-screen flex items-center justify-center" style={{ backgroundColor: BG, color: FG }}>
+        <p style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#666' }}>Загрузка</p>
       </div>
     );
   }
 
   const hasAccess = (c: Course) => role === 'admin' || c.is_free || accessMap.has(c.id);
-
-  // Show "Начните здесь" hint only for users with only free courses
-  const hasPaidAccess = role === 'admin' || courses.some((c) => !c.is_free && accessMap.has(c.id));
-  const showMenuHint = !hasPaidAccess;
+  const hasPaidAccess = role === 'admin' || courses.some(c => !c.is_free && accessMap.has(c.id));
+  const isFreeUser = !hasPaidAccess;
 
   const getCourseLessons = (courseId: string) =>
-    allLessons.filter((l) => l.course_id === courseId).sort((a, b) => a.sort_order - b.sort_order);
+    allLessons.filter(l => l.course_id === courseId).sort((a, b) => a.sort_order - b.sort_order);
 
   const getUnlockedSortOrders = (course: Course, courseLessons: Lesson[]) => {
-    if (role === 'admin') {
-      return courseLessons.map((_, i) => i + 1);
-    }
+    if (role === 'admin') return courseLessons.map((_, i) => i + 1);
     if (course.is_free) {
-      // Sequential: first lesson always open, others require previous completed
       const unlocked: number[] = [1];
       for (let i = 1; i < courseLessons.length; i++) {
-        if (completedIds.has(courseLessons[i - 1].id)) {
-          unlocked.push(i + 1);
-        } else {
-          break;
-        }
+        if (completedIds.has(courseLessons[i - 1].id)) unlocked.push(i + 1);
+        else break;
       }
       return unlocked;
     }
@@ -189,18 +225,13 @@ export default function SchoolDashboard() {
   };
 
   const getUnlockedLessons = (course: Course, courseLessons: Lesson[]) => {
-    const unlockedSortOrders = getUnlockedSortOrders(course, courseLessons);
-    return courseLessons.filter((_, i) => unlockedSortOrders.includes(i + 1));
+    const u = getUnlockedSortOrders(course, courseLessons);
+    return courseLessons.filter((_, i) => u.includes(i + 1));
   };
 
-  const getCompletedUnlockedCount = (course: Course, courseLessons: Lesson[]) => {
-    const unlockedLessons = getUnlockedLessons(course, courseLessons);
-    return unlockedLessons.filter((lesson) => completedIds.has(lesson.id)).length;
-  };
-
-  const getFirstUnlockedIncompleteLesson = (course: Course, courseLessons: Lesson[]) => {
-    const unlockedLessons = getUnlockedLessons(course, courseLessons);
-    return unlockedLessons.find((lesson) => !completedIds.has(lesson.id)) || null;
+  const getFirstIncomplete = (course: Course, courseLessons: Lesson[]) => {
+    const u = getUnlockedLessons(course, courseLessons);
+    return u.find(l => !completedIds.has(l.id)) || null;
   };
 
   const selectCourse = (id: string | null) => {
@@ -208,48 +239,108 @@ export default function SchoolDashboard() {
     setMobileSidebarOpen(false);
   };
 
-  const selectedCourseData = courses.find((c) => c.id === selectedCourse);
+  // -------- main course (TM 4.5 if available, else first paid course) --------
+  const tmCourse = courses.find(c => c.title === 'TRADE MASTER 4.5' && hasAccess(c)) || null;
+  const tmLessons = tmCourse ? getCourseLessons(tmCourse.id) : [];
+  const tmProgress = tmCourse ? (progress[tmCourse.id] || { completed: 0, total: 0 }) : null;
+  const tmNextLesson = tmCourse ? getFirstIncomplete(tmCourse, tmLessons) : null;
+  const tmAccess = tmCourse ? accessMap.get(tmCourse.id) : null;
+
+  // -------- end-of-program countdown: granted_at + 90d --------
+  const now = useNow(1000);
+  const programEnd = useMemo(() => {
+    if (!tmAccess?.granted_at) return null;
+    const start = new Date(tmAccess.granted_at);
+    return new Date(start.getTime() + 90 * 86400000);
+  }, [tmAccess?.granted_at]);
+  const daysInSystem = useMemo(() => {
+    if (!tmAccess?.granted_at) return 0;
+    const start = new Date(tmAccess.granted_at).getTime();
+    return Math.max(0, Math.floor((now.getTime() - start) / 86400000));
+  }, [tmAccess?.granted_at, now]);
+  const programCountdown = programEnd ? formatCountdown(programEnd, now) : null;
+
+  // -------- next live streams --------
+  const upcomingLives = useMemo(() => nextLiveStream(now), [now]);
+  const liveCountdown = upcomingLives[0] ? formatCountdown(upcomingLives[0], now) : null;
+
+  // -------- recent activity (last 5 completions) --------
+  const recentActivity = useMemo(() => {
+    return [...completions]
+      .sort((a, b) => new Date(b.completed_at).getTime() - new Date(a.completed_at).getTime())
+      .slice(0, 5)
+      .map(c => ({ ...c, lesson: allLessons.find(l => l.id === c.lesson_id) }))
+      .filter(x => x.lesson);
+  }, [completions, allLessons]);
+
+  // -------- selected course detail (shown if selectedCourse set) --------
+  const selectedCourseData = courses.find(c => c.id === selectedCourse);
   const selectedAccessible = selectedCourseData ? hasAccess(selectedCourseData) : false;
   const selectedLessons = selectedCourseData ? getCourseLessons(selectedCourseData.id) : [];
   const selectedUnlockedSortOrders = selectedCourseData ? getUnlockedSortOrders(selectedCourseData, selectedLessons) : [];
   const selectedUnlockedLessons = selectedCourseData ? getUnlockedLessons(selectedCourseData, selectedLessons) : [];
-  const selectedCompletedUnlockedCount = selectedCourseData ? getCompletedUnlockedCount(selectedCourseData, selectedLessons) : 0;
-  const nextLesson = selectedCourseData ? getFirstUnlockedIncompleteLesson(selectedCourseData, selectedLessons) : null;
+  const selectedNext = selectedCourseData ? getFirstIncomplete(selectedCourseData, selectedLessons) : null;
+  const selectedProgress = selectedCourse ? (progress[selectedCourse] || { completed: 0, total: 0 }) : { completed: 0, total: 0 };
+  const selectedPct = selectedProgress.total > 0 ? Math.round((selectedProgress.completed / selectedProgress.total) * 100) : 0;
 
-  // "All completed" only when every lesson in the course is unlocked AND completed
-  const allCompleted = selectedAccessible
-    && selectedLessons.length > 0
-    && selectedUnlockedLessons.length >= selectedLessons.length
-    && selectedCompletedUnlockedCount >= selectedLessons.length;
+  const initial = (profileName || profileEmail || '?').trim().charAt(0).toUpperCase();
 
-  const p = selectedCourse ? (progress[selectedCourse] || { completed: 0, total: 0 }) : { completed: 0, total: 0 };
-  const pct = p.total > 0 ? Math.round((p.completed / p.total) * 100) : 0;
-
+  // ============= RENDER =============
   return (
-    <div data-school-skin className="min-h-screen flex flex-col sm:flex-row" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
+    <div data-school-skin className="min-h-screen flex flex-col sm:flex-row" style={{ backgroundColor: BG, color: FG }}>
       {mobileSidebarOpen && (
-        <div
-          className="sm:hidden fixed inset-0 z-40"
-          style={{ backgroundColor: 'rgba(0,0,0,0.6)' }}
-          onClick={() => setMobileSidebarOpen(false)}
-        />
+        <div className="sm:hidden fixed inset-0 z-40" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }} onClick={() => setMobileSidebarOpen(false)} />
       )}
 
+      {/* ==================== SIDEBAR ==================== */}
       <aside
-        className={`
-          fixed sm:relative top-0 left-0 h-full z-50
-          flex flex-col w-64 flex-shrink-0 border-r
-          transition-transform duration-300 ease-in-out
-          ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0
-        `}
-        style={{ borderColor: '#1a1a1a', backgroundColor: '#0a0a0a' }}
+        className={`fixed sm:relative top-0 left-0 h-full sm:h-screen z-50 flex flex-col flex-shrink-0 border-r transition-transform duration-300 ease-in-out
+          ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0 sm:sticky sm:top-0`}
+        style={{ width: 248, borderColor: BORDER, backgroundColor: '#0a0a0a' }}
       >
-        <div className="border-b cursor-pointer relative overflow-hidden" style={{ borderColor: '#1a1a1a' }} onClick={() => selectCourse(null)}>
-          <video key={logoVideo} src={logoVideo} autoPlay loop muted playsInline className="w-full object-cover block" />
-        </div>
+        {/* Header — clickable, resets selection */}
+        <button
+          onClick={() => { selectCourse(null); setMobileSidebarOpen(false); }}
+          className="border-b flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition"
+          style={{ borderColor: BORDER }}
+        >
+          <div style={{ width: 40, height: 40, overflow: 'hidden', borderRadius: 6, flexShrink: 0, backgroundColor: '#000' }}>
+            <video key={logoVideo} src={logoVideo} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+          </div>
+          <div className="min-w-0">
+            <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: FG }}>
+              TRADELIKETYO
+            </div>
+            <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#666', marginTop: 2 }}>
+              Кабинет
+            </div>
+          </div>
+        </button>
 
-        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
-          {courses.map((c) => {
+        {/* Nav: Главная */}
+        <nav className="px-3 pt-4 pb-2">
+          <button
+            onClick={() => { selectCourse(null); setMobileSidebarOpen(false); }}
+            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md transition"
+            style={{
+              backgroundColor: selectedCourse === null ? '#141414' : 'transparent',
+              borderLeft: selectedCourse === null ? `2px solid ${ACCENT}` : '2px solid transparent',
+              fontFamily: MONO, fontSize: 12, color: FG,
+            }}
+          >
+            <HomeIcon size={14} style={{ color: selectedCourse === null ? ACCENT : '#666' }} />
+            <span>Главная</span>
+          </button>
+        </nav>
+
+        {/* Programs */}
+        <div className="px-5 pt-4 pb-2">
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555' }}>
+            Программы
+          </div>
+        </div>
+        <nav className="flex-1 overflow-y-auto px-3 space-y-1 pb-4">
+          {courses.map(c => {
             const accessible = hasAccess(c);
             const cp = progress[c.id] || { completed: 0, total: 0 };
             const cpct = cp.total > 0 ? Math.round((cp.completed / cp.total) * 100) : 0;
@@ -259,377 +350,832 @@ export default function SchoolDashboard() {
               <button
                 key={c.id}
                 onClick={() => accessible && selectCourse(c.id)}
-                className="w-full text-left rounded-lg px-3 py-2.5 transition-all"
+                disabled={!accessible}
+                className="w-full text-left rounded-md px-3 py-2.5 transition-all"
                 style={{
                   backgroundColor: isSelected ? '#141414' : 'transparent',
-                  borderLeft: isSelected ? '2px solid #4a8a4a' : '2px solid transparent',
-                  opacity: accessible ? 1 : 0.5,
+                  borderLeft: isSelected ? `2px solid ${ACCENT}` : '2px solid transparent',
+                  opacity: accessible ? 1 : 0.45,
                   cursor: accessible ? 'pointer' : 'default',
                 }}
               >
-                <div className="flex items-center justify-between">
-                  <span className="text-sm truncate" style={{ fontFamily: font.mono, color: accessible ? '#e8e0d0' : '#555' }}>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="truncate" style={{ fontFamily: MONO, fontSize: 12, color: accessible ? FG : '#555' }}>
                     {c.title}
                   </span>
-                  {!accessible && <Lock size={12} style={{ color: '#444' }} />}
+                  {!accessible && <Lock size={11} style={{ color: '#444', flexShrink: 0 }} />}
                 </div>
-                {accessible && cp.total > 0 && c.title === 'TRADE MASTER 4.5' && (
-                  <div className="mt-1.5">
-                    <div className="h-1 rounded-full overflow-hidden" style={{ backgroundColor: '#1a1a1a' }}>
-                      <div className="h-full rounded-full" style={{ width: `${cpct}%`, backgroundColor: '#4a8a4a' }} />
+                {accessible && cp.total > 0 && (
+                  <div className="mt-2">
+                    <div style={{ height: 3, backgroundColor: BORDER, borderRadius: 2, overflow: 'hidden' }}>
+                      <div style={{ width: `${cpct}%`, height: '100%', backgroundColor: ACCENT, transition: 'width 0.4s' }} />
                     </div>
-                    <span className="text-[10px] mt-0.5 block" style={{ color: '#555', fontFamily: font.mono }}>
-                      {cp.completed}/{cp.total} занятий
-                    </span>
+                    <div style={{ fontFamily: MONO, fontSize: 9, color: '#555', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
+                      {cp.completed}/{cp.total}
+                    </div>
                   </div>
                 )}
                 {!accessible && (
-                  <span className="text-[10px] mt-0.5 block" style={{ color: '#444', fontFamily: font.mono }}>
-                    Закрыто
-                  </span>
+                  <div style={{ fontFamily: MONO, fontSize: 9, color: '#444', marginTop: 4 }}>Закрыто</div>
                 )}
               </button>
             );
           })}
         </nav>
 
-        <div className="p-3 border-t space-y-1" style={{ borderColor: '#1a1a1a' }}>
-          {role === 'admin' && (
-            <button
-              onClick={() => navigate('/school/admin')}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs hover:bg-white/5 transition"
-              style={{ fontFamily: font.mono, color: '#4a8a4a' }}
+        {/* Profile */}
+        <div className="border-t p-3 space-y-2" style={{ borderColor: BORDER }}>
+          <div className="flex items-center gap-3 px-2 py-2">
+            <div
+              className="flex items-center justify-center flex-shrink-0"
+              style={{
+                width: 36, height: 36, borderRadius: '50%',
+                background: 'linear-gradient(135deg, #2a2a2a, #1a1a1a)',
+                color: ACCENT, fontFamily: DISPLAY, fontStyle: 'italic', fontSize: 18, fontWeight: 400,
+              }}
             >
-              <Settings size={14} /> Админ-панель
-            </button>
-          )}
+              {initial}
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="truncate" style={{ fontFamily: SANS, fontSize: 12, color: FG }}>
+                {profileName || profileEmail || 'Студент'}
+              </div>
+              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666', marginTop: 2 }}>
+                {isFreeUser ? 'Вводный доступ' : 'Активный'}
+              </div>
+            </div>
+            {role === 'admin' && (
+              <button onClick={() => navigate('/school/admin')} className="p-1.5 hover:bg-white/5 rounded transition" title="Админ">
+                <Settings size={14} style={{ color: '#666' }} />
+              </button>
+            )}
+          </div>
           <button
             onClick={signOut}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs hover:bg-white/5 transition"
-            style={{ fontFamily: font.mono, color: '#666' }}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded text-xs hover:bg-white/5 transition"
+            style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.1em', color: '#666' }}
           >
-            <LogOut size={14} /> Выйти
+            <LogOut size={13} /> Выйти
           </button>
         </div>
       </aside>
 
-      <main className="flex-1 min-h-screen">
-        <header className="sm:hidden border-b px-3 py-3 flex items-center justify-between" style={{ borderColor: '#1a1a1a' }}>
-          <div className="flex items-center gap-2">
-            <button onClick={() => setMobileSidebarOpen(true)} className="p-1.5 hover:bg-white/5 rounded-lg transition">
-              <Menu size={20} style={{ color: '#e8e0d0' }} />
-            </button>
-            {/* Mobile hint removed in favor of prominent home banner */}
-          </div>
-          <div className="cursor-pointer" onClick={() => { selectCourse(null); navigate('/school/dashboard'); }}>
-            <video key={logoVideo} src={logoVideo} autoPlay loop muted playsInline className="w-9 h-9 rounded-lg object-cover" />
-          </div>
-          <div className="flex items-center gap-1">
-            {role === 'admin' && (
-              <button onClick={() => navigate('/school/admin')} className="p-2 hover:bg-white/5 rounded-lg transition">
-                <Settings size={16} style={{ color: '#4a8a4a' }} />
+      {/* ==================== MAIN ==================== */}
+      <main className="flex-1 min-h-screen flex flex-col">
+        {/* Top bar */}
+        <header
+          className="sticky top-0 z-30 border-b"
+          style={{
+            borderColor: BORDER,
+            backgroundColor: 'rgba(8,8,8,0.85)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+          }}
+        >
+          <div className="flex items-center justify-between px-4 sm:px-6 py-3">
+            <div className="flex items-center gap-2">
+              <button onClick={() => setMobileSidebarOpen(true)} className="sm:hidden p-1.5 hover:bg-white/5 rounded transition">
+                <Menu size={18} style={{ color: FG }} />
               </button>
-            )}
-            <button onClick={signOut} className="p-2 hover:bg-white/5 rounded-lg transition">
-              <LogOut size={16} style={{ color: '#666' }} />
-            </button>
+              <span className="inline-block" style={{
+                width: 6, height: 6, borderRadius: '50%',
+                backgroundColor: isFreeUser ? '#888' : ACCENT,
+                animation: isFreeUser ? 'none' : 'tlyPulse 2.4s ease-out infinite',
+              }} />
+              <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#888' }}>
+                TLT · Кабинет · {isFreeUser ? 'Вводный доступ' : 'Live'}
+              </span>
+            </div>
+            <div className="hidden sm:flex items-center gap-5">
+              <span style={{ fontFamily: MONO, fontSize: 11, color: '#666' }}>
+                {now.toLocaleDateString('ru-RU', { day: '2-digit', month: 'short', year: 'numeric' })}
+              </span>
+              <a
+                href="https://t.me/rav_999"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#888' }}
+                className="hover:text-foreground transition"
+              >
+                Поддержка
+              </a>
+            </div>
           </div>
         </header>
 
-        <div className="max-w-3xl mx-auto p-4 sm:p-8">
+        {/* Body */}
+        <div className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-8 py-8 sm:py-12">
+          {/* ----- Selected course detail view ----- */}
           {selectedCourseData && selectedAccessible && (
-            <>
-              <div className="mb-6">
-                <span className="tly-section-tag mb-3 block">Курс</span>
-                <h1 className="text-3xl sm:text-5xl mb-2 tly-display">
-                  {selectedCourseData.title}
-                </h1>
-                {selectedCourseData.subtitle && (
-                  <p className="text-sm mb-3 tly-mono uppercase tracking-[0.2em]" style={{ color: '#666' }}>{selectedCourseData.subtitle}</p>
-                )}
-                {selectedCourseData.title === 'TRADE MASTER 4.5' && (
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#1a1a1a' }}>
-                      <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: '#4a8a4a' }} />
-                    </div>
-                    <span className="text-xs flex-shrink-0" style={{ color: '#666', fontFamily: font.mono }}>
-                      {p.completed}/{p.total} · {pct}%
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {!allCompleted && (() => {
-                // If there's an incomplete unlocked lesson, point to it; otherwise point to the first unlocked lesson for review
-                const target = nextLesson || (selectedUnlockedLessons.length > 0 ? selectedUnlockedLessons[0] : null);
-                if (!target) return null;
-                return (
-                  <button
-                    onClick={() => navigate(`/school/lesson/${target.id}`)}
-                    className="w-full rounded-xl border p-4 mb-6 flex items-center justify-between transition-all hover:border-[#2a2a2a]"
-                    style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}
-                  >
-                    <div className="text-left min-w-0">
-                      <p className="text-[11px] uppercase tracking-wider mb-1" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
-                        {p.completed === 0 ? 'Начать' : 'Продолжить'}
-                      </p>
-                      <p className="text-sm truncate" style={{ fontFamily: font.mono, color: '#e8e0d0' }}>
-                        Занятие {selectedLessons.indexOf(target) + 1}. {target.title}
-                      </p>
-                    </div>
-                    <ArrowRight size={16} style={{ color: '#4a8a4a' }} className="flex-shrink-0 ml-3" />
-                  </button>
-                );
-              })()}
-
-              <div className="space-y-1">
-                {selectedLessons.map((l, i) => {
-                  const done = completedIds.has(l.id);
-                  const unlocked = selectedUnlockedSortOrders.includes(i + 1);
-                  return (
-                    <div
-                      key={l.id}
-                      className="rounded-lg px-4 py-3 flex items-start gap-3 transition-all"
-                      style={{ opacity: unlocked ? 1 : 0.5 }}
-                    >
-                      <span className="text-xs flex-shrink-0 mt-0.5" style={{ color: done ? '#4a8a4a' : '#555', fontFamily: font.mono, minWidth: '1.5rem' }}>
-                        {i + 1}
-                      </span>
-                      <div className="flex-1 min-w-0">
-                        <span className="text-sm block" style={{ fontFamily: font.mono, color: unlocked ? '#e8e0d0' : '#444' }}>
-                          {l.title}
-                        </span>
-                        {l.description && (
-                          <p className="text-[13px] mt-1 line-clamp-2" style={{ color: unlocked ? '#e8e0d0' : '#333', fontFamily: font.mono }}>
-                            {l.description}
-                          </p>
-                        )}
-                      </div>
-                      {!unlocked ? (
-                        <Lock size={14} className="flex-shrink-0 mt-0.5" style={{ color: '#333' }} />
-                      ) : done ? (
-                        <button
-                          onClick={() => navigate(`/school/lesson/${l.id}`)}
-                          className="flex-shrink-0 flex items-center gap-1 text-xs py-1.5 hover:opacity-70 transition"
-                          style={{ color: '#4a8a4a', fontFamily: font.mono, cursor: 'pointer' }}
-                        >
-                          <CheckCircle size={14} />
-                        </button>
-                      ) : (
-                        <button
-                          onClick={() => navigate(`/school/lesson/${l.id}`)}
-                          className="flex-shrink-0 text-xs px-3 py-1.5 rounded-lg border transition-all hover:bg-white/5"
-                          style={{ borderColor: '#222', color: '#4a8a4a', fontFamily: font.mono, cursor: 'pointer' }}
-                        >
-                          Открыть
-                        </button>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-
-              {allCompleted && (
-                <p className="text-center text-sm mt-6" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
-                  Все занятия завершены ✓
-                </p>
-              )}
-            </>
+            <SelectedCourseView
+              course={selectedCourseData}
+              lessons={selectedLessons}
+              unlockedSortOrders={selectedUnlockedSortOrders}
+              completedIds={completedIds}
+              progress={selectedProgress}
+              pct={selectedPct}
+              nextLesson={selectedNext}
+              onOpen={(id) => navigate(`/school/lesson/${id}`)}
+            />
           )}
 
           {selectedCourseData && !selectedAccessible && (
-            <div className="flex flex-col items-center justify-center py-20">
-              <Lock size={32} style={{ color: '#333' }} className="mb-4" />
-              <p className="text-sm" style={{ color: '#555', fontFamily: font.mono }}>Программа закрыта</p>
+            <div className="flex flex-col items-center justify-center py-24">
+              <Lock size={28} style={{ color: '#333' }} className="mb-4" />
+              <p style={{ fontFamily: MONO, fontSize: 12, color: '#555' }}>Программа закрыта</p>
             </div>
           )}
 
-          {!selectedCourse && (() => {
-            const canAccess = (c: Course) => role === 'admin' || c.is_free || accessMap.has(c.id);
-            const accessibleCourses = courses.filter(canAccess);
+          {/* ----- Home view ----- */}
+          {!selectedCourse && !isFreeUser && (
+            <PaidHome
+              welcomeTitle={welcomeTitle}
+              profileName={profileName}
+              tmCourse={tmCourse}
+              tmLessons={tmLessons}
+              tmProgress={tmProgress}
+              tmNextLesson={tmNextLesson}
+              programCountdown={programCountdown}
+              daysInSystem={daysInSystem}
+              upcomingLives={upcomingLives}
+              liveCountdown={liveCountdown}
+              recentActivity={recentActivity}
+              courses={courses.filter(c => hasAccess(c))}
+              progress={progress}
+              now={now}
+              onOpenLesson={(id) => navigate(`/school/lesson/${id}`)}
+              onSelectCourse={selectCourse}
+              userId={user?.id}
+            />
+          )}
 
-            // Always find TRADE MASTER 4.5 for the progress card
-            const tmCourse = accessibleCourses.find(c => c.title === 'TRADE MASTER 4.5') || null;
-
-            // Find any active course with incomplete lessons for the CTA
-            let activeCourse: Course | null = null;
-            let activeNextLesson: Lesson | null = null;
-
-            for (const c of accessibleCourses) {
-              const cLessons = getCourseLessons(c.id);
-              const next = getFirstUnlockedIncompleteLesson(c, cLessons);
-              if (next) {
-                activeCourse = c;
-                activeNextLesson = next;
-                break;
-              }
-            }
-
-            if (!activeCourse) {
-              for (const c of accessibleCourses) {
-                const cLessons = getCourseLessons(c.id);
-                const unlockedLessons = getUnlockedLessons(c, cLessons);
-                const completedUnlockedCount = getCompletedUnlockedCount(c, cLessons);
-
-                if (unlockedLessons.length > 0 && completedUnlockedCount >= unlockedLessons.length) {
-                  activeCourse = c;
-                  break;
-                }
-              }
-            }
-
-            // Progress data for TM4.5 specifically
-            const tmLessons = tmCourse ? getCourseLessons(tmCourse.id) : [];
-            const tmUnlockedLessons = tmCourse ? getUnlockedLessons(tmCourse, tmLessons) : [];
-            const tmCompletedCount = tmCourse ? getCompletedUnlockedCount(tmCourse, tmLessons) : 0;
-            const tmProgress = tmCourse ? (progress[tmCourse.id] || { completed: 0, total: 0 }) : null;
-            const tmPct = tmProgress && tmProgress.total > 0 ? Math.round((tmProgress.completed / tmProgress.total) * 100) : 0;
-            const tmNextLesson = tmCourse ? getFirstUnlockedIncompleteLesson(tmCourse, tmLessons) : null;
-            const tmAllCompleted = !!tmCourse
-              && tmLessons.length > 0
-              && tmUnlockedLessons.length >= tmLessons.length
-              && tmCompletedCount >= tmLessons.length;
-
-            const ap = activeCourse ? (progress[activeCourse.id] || { completed: 0, total: 0 }) : null;
-            const activeLessons = activeCourse ? getCourseLessons(activeCourse.id) : [];
-            const activeUnlockedLessons = activeCourse ? getUnlockedLessons(activeCourse, activeLessons) : [];
-            const activeCompletedUnlockedCount = activeCourse ? getCompletedUnlockedCount(activeCourse, activeLessons) : 0;
-            const activeAllCompleted = !!activeCourse
-              && activeLessons.length > 0
-              && activeUnlockedLessons.length >= activeLessons.length
-              && activeCompletedUnlockedCount >= activeLessons.length;
-
-            return (
-              <div className="py-8 sm:py-12">
-                <div className="tly-section-tag mb-5 inline-flex items-center"><span className="tly-pulse" style={{ marginRight: 10 }} />TLT · КАБИНЕТ · LIVE</div>
-                <h1 className="tly-display leading-[1.02] text-4xl sm:text-5xl lg:text-6xl xl:text-7xl mt-2 mb-5 fade-in-up">
-                  {renderHeroTitle(welcomeTitle)}
-                </h1>
-                <p className="tly-mono uppercase tracking-[0.22em] text-[11px] sm:text-xs mb-10 fade-in-up fade-in-up-delay-1" style={{ color: 'var(--tly-fg-mute)' }}>
-                  {welcomeSubtitle}
-                </p>
-
-                {showMenuHint && (() => {
-                  const freeCourse = accessibleCourses.find((c) => c.is_free);
-                  if (!freeCourse) return null;
-                  return (
-                    <div
-                      className="mb-8 rounded-2xl border-2 p-6 sm:p-10 text-center relative overflow-hidden"
-                      style={{
-                        borderColor: '#4a8a4a',
-                        background: 'linear-gradient(135deg, #0f1a0f 0%, #122012 50%, #0d160d 100%)',
-                        boxShadow: '0 0 0 1px rgba(74,138,74,0.15), 0 20px 60px -20px rgba(74,138,74,0.4)',
-                      }}
-                    >
-                      <div
-                        aria-hidden
-                        className="absolute inset-0 pointer-events-none animate-pulse"
-                        style={{ boxShadow: 'inset 0 0 80px rgba(74,138,74,0.15)' }}
-                      />
-                      <p
-                        className="text-[11px] sm:text-xs uppercase tracking-[0.2em] mb-4"
-                        style={{ color: '#4a8a4a', fontFamily: font.mono }}
-                      >
-                        ● Доступ открыт
-                      </p>
-                      <h2
-                        className="text-2xl sm:text-4xl mb-3 leading-tight"
-                        style={{ fontFamily: font.heading, color: '#e8e0d0' }}
-                      >
-                        Ваш допуск открыт
-                      </h2>
-                      <p
-                        className="text-sm sm:text-base mb-7 max-w-xl mx-auto"
-                        style={{ color: '#a8a090', fontFamily: font.mono }}
-                      >
-                        Допуск к сделке — начните с первого занятия
-                      </p>
-                      <button
-                        onClick={() => selectCourse(freeCourse.id)}
-                        className="inline-flex items-center gap-3 px-8 sm:px-10 py-4 sm:py-5 rounded-xl text-base sm:text-lg font-semibold transition-all hover:scale-[1.02] hover:shadow-2xl active:scale-[0.99]"
-                        style={{
-                          backgroundColor: '#4a8a4a',
-                          color: '#0a0a0a',
-                          fontFamily: font.mono,
-                          boxShadow: '0 10px 40px -10px rgba(74,138,74,0.6)',
-                        }}
-                      >
-                        Перейти к программе
-                        <ArrowRight size={20} />
-                      </button>
-                    </div>
-                  );
-                })()}
-
-                {tmCourse && (
-                  <div className="rounded-xl border p-5 sm:p-6" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
-                    <p className="text-[11px] uppercase tracking-wider mb-3" style={{ color: '#555', fontFamily: font.mono }}>
-                      {tmProgress && tmProgress.completed > 0 ? 'Текущая программа' : 'Начните подготовку'}
-                    </p>
-                    <h2 className="text-xl sm:text-2xl mb-1" style={{ fontFamily: font.heading }}>
-                      {tmCourse.title}
-                    </h2>
-                    {tmCourse.subtitle && (
-                      <p className="text-xs mb-4" style={{ color: '#666', fontFamily: font.mono }}>{tmCourse.subtitle}</p>
-                    )}
-
-                    {tmProgress && tmProgress.total > 0 && (
-                      <div className="mb-4">
-                        <div className="flex items-center gap-3 mb-1">
-                          <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: '#1a1a1a' }}>
-                            <div className="h-full rounded-full transition-all" style={{ width: `${tmPct}%`, backgroundColor: '#4a8a4a' }} />
-                          </div>
-                          <span className="text-xs flex-shrink-0" style={{ color: '#666', fontFamily: font.mono }}>
-                            {tmProgress.completed}/{tmProgress.total} · {tmPct}%
-                          </span>
-                        </div>
-                      </div>
-                    )}
-
-                    {!tmAllCompleted && (() => {
-                      const target = tmNextLesson || (tmUnlockedLessons.length > 0 ? tmUnlockedLessons[0] : null);
-                      if (!target) return null;
-                      return (
-                        <button
-                          onClick={() => navigate(`/school/lesson/${target.id}`)}
-                          className="w-full rounded-lg border p-3 flex items-center justify-between transition-all hover:border-[#2a2a2a]"
-                          style={{ borderColor: '#1a1a1a', backgroundColor: '#111' }}
-                        >
-                          <div className="text-left min-w-0">
-                            <p className="text-[11px] uppercase tracking-wider mb-0.5" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
-                              {tmProgress && tmProgress.completed === 0 ? 'Начать' : 'Продолжить'}
-                            </p>
-                            <p className="text-sm truncate" style={{ fontFamily: font.mono, color: '#e8e0d0' }}>
-                              Занятие {tmLessons.indexOf(target) + 1}. {target.title}
-                            </p>
-                          </div>
-                          <ArrowRight size={16} style={{ color: '#4a8a4a' }} className="flex-shrink-0 ml-3" />
-                        </button>
-                      );
-                    })()}
-
-                    {tmAllCompleted && (
-                      <p className="text-sm" style={{ color: '#4a8a4a', fontFamily: font.mono }}>
-                        Все занятия завершены ✓
-                      </p>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })()}
-
-          {/* Activate invite code section — only on home or free course */}
-          {(!selectedCourseData || selectedCourseData.is_free) && (
-            <ActivateCodeSection userId={user?.id} onActivated={() => window.location.reload()} />
+          {!selectedCourse && isFreeUser && (
+            <FreeHome
+              courses={courses}
+              progress={progress}
+              accessMap={accessMap}
+              hasAccess={hasAccess}
+              role={role}
+              completedIds={completedIds}
+              getCourseLessons={getCourseLessons}
+              getUnlockedLessons={getUnlockedLessons}
+              getFirstIncomplete={getFirstIncomplete}
+              upcomingLives={upcomingLives}
+              liveCountdown={liveCountdown}
+              now={now}
+              onOpenLesson={(id) => navigate(`/school/lesson/${id}`)}
+              onSelectCourse={selectCourse}
+              userId={user?.id}
+            />
           )}
         </div>
+
+        {/* Footer */}
+        <footer className="border-t px-4 sm:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-2" style={{ borderColor: BORDER }}>
+          <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#555' }}>
+            © TRADELIKETYO · 2026
+          </span>
+          <a
+            href="https://t.me/rav_999"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666' }}
+            className="hover:text-foreground transition"
+          >
+            Telegram автора
+          </a>
+        </footer>
       </main>
     </div>
   );
 }
 
-function ActivateCodeSection({ userId, onActivated }: { userId?: string; onActivated: () => void }) {
+// ====================================================================
+//   SELECTED COURSE DETAIL
+// ====================================================================
+function SelectedCourseView({
+  course, lessons, unlockedSortOrders, completedIds, progress, pct, nextLesson, onOpen,
+}: {
+  course: Course;
+  lessons: Lesson[];
+  unlockedSortOrders: number[];
+  completedIds: Set<string>;
+  progress: { completed: number; total: number };
+  pct: number;
+  nextLesson: Lesson | null;
+  onOpen: (id: string) => void;
+}) {
+  return (
+    <>
+      <div className="mb-8">
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 14 }}>
+          ◆ Программа
+        </div>
+        <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(36px, 5vw, 56px)', lineHeight: 1.02, letterSpacing: '-0.025em', color: FG }}>
+          {course.title}
+        </h1>
+        {course.subtitle && (
+          <p className="mt-3" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '60ch' }}>
+            {course.subtitle}
+          </p>
+        )}
+        {progress.total > 0 && (
+          <div className="mt-6 flex items-center gap-4">
+            <div className="flex-1" style={{ height: 2, backgroundColor: BORDER, overflow: 'hidden' }}>
+              <div style={{ width: `${pct}%`, height: '100%', backgroundColor: ACCENT, transition: 'width 0.4s' }} />
+            </div>
+            <span style={{ fontFamily: MONO, fontSize: 11, color: '#666', fontVariantNumeric: 'tabular-nums' }}>
+              {progress.completed}/{progress.total} · {pct}%
+            </span>
+          </div>
+        )}
+      </div>
+
+      {nextLesson && (
+        <button
+          onClick={() => onOpen(nextLesson.id)}
+          className="w-full p-5 mb-8 flex items-center justify-between transition-all hover:bg-white/[0.02] group"
+          style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 8 }}
+        >
+          <div className="text-left min-w-0">
+            <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 6 }}>
+              {progress.completed === 0 ? 'Начать' : 'Продолжить'} · занятие {lessons.indexOf(nextLesson) + 1}
+            </div>
+            <div className="truncate" style={{ fontFamily: DISPLAY, fontSize: 22, color: FG, fontWeight: 350 }}>
+              {nextLesson.title}
+            </div>
+          </div>
+          <ArrowRight size={18} style={{ color: ACCENT, flexShrink: 0, marginLeft: 16, transition: 'transform 0.3s' }} className="group-hover:translate-x-1" />
+        </button>
+      )}
+
+      <div className="space-y-1">
+        {lessons.map((l, i) => {
+          const done = completedIds.has(l.id);
+          const unlocked = unlockedSortOrders.includes(i + 1);
+          return (
+            <div
+              key={l.id}
+              className="flex items-center gap-4 px-4 py-3 transition-all"
+              style={{
+                borderTop: i === 0 ? `1px solid ${BORDER}` : 'none',
+                borderBottom: `1px solid ${BORDER}`,
+                opacity: unlocked ? 1 : 0.45,
+              }}
+            >
+              <div
+                className="flex items-center justify-center flex-shrink-0"
+                style={{
+                  width: 36, height: 36,
+                  border: `1px solid ${done ? ACCENT : BORDER}`,
+                  backgroundColor: done ? `${ACCENT}11` : 'transparent',
+                  color: done ? ACCENT : (unlocked ? '#888' : '#444'),
+                  fontFamily: MONO, fontSize: 12, fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {done ? '✓' : !unlocked ? <Lock size={12} /> : i + 1}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 500, color: unlocked ? FG : '#555' }} className="truncate">
+                  {l.title}
+                </div>
+                {l.description && (
+                  <div style={{ fontFamily: SANS, fontSize: 12, color: '#888', marginTop: 2 }} className="truncate">
+                    {l.description}
+                  </div>
+                )}
+              </div>
+              {!unlocked ? (
+                <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#444' }}>
+                  Закрыто
+                </span>
+              ) : done ? (
+                <button onClick={() => onOpen(l.id)} className="hover:opacity-70 transition" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT }}>
+                  Повторить →
+                </button>
+              ) : (
+                <button
+                  onClick={() => onOpen(l.id)}
+                  style={{
+                    fontFamily: MONO, fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500,
+                    backgroundColor: ACCENT, color: '#0a0a0a',
+                    padding: '8px 16px', borderRadius: 6,
+                  }}
+                >
+                  Открыть
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+// ====================================================================
+//   PAID HOME
+// ====================================================================
+function PaidHome({
+  welcomeTitle, profileName, tmCourse, tmLessons, tmProgress, tmNextLesson,
+  programCountdown, daysInSystem, upcomingLives, liveCountdown, recentActivity,
+  courses, progress, now, onOpenLesson, onSelectCourse, userId,
+}: {
+  welcomeTitle: string;
+  profileName: string;
+  tmCourse: Course | null;
+  tmLessons: Lesson[];
+  tmProgress: { completed: number; total: number } | null;
+  tmNextLesson: Lesson | null;
+  programCountdown: { d: number; h: number; m: number; s: number } | null;
+  daysInSystem: number;
+  upcomingLives: Date[];
+  liveCountdown: { d: number; h: number; m: number; s: number } | null;
+  recentActivity: { lesson_id: string; completed_at: string; lesson?: Lesson }[];
+  courses: Course[];
+  progress: ProgressMap;
+  now: Date;
+  onOpenLesson: (id: string) => void;
+  onSelectCourse: (id: string) => void;
+  userId?: string;
+}) {
+  const greetingName = profileName ? profileName.split(' ')[0] : 'Трейдер';
+  const heroText = `${greetingName}, *система* ждёт вас.`;
+  const remaining = tmProgress ? Math.max(0, tmProgress.total - tmProgress.completed) : 0;
+  const completed = tmProgress?.completed ?? 0;
+
+  return (
+    <>
+      {/* Hero */}
+      <div className="mb-12">
+        <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(38px, 5.5vw, 64px)', lineHeight: 1.02, letterSpacing: '-0.025em', color: FG }}>
+          {renderHeroTitle(heroText)}
+        </h1>
+        <p className="mt-4" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '52ch' }}>
+          {welcomeTitle && welcomeTitle !== 'Добро пожаловать в систему' ? welcomeTitle.replace(/[*~]/g, '') : 'Программа открыта. Соблюдайте регламент — он работает за вас.'}
+        </p>
+      </div>
+
+      {/* KPI strip */}
+      <div className="mb-10 grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: BORDER, border: `1px solid ${BORDER}` }}>
+        <KpiCell label="День в системе" value={String(daysInSystem)} />
+        <KpiCell label="Осталось уроков" value={String(remaining)} />
+        <KpiCell label="Завершено уроков" value={String(completed)} />
+        <KpiCell
+          label="До завершения обучения"
+          value={programCountdown ? `${programCountdown.d}д ${String(programCountdown.h).padStart(2,'0')}:${String(programCountdown.m).padStart(2,'0')}:${String(programCountdown.s).padStart(2,'0')}` : '—'}
+          accent
+          pulse
+          mono
+        />
+      </div>
+
+      {/* Continue + Live grid */}
+      <div className="mb-10 grid grid-cols-1 lg:grid-cols-3 gap-5">
+        {/* Continue card 2/3 */}
+        <button
+          onClick={() => tmNextLesson && onOpenLesson(tmNextLesson.id)}
+          disabled={!tmNextLesson}
+          className="lg:col-span-2 text-left p-7 transition-all hover:border-[#2a2a2a] group relative overflow-hidden"
+          style={{
+            border: `1px solid ${BORDER}`,
+            backgroundColor: CARD,
+            borderRadius: 10,
+            background: `radial-gradient(circle at 0% 0%, ${ACCENT}22 0%, ${CARD} 60%)`,
+          }}
+        >
+          {tmNextLesson && tmCourse ? (
+            <>
+              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
+                Продолжить · занятие {tmLessons.indexOf(tmNextLesson) + 1}
+              </div>
+              <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, lineHeight: 1.2, color: FG, marginBottom: 8 }}>
+                {tmNextLesson.title}
+              </h2>
+              {tmNextLesson.description && (
+                <p style={{ fontFamily: SANS, fontSize: 13, color: '#888', lineHeight: 1.55, marginBottom: 16 }} className="line-clamp-2">
+                  {tmNextLesson.description}
+                </p>
+              )}
+              <div className="flex items-center justify-between">
+                <div className="flex gap-4" style={{ fontFamily: MONO, fontSize: 11, color: '#666' }}>
+                  <span>● Видео</span>
+                  <span>● PDF</span>
+                </div>
+                <div className="flex items-center gap-2 transition-transform group-hover:translate-x-1" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: ACCENT }}>
+                  Открыть <ArrowRight size={14} />
+                </div>
+              </div>
+            </>
+          ) : (
+            <div>
+              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
+                Программа завершена
+              </div>
+              <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG }}>
+                Все занятия пройдены ✓
+              </h2>
+            </div>
+          )}
+        </button>
+
+        {/* Live card 1/3 */}
+        <LiveStreamsCard upcoming={upcomingLives} countdown={liveCountdown} now={now} />
+      </div>
+
+      {/* Programs grid */}
+      <div className="mb-12">
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 16 }}>
+          Программы
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {courses.map(c => {
+            const cp = progress[c.id] || { completed: 0, total: 0 };
+            const cpct = cp.total > 0 ? Math.round((cp.completed / cp.total) * 100) : 0;
+            return (
+              <button
+                key={c.id}
+                onClick={() => onSelectCourse(c.id)}
+                className="text-left p-5 transition-all hover:border-[#2a2a2a]"
+                style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 8 }}
+              >
+                <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 8 }}>
+                  Программа
+                </div>
+                <h3 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG, marginBottom: 6 }}>
+                  {c.title}
+                </h3>
+                {c.subtitle && (
+                  <p style={{ fontFamily: SANS, fontSize: 13, color: '#888', lineHeight: 1.5, marginBottom: 14 }} className="line-clamp-2">
+                    {c.subtitle}
+                  </p>
+                )}
+                {cp.total > 0 && (
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1" style={{ height: 2, backgroundColor: BORDER, overflow: 'hidden' }}>
+                      <div style={{ width: `${cpct}%`, height: '100%', backgroundColor: ACCENT }} />
+                    </div>
+                    <span style={{ fontFamily: MONO, fontSize: 10, color: '#666', fontVariantNumeric: 'tabular-nums' }}>
+                      {cp.completed}/{cp.total}
+                    </span>
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Activity + Code */}
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+        <div className="lg:col-span-3 p-6" style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 8 }}>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 16 }}>
+            Последняя активность
+          </div>
+          {recentActivity.length === 0 ? (
+            <p style={{ fontFamily: MONO, fontSize: 12, color: '#666' }}>Пока пусто</p>
+          ) : (
+            <div>
+              {recentActivity.map((a, i) => (
+                <div key={i} className="flex items-center gap-3 py-3" style={{ borderTop: i > 0 ? `1px solid #141414` : 'none' }}>
+                  <span style={{ color: ACCENT, fontFamily: MONO, fontSize: 12 }}>✓</span>
+                  <span className="flex-1 truncate" style={{ fontFamily: SANS, fontSize: 13, color: FG }}>
+                    {a.lesson?.title}
+                  </span>
+                  <span style={{ fontFamily: MONO, fontSize: 10, color: '#666', flexShrink: 0 }}>
+                    {new Date(a.completed_at).toLocaleDateString('ru-RU', { day: '2-digit', month: 'short' })}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="lg:col-span-2">
+          <ActivateCodeSection userId={userId} onActivated={() => window.location.reload()} compact />
+        </div>
+      </div>
+    </>
+  );
+}
+
+// ====================================================================
+//   FREE HOME
+// ====================================================================
+function FreeHome({
+  courses, progress, accessMap, hasAccess, role, completedIds,
+  getCourseLessons, getUnlockedLessons, getFirstIncomplete,
+  upcomingLives, liveCountdown, now, onOpenLesson, onSelectCourse, userId,
+}: {
+  courses: Course[];
+  progress: ProgressMap;
+  accessMap: Map<string, any>;
+  hasAccess: (c: Course) => boolean;
+  role: string | null;
+  completedIds: Set<string>;
+  getCourseLessons: (id: string) => Lesson[];
+  getUnlockedLessons: (c: Course, l: Lesson[]) => Lesson[];
+  getFirstIncomplete: (c: Course, l: Lesson[]) => Lesson | null;
+  upcomingLives: Date[];
+  liveCountdown: { d: number; h: number; m: number; s: number } | null;
+  now: Date;
+  onOpenLesson: (id: string) => void;
+  onSelectCourse: (id: string) => void;
+  userId?: string;
+}) {
+  const freeCourse = courses.find(c => c.is_free) || null;
+  const freeLessons = freeCourse ? getCourseLessons(freeCourse.id) : [];
+  const freeUnlocked = freeCourse ? getUnlockedLessons(freeCourse, freeLessons) : [];
+  const freeProgress = freeCourse ? (progress[freeCourse.id] || { completed: 0, total: 0 }) : null;
+  const freeNext = freeCourse ? getFirstIncomplete(freeCourse, freeLessons) : null;
+  const completed = freeProgress?.completed ?? 0;
+  const total = freeProgress?.total ?? 0;
+  const completedAll = total > 0 && completed >= total;
+
+  // Locked paid courses
+  const lockedPaid = courses.filter(c => !c.is_free && !hasAccess(c));
+
+  // Largest paid program total for the locked KPI cell
+  const mainPaid = courses.find(c => c.title === 'TRADE MASTER 4.5') || courses.find(c => !c.is_free) || null;
+  const mainPaidTotal = mainPaid ? getCourseLessons(mainPaid.id).length : 0;
+
+  const lockedLabelFor = (c: Course) => {
+    if (c.title.toLowerCase().includes('master')) return 'Допуск через куратора';
+    if (c.title.toLowerCase().includes('elite') || c.title.toLowerCase().includes('vip')) return 'По приглашению';
+    return 'После TM 4.5';
+  };
+
+  return (
+    <>
+      {/* Hero */}
+      <div className="mb-12">
+        <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(38px, 5.5vw, 64px)', lineHeight: 1.02, letterSpacing: '-0.025em', color: FG }}>
+          {renderHeroTitle('Добро пожаловать в *систему*.')}
+        </h1>
+        <p className="mt-4" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '60ch' }}>
+          Вы получили доступ к {total || 'нескольким'} вводным занятиям TLT. Они показывают, как устроена система. Основная программа TRADE MASTER 4.5 открывается по коду доступа от администратора.
+        </p>
+      </div>
+
+      {/* KPI strip — 2 cells */}
+      <div className="mb-10 grid grid-cols-1 sm:grid-cols-2 gap-px" style={{ backgroundColor: BORDER, border: `1px solid ${BORDER}` }}>
+        <div className="p-6" style={{ backgroundColor: BG }}>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 14 }}>
+            Вводный курс
+          </div>
+          <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 32, lineHeight: 1, color: FG, marginBottom: 12, fontVariantNumeric: 'tabular-nums' }}>
+            {completed}<span style={{ color: '#666', fontSize: 22 }}> / {total}</span>
+          </div>
+          {total > 0 && (
+            <div style={{ height: 2, backgroundColor: BORDER, overflow: 'hidden' }}>
+              <div style={{ width: `${(completed / total) * 100}%`, height: '100%', backgroundColor: ACCENT }} />
+            </div>
+          )}
+        </div>
+        <div className="p-6 flex flex-col justify-between" style={{ backgroundColor: BG }}>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 14 }}>
+            Основная программа
+          </div>
+          <div>
+            <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: '#666', marginBottom: 8 }}>
+              {mainPaidTotal} занятий · TM 4.5
+            </div>
+            <div className="flex items-center gap-2" style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666' }}>
+              <Lock size={11} /> Закрыто · нужен код
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main card + live */}
+      <div className="mb-10 grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="lg:col-span-2">
+          {completed === 0 && freeNext && freeCourse ? (
+            <div
+              className="p-7 relative overflow-hidden"
+              style={{
+                border: `1px solid ${ACCENT}66`,
+                background: 'linear-gradient(135deg, #1a1408 0%, #0f0d08 60%)',
+                borderRadius: 10,
+              }}
+            >
+              <div aria-hidden style={{ position: 'absolute', top: 0, right: 0, width: 200, height: 200, background: `radial-gradient(circle, ${ACCENT}44, transparent 70%)`, pointerEvents: 'none' }} />
+              <div className="flex items-center gap-2 mb-3" style={{ position: 'relative' }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: ACCENT, display: 'inline-block', animation: 'tlyPulse 2.4s ease-out infinite' }} />
+                <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT }}>
+                  Доступ открыт · начните здесь
+                </span>
+              </div>
+              <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 28, lineHeight: 1.1, color: FG, marginBottom: 14, letterSpacing: '-0.02em', position: 'relative' }}>
+                Допуск получают <em style={{ color: ACCENT, fontStyle: 'italic' }}>не все</em>. Начните с первого занятия.
+              </h2>
+              <p style={{ fontFamily: SANS, fontSize: 14, color: '#a8a090', lineHeight: 1.55, marginBottom: 22, maxWidth: '52ch', position: 'relative' }}>
+                Это вводная программа. Она показывает, как устроены правила. Если поймёте — будет основная.
+              </p>
+              <button
+                onClick={() => onOpenLesson(freeNext.id)}
+                style={{
+                  fontFamily: MONO, fontSize: 12, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
+                  backgroundColor: ACCENT, color: '#0a0a0a',
+                  padding: '14px 24px', borderRadius: 8, position: 'relative',
+                  display: 'inline-flex', alignItems: 'center', gap: 10,
+                }}
+              >
+                Перейти к занятию 1 <ArrowRight size={14} />
+              </button>
+            </div>
+          ) : !completedAll && freeNext ? (
+            <button
+              onClick={() => onOpenLesson(freeNext.id)}
+              className="w-full text-left p-6 transition-all hover:border-[#2a2a2a] group"
+              style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 10 }}
+            >
+              {total > 0 && (
+                <div style={{ height: 2, backgroundColor: BORDER, marginBottom: 18, overflow: 'hidden' }}>
+                  <div style={{ width: `${(completed / total) * 100}%`, height: '100%', backgroundColor: ACCENT }} />
+                </div>
+              )}
+              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 10 }}>
+                Продолжить · занятие {freeLessons.indexOf(freeNext) + 1}
+              </div>
+              <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG, marginBottom: 8 }}>
+                {freeNext.title}
+              </h2>
+              {freeNext.description && (
+                <p style={{ fontFamily: SANS, fontSize: 13, color: '#888', lineHeight: 1.55, marginBottom: 14 }} className="line-clamp-2">
+                  {freeNext.description}
+                </p>
+              )}
+              <div className="flex items-center gap-2 transition-transform group-hover:translate-x-1" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: ACCENT }}>
+                Открыть <ArrowRight size={14} />
+              </div>
+            </button>
+          ) : (
+            <div className="p-7" style={{ border: `1px solid ${ACCENT}66`, background: 'linear-gradient(135deg, #1a1408 0%, #0f0d08 60%)', borderRadius: 10 }}>
+              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
+                ◆ Готовы к следующему шагу
+              </div>
+              <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 28, lineHeight: 1.1, color: FG, marginBottom: 14 }}>
+                Вы готовы к <em style={{ color: ACCENT, fontStyle: 'italic' }}>основной</em> программе.
+              </h2>
+              <p style={{ fontFamily: SANS, fontSize: 14, color: '#a8a090', lineHeight: 1.55, marginBottom: 22, maxWidth: '52ch' }}>
+                Свяжитесь с куратором — он решит, готовы ли вы к допуску. Не все получают.
+              </p>
+              <a
+                href="https://t.me/rav_999"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  fontFamily: MONO, fontSize: 12, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
+                  backgroundColor: ACCENT, color: '#0a0a0a',
+                  padding: '14px 24px', borderRadius: 8,
+                  display: 'inline-flex', alignItems: 'center', gap: 10,
+                }}
+              >
+                <MessageCircle size={14} /> Написать Сергею
+              </a>
+            </div>
+          )}
+        </div>
+
+        <LiveStreamsCard upcoming={upcomingLives} countdown={liveCountdown} now={now} />
+      </div>
+
+      {/* Locked paid programs */}
+      {lockedPaid.length > 0 && (
+        <div className="mb-12">
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 16 }}>
+            Программы по допуску
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {lockedPaid.map(c => (
+              <div
+                key={c.id}
+                className="p-5"
+                style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 8, opacity: 0.55 }}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#666' }}>
+                    Программа
+                  </div>
+                  <Lock size={12} style={{ color: '#555' }} />
+                </div>
+                <h3 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 20, color: FG, marginBottom: 6 }}>
+                  {c.title}
+                </h3>
+                {c.subtitle && (
+                  <p style={{ fontFamily: SANS, fontSize: 12, color: '#888', lineHeight: 1.5, marginBottom: 12 }} className="line-clamp-2">
+                    {c.subtitle}
+                  </p>
+                )}
+                <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: ACCENT }}>
+                  {lockedLabelFor(c)}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Code section */}
+      <ActivateCodeSection userId={userId} onActivated={() => window.location.reload()} />
+    </>
+  );
+}
+
+// ====================================================================
+//   SUB COMPONENTS
+// ====================================================================
+function KpiCell({ label, value, accent, pulse, mono }: { label: string; value: string; accent?: boolean; pulse?: boolean; mono?: boolean }) {
+  return (
+    <div className="p-5 sm:p-6" style={{ backgroundColor: BG }}>
+      <div className="flex items-center gap-2 mb-3">
+        {pulse && <span style={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: ACCENT, animation: 'tlyPulse 2.4s ease-out infinite' }} />}
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555' }}>
+          {label}
+        </div>
+      </div>
+      <div style={{
+        fontFamily: mono ? MONO : DISPLAY,
+        fontWeight: mono ? 500 : 350,
+        fontSize: mono ? 18 : 32,
+        lineHeight: 1,
+        color: accent ? ACCENT : FG,
+        letterSpacing: mono ? '0.02em' : '-0.02em',
+        fontVariantNumeric: 'tabular-nums',
+      }}>
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function LiveStreamsCard({ upcoming, countdown, now }: { upcoming: Date[]; countdown: { d: number; h: number; m: number; s: number } | null; now: Date }) {
+  return (
+    <div className="p-6" style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 10 }}>
+      <div className="flex items-center gap-2 mb-4">
+        <span style={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: ACCENT, animation: 'tlyPulse 2.4s ease-out infinite' }} />
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT }}>
+          Прямые эфиры
+        </div>
+      </div>
+
+      {countdown && (
+        <div className="grid grid-cols-4 gap-2 mb-5">
+          {[
+            { v: countdown.d, l: 'д' },
+            { v: countdown.h, l: 'ч' },
+            { v: countdown.m, l: 'м' },
+            { v: countdown.s, l: 'с' },
+          ].map((x, i) => (
+            <div key={i} className="text-center">
+              <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, lineHeight: 1, color: FG, fontVariantNumeric: 'tabular-nums' }}>
+                {String(x.v).padStart(2, '0')}
+              </div>
+              <div style={{ fontFamily: MONO, fontSize: 9, color: '#666', marginTop: 4, textTransform: 'uppercase', letterSpacing: '0.14em' }}>
+                {x.l}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="space-y-2 mb-5">
+        {upcoming.map((d, i) => {
+          const isNext = i === 0;
+          const dow = d.toLocaleDateString('ru-RU', { weekday: 'short' });
+          const day = d.getDate();
+          const time = d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+          return (
+            <div key={i} className="flex items-center gap-3 py-2" style={{ borderTop: i > 0 ? `1px solid #141414` : 'none' }}>
+              <div style={{ fontFamily: DISPLAY, fontSize: 22, fontWeight: 350, color: isNext ? ACCENT : FG, minWidth: 30, textAlign: 'center' }}>
+                {day}
+              </div>
+              <div className="flex-1">
+                <div style={{ fontFamily: MONO, fontSize: 11, color: isNext ? FG : '#888', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+                  {dow} · {time}
+                </div>
+              </div>
+              {isNext && (
+                <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: ACCENT, padding: '2px 8px', border: `1px solid ${ACCENT}66`, borderRadius: 4 }}>
+                  Скоро
+                </span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      <p style={{ fontFamily: SANS, fontSize: 12, color: '#888', lineHeight: 1.5 }}>
+        Эфир в группе{' '}
+        <span style={{ color: ACCENT }}>Telegram</span>{' '}/{' '}
+        <span style={{ color: ACCENT }}>YouTube</span>
+      </p>
+    </div>
+  );
+}
+
+function ActivateCodeSection({ userId, onActivated, compact }: { userId?: string; onActivated: () => void; compact?: boolean }) {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; success: boolean } | null>(null);
@@ -658,37 +1204,52 @@ function ActivateCodeSection({ userId, onActivated }: { userId?: string; onActiv
   };
 
   return (
-    <div className="mt-10 rounded-xl border p-5" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
+    <div className="p-6 h-full flex flex-col" style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 8 }}>
       <div className="flex items-center gap-2 mb-3">
-        <Ticket size={14} style={{ color: '#666' }} />
-        <span className="text-xs uppercase tracking-wider" style={{ color: '#666', fontFamily: "'Inter', sans-serif" }}>
-          Есть код доступа? Активируй здесь!
+        <Ticket size={14} style={{ color: ACCENT }} />
+        <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT }}>
+          Код доступа
         </span>
       </div>
-      <div className="flex gap-2">
+      <p style={{ fontFamily: SANS, fontSize: 12, color: '#888', lineHeight: 1.55, marginBottom: 14 }}>
+        {compact ? 'Получили код? Откройте программу.' : 'Получили код доступа? Введите его, чтобы открыть основную программу.'}
+      </p>
+      <div className="flex gap-2 mb-2">
         <input
           type="text"
           value={code}
           onChange={e => setCode(e.target.value)}
           placeholder="Введите код"
-          className="flex-1 px-3 py-2 rounded-lg border text-sm"
-          style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: "'Inter', sans-serif" }}
+          className="flex-1 px-3 py-2.5"
+          style={{ backgroundColor: '#0a0a0a', border: `1px solid #1f1f1f`, borderRadius: 6, color: FG, fontFamily: MONO, fontSize: 12 }}
           onKeyDown={e => e.key === 'Enter' && activate()}
         />
         <button
           onClick={activate}
           disabled={loading || !code.trim()}
-          className="px-4 py-2 rounded-lg text-xs whitespace-nowrap"
-          style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: "'Inter', sans-serif", opacity: loading ? 0.6 : 1 }}
+          style={{
+            backgroundColor: ACCENT, color: '#0a0a0a',
+            fontFamily: MONO, fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500,
+            padding: '0 18px', borderRadius: 6, opacity: loading ? 0.6 : 1, whiteSpace: 'nowrap',
+          }}
         >
-          {loading ? '...' : 'Активировать код'}
+          {loading ? '...' : 'Открыть'}
         </button>
       </div>
       {message && (
-        <p className="text-xs mt-2" style={{ color: message.success ? '#4a8a4a' : '#e85d3a', fontFamily: "'Inter', sans-serif" }}>
+        <p style={{ fontFamily: MONO, fontSize: 11, color: message.success ? ACCENT : '#e85d3a', marginTop: 6 }}>
           {message.text}
         </p>
       )}
+      <a
+        href="https://t.me/rav_999"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-auto pt-3 hover:opacity-80 transition"
+        style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#666' }}
+      >
+        Нет кода? → Написать Сергею
+      </a>
     </div>
   );
 }

@@ -84,8 +84,10 @@ export default function SchoolAuth() {
 
   const LogoBlock = () => (
     <div className="flex flex-col items-center mb-6">
-      <img src={logo} alt="TRADELIKETYO" className="rounded-xl object-cover" style={{ width: '11.7rem', height: '11.7rem' }} />
-      <span className="tly-section-tag mt-4">Вход в систему</span>
+      <img src={logo} alt="TRADELIKETYO" className="rounded-xl object-cover" style={{ width: '8rem', height: '8rem' }} />
+      <span className="mt-5 text-[10px] uppercase tracking-[0.22em]" style={{ color: '#666', fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}>
+        Вход в систему
+      </span>
     </div>
   );
 
@@ -105,15 +107,15 @@ export default function SchoolAuth() {
               onChange={e => setEmail(e.target.value)}
               required
               className="w-full px-4 py-3 rounded-lg border text-sm"
-              style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: "'Inter', sans-serif" }}
+              style={{ backgroundColor: '#0a0a0a', borderColor: '#1f1f1f', color: '#e8e0d0', fontFamily: "'Inter', sans-serif" }}
             />
             {error && <p className="text-sm" style={{ color: '#e85d3a' }}>{error}</p>}
-            {success && <p className="text-sm" style={{ color: '#4a8a4a' }}>{success}</p>}
+            {success && <p className="text-sm" style={{ color: '#caa472' }}>{success}</p>}
             <button
               type="submit"
               disabled={loading}
               className="w-full py-3 rounded-lg font-medium text-sm transition-all"
-              style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: "'Inter', sans-serif", opacity: loading ? 0.6 : 1 }}
+              style={{ backgroundColor: '#caa472', color: '#0a0a0a', fontFamily: "'JetBrains Mono', ui-monospace, monospace", fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.18em', fontWeight: 500, opacity: loading ? 0.6 : 1 }}
             >
               {loading ? '...' : 'Отправить ссылку'}
             </button>
@@ -149,7 +151,7 @@ export default function SchoolAuth() {
               onChange={e => setFullName(e.target.value)}
               required
               className="w-full px-4 py-3 rounded-lg border text-sm"
-              style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: "'Inter', sans-serif" }}
+              style={{ backgroundColor: '#0a0a0a', borderColor: '#1f1f1f', color: '#e8e0d0', fontFamily: "'Inter', sans-serif" }}
             />
           )}
           {!isLogin && (
@@ -159,7 +161,7 @@ export default function SchoolAuth() {
               value={inviteCode}
               onChange={e => setInviteCode(e.target.value)}
               className="w-full px-4 py-3 rounded-lg border text-sm"
-              style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: "'Inter', sans-serif" }}
+              style={{ backgroundColor: '#0a0a0a', borderColor: '#1f1f1f', color: '#e8e0d0', fontFamily: "'Inter', sans-serif" }}
             />
           )}
           <input
@@ -169,7 +171,7 @@ export default function SchoolAuth() {
             onChange={e => setEmail(e.target.value)}
             required
             className="w-full px-4 py-3 rounded-lg border text-sm"
-            style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: "'Inter', sans-serif" }}
+            style={{ backgroundColor: '#0a0a0a', borderColor: '#1f1f1f', color: '#e8e0d0', fontFamily: "'Inter', sans-serif" }}
           />
           <input
             type="password"
@@ -179,7 +181,7 @@ export default function SchoolAuth() {
             required
             minLength={6}
             className="w-full px-4 py-3 rounded-lg border text-sm"
-            style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: "'Inter', sans-serif" }}
+            style={{ backgroundColor: '#0a0a0a', borderColor: '#1f1f1f', color: '#e8e0d0', fontFamily: "'Inter', sans-serif" }}
           />
 
           {error && <p className="text-sm" style={{ color: '#e85d3a' }}>{error}</p>}
@@ -188,7 +190,7 @@ export default function SchoolAuth() {
             type="submit"
             disabled={loading}
             className="w-full py-3 rounded-lg font-medium text-sm transition-all"
-            style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: "'Inter', sans-serif", opacity: loading ? 0.6 : 1 }}
+            style={{ backgroundColor: '#caa472', color: '#0a0a0a', fontFamily: "'JetBrains Mono', ui-monospace, monospace", fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.18em', fontWeight: 500, opacity: loading ? 0.6 : 1 }}
           >
             {loading ? '...' : isLogin ? 'Войти' : 'Создать аккаунт'}
           </button>
