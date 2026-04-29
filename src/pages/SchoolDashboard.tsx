@@ -471,7 +471,7 @@ export default function SchoolDashboard() {
                 {now.toLocaleDateString('ru-RU', { day: '2-digit', month: 'short', year: 'numeric' })}
               </span>
               <a
-                href="https://t.me/rav_999"
+                href="http://t.me/tradeliketyo"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#888' }}
