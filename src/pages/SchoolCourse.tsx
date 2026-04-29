@@ -103,44 +103,44 @@ export default function SchoolCourse() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-8 py-10 sm:py-14">
+      <main className="max-w-5xl mx-auto px-4 sm:px-8 py-5 sm:py-7">
         {/* Header grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 mb-6">
           <div className="lg:col-span-2">
-            <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 18 }}>
+            <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 10 }}>
               ◆ Программа
             </div>
-            <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(36px, 5vw, 56px)', lineHeight: 1.02, letterSpacing: '-0.025em', color: FG }}>
+            <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(28px, 3.6vw, 40px)', lineHeight: 1.05, letterSpacing: '-0.025em', color: FG }}>
               {courseTitle}
             </h1>
             {courseSubtitle && (
-              <p className="mt-4" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '60ch' }}>
+              <p className="mt-2" style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.5, color: '#a8a090', maxWidth: '60ch' }}>
                 {courseSubtitle}
               </p>
             )}
           </div>
 
-          <div className="p-6" style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 10 }}>
-            <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 48, lineHeight: 1, color: ACCENT, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
-              {pct}<span style={{ fontSize: 24, color: '#888' }}>%</span>
+          <div className="p-4" style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 10 }}>
+            <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 32, lineHeight: 1, color: ACCENT, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
+              {pct}<span style={{ fontSize: 18, color: '#888' }}>%</span>
             </div>
-            <div style={{ height: 2, backgroundColor: BORDER, marginTop: 16, marginBottom: 18, overflow: 'hidden' }}>
+            <div style={{ height: 2, backgroundColor: BORDER, marginTop: 10, marginBottom: 12, overflow: 'hidden' }}>
               <div style={{ width: `${pct}%`, height: '100%', backgroundColor: ACCENT, transition: 'width 0.4s' }} />
             </div>
-            <div className="grid grid-cols-2 gap-4 mb-5">
+            <div className="grid grid-cols-2 gap-3 mb-3">
               <div>
-                <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666', marginBottom: 4 }}>
+                <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666', marginBottom: 2 }}>
                   Завершено
                 </div>
-                <div style={{ fontFamily: DISPLAY, fontSize: 22, fontWeight: 350, color: FG, fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ fontFamily: DISPLAY, fontSize: 18, fontWeight: 350, color: FG, fontVariantNumeric: 'tabular-nums' }}>
                   {completed}
                 </div>
               </div>
               <div>
-                <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666', marginBottom: 4 }}>
+                <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666', marginBottom: 2 }}>
                   Осталось
                 </div>
-                <div style={{ fontFamily: DISPLAY, fontSize: 22, fontWeight: 350, color: FG, fontVariantNumeric: 'tabular-nums' }}>
+                <div style={{ fontFamily: DISPLAY, fontSize: 18, fontWeight: 350, color: FG, fontVariantNumeric: 'tabular-nums' }}>
                   {remaining}
                 </div>
               </div>
@@ -148,7 +148,7 @@ export default function SchoolCourse() {
             {nextLesson && (
               <button
                 onClick={() => navigate(`/school/lesson/${nextLesson.id}`)}
-                className="w-full flex items-center justify-center gap-2 py-3 transition-all hover:brightness-110"
+                className="w-full flex items-center justify-center gap-2 py-2.5 transition-all hover:brightness-110"
                 style={{ backgroundColor: ACCENT, color: '#0a0a0a', fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500, borderRadius: 6 }}
               >
                 Продолжить <ArrowRight size={14} />
@@ -158,7 +158,7 @@ export default function SchoolCourse() {
         </div>
 
         {/* Lessons list */}
-        <div className="space-y-1">
+        <div className="space-y-0">
           {lessons.map((l, i) => {
             const done = completedIds.has(l.id);
             const unlocked = isUnlocked(i);
@@ -166,7 +166,7 @@ export default function SchoolCourse() {
             return (
               <div
                 key={l.id}
-                className="flex items-center gap-4 px-4 py-4 transition-all"
+                className="flex items-center gap-3 px-3 py-2.5 transition-all"
                 style={{
                   borderTop: i === 0 ? `1px solid ${BORDER}` : 'none',
                   borderBottom: `1px solid ${BORDER}`,
@@ -177,35 +177,32 @@ export default function SchoolCourse() {
                 <div
                   className="flex items-center justify-center flex-shrink-0"
                   style={{
-                    width: 36, height: 36,
+                    width: 28, height: 28,
                     border: `1px solid ${status === 'done' ? ACCENT : BORDER}`,
                     backgroundColor: status === 'done' ? `${ACCENT}11` : 'transparent',
                     color: status === 'done' ? ACCENT : (status === 'open' ? FG : '#444'),
-                    fontFamily: MONO, fontSize: 12, fontVariantNumeric: 'tabular-nums', fontWeight: 500,
+                    fontFamily: MONO, fontSize: 11, fontVariantNumeric: 'tabular-nums', fontWeight: 500,
                   }}
                 >
                   {status === 'done' ? '✓' : status === 'locked' ? <Lock size={12} /> : i + 1}
                 </div>
 
                 <div className="flex-1 min-w-0">
-                  <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666', marginBottom: 4 }}>
-                    Занятие {i + 1}
+                  <div className="flex items-baseline gap-2 min-w-0">
+                    <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#666', flexShrink: 0 }}>
+                      №{String(i + 1).padStart(2, '0')}
+                    </span>
+                    <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: 500, color: status === 'locked' ? '#555' : FG }} className="truncate">
+                      {l.title}
+                    </span>
                   </div>
-                  <div style={{ fontFamily: SANS, fontSize: 14, fontWeight: 500, color: status === 'locked' ? '#555' : FG }} className="truncate">
-                    {l.title}
-                  </div>
-                  {l.description && (
-                    <div style={{ fontFamily: SANS, fontSize: 12, color: '#888', marginTop: 4, lineHeight: 1.5 }} className="truncate">
-                      {l.description}
-                    </div>
-                  )}
                 </div>
 
                 {status === 'locked' ? (
                   <span
                     style={{
-                      fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase',
-                      color: '#666', padding: '6px 12px', backgroundColor: '#141414', borderRadius: 4,
+                      fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase',
+                      color: '#666', padding: '4px 8px', backgroundColor: '#141414', borderRadius: 4,
                     }}
                   >
                     Закрыто
@@ -214,7 +211,7 @@ export default function SchoolCourse() {
                   <button
                     onClick={() => navigate(`/school/lesson/${l.id}`)}
                     className="hover:opacity-70 transition flex-shrink-0"
-                    style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: ACCENT }}
+                    style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: ACCENT }}
                   >
                     Повторить →
                   </button>
@@ -224,8 +221,8 @@ export default function SchoolCourse() {
                     className="flex-shrink-0 hover:brightness-110 transition"
                     style={{
                       backgroundColor: ACCENT, color: '#0a0a0a',
-                      fontFamily: MONO, fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500,
-                      padding: '8px 16px', borderRadius: 6,
+                      fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500,
+                      padding: '6px 12px', borderRadius: 6,
                     }}
                   >
                     Открыть
