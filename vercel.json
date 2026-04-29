@@ -7,6 +7,8 @@
     { "source": "/site", "destination": "https://t.me/New_TradeLikeTYO_bot?start=site", "permanent": false },
     { "source": "/bio", "destination": "https://t.me/New_TradeLikeTYO_bot?start=bio", "permanent": false },
     { "source": "/warm", "destination": "https://t.me/New_TradeLikeTYO_bot?start=warm", "permanent": false },
+    { "source": "/p-telegram", "destination": "https://t.me/New_TradeLikeTYO_bot?start=posevT", "permanent": false },
+    { "source": "/telegram", "destination": "https://t.me/New_TradeLikeTYO_bot?start=telegram", "permanent": false },
     { "source": "/start", "destination": "https://t.me/New_TradeLikeTYO_bot", "permanent": false }
   ],
   "rewrites": [
