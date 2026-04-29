@@ -37,31 +37,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (session?.user) {
           // Fetch role with setTimeout to avoid Supabase auth deadlock
           setTimeout(async () => {
-            const [{ data: roleData }, { data: profileData }] = await Promise.all([
-              supabase
-                .from('user_roles')
-                .select('role')
-                .eq('user_id', session.user.id)
-                .single(),
-              supabase
-                .from('profiles')
-                .select('is_blocked')
-                .eq('user_id', session.user.id)
-                .single(),
-            ]);
+            try {
+              const [roleRes, profileRes] = await Promise.all([
+                supabase
+                  .from('user_roles')
+                  .select('role')
+                  .eq('user_id', session.user.id)
+                  .maybeSingle(),
+                supabase
+                  .from('profiles')
+                  .select('is_blocked')
+                  .eq('user_id', session.user.id)
+                  .maybeSingle(),
+              ]);
 
-            if (profileData?.is_blocked) {
-              await supabase.auth.signOut();
-              setSession(null);
-              setUser(null);
-              setRole(null);
+              if (profileRes.data?.is_blocked) {
+                await supabase.auth.signOut();
+                setSession(null);
+                setUser(null);
+                setRole(null);
+                setLoading(false);
+                alert('Доступ приостановлен. Обратитесь к наставнику.');
+                return;
+              }
+
+              setRole((roleRes.data?.role as UserRole) ?? 'student');
+            } catch (err) {
+              console.error('[AuthContext] role/profile load failed', err);
+              setRole('student');
+            } finally {
               setLoading(false);
-              alert('Доступ приостановлен. Обратитесь к наставнику.');
-              return;
             }
-
-            setRole((roleData?.role as UserRole) ?? 'student');
-            setLoading(false);
           }, 0);
         } else {
           setRole(null);
