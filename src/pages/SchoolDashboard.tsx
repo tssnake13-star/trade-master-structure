@@ -66,6 +66,9 @@ function nextLiveStream(now: Date) {
   // Mon (1) and Thu (4) at 20:00 GMT+5
   const offsetMinutes = -now.getTimezoneOffset(); // local offset
   const targetOffset = 5 * 60; // GMT+5
+  // Длительность эфира — счётчик переключается на следующий эфир
+  // только после окончания текущего, а не в момент его начала.
+  const liveDurationMs = 2 * 60 * 60 * 1000; // 2 часа
   const list: Date[] = [];
   const base = new Date(now.getTime());
   for (let i = 0; i < 14; i++) {
@@ -78,7 +81,11 @@ function nextLiveStream(now: Date) {
       // 20:00 in GMT+5 → convert back to local
       const ts = Date.UTC(gmt5.getUTCFullYear(), gmt5.getUTCMonth(), gmt5.getUTCDate(), 20 - 5, 0, 0);
       const event = new Date(ts);
-      if (event.getTime() > now.getTime()) list.push(event);
+      // Считаем эфир актуальным, пока не прошла его длительность.
+      // Это удерживает текущий эфир в списке (с обнулённым обратным
+      // отсчётом) до фактического окончания, и только потом счётчик
+      // переключается на следующий день.
+      if (event.getTime() + liveDurationMs > now.getTime()) list.push(event);
     }
   }
   return list.slice(0, 3);
