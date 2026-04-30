@@ -540,6 +540,7 @@ export default function SchoolDashboard() {
               tmProgress={tmProgress}
               tmNextLesson={tmNextLesson}
               programCountdown={programCountdown}
+              programEnd={programEnd}
               daysInSystem={daysInSystem}
               timeInSystem={timeInSystem}
               isAdmin={role === 'admin'}
@@ -718,7 +719,7 @@ function SelectedCourseView({
 // ====================================================================
 function PaidHome({
   welcomeTitle, profileName, tmCourse, tmLessons, tmProgress, tmNextLesson,
-  programCountdown, daysInSystem, timeInSystem, isAdmin, upcomingLives, liveCountdown, recentActivity,
+  programCountdown, programEnd, daysInSystem, timeInSystem, isAdmin, upcomingLives, liveCountdown, recentActivity,
   courses, progress, now, onOpenLesson, onSelectCourse, userId, t,
 }: {
   welcomeTitle: string;
@@ -728,6 +729,7 @@ function PaidHome({
   tmProgress: { completed: number; total: number } | null;
   tmNextLesson: Lesson | null;
   programCountdown: { d: number; h: number; m: number; s: number } | null;
+  programEnd: Date | null;
   daysInSystem: number;
   timeInSystem: { h: number; m: number; s: number } | null;
   isAdmin: boolean;
