@@ -597,11 +597,13 @@ export default function SchoolDashboard() {
   );
 }
 
+type TFn = (key: DashboardTextKey, vars?: Record<string, string | number>) => string;
+
 // ====================================================================
 //   SELECTED COURSE DETAIL
 // ====================================================================
 function SelectedCourseView({
-  course, lessons, unlockedSortOrders, completedIds, progress, pct, nextLesson, onOpen,
+  course, lessons, unlockedSortOrders, completedIds, progress, pct, nextLesson, onOpen, t,
 }: {
   course: Course;
   lessons: Lesson[];
@@ -611,12 +613,13 @@ function SelectedCourseView({
   pct: number;
   nextLesson: Lesson | null;
   onOpen: (id: string) => void;
+  t: TFn;
 }) {
   return (
     <>
       <div className="mb-8">
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 14 }}>
-          ◆ Программа
+          {t('course_eyebrow')}
         </div>
         <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(36px, 5vw, 56px)', lineHeight: 1.02, letterSpacing: '-0.025em', color: FG }}>
           {course.title}
@@ -682,11 +685,11 @@ function SelectedCourseView({
               </div>
               {!unlocked ? (
                 <span className="flex-shrink-0 pt-1" style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#444' }}>
-                  Закрыто
+                  {t('course_lesson_locked')}
                 </span>
               ) : done ? (
                 <button onClick={() => onOpen(l.id)} className="flex-shrink-0 pt-1 hover:opacity-70 transition" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT }}>
-                  Повторить →
+                  {t('course_lesson_repeat')}
                 </button>
               ) : (
                 <button
@@ -698,7 +701,7 @@ function SelectedCourseView({
                     padding: '8px 16px', borderRadius: 6,
                   }}
                 >
-                  Открыть
+                  {t('course_lesson_open')}
                 </button>
               )}
             </div>
