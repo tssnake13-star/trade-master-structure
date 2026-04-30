@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Lock, Settings, LogOut, ArrowRight, Menu, Ticket, Home as HomeIcon, MessageCircle } from 'lucide-react';
 import logoVideoFallback from '@/assets/logo-dashboard.mp4';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
+import { useDashboardTexts, type DashboardTextKey } from '@/lib/dashboardTexts';
 
 interface Course {
   id: string;
@@ -131,6 +132,7 @@ export default function SchoolDashboard() {
   const { session, user, role, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useDashboardTexts();
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [accessMap, setAccessMap] = useState<Map<string, { courseId: string; unlocked: number[]; granted_at?: string | null; expires_at?: string | null }>>(new Map());
@@ -263,7 +265,7 @@ export default function SchoolDashboard() {
   if (authLoading || loading) {
     return (
       <div data-school-skin className="min-h-screen flex items-center justify-center" style={{ backgroundColor: BG, color: FG }}>
-        <p style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#666' }}>Загрузка</p>
+        <p style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#666' }}>{t('loading_label')}</p>
       </div>
     );
   }
