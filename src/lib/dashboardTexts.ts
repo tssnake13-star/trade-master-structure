@@ -255,7 +255,7 @@ export function useDashboardTexts() {
     const raw = overrides[key] ?? DASHBOARD_TEXT_DEFAULTS[key];
     if (!vars) return raw;
     return Object.entries(vars).reduce(
-      (acc, [k, v]) => acc.replaceAll(`{${k}}`, String(v)),
+      (acc, [k, v]) => acc.split(`{${k}}`).join(String(v)),
       raw,
     );
   };
