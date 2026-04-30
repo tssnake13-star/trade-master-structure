@@ -136,7 +136,7 @@ export default function SchoolStudentDetail() {
   };
 
   const toggleAdminRole = async () => {
-    if (!studentId || isSelf || profile?.email === SUPER_ADMIN_EMAIL) return;
+    if (!studentId || isSelf || !canModifySuperAdminTarget) return;
     const newRole = studentRole === 'admin' ? 'student' : 'admin';
     const { data: existing } = await supabase
       .from('user_roles')
@@ -262,7 +262,7 @@ export default function SchoolStudentDetail() {
                 <span className="text-xs" style={{ color: studentRole === 'admin' ? '#4a8a4a' : '#e8e0d0', fontFamily: font.mono }}>
                   {studentRole}
                 </span>
-                {!isSelf && profile.email !== SUPER_ADMIN_EMAIL && (
+                {!isSelf && canModifySuperAdminTarget && (
                   <button
                     onClick={toggleAdminRole}
                     className="text-[11px] px-2.5 py-1 rounded flex items-center gap-1 hover:opacity-80 transition"
@@ -372,7 +372,7 @@ export default function SchoolStudentDetail() {
         </section>
 
         {/* ======== ACTIONS BLOCK ======== */}
-        {!isSelf && (
+        {!isSelf && canModifySuperAdminTarget && (
           <section className="rounded-lg border p-5" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
             <h2 className="text-sm mb-4" style={{ fontFamily: font.heading, color: '#888' }}>Действия</h2>
             <div className="flex flex-wrap gap-2">
