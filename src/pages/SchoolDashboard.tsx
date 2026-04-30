@@ -771,40 +771,12 @@ function PaidHome({
         </p>
       </div>
 
-      {/* KPI strip */}
-      <div className="mb-10 grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: BORDER, border: `1px solid ${BORDER}` }}>
-        <KpiCell
-          label="День в системе"
-          value={
-            isAdmin
-              ? '∞'
-              : daysInSystem < 1 && timeInSystem
-                ? `${timeInSystem.h}ч ${String(timeInSystem.m).padStart(2, '0')}:${String(timeInSystem.s).padStart(2, '0')}`
-                : String(daysInSystem)
-          }
-        />
-        <KpiCell label="Осталось уроков" value={String(remaining)} />
-        <KpiCellDual
-          label="Завершено уроков"
-          primary={{ caption: 'Основные', value: `${completed}/${tmTotal}`, pct: tmPct }}
-          secondary={{ caption: 'Дополнительные', value: `${extraCompleted}/${extraTotal}`, pct: extraPct }}
-        />
-        <KpiCell
-          label="До завершения обучения"
-          value={programCountdown ? `${programCountdown.d}д ${String(programCountdown.h).padStart(2,'0')}:${String(programCountdown.m).padStart(2,'0')}:${String(programCountdown.s).padStart(2,'0')}` : '—'}
-          accent
-          pulse
-          mono
-        />
-      </div>
-
-      {/* Continue + Live grid */}
-      <div className="mb-10 grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Continue card 2/3 */}
+      {/* Continue card (на всю ширину, выше всех) */}
+      <div className="mb-10">
         <button
           onClick={() => tmNextLesson && onOpenLesson(tmNextLesson.id)}
           disabled={!tmNextLesson}
-          className="lg:col-span-2 text-left p-7 transition-all hover:border-[#2a2a2a] group relative overflow-hidden"
+          className="w-full text-left p-7 transition-all hover:border-[#2a2a2a] group relative overflow-hidden"
           style={{
             border: `1px solid ${BORDER}`,
             backgroundColor: CARD,
@@ -854,8 +826,37 @@ function PaidHome({
             </div>
           )}
         </button>
+      </div>
 
-        {/* Live card 1/3 */}
+      {/* KPI strip */}
+      <div className="mb-10 grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: BORDER, border: `1px solid ${BORDER}` }}>
+        <KpiCell
+          label="День в системе"
+          value={
+            isAdmin
+              ? '∞'
+              : daysInSystem < 1 && timeInSystem
+                ? `${timeInSystem.h}ч ${String(timeInSystem.m).padStart(2, '0')}:${String(timeInSystem.s).padStart(2, '0')}`
+                : String(daysInSystem)
+          }
+        />
+        <KpiCell label="Осталось уроков" value={String(remaining)} />
+        <KpiCellDual
+          label="Завершено уроков"
+          primary={{ caption: 'Основные', value: `${completed}/${tmTotal}`, pct: tmPct }}
+          secondary={{ caption: 'Дополнительные', value: `${extraCompleted}/${extraTotal}`, pct: extraPct }}
+        />
+        <KpiCell
+          label="До завершения обучения"
+          value={programCountdown ? `${programCountdown.d}д ${String(programCountdown.h).padStart(2,'0')}:${String(programCountdown.m).padStart(2,'0')}:${String(programCountdown.s).padStart(2,'0')}` : '—'}
+          accent
+          pulse
+          mono
+        />
+      </div>
+
+      {/* Live card */}
+      <div className="mb-10">
         <LiveStreamsCard upcoming={upcomingLives} countdown={liveCountdown} now={now} />
       </div>
 
