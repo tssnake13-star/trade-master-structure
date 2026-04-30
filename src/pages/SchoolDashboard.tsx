@@ -104,16 +104,24 @@ function formatCountdown(target: Date, now: Date) {
 function useNow(_intervalMs = 1000) {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
-    let timeoutId: number;
-    const tick = () => {
-      const n = new Date();
-      setNow(n);
-      const delay = 1000 - (n.getTime() % 1000);
-      timeoutId = window.setTimeout(tick, delay);
+    // Используем requestAnimationFrame и ререндерим только при смене секунды.
+    // Это убирает «прыгающие» секунды: setTimeout/​setInterval дрейфуют,
+    // когда вкладка под нагрузкой или JS занят, и следующий тик может прийти
+    // через 2 секунды. rAF гарантирует обновление каждый кадр, а сравнение
+    // по секундам не даёт лишних рендеров.
+    let rafId = 0;
+    let lastSec = Math.floor(Date.now() / 1000);
+    const loop = () => {
+      const t = Date.now();
+      const sec = Math.floor(t / 1000);
+      if (sec !== lastSec) {
+        lastSec = sec;
+        setNow(new Date(t));
+      }
+      rafId = requestAnimationFrame(loop);
     };
-    const first = 1000 - (Date.now() % 1000);
-    timeoutId = window.setTimeout(tick, first);
-    return () => window.clearTimeout(timeoutId);
+    rafId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafId);
   }, []);
   return now;
 }
@@ -1252,6 +1260,9 @@ function LiveStreamsCard({ upcoming, countdown, now }: { upcoming: Date[]; count
       )}
 
       <div className="space-y-2 mb-5">
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 4 }}>
+          Расписание
+        </div>
         {upcoming.map((d, i) => {
           const isNext = i === 0;
           const dow = d.toLocaleDateString('ru-RU', { weekday: 'short' });
@@ -1260,16 +1271,16 @@ function LiveStreamsCard({ upcoming, countdown, now }: { upcoming: Date[]; count
           const time = d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
           return (
             <div key={i} className="flex items-center gap-3 py-2" style={{ borderTop: i > 0 ? `1px solid #141414` : 'none' }}>
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 4, minWidth: 52, justifyContent: 'center' }}>
-                <span style={{ fontFamily: DISPLAY, fontSize: 22, fontWeight: 350, color: isNext ? ACCENT : FG, lineHeight: 1 }}>
-                  {day}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 64, justifyContent: 'flex-start', fontVariantNumeric: 'tabular-nums' }}>
+                <span style={{ fontFamily: MONO, fontSize: 18, fontWeight: 500, color: isNext ? ACCENT : FG, lineHeight: 1, letterSpacing: '0.02em' }}>
+                  {String(day).padStart(2, '0')}
                 </span>
-                <span style={{ fontFamily: MONO, fontSize: 11, color: isNext ? ACCENT : '#888', textTransform: 'uppercase', letterSpacing: '0.1em', lineHeight: 1 }}>
+                <span style={{ fontFamily: MONO, fontSize: 11, color: isNext ? ACCENT : '#888', textTransform: 'uppercase', letterSpacing: '0.14em', lineHeight: 1 }}>
                   {month}
                 </span>
               </div>
               <div className="flex-1">
-                <div style={{ fontFamily: MONO, fontSize: 11, color: isNext ? FG : '#888', textTransform: 'uppercase', letterSpacing: '0.12em' }}>
+                <div style={{ fontFamily: MONO, fontSize: 11, color: isNext ? FG : '#888', textTransform: 'uppercase', letterSpacing: '0.14em', lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
                   {dow} · {time}
                 </div>
               </div>
