@@ -1178,7 +1178,7 @@ function FreeHome({
 // ====================================================================
 //   SUB COMPONENTS
 // ====================================================================
-function KpiCell({ label, value, accent, pulse, mono, valueSize }: { label: string; value: string; accent?: boolean; pulse?: boolean; mono?: boolean; valueSize?: number }) {
+function KpiCell({ label, value, accent, pulse, mono, valueSize, hint }: { label: string; value: string; accent?: boolean; pulse?: boolean; mono?: boolean; valueSize?: number; hint?: string }) {
   return (
     <div className="p-5 sm:p-6" style={{ backgroundColor: BG }}>
       <div className="flex items-center gap-2 mb-3">
@@ -1198,6 +1198,19 @@ function KpiCell({ label, value, accent, pulse, mono, valueSize }: { label: stri
       }}>
         {value}
       </div>
+      {hint && (
+        <div style={{
+          fontFamily: MONO,
+          fontSize: 11,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: '#777',
+          marginTop: 10,
+          fontVariantNumeric: 'tabular-nums',
+        }}>
+          {hint}
+        </div>
+      )}
     </div>
   );
 }
