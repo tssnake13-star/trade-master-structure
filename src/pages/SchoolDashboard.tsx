@@ -771,6 +771,33 @@ function PaidHome({
         </p>
       </div>
 
+      {/* KPI strip */}
+      <div className="mb-10 grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: BORDER, border: `1px solid ${BORDER}` }}>
+        <KpiCell
+          label="День в системе"
+          value={
+            isAdmin
+              ? '∞'
+              : daysInSystem < 1 && timeInSystem
+                ? `${timeInSystem.h}ч ${String(timeInSystem.m).padStart(2, '0')}:${String(timeInSystem.s).padStart(2, '0')}`
+                : String(daysInSystem)
+          }
+        />
+        <KpiCell label="Осталось уроков" value={String(remaining)} />
+        <KpiCellDual
+          label="Завершено уроков"
+          primary={{ caption: 'Основные', value: `${completed}/${tmTotal}`, pct: tmPct }}
+          secondary={{ caption: 'Дополнительные', value: `${extraCompleted}/${extraTotal}`, pct: extraPct }}
+        />
+        <KpiCell
+          label="До завершения обучения"
+          value={programCountdown ? `${programCountdown.d}д ${String(programCountdown.h).padStart(2,'0')}:${String(programCountdown.m).padStart(2,'0')}:${String(programCountdown.s).padStart(2,'0')}` : '—'}
+          accent
+          pulse
+          mono
+        />
+      </div>
+
       {/* Continue + Live grid */}
       <div className="mb-10 grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Continue card 2/3 */}
@@ -828,42 +855,8 @@ function PaidHome({
           )}
         </button>
 
-        {/* День в системе (1/3) */}
-        <div
-          className="p-7 flex flex-col justify-between"
-          style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 10 }}
-        >
-          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#666', marginBottom: 12 }}>
-            День в системе
-          </div>
-          <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 32, lineHeight: 1.1, color: FG }}>
-            {isAdmin
-              ? '∞'
-              : daysInSystem < 1 && timeInSystem
-                ? `${timeInSystem.h}ч ${String(timeInSystem.m).padStart(2, '0')}:${String(timeInSystem.s).padStart(2, '0')}`
-                : String(daysInSystem)}
-          </div>
-        </div>
-      </div>
-
-      {/* KPI strip */}
-      <div className="mb-10 grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: BORDER, border: `1px solid ${BORDER}` }}>
-        <div style={{ backgroundColor: CARD }}>
-          <LiveStreamsCard upcoming={upcomingLives} countdown={liveCountdown} now={now} />
-        </div>
-        <KpiCell label="Осталось уроков" value={String(remaining)} />
-        <KpiCellDual
-          label="Завершено уроков"
-          primary={{ caption: 'Основные', value: `${completed}/${tmTotal}`, pct: tmPct }}
-          secondary={{ caption: 'Дополнительные', value: `${extraCompleted}/${extraTotal}`, pct: extraPct }}
-        />
-        <KpiCell
-          label="До завершения обучения"
-          value={programCountdown ? `${programCountdown.d}д ${String(programCountdown.h).padStart(2,'0')}:${String(programCountdown.m).padStart(2,'0')}:${String(programCountdown.s).padStart(2,'0')}` : '—'}
-          accent
-          pulse
-          mono
-        />
+        {/* Live card 1/3 */}
+        <LiveStreamsCard upcoming={upcomingLives} countdown={liveCountdown} now={now} />
       </div>
 
       {/* Programs grid */}
