@@ -6,6 +6,14 @@ import { ArrowLeft, Plus, Trash2, Pencil, GripVertical, Upload, X } from 'lucide
 import VideoBlockEditor from '@/components/school/VideoBlockEditor';
 import { SITE_ASSET_KEYS, notifySiteAssetChange } from '@/hooks/useSiteAsset';
 import {
+  DASHBOARD_TEXT_DEFAULTS,
+  DASHBOARD_TEXT_GROUPS,
+  STORAGE_PREFIX_DASHBOARD_TEXT,
+  loadDashboardTextsForAdmin,
+  notifyDashboardTextsChanged,
+  type DashboardTextKey,
+} from '@/lib/dashboardTexts';
+import {
   DndContext,
   closestCenter,
   KeyboardSensor,
