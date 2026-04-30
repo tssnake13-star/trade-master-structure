@@ -355,7 +355,7 @@ export default function SchoolDashboard() {
           </div>
           <div className="min-w-0">
             <div style={{ fontFamily: MONO, fontSize: 14, letterSpacing: '0.18em', textTransform: 'uppercase', color: FG }}>
-              TRADELIKETYO
+              {t('sidebar_brand')}
             </div>
           </div>
         </button>
@@ -372,14 +372,14 @@ export default function SchoolDashboard() {
             }}
           >
             <HomeIcon size={14} style={{ color: selectedCourse === null ? ACCENT : '#666' }} />
-            <span>Главная</span>
+            <span>{t('sidebar_home')}</span>
           </button>
         </nav>
 
         {/* Programs */}
         <div className="px-5 pt-4 pb-2">
           <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555' }}>
-            Программы
+            {t('sidebar_programs_label')}
           </div>
         </div>
         <nav className="overflow-y-auto px-3 space-y-1 pb-4">
@@ -419,7 +419,7 @@ export default function SchoolDashboard() {
                   </div>
                 )}
                 {!accessible && (
-                  <div style={{ fontFamily: MONO, fontSize: 9, color: '#444', marginTop: 4 }}>Закрыто</div>
+                  <div style={{ fontFamily: MONO, fontSize: 9, color: '#444', marginTop: 4 }}>{t('sidebar_locked')}</div>
                 )}
               </button>
             );
@@ -441,10 +441,10 @@ export default function SchoolDashboard() {
             </div>
             <div className="min-w-0 flex-1">
               <div className="truncate" style={{ fontFamily: SANS, fontSize: 12, color: FG }}>
-                {profileName || profileEmail || 'Студент'}
+                {profileName || profileEmail || t('sidebar_default_name')}
               </div>
               <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666', marginTop: 2 }}>
-                {isFreeUser ? 'Вводный доступ' : 'Активный'}
+                {isFreeUser ? t('sidebar_status_intro') : t('sidebar_status_active')}
               </div>
             </div>
             {role === 'admin' && (
@@ -458,7 +458,7 @@ export default function SchoolDashboard() {
             className="w-full flex items-center gap-2 px-3 py-2 rounded text-xs hover:bg-white/5 transition"
             style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.1em', color: '#666' }}
           >
-            <LogOut size={13} /> Выйти
+            <LogOut size={13} /> {t('sidebar_signout')}
           </button>
         </div>
       </aside>
@@ -486,7 +486,7 @@ export default function SchoolDashboard() {
                 animation: isFreeUser ? 'none' : 'tlyPulse 2.4s ease-out infinite',
               }} />
               <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#888' }}>
-                {isFreeUser ? 'Вводный доступ' : 'Live'} · КАБИНЕТ ТРЕЙДЕРА
+                {isFreeUser ? t('header_status_intro') : t('header_status_live')} · {t('header_status_suffix')}
               </span>
             </div>
             <div className="hidden sm:flex items-center gap-5">
@@ -500,7 +500,7 @@ export default function SchoolDashboard() {
                 style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#888' }}
                 className="hover:text-foreground transition"
               >
-                Поддержка
+                {t('header_support')}
               </a>
             </div>
           </div>
@@ -525,7 +525,7 @@ export default function SchoolDashboard() {
           {selectedCourseData && !selectedAccessible && (
             <div className="flex flex-col items-center justify-center py-24">
               <Lock size={28} style={{ color: '#333' }} className="mb-4" />
-              <p style={{ fontFamily: MONO, fontSize: 12, color: '#555' }}>Программа закрыта</p>
+              <p style={{ fontFamily: MONO, fontSize: 12, color: '#555' }}>{t('locked_program_message')}</p>
             </div>
           )}
 
@@ -551,6 +551,7 @@ export default function SchoolDashboard() {
               onOpenLesson={(id) => navigate(`/school/lesson/${id}`)}
               onSelectCourse={selectCourse}
               userId={user?.id}
+              t={t}
             />
           )}
 
@@ -571,6 +572,7 @@ export default function SchoolDashboard() {
               onOpenLesson={(id) => navigate(`/school/lesson/${id}`)}
               onSelectCourse={selectCourse}
               userId={user?.id}
+              t={t}
             />
           )}
         </div>
@@ -578,7 +580,7 @@ export default function SchoolDashboard() {
         {/* Footer */}
         <footer className="border-t px-4 sm:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-2" style={{ borderColor: BORDER }}>
           <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#555' }}>
-            © TRADELIKETYO · 2026
+            {t('footer_copyright')}
           </span>
           <a
             href="https://t.me/rav_999"
@@ -587,7 +589,7 @@ export default function SchoolDashboard() {
             style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666' }}
             className="hover:text-foreground transition"
           >
-            Telegram автора
+            {t('footer_telegram')}
           </a>
         </footer>
       </main>
