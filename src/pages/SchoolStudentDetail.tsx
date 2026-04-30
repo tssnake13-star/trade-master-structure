@@ -81,6 +81,10 @@ export default function SchoolStudentDetail() {
   useEffect(() => { load(); }, [studentId]);
 
   const isSelf = user?.id === studentId;
+  const callerIsSuperAdmin = isSuperAdminEmail(user?.email);
+  const targetIsSuperAdmin = isSuperAdminEmail(profile?.email);
+  // Только супер-админ может менять/блокировать/удалять супер-админа
+  const canModifySuperAdminTarget = !targetIsSuperAdmin || callerIsSuperAdmin;
 
   const toggleBlock = async () => {
     if (!profile) return;
