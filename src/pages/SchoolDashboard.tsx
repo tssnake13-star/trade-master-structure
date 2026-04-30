@@ -519,6 +519,7 @@ export default function SchoolDashboard() {
               pct={selectedPct}
               nextLesson={selectedNext}
               onOpen={(id) => navigate(`/school/lesson/${id}`)}
+              t={t}
             />
           )}
 
