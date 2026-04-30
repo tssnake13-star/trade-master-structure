@@ -1241,23 +1241,23 @@ function KpiCellDual({
   );
 }
 
-function LiveStreamsCard({ upcoming, countdown, now }: { upcoming: Date[]; countdown: { d: number; h: number; m: number; s: number } | null; now: Date }) {
+function LiveStreamsCard({ upcoming, countdown, now, t }: { upcoming: Date[]; countdown: { d: number; h: number; m: number; s: number } | null; now: Date; t: TFn }) {
   return (
     <div className="p-6" style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 10 }}>
       <div className="flex items-center gap-2 mb-4">
         <span style={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: ACCENT, animation: 'tlyPulse 2.4s ease-out infinite' }} />
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT }}>
-          Закрытые прямые эфиры
+          {t('live_label')}
         </div>
       </div>
 
       {countdown && (
         <div className="grid grid-cols-4 gap-2 mb-5">
           {[
-            { v: countdown.d, l: 'д' },
-            { v: countdown.h, l: 'ч' },
-            { v: countdown.m, l: 'м' },
-            { v: countdown.s, l: 'с' },
+            { v: countdown.d, l: t('live_unit_d') },
+            { v: countdown.h, l: t('live_unit_h') },
+            { v: countdown.m, l: t('live_unit_m') },
+            { v: countdown.s, l: t('live_unit_s') },
           ].map((x, i) => (
             <div key={i} className="text-center">
               <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, lineHeight: 1, color: FG, fontVariantNumeric: 'tabular-nums' }}>
@@ -1273,7 +1273,7 @@ function LiveStreamsCard({ upcoming, countdown, now }: { upcoming: Date[]; count
 
       <div className="space-y-2 mb-5">
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 4 }}>
-          Расписание
+          {t('live_schedule_label')}
         </div>
         {upcoming.map((d, i) => {
           const isNext = i === 0;
@@ -1298,7 +1298,7 @@ function LiveStreamsCard({ upcoming, countdown, now }: { upcoming: Date[]; count
               </div>
               {isNext && (
                 <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: ACCENT, padding: '2px 8px', border: `1px solid ${ACCENT}66`, borderRadius: 4 }}>
-                  Скоро
+                  {t('live_soon_badge')}
                 </span>
               )}
             </div>
@@ -1307,15 +1307,13 @@ function LiveStreamsCard({ upcoming, countdown, now }: { upcoming: Date[]; count
       </div>
 
       <p style={{ fontFamily: SANS, fontSize: 12, color: '#888', lineHeight: 1.5 }}>
-        Эфир в группе{' '}
-        <span style={{ color: ACCENT }}>Telegram</span>{' '}/{' '}
-        <span style={{ color: ACCENT }}>YouTube</span>
+        {t('live_footer_text')}
       </p>
     </div>
   );
 }
 
-function ActivateCodeSection({ userId, onActivated, compact }: { userId?: string; onActivated: () => void; compact?: boolean }) {
+function ActivateCodeSection({ userId, onActivated, compact, t }: { userId?: string; onActivated: () => void; compact?: boolean; t: TFn }) {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; success: boolean } | null>(null);
@@ -1328,16 +1326,16 @@ function ActivateCodeSection({ userId, onActivated, compact }: { userId?: string
       const { data: isValid, error: err } = await supabase.rpc('validate_invite_code', { _code: code.trim() });
       if (err) throw err;
       if (!isValid) {
-        setMessage({ text: 'Код недействителен или уже использован', success: false });
+        setMessage({ text: t('code_invalid'), success: false });
         setLoading(false);
         return;
       }
       await supabase.rpc('use_invite_code', { _code: code.trim(), _user_id: userId });
-      setMessage({ text: 'Доступ открыт', success: true });
+      setMessage({ text: t('code_success'), success: true });
       setCode('');
       setTimeout(onActivated, 1500);
     } catch {
-      setMessage({ text: 'Произошла ошибка', success: false });
+      setMessage({ text: t('code_error'), success: false });
     } finally {
       setLoading(false);
     }
@@ -1348,18 +1346,18 @@ function ActivateCodeSection({ userId, onActivated, compact }: { userId?: string
       <div className="flex items-center gap-2 mb-3">
         <Ticket size={14} style={{ color: ACCENT }} />
         <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT }}>
-          Код доступа
+          {t('code_label')}
         </span>
       </div>
       <p style={{ fontFamily: SANS, fontSize: 12, color: '#888', lineHeight: 1.55, marginBottom: 14 }}>
-        {compact ? 'Получили код? Откройте программу.' : 'Получили код доступа? Введите его, чтобы открыть основную программу.'}
+        {compact ? t('code_description_compact') : t('code_description_full')}
       </p>
       <div className="flex gap-2 mb-2">
         <input
           type="text"
           value={code}
           onChange={e => setCode(e.target.value)}
-          placeholder="Введите код"
+          placeholder={t('code_placeholder')}
           className="flex-1 px-3 py-2.5"
           style={{ backgroundColor: '#0a0a0a', border: `1px solid #1f1f1f`, borderRadius: 6, color: FG, fontFamily: MONO, fontSize: 12 }}
           onKeyDown={e => e.key === 'Enter' && activate()}
@@ -1373,7 +1371,7 @@ function ActivateCodeSection({ userId, onActivated, compact }: { userId?: string
             padding: '0 18px', borderRadius: 6, opacity: loading ? 0.6 : 1, whiteSpace: 'nowrap',
           }}
         >
-          {loading ? '...' : 'Открыть'}
+          {loading ? '...' : t('code_submit')}
         </button>
       </div>
       {message && (
@@ -1388,7 +1386,7 @@ function ActivateCodeSection({ userId, onActivated, compact }: { userId?: string
         className="mt-auto pt-3 hover:opacity-80 transition"
         style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#666' }}
       >
-        Нет кода? → Написать Сергею
+        {t('code_help_link')}
       </a>
     </div>
   );
