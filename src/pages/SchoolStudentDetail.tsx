@@ -4,7 +4,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, ShieldOff, ShieldCheck, Trash2, Plus, ChevronRight, Unlock, ShieldPlus, ShieldMinus, KeyRound, Eye, EyeOff, RefreshCw, Copy, Check } from 'lucide-react';
 
-const SUPER_ADMIN_EMAIL = 'tssnake13@gmail.com';
+const SUPER_ADMIN_EMAILS = ['tssnake13@gmail.com', 'tssnake@list.ru'];
+const isSuperAdminEmail = (email?: string | null) =>
+  !!email && SUPER_ADMIN_EMAILS.includes(email.toLowerCase());
 
 const font = { heading: "'Inter', sans-serif", mono: "'Inter', sans-serif" };
 
