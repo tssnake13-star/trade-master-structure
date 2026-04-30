@@ -40,7 +40,7 @@ const Header = () => {
           <div className="flex items-center justify-between h-16 md:h-20">
             {/* Logo */}
             <a href="#" className="flex items-center gap-2">
-              <div className="h-8 md:h-10 w-8 md:w-10 overflow-hidden rounded bg-foreground/5 flex-shrink-0">
+              <div className="h-11 md:h-14 w-11 md:w-14 overflow-hidden rounded bg-foreground/5 flex-shrink-0">
                 <video
                   key={logoVideo}
                   src={logoVideo}
