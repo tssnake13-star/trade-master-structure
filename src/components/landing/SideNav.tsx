@@ -26,17 +26,30 @@ const SideNav = () => {
       .filter((el): el is HTMLElement => !!el);
     if (!targets.length) return;
 
-    const io = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible[0]) setActive(visible[0].target.id);
-      },
-      { threshold: [0.2, 0.5, 0.8], rootMargin: '-30% 0px -50% 0px' }
-    );
-    targets.forEach((el) => io.observe(el));
-    return () => io.disconnect();
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const probe = window.innerHeight * 0.35; // линия активации сверху вьюпорта
+      let current = targets[0].id;
+      for (const el of targets) {
+        const top = el.getBoundingClientRect().top;
+        if (top - probe <= 0) current = el.id;
+        else break;
+      }
+      setActive(current);
+    };
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
   return (
