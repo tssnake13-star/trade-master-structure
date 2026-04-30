@@ -585,7 +585,7 @@ export default function SchoolDashboard() {
             {t('footer_copyright')}
           </span>
           <a
-            href="https://t.me/rav_999"
+            href="http://t.me/tradeliketyo"
             target="_blank"
             rel="noopener noreferrer"
             style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666' }}
@@ -1117,7 +1117,7 @@ function FreeHome({
                 {t('free_done_subtitle')}
               </p>
               <a
-                href="https://t.me/rav_999"
+                href="http://t.me/tradeliketyo"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -1396,7 +1396,7 @@ function ActivateCodeSection({ userId, onActivated, compact, t }: { userId?: str
         </p>
       )}
       <a
-        href="https://t.me/rav_999"
+        href="http://t.me/tradeliketyo"
         target="_blank"
         rel="noopener noreferrer"
         className="mt-auto pt-3 hover:opacity-80 transition"
