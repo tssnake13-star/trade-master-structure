@@ -961,7 +961,7 @@ function PaidHome({
 function FreeHome({
   courses, progress, accessMap, hasAccess, role, completedIds,
   getCourseLessons, getUnlockedLessons, getFirstIncomplete,
-  upcomingLives, liveCountdown, now, onOpenLesson, onSelectCourse, userId,
+  upcomingLives, liveCountdown, now, onOpenLesson, onSelectCourse, userId, t,
 }: {
   courses: Course[];
   progress: ProgressMap;
@@ -978,6 +978,7 @@ function FreeHome({
   onOpenLesson: (id: string) => void;
   onSelectCourse: (id: string) => void;
   userId?: string;
+  t: TFn;
 }) {
   const freeCourse = courses.find(c => c.is_free) || null;
   const freeLessons = freeCourse ? getCourseLessons(freeCourse.id) : [];
@@ -996,9 +997,9 @@ function FreeHome({
   const mainPaidTotal = mainPaid ? getCourseLessons(mainPaid.id).length : 0;
 
   const lockedLabelFor = (c: Course) => {
-    if (c.title.toLowerCase().includes('master')) return 'Допуск через куратора';
-    if (c.title.toLowerCase().includes('elite') || c.title.toLowerCase().includes('vip')) return 'По приглашению';
-    return 'После TM 4.5';
+    if (c.title.toLowerCase().includes('master')) return t('free_locked_master');
+    if (c.title.toLowerCase().includes('elite') || c.title.toLowerCase().includes('vip')) return t('free_locked_elite');
+    return t('free_locked_other');
   };
 
   return (
@@ -1006,10 +1007,10 @@ function FreeHome({
       {/* Hero */}
       <div className="mb-12">
         <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(38px, 5.5vw, 64px)', lineHeight: 1.02, letterSpacing: '-0.025em', color: FG }}>
-          {renderHeroTitle('Добро пожаловать в *систему*.')}
+          {renderHeroTitle(t('free_hero_title'))}
         </h1>
         <p className="mt-4" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '60ch' }}>
-          Вы получили доступ к {total || 'нескольким'} вводным занятиям TLT. Они показывают, как устроена система. Основная программа TRADE MASTER 4.5 открывается по коду доступа от администратора.
+          {t('free_hero_subtitle_template', { total: total || 'нескольким' })}
         </p>
       </div>
 
@@ -1017,7 +1018,7 @@ function FreeHome({
       <div className="mb-10 grid grid-cols-1 sm:grid-cols-2 gap-px" style={{ backgroundColor: BORDER, border: `1px solid ${BORDER}` }}>
         <div className="p-6" style={{ backgroundColor: BG }}>
           <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 14 }}>
-            Вводный курс
+            {t('free_kpi_intro_label')}
           </div>
           <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 32, lineHeight: 1, color: FG, marginBottom: 12, fontVariantNumeric: 'tabular-nums' }}>
             {completed}<span style={{ color: '#666', fontSize: 22 }}> / {total}</span>
@@ -1030,14 +1031,14 @@ function FreeHome({
         </div>
         <div className="p-6 flex flex-col justify-between" style={{ backgroundColor: BG }}>
           <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 14 }}>
-            Основная программа
+            {t('free_kpi_main_label')}
           </div>
           <div>
             <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: '#666', marginBottom: 8 }}>
-              {mainPaidTotal} занятий · TM 4.5
+              {mainPaidTotal} {t('free_kpi_main_value_suffix')}
             </div>
             <div className="flex items-center gap-2" style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666' }}>
-              <Lock size={11} /> Закрыто · нужен код
+              <Lock size={11} /> {t('free_kpi_main_locked')}
             </div>
           </div>
         </div>
@@ -1059,14 +1060,14 @@ function FreeHome({
               <div className="flex items-center gap-2 mb-3" style={{ position: 'relative' }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: ACCENT, display: 'inline-block', animation: 'tlyPulse 2.4s ease-out infinite' }} />
                 <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT }}>
-                  Доступ открыт · начните здесь
+                  {t('free_intro_eyebrow')}
                 </span>
               </div>
               <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 28, lineHeight: 1.1, color: FG, marginBottom: 14, letterSpacing: '-0.02em', position: 'relative' }}>
-                Допуск получают <em style={{ color: ACCENT, fontStyle: 'italic' }}>не все</em>. Начните с первого занятия.
+                {renderHeroTitle(t('free_intro_title'))}
               </h2>
               <p style={{ fontFamily: SANS, fontSize: 14, color: '#a8a090', lineHeight: 1.55, marginBottom: 22, maxWidth: '52ch', position: 'relative' }}>
-                Это вводная программа. Она показывает, как устроены правила. Если поймёте — будет основная.
+                {t('free_intro_subtitle')}
               </p>
               <button
                 onClick={() => onOpenLesson(freeNext.id)}
@@ -1077,7 +1078,7 @@ function FreeHome({
                   display: 'inline-flex', alignItems: 'center', gap: 10,
                 }}
               >
-                Перейти к занятию 1 <ArrowRight size={14} />
+                {t('free_intro_cta')} <ArrowRight size={14} />
               </button>
             </div>
           ) : !completedAll && freeNext ? (
@@ -1092,25 +1093,25 @@ function FreeHome({
                 </div>
               )}
               <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 10 }}>
-                Продолжить · занятие {freeLessons.indexOf(freeNext) + 1}
+                {t('free_continue_eyebrow')} {freeLessons.indexOf(freeNext) + 1}
               </div>
               <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG, marginBottom: 8 }}>
                 {freeNext.title}
               </h2>
               <div className="flex items-center gap-2 transition-transform group-hover:translate-x-1" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: ACCENT }}>
-                Открыть <ArrowRight size={14} />
+                {t('free_continue_open')} <ArrowRight size={14} />
               </div>
             </button>
           ) : (
             <div className="p-7" style={{ border: `1px solid ${ACCENT}66`, background: 'linear-gradient(135deg, #1a1408 0%, #0f0d08 60%)', borderRadius: 10 }}>
               <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
-                ◆ Готовы к следующему шагу
+                {t('free_done_eyebrow')}
               </div>
               <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 28, lineHeight: 1.1, color: FG, marginBottom: 14 }}>
-                Вы готовы к <em style={{ color: ACCENT, fontStyle: 'italic' }}>основной</em> программе.
+                {renderHeroTitle(t('free_done_title'))}
               </h2>
               <p style={{ fontFamily: SANS, fontSize: 14, color: '#a8a090', lineHeight: 1.55, marginBottom: 22, maxWidth: '52ch' }}>
-                Свяжитесь с автором — он подскажет как получить доступ.
+                {t('free_done_subtitle')}
               </p>
               <a
                 href="https://t.me/rav_999"
@@ -1123,20 +1124,20 @@ function FreeHome({
                   display: 'inline-flex', alignItems: 'center', gap: 10,
                 }}
               >
-                <MessageCircle size={14} /> Написать Сергею
+                <MessageCircle size={14} /> {t('free_done_cta')}
               </a>
             </div>
           )}
         </div>
 
-        <LiveStreamsCard upcoming={upcomingLives} countdown={liveCountdown} now={now} />
+        <LiveStreamsCard upcoming={upcomingLives} countdown={liveCountdown} now={now} t={t} />
       </div>
 
       {/* Locked paid programs */}
       {lockedPaid.length > 0 && (
         <div className="mb-12">
           <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 16 }}>
-            Программы по допуску
+            {t('free_locked_label')}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {lockedPaid.map(c => (
@@ -1147,7 +1148,7 @@ function FreeHome({
               >
                 <div className="flex items-center justify-between mb-2">
                   <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#666' }}>
-                    Программа
+                    {t('programs_card_eyebrow')}
                   </div>
                   <Lock size={12} style={{ color: '#555' }} />
                 </div>
@@ -1169,7 +1170,7 @@ function FreeHome({
       )}
 
       {/* Code section */}
-      <ActivateCodeSection userId={userId} onActivated={() => window.location.reload()} />
+      <ActivateCodeSection userId={userId} onActivated={() => window.location.reload()} t={t} />
     </>
   );
 }
