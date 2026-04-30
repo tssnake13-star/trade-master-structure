@@ -299,6 +299,8 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_super_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_super_admin_email: { Args: { _email: string }; Returns: boolean }
       use_invite_code: {
         Args: { _code: string; _user_id: string }
         Returns: undefined
