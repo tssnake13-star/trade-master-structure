@@ -1235,7 +1235,7 @@ function LiveStreamsCard({ upcoming, countdown, now }: { upcoming: Date[]; count
       <div className="flex items-center gap-2 mb-4">
         <span style={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: ACCENT, animation: 'tlyPulse 2.4s ease-out infinite' }} />
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT }}>
-          Прямые эфиры
+          Закрытые прямые эфиры
         </div>
       </div>
 
