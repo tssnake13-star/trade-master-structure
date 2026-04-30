@@ -805,18 +805,18 @@ function PaidHome({
           {tmNextLesson && tmCourse ? (
             <>
               <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
-                Продолжить · занятие {tmLessons.indexOf(tmNextLesson) + 1}
+                {t('continue_eyebrow')} {tmLessons.indexOf(tmNextLesson) + 1}
               </div>
               <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, lineHeight: 1.2, color: FG, marginBottom: 8 }}>
                 {tmNextLesson.title}
               </h2>
               <div className="flex items-center justify-between">
                 <div className="flex gap-4" style={{ fontFamily: MONO, fontSize: 11, color: '#666' }}>
-                  <span>● Видео</span>
-                  <span>● PDF</span>
+                  <span>{t('continue_meta_video')}</span>
+                  <span>{t('continue_meta_pdf')}</span>
                 </div>
                 <div className="flex items-center gap-2 transition-transform group-hover:translate-x-1" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: ACCENT }}>
-                  Открыть <ArrowRight size={14} />
+                  {t('continue_open')} <ArrowRight size={14} />
                 </div>
               </div>
             </>
@@ -825,19 +825,19 @@ function PaidHome({
               {remaining > 0 ? (
                 <>
                   <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
-                    Ожидает открытия
+                    {t('continue_pending_eyebrow')}
                   </div>
                   <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG }}>
-                    Следующее занятие откроет наставник
+                    {t('continue_pending_title')}
                   </h2>
                 </>
               ) : (
                 <>
                   <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
-                    Программа завершена
+                    {t('continue_done_eyebrow')}
                   </div>
                   <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG }}>
-                    Все занятия пройдены ✓
+                    {t('continue_done_title')}
                   </h2>
                 </>
               )}
@@ -849,7 +849,7 @@ function PaidHome({
       {/* KPI strip */}
       <div className="mb-10 grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: BORDER, border: `1px solid ${BORDER}` }}>
         <KpiCell
-          label="День в системе"
+          label={t('kpi_days_label')}
           value={
             isAdmin
               ? '∞'
@@ -858,14 +858,14 @@ function PaidHome({
                 : String(daysInSystem)
           }
         />
-        <KpiCell label="Осталось уроков" value={String(remaining)} />
+        <KpiCell label={t('kpi_remaining_label')} value={String(remaining)} />
         <KpiCellDual
-          label="Завершено уроков"
-          primary={{ caption: 'Основные', value: `${completed}/${tmTotal}`, pct: tmPct }}
-          secondary={{ caption: 'Дополнительные', value: `${extraCompleted}/${extraTotal}`, pct: extraPct }}
+          label={t('kpi_completed_label')}
+          primary={{ caption: t('kpi_completed_primary'), value: `${completed}/${tmTotal}`, pct: tmPct }}
+          secondary={{ caption: t('kpi_completed_secondary'), value: `${extraCompleted}/${extraTotal}`, pct: extraPct }}
         />
         <KpiCell
-          label="До завершения обучения"
+          label={t('kpi_countdown_label')}
           value={programCountdown ? `${programCountdown.d}д ${String(programCountdown.h).padStart(2,'0')}:${String(programCountdown.m).padStart(2,'0')}:${String(programCountdown.s).padStart(2,'0')}` : '—'}
           accent
           pulse
@@ -876,13 +876,13 @@ function PaidHome({
 
       {/* Live card */}
       <div className="mb-10">
-        <LiveStreamsCard upcoming={upcomingLives} countdown={liveCountdown} now={now} />
+        <LiveStreamsCard upcoming={upcomingLives} countdown={liveCountdown} now={now} t={t} />
       </div>
 
       {/* Programs grid */}
       <div className="mb-12">
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 16 }}>
-          Программы
+          {t('programs_label')}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {courses.map(c => {
@@ -896,7 +896,7 @@ function PaidHome({
                 style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 8 }}
               >
                 <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 8 }}>
-                  Программа
+                  {t('programs_card_eyebrow')}
                 </div>
                 <h3 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG, marginBottom: 6 }}>
                   {c.title}
@@ -926,10 +926,10 @@ function PaidHome({
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
         <div className="lg:col-span-3 p-6" style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 8 }}>
           <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 16 }}>
-            Последняя активность
+            {t('activity_label')}
           </div>
           {recentActivity.length === 0 ? (
-            <p style={{ fontFamily: MONO, fontSize: 12, color: '#666' }}>Пока пусто</p>
+            <p style={{ fontFamily: MONO, fontSize: 12, color: '#666' }}>{t('activity_empty')}</p>
           ) : (
             <div>
               {recentActivity.map((a, i) => (
@@ -948,7 +948,7 @@ function PaidHome({
         </div>
 
         <div className="lg:col-span-2">
-          <ActivateCodeSection userId={userId} onActivated={() => window.location.reload()} compact />
+          <ActivateCodeSection userId={userId} onActivated={() => window.location.reload()} compact t={t} />
         </div>
       </div>
     </>
