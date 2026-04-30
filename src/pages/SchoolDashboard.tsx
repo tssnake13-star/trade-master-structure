@@ -719,7 +719,7 @@ function SelectedCourseView({
 function PaidHome({
   welcomeTitle, profileName, tmCourse, tmLessons, tmProgress, tmNextLesson,
   programCountdown, daysInSystem, timeInSystem, isAdmin, upcomingLives, liveCountdown, recentActivity,
-  courses, progress, now, onOpenLesson, onSelectCourse, userId,
+  courses, progress, now, onOpenLesson, onSelectCourse, userId, t,
 }: {
   welcomeTitle: string;
   profileName: string;
@@ -740,9 +740,10 @@ function PaidHome({
   onOpenLesson: (id: string) => void;
   onSelectCourse: (id: string) => void;
   userId?: string;
+  t: TFn;
 }) {
-  const greetingName = profileName ? profileName.split(' ')[0] : 'Трейдер';
-  const heroText = `${greetingName}, *система* ждёт вас.`;
+  const greetingName = profileName ? profileName.split(' ')[0] : t('paid_hero_default_name');
+  const heroText = t('paid_hero_title_template', { name: greetingName });
   const remaining = tmProgress ? Math.max(0, tmProgress.total - tmProgress.completed) : 0;
   const completed = tmProgress?.completed ?? 0;
   const tmTotal = tmProgress?.total ?? 0;
@@ -765,7 +766,7 @@ function PaidHome({
       {/* Hero */}
       <div className="mb-12">
         <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 14 }}>
-          С возвращением
+          {t('paid_hero_eyebrow')}
         </div>
         <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(38px, 5.5vw, 64px)', lineHeight: 1.02, letterSpacing: '-0.025em', color: FG }}>
           {renderHeroTitle(heroText)}
@@ -779,7 +780,7 @@ function PaidHome({
             const nextNum = String(nextIdx).padStart(2, '0');
             const nextTitle = (tmNextLesson?.title?.toLowerCase() ?? '').replace(/[\s.\u00A0]+$/, '');
             if (tmTotal > 0 && completed >= tmTotal) {
-              return 'Вы прошли 100% основной программы. Приступайте к тренировкам и наработке опыта насмотренности.';
+              return tFn('paid_hero_completed_text');
             }
             return tmNextLesson
               ? `Вы прошли ${tmPct}% основной программы. Сегодня — занятие ${nextNum}: ${nextTitle}. Ниже нажмите Открыть, чтобы быстро продолжить обучение.`
