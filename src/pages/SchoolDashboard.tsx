@@ -773,14 +773,14 @@ function PaidHome({
         </h1>
         <p className="mt-4" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '52ch' }}>
           {(() => {
-            const t = (welcomeTitle || '').replace(/[*~]/g, '').trim();
-            const isDefault = !t || /добро пожаловать/i.test(t);
-            if (!isDefault) return t;
+            const wt = (welcomeTitle || '').replace(/[*~]/g, '').trim();
+            const isDefault = !wt || /добро пожаловать/i.test(wt);
+            if (!isDefault) return wt;
             const nextIdx = tmNextLesson ? tmLessons.indexOf(tmNextLesson) + 1 : 0;
             const nextNum = String(nextIdx).padStart(2, '0');
             const nextTitle = (tmNextLesson?.title?.toLowerCase() ?? '').replace(/[\s.\u00A0]+$/, '');
             if (tmTotal > 0 && completed >= tmTotal) {
-              return tFn('paid_hero_completed_text');
+              return t('paid_hero_completed_text');
             }
             return tmNextLesson
               ? `Вы прошли ${tmPct}% основной программы. Сегодня — занятие ${nextNum}: ${nextTitle}. Ниже нажмите Открыть, чтобы быстро продолжить обучение.`
