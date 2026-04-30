@@ -760,7 +760,7 @@ function PaidHome({
             if (!isDefault) return t;
             const nextIdx = tmNextLesson ? tmLessons.indexOf(tmNextLesson) + 1 : 0;
             const nextNum = String(nextIdx).padStart(2, '0');
-            const nextTitle = tmNextLesson?.title?.toLowerCase() ?? '';
+            const nextTitle = (tmNextLesson?.title?.toLowerCase() ?? '').replace(/[\s.\u00A0]+$/, '');
             if (tmTotal > 0 && completed >= tmTotal) {
               return 'Вы прошли 100% основной программы. Приступайте к тренировкам и наработке опыта насмотренности.';
             }
