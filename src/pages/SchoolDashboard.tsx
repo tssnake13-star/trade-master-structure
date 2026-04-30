@@ -744,7 +744,13 @@ function PaidHome({
           {(() => {
             const t = (welcomeTitle || '').replace(/[*~]/g, '').trim();
             const isDefault = !t || /добро пожаловать/i.test(t);
-            return isDefault ? 'Программа открыта. Соблюдайте регламент — он работает за вас.' : t;
+            if (!isDefault) return t;
+            const nextIdx = tmNextLesson ? tmLessons.indexOf(tmNextLesson) + 1 : 0;
+            const nextNum = String(nextIdx).padStart(2, '0');
+            const nextTitle = tmNextLesson?.title?.toLowerCase() ?? '';
+            return tmNextLesson
+              ? `Вы прошли ${tmPct}% основной программы. Сегодня — занятие ${nextNum}: ${nextTitle}. Войдите в режим, повторите состояние, нажмите кнопку.`
+              : `Вы прошли ${tmPct}% основной программы. Войдите в режим, повторите состояние, нажмите кнопку.`;
           })()}
         </p>
       </div>
