@@ -828,29 +828,22 @@ function PaidHome({
           )}
         </button>
 
-        {/* День в системе (1/3) */}
-        <div
-          className="p-7 flex flex-col justify-between"
-          style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 10 }}
-        >
-          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#666', marginBottom: 12 }}>
-            День в системе
-          </div>
-          <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 32, lineHeight: 1.1, color: FG }}>
-            {isAdmin
-              ? '∞'
-              : daysInSystem < 1 && timeInSystem
-                ? `${timeInSystem.h}ч ${String(timeInSystem.m).padStart(2, '0')}:${String(timeInSystem.s).padStart(2, '0')}`
-                : String(daysInSystem)}
-          </div>
-        </div>
+        {/* Live card 1/3 */}
+        <LiveStreamsCard upcoming={upcomingLives} countdown={liveCountdown} now={now} />
       </div>
 
       {/* KPI strip */}
       <div className="mb-10 grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: BORDER, border: `1px solid ${BORDER}` }}>
-        <div style={{ backgroundColor: CARD }}>
-          <LiveStreamsCard upcoming={upcomingLives} countdown={liveCountdown} now={now} />
-        </div>
+        <KpiCell
+          label="День в системе"
+          value={
+            isAdmin
+              ? '∞'
+              : daysInSystem < 1 && timeInSystem
+                ? `${timeInSystem.h}ч ${String(timeInSystem.m).padStart(2, '0')}:${String(timeInSystem.s).padStart(2, '0')}`
+                : String(daysInSystem)
+          }
+        />
         <KpiCell label="Осталось уроков" value={String(remaining)} />
         <KpiCellDual
           label="Завершено уроков"
