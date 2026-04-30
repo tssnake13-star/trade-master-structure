@@ -540,6 +540,7 @@ export default function SchoolDashboard() {
               tmProgress={tmProgress}
               tmNextLesson={tmNextLesson}
               programCountdown={programCountdown}
+              programEnd={programEnd}
               daysInSystem={daysInSystem}
               timeInSystem={timeInSystem}
               isAdmin={role === 'admin'}
@@ -718,7 +719,7 @@ function SelectedCourseView({
 // ====================================================================
 function PaidHome({
   welcomeTitle, profileName, tmCourse, tmLessons, tmProgress, tmNextLesson,
-  programCountdown, daysInSystem, timeInSystem, isAdmin, upcomingLives, liveCountdown, recentActivity,
+  programCountdown, programEnd, daysInSystem, timeInSystem, isAdmin, upcomingLives, liveCountdown, recentActivity,
   courses, progress, now, onOpenLesson, onSelectCourse, userId, t,
 }: {
   welcomeTitle: string;
@@ -728,6 +729,7 @@ function PaidHome({
   tmProgress: { completed: number; total: number } | null;
   tmNextLesson: Lesson | null;
   programCountdown: { d: number; h: number; m: number; s: number } | null;
+  programEnd: Date | null;
   daysInSystem: number;
   timeInSystem: { h: number; m: number; s: number } | null;
   isAdmin: boolean;
@@ -871,6 +873,7 @@ function PaidHome({
           pulse
           mono
           valueSize={26}
+          hint={programEnd ? programEnd.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }) : undefined}
         />
       </div>
 
@@ -1178,7 +1181,7 @@ function FreeHome({
 // ====================================================================
 //   SUB COMPONENTS
 // ====================================================================
-function KpiCell({ label, value, accent, pulse, mono, valueSize }: { label: string; value: string; accent?: boolean; pulse?: boolean; mono?: boolean; valueSize?: number }) {
+function KpiCell({ label, value, accent, pulse, mono, valueSize, hint }: { label: string; value: string; accent?: boolean; pulse?: boolean; mono?: boolean; valueSize?: number; hint?: string }) {
   return (
     <div className="p-5 sm:p-6" style={{ backgroundColor: BG }}>
       <div className="flex items-center gap-2 mb-3">
@@ -1198,6 +1201,19 @@ function KpiCell({ label, value, accent, pulse, mono, valueSize }: { label: stri
       }}>
         {value}
       </div>
+      {hint && (
+        <div style={{
+          fontFamily: MONO,
+          fontSize: 11,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: '#777',
+          marginTop: 10,
+          fontVariantNumeric: 'tabular-nums',
+        }}>
+          {hint}
+        </div>
+      )}
     </div>
   );
 }
