@@ -861,6 +861,7 @@ function PaidHome({
           accent
           pulse
           mono
+          valueSize={26}
         />
       </div>
 
@@ -1167,7 +1168,7 @@ function FreeHome({
 // ====================================================================
 //   SUB COMPONENTS
 // ====================================================================
-function KpiCell({ label, value, accent, pulse, mono }: { label: string; value: string; accent?: boolean; pulse?: boolean; mono?: boolean }) {
+function KpiCell({ label, value, accent, pulse, mono, valueSize }: { label: string; value: string; accent?: boolean; pulse?: boolean; mono?: boolean; valueSize?: number }) {
   return (
     <div className="p-5 sm:p-6" style={{ backgroundColor: BG }}>
       <div className="flex items-center gap-2 mb-3">
@@ -1179,7 +1180,7 @@ function KpiCell({ label, value, accent, pulse, mono }: { label: string; value: 
       <div style={{
         fontFamily: mono ? MONO : DISPLAY,
         fontWeight: mono ? 500 : 350,
-        fontSize: mono ? 18 : 32,
+        fontSize: valueSize ?? (mono ? 18 : 32),
         lineHeight: 1,
         color: accent ? ACCENT : FG,
         letterSpacing: mono ? '0.02em' : '-0.02em',
