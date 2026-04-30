@@ -190,6 +190,7 @@ export default function SchoolDashboard() {
   }, [authLoading, session, navigate]);
 
   useEffect(() => {
+    if (authLoading) return;
     if (!user) return;
     const load = async () => {
       const [coursesRes, accessRes, lessonsRes, progressRes, profileRes, titleRes] = await Promise.all([
@@ -257,7 +258,7 @@ export default function SchoolDashboard() {
       setLoading(false);
     };
     load();
-  }, [user, role, location.state]);
+  }, [authLoading, user, role, location.state]);
 
   if (authLoading || loading) {
     return (
