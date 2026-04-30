@@ -765,37 +765,10 @@ function PaidHome({
               return 'Вы прошли 100% основной программы. Приступайте к тренировкам и наработке опыта насмотренности.';
             }
             return tmNextLesson
-              ? `Вы прошли ${tmPct}% основной программы. Сегодня — занятие ${nextNum}: ${nextTitle}. Войдите в режим, повторите состояние, нажмите кнопку.`
-              : `Вы прошли ${tmPct}% основной программы. Войдите в режим, повторите состояние, нажмите кнопку.`;
+              ? `Вы прошли ${tmPct}% основной программы. Сегодня — занятие ${nextNum}: ${nextTitle}. Ниже нажмите Открыть, чтобы быстро продолжить обучение.`
+              : `Вы прошли ${tmPct}% основной программы. Ниже нажмите Открыть, чтобы быстро продолжить обучение.`;
           })()}
         </p>
-      </div>
-
-      {/* KPI strip */}
-      <div className="mb-10 grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: BORDER, border: `1px solid ${BORDER}` }}>
-        <KpiCell
-          label="День в системе"
-          value={
-            isAdmin
-              ? '∞'
-              : daysInSystem < 1 && timeInSystem
-                ? `${timeInSystem.h}ч ${String(timeInSystem.m).padStart(2, '0')}:${String(timeInSystem.s).padStart(2, '0')}`
-                : String(daysInSystem)
-          }
-        />
-        <KpiCell label="Осталось уроков" value={String(remaining)} />
-        <KpiCellDual
-          label="Завершено уроков"
-          primary={{ caption: 'Основные', value: `${completed}/${tmTotal}`, pct: tmPct }}
-          secondary={{ caption: 'Дополнительные', value: `${extraCompleted}/${extraTotal}`, pct: extraPct }}
-        />
-        <KpiCell
-          label="До завершения обучения"
-          value={programCountdown ? `${programCountdown.d}д ${String(programCountdown.h).padStart(2,'0')}:${String(programCountdown.m).padStart(2,'0')}:${String(programCountdown.s).padStart(2,'0')}` : '—'}
-          accent
-          pulse
-          mono
-        />
       </div>
 
       {/* Continue + Live grid */}
@@ -857,6 +830,33 @@ function PaidHome({
 
         {/* Live card 1/3 */}
         <LiveStreamsCard upcoming={upcomingLives} countdown={liveCountdown} now={now} />
+      </div>
+
+      {/* KPI strip */}
+      <div className="mb-10 grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: BORDER, border: `1px solid ${BORDER}` }}>
+        <KpiCell
+          label="День в системе"
+          value={
+            isAdmin
+              ? '∞'
+              : daysInSystem < 1 && timeInSystem
+                ? `${timeInSystem.h}ч ${String(timeInSystem.m).padStart(2, '0')}:${String(timeInSystem.s).padStart(2, '0')}`
+                : String(daysInSystem)
+          }
+        />
+        <KpiCell label="Осталось уроков" value={String(remaining)} />
+        <KpiCellDual
+          label="Завершено уроков"
+          primary={{ caption: 'Основные', value: `${completed}/${tmTotal}`, pct: tmPct }}
+          secondary={{ caption: 'Дополнительные', value: `${extraCompleted}/${extraTotal}`, pct: extraPct }}
+        />
+        <KpiCell
+          label="До завершения обучения"
+          value={programCountdown ? `${programCountdown.d}д ${String(programCountdown.h).padStart(2,'0')}:${String(programCountdown.m).padStart(2,'0')}:${String(programCountdown.s).padStart(2,'0')}` : '—'}
+          accent
+          pulse
+          mono
+        />
       </div>
 
       {/* Programs grid */}
