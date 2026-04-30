@@ -6,6 +6,14 @@ import { ArrowLeft, Plus, Trash2, Pencil, GripVertical, Upload, X } from 'lucide
 import VideoBlockEditor from '@/components/school/VideoBlockEditor';
 import { SITE_ASSET_KEYS, notifySiteAssetChange } from '@/hooks/useSiteAsset';
 import {
+  DASHBOARD_TEXT_DEFAULTS,
+  DASHBOARD_TEXT_GROUPS,
+  STORAGE_PREFIX_DASHBOARD_TEXT,
+  loadDashboardTextsForAdmin,
+  notifyDashboardTextsChanged,
+  type DashboardTextKey,
+} from '@/lib/dashboardTexts';
+import {
   DndContext,
   closestCenter,
   KeyboardSensor,
@@ -210,6 +218,175 @@ function SettingsTab() {
           previewType="video"
         />
       </div>
+
+      <DashboardTextsEditor />
+    </div>
+  );
+}
+
+/* ========= DASHBOARD TEXTS EDITOR ========= */
+function DashboardTextsEditor() {
+  const [values, setValues] = useState<Record<string, string>>({});
+  const [initial, setInitial] = useState<Record<string, string>>({});
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [openGroup, setOpenGroup] = useState<string | null>(DASHBOARD_TEXT_GROUPS[0]?.title ?? null);
+
+  useEffect(() => {
+    loadDashboardTextsForAdmin().then(map => {
+      // Pre-fill with defaults so the textarea shows current effective text
+      const merged: Record<string, string> = {};
+      (Object.keys(DASHBOARD_TEXT_DEFAULTS) as DashboardTextKey[]).forEach(k => {
+        merged[k] = map[k] ?? DASHBOARD_TEXT_DEFAULTS[k];
+      });
+      setValues(merged);
+      setInitial(merged);
+      setLoading(false);
+    });
+  }, []);
+
+  const dirtyKeys = Object.keys(values).filter(k => values[k] !== initial[k]);
+
+  const save = async () => {
+    if (dirtyKeys.length === 0) return;
+    setSaving(true);
+    const now = new Date().toISOString();
+    const updated: Record<string, string> = {};
+    const rows = dirtyKeys.map(k => {
+      const isDefault = values[k].trim() === DASHBOARD_TEXT_DEFAULTS[k as DashboardTextKey];
+      // If equal to default, store as override too — keeps things consistent.
+      // Empty string => delete to fall back to default.
+      updated[k] = values[k];
+      return { key: STORAGE_PREFIX_DASHBOARD_TEXT + k, value: values[k], updated_at: now };
+    });
+    // Delete rows where value is empty
+    const toDelete = rows.filter(r => r.value === '').map(r => r.key);
+    const toUpsert = rows.filter(r => r.value !== '');
+    if (toDelete.length > 0) {
+      await supabase.from('site_settings').delete().in('key', toDelete);
+    }
+    if (toUpsert.length > 0) {
+      await supabase.from('site_settings').upsert(toUpsert, { onConflict: 'key' });
+    }
+    notifyDashboardTextsChanged(updated);
+    setInitial({ ...values });
+    setSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  const reset = (key: string) => {
+    setValues(v => ({ ...v, [key]: DASHBOARD_TEXT_DEFAULTS[key as DashboardTextKey] }));
+  };
+
+  return (
+    <div className="mt-10">
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-lg" style={{ fontFamily: font.heading }}>Тексты дэшборда</h2>
+        <div className="flex items-center gap-3">
+          {saved && <span className="text-xs" style={{ color: '#4a8a4a', fontFamily: font.mono }}>Сохранено ✓</span>}
+          <button
+            onClick={save}
+            disabled={saving || dirtyKeys.length === 0}
+            className="text-xs px-4 py-2 rounded"
+            style={{
+              backgroundColor: dirtyKeys.length === 0 ? '#222' : '#4a8a4a',
+              color: '#e8e0d0', fontFamily: font.mono,
+              opacity: saving ? 0.6 : 1,
+              cursor: dirtyKeys.length === 0 ? 'default' : 'pointer',
+            }}
+          >
+            {saving ? '...' : `Сохранить${dirtyKeys.length > 0 ? ` (${dirtyKeys.length})` : ''}`}
+          </button>
+        </div>
+      </div>
+      <p className="text-[11px] mb-4 leading-relaxed" style={{ color: '#666', fontFamily: font.mono }}>
+        Все надписи дэшборда. Пустое поле — вернёт значение по умолчанию.
+        В шаблонах <code>{'{name}'}</code>, <code>{'{total}'}</code> подставляются автоматически.
+      </p>
+
+      {loading ? (
+        <p className="text-xs" style={{ color: '#666', fontFamily: font.mono }}>Загрузка...</p>
+      ) : (
+        <div className="space-y-2">
+          {DASHBOARD_TEXT_GROUPS.map(group => {
+            const isOpen = openGroup === group.title;
+            const groupDirty = group.keys.filter(k => values[k] !== initial[k]).length;
+            return (
+              <div key={group.title} className="rounded-lg border" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
+                <button
+                  onClick={() => setOpenGroup(isOpen ? null : group.title)}
+                  className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-white/[0.02] transition"
+                  style={{ fontFamily: font.heading, fontSize: 14, color: '#e8e0d0' }}
+                >
+                  <span className="flex items-center gap-2">
+                    {group.title}
+                    {groupDirty > 0 && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono }}>
+                        {groupDirty}
+                      </span>
+                    )}
+                  </span>
+                  <span style={{ color: '#666', fontFamily: font.mono, fontSize: 11 }}>
+                    {isOpen ? '−' : '+'}
+                  </span>
+                </button>
+                {isOpen && (
+                  <div className="px-4 pb-4 space-y-3 border-t" style={{ borderColor: '#1a1a1a' }}>
+                    {group.keys.map(key => {
+                      const val = values[key] ?? '';
+                      const def = DASHBOARD_TEXT_DEFAULTS[key];
+                      const isDirty = val !== initial[key];
+                      const isDefault = val === def;
+                      const isMultiline = def.length > 60 || def.includes('\n');
+                      return (
+                        <div key={key} className="pt-3">
+                          <div className="flex items-center justify-between mb-1">
+                            <label className="text-[11px]" style={{ color: '#888', fontFamily: font.mono }}>
+                              {key}
+                              {isDirty && <span className="ml-2" style={{ color: '#caa472' }}>● изменено</span>}
+                            </label>
+                            {!isDefault && (
+                              <button
+                                onClick={() => reset(key)}
+                                className="text-[10px] hover:underline"
+                                style={{ color: '#666', fontFamily: font.mono }}
+                              >
+                                сбросить
+                              </button>
+                            )}
+                          </div>
+                          {isMultiline ? (
+                            <textarea
+                              value={val}
+                              onChange={e => setValues(v => ({ ...v, [key]: e.target.value }))}
+                              rows={Math.min(6, Math.max(2, Math.ceil(val.length / 70)))}
+                              className="w-full px-3 py-2 rounded border text-sm"
+                              style={{ backgroundColor: '#111', borderColor: isDirty ? '#caa472' : '#222', color: '#e8e0d0', fontFamily: font.mono }}
+                            />
+                          ) : (
+                            <input
+                              value={val}
+                              onChange={e => setValues(v => ({ ...v, [key]: e.target.value }))}
+                              placeholder={def}
+                              className="w-full px-3 py-2 rounded border text-sm"
+                              style={{ backgroundColor: '#111', borderColor: isDirty ? '#caa472' : '#222', color: '#e8e0d0', fontFamily: font.mono }}
+                            />
+                          )}
+                          <div className="text-[10px] mt-1" style={{ color: '#555', fontFamily: font.mono }}>
+                            По умолчанию: {def}
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Lock, Settings, LogOut, ArrowRight, Menu, Ticket, Home as HomeIcon, MessageCircle } from 'lucide-react';
 import logoVideoFallback from '@/assets/logo-dashboard.mp4';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
+import { useDashboardTexts, type DashboardTextKey } from '@/lib/dashboardTexts';
 
 interface Course {
   id: string;
@@ -131,6 +132,7 @@ export default function SchoolDashboard() {
   const { session, user, role, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useDashboardTexts();
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [accessMap, setAccessMap] = useState<Map<string, { courseId: string; unlocked: number[]; granted_at?: string | null; expires_at?: string | null }>>(new Map());
@@ -263,7 +265,7 @@ export default function SchoolDashboard() {
   if (authLoading || loading) {
     return (
       <div data-school-skin className="min-h-screen flex items-center justify-center" style={{ backgroundColor: BG, color: FG }}>
-        <p style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#666' }}>Загрузка</p>
+        <p style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#666' }}>{t('loading_label')}</p>
       </div>
     );
   }
@@ -353,7 +355,7 @@ export default function SchoolDashboard() {
           </div>
           <div className="min-w-0">
             <div style={{ fontFamily: MONO, fontSize: 14, letterSpacing: '0.18em', textTransform: 'uppercase', color: FG }}>
-              TRADELIKETYO
+              {t('sidebar_brand')}
             </div>
           </div>
         </button>
@@ -370,14 +372,14 @@ export default function SchoolDashboard() {
             }}
           >
             <HomeIcon size={14} style={{ color: selectedCourse === null ? ACCENT : '#666' }} />
-            <span>Главная</span>
+            <span>{t('sidebar_home')}</span>
           </button>
         </nav>
 
         {/* Programs */}
         <div className="px-5 pt-4 pb-2">
           <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555' }}>
-            Программы
+            {t('sidebar_programs_label')}
           </div>
         </div>
         <nav className="overflow-y-auto px-3 space-y-1 pb-4">
@@ -417,7 +419,7 @@ export default function SchoolDashboard() {
                   </div>
                 )}
                 {!accessible && (
-                  <div style={{ fontFamily: MONO, fontSize: 9, color: '#444', marginTop: 4 }}>Закрыто</div>
+                  <div style={{ fontFamily: MONO, fontSize: 9, color: '#444', marginTop: 4 }}>{t('sidebar_locked')}</div>
                 )}
               </button>
             );
@@ -439,10 +441,10 @@ export default function SchoolDashboard() {
             </div>
             <div className="min-w-0 flex-1">
               <div className="truncate" style={{ fontFamily: SANS, fontSize: 12, color: FG }}>
-                {profileName || profileEmail || 'Студент'}
+                {profileName || profileEmail || t('sidebar_default_name')}
               </div>
               <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666', marginTop: 2 }}>
-                {isFreeUser ? 'Вводный доступ' : 'Активный'}
+                {isFreeUser ? t('sidebar_status_intro') : t('sidebar_status_active')}
               </div>
             </div>
             {role === 'admin' && (
@@ -456,7 +458,7 @@ export default function SchoolDashboard() {
             className="w-full flex items-center gap-2 px-3 py-2 rounded text-xs hover:bg-white/5 transition"
             style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.1em', color: '#666' }}
           >
-            <LogOut size={13} /> Выйти
+            <LogOut size={13} /> {t('sidebar_signout')}
           </button>
         </div>
       </aside>
@@ -484,7 +486,7 @@ export default function SchoolDashboard() {
                 animation: isFreeUser ? 'none' : 'tlyPulse 2.4s ease-out infinite',
               }} />
               <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#888' }}>
-                {isFreeUser ? 'Вводный доступ' : 'Live'} · КАБИНЕТ ТРЕЙДЕРА
+                {isFreeUser ? t('header_status_intro') : t('header_status_live')} · {t('header_status_suffix')}
               </span>
             </div>
             <div className="hidden sm:flex items-center gap-5">
@@ -498,7 +500,7 @@ export default function SchoolDashboard() {
                 style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#888' }}
                 className="hover:text-foreground transition"
               >
-                Поддержка
+                {t('header_support')}
               </a>
             </div>
           </div>
@@ -517,13 +519,14 @@ export default function SchoolDashboard() {
               pct={selectedPct}
               nextLesson={selectedNext}
               onOpen={(id) => navigate(`/school/lesson/${id}`)}
+              t={t}
             />
           )}
 
           {selectedCourseData && !selectedAccessible && (
             <div className="flex flex-col items-center justify-center py-24">
               <Lock size={28} style={{ color: '#333' }} className="mb-4" />
-              <p style={{ fontFamily: MONO, fontSize: 12, color: '#555' }}>Программа закрыта</p>
+              <p style={{ fontFamily: MONO, fontSize: 12, color: '#555' }}>{t('locked_program_message')}</p>
             </div>
           )}
 
@@ -549,6 +552,7 @@ export default function SchoolDashboard() {
               onOpenLesson={(id) => navigate(`/school/lesson/${id}`)}
               onSelectCourse={selectCourse}
               userId={user?.id}
+              t={t}
             />
           )}
 
@@ -569,6 +573,7 @@ export default function SchoolDashboard() {
               onOpenLesson={(id) => navigate(`/school/lesson/${id}`)}
               onSelectCourse={selectCourse}
               userId={user?.id}
+              t={t}
             />
           )}
         </div>
@@ -576,7 +581,7 @@ export default function SchoolDashboard() {
         {/* Footer */}
         <footer className="border-t px-4 sm:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-2" style={{ borderColor: BORDER }}>
           <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#555' }}>
-            © TRADELIKETYO · 2026
+            {t('footer_copyright')}
           </span>
           <a
             href="https://t.me/rav_999"
@@ -585,7 +590,7 @@ export default function SchoolDashboard() {
             style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666' }}
             className="hover:text-foreground transition"
           >
-            Telegram автора
+            {t('footer_telegram')}
           </a>
         </footer>
       </main>
@@ -593,11 +598,13 @@ export default function SchoolDashboard() {
   );
 }
 
+type TFn = (key: DashboardTextKey, vars?: Record<string, string | number>) => string;
+
 // ====================================================================
 //   SELECTED COURSE DETAIL
 // ====================================================================
 function SelectedCourseView({
-  course, lessons, unlockedSortOrders, completedIds, progress, pct, nextLesson, onOpen,
+  course, lessons, unlockedSortOrders, completedIds, progress, pct, nextLesson, onOpen, t,
 }: {
   course: Course;
   lessons: Lesson[];
@@ -607,12 +614,13 @@ function SelectedCourseView({
   pct: number;
   nextLesson: Lesson | null;
   onOpen: (id: string) => void;
+  t: TFn;
 }) {
   return (
     <>
       <div className="mb-8">
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 14 }}>
-          ◆ Программа
+          {t('course_eyebrow')}
         </div>
         <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(36px, 5vw, 56px)', lineHeight: 1.02, letterSpacing: '-0.025em', color: FG }}>
           {course.title}
@@ -678,11 +686,11 @@ function SelectedCourseView({
               </div>
               {!unlocked ? (
                 <span className="flex-shrink-0 pt-1" style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#444' }}>
-                  Закрыто
+                  {t('course_lesson_locked')}
                 </span>
               ) : done ? (
                 <button onClick={() => onOpen(l.id)} className="flex-shrink-0 pt-1 hover:opacity-70 transition" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT }}>
-                  Повторить →
+                  {t('course_lesson_repeat')}
                 </button>
               ) : (
                 <button
@@ -694,7 +702,7 @@ function SelectedCourseView({
                     padding: '8px 16px', borderRadius: 6,
                   }}
                 >
-                  Открыть
+                  {t('course_lesson_open')}
                 </button>
               )}
             </div>
@@ -711,7 +719,7 @@ function SelectedCourseView({
 function PaidHome({
   welcomeTitle, profileName, tmCourse, tmLessons, tmProgress, tmNextLesson,
   programCountdown, daysInSystem, timeInSystem, isAdmin, upcomingLives, liveCountdown, recentActivity,
-  courses, progress, now, onOpenLesson, onSelectCourse, userId,
+  courses, progress, now, onOpenLesson, onSelectCourse, userId, t,
 }: {
   welcomeTitle: string;
   profileName: string;
@@ -732,9 +740,10 @@ function PaidHome({
   onOpenLesson: (id: string) => void;
   onSelectCourse: (id: string) => void;
   userId?: string;
+  t: TFn;
 }) {
-  const greetingName = profileName ? profileName.split(' ')[0] : 'Трейдер';
-  const heroText = `${greetingName}, *система* ждёт вас.`;
+  const greetingName = profileName ? profileName.split(' ')[0] : t('paid_hero_default_name');
+  const heroText = t('paid_hero_title_template', { name: greetingName });
   const remaining = tmProgress ? Math.max(0, tmProgress.total - tmProgress.completed) : 0;
   const completed = tmProgress?.completed ?? 0;
   const tmTotal = tmProgress?.total ?? 0;
@@ -757,21 +766,21 @@ function PaidHome({
       {/* Hero */}
       <div className="mb-12">
         <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 14 }}>
-          С возвращением
+          {t('paid_hero_eyebrow')}
         </div>
         <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(38px, 5.5vw, 64px)', lineHeight: 1.02, letterSpacing: '-0.025em', color: FG }}>
           {renderHeroTitle(heroText)}
         </h1>
         <p className="mt-4" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '52ch' }}>
           {(() => {
-            const t = (welcomeTitle || '').replace(/[*~]/g, '').trim();
-            const isDefault = !t || /добро пожаловать/i.test(t);
-            if (!isDefault) return t;
+            const wt = (welcomeTitle || '').replace(/[*~]/g, '').trim();
+            const isDefault = !wt || /добро пожаловать/i.test(wt);
+            if (!isDefault) return wt;
             const nextIdx = tmNextLesson ? tmLessons.indexOf(tmNextLesson) + 1 : 0;
             const nextNum = String(nextIdx).padStart(2, '0');
             const nextTitle = (tmNextLesson?.title?.toLowerCase() ?? '').replace(/[\s.\u00A0]+$/, '');
             if (tmTotal > 0 && completed >= tmTotal) {
-              return 'Вы прошли 100% основной программы. Приступайте к тренировкам и наработке опыта насмотренности.';
+              return t('paid_hero_completed_text');
             }
             return tmNextLesson
               ? `Вы прошли ${tmPct}% основной программы. Сегодня — занятие ${nextNum}: ${nextTitle}. Ниже нажмите Открыть, чтобы быстро продолжить обучение.`
@@ -796,18 +805,18 @@ function PaidHome({
           {tmNextLesson && tmCourse ? (
             <>
               <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
-                Продолжить · занятие {tmLessons.indexOf(tmNextLesson) + 1}
+                {t('continue_eyebrow')} {tmLessons.indexOf(tmNextLesson) + 1}
               </div>
               <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, lineHeight: 1.2, color: FG, marginBottom: 8 }}>
                 {tmNextLesson.title}
               </h2>
               <div className="flex items-center justify-between">
                 <div className="flex gap-4" style={{ fontFamily: MONO, fontSize: 11, color: '#666' }}>
-                  <span>● Видео</span>
-                  <span>● PDF</span>
+                  <span>{t('continue_meta_video')}</span>
+                  <span>{t('continue_meta_pdf')}</span>
                 </div>
                 <div className="flex items-center gap-2 transition-transform group-hover:translate-x-1" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: ACCENT }}>
-                  Открыть <ArrowRight size={14} />
+                  {t('continue_open')} <ArrowRight size={14} />
                 </div>
               </div>
             </>
@@ -816,19 +825,19 @@ function PaidHome({
               {remaining > 0 ? (
                 <>
                   <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
-                    Ожидает открытия
+                    {t('continue_pending_eyebrow')}
                   </div>
                   <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG }}>
-                    Следующее занятие откроет наставник
+                    {t('continue_pending_title')}
                   </h2>
                 </>
               ) : (
                 <>
                   <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
-                    Программа завершена
+                    {t('continue_done_eyebrow')}
                   </div>
                   <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG }}>
-                    Все занятия пройдены ✓
+                    {t('continue_done_title')}
                   </h2>
                 </>
               )}
@@ -840,7 +849,7 @@ function PaidHome({
       {/* KPI strip */}
       <div className="mb-10 grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: BORDER, border: `1px solid ${BORDER}` }}>
         <KpiCell
-          label="День в системе"
+          label={t('kpi_days_label')}
           value={
             isAdmin
               ? '∞'
@@ -849,14 +858,14 @@ function PaidHome({
                 : String(daysInSystem)
           }
         />
-        <KpiCell label="Осталось уроков" value={String(remaining)} />
+        <KpiCell label={t('kpi_remaining_label')} value={String(remaining)} />
         <KpiCellDual
-          label="Завершено уроков"
-          primary={{ caption: 'Основные', value: `${completed}/${tmTotal}`, pct: tmPct }}
-          secondary={{ caption: 'Дополнительные', value: `${extraCompleted}/${extraTotal}`, pct: extraPct }}
+          label={t('kpi_completed_label')}
+          primary={{ caption: t('kpi_completed_primary'), value: `${completed}/${tmTotal}`, pct: tmPct }}
+          secondary={{ caption: t('kpi_completed_secondary'), value: `${extraCompleted}/${extraTotal}`, pct: extraPct }}
         />
         <KpiCell
-          label="До завершения обучения"
+          label={t('kpi_countdown_label')}
           value={programCountdown ? `${programCountdown.d}д ${String(programCountdown.h).padStart(2,'0')}:${String(programCountdown.m).padStart(2,'0')}:${String(programCountdown.s).padStart(2,'0')}` : '—'}
           accent
           pulse
@@ -867,13 +876,13 @@ function PaidHome({
 
       {/* Live card */}
       <div className="mb-10">
-        <LiveStreamsCard upcoming={upcomingLives} countdown={liveCountdown} now={now} />
+        <LiveStreamsCard upcoming={upcomingLives} countdown={liveCountdown} now={now} t={t} />
       </div>
 
       {/* Programs grid */}
       <div className="mb-12">
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 16 }}>
-          Программы
+          {t('programs_label')}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {courses.map(c => {
@@ -887,7 +896,7 @@ function PaidHome({
                 style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 8 }}
               >
                 <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 8 }}>
-                  Программа
+                  {t('programs_card_eyebrow')}
                 </div>
                 <h3 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG, marginBottom: 6 }}>
                   {c.title}
@@ -917,10 +926,10 @@ function PaidHome({
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
         <div className="lg:col-span-3 p-6" style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 8 }}>
           <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 16 }}>
-            Последняя активность
+            {t('activity_label')}
           </div>
           {recentActivity.length === 0 ? (
-            <p style={{ fontFamily: MONO, fontSize: 12, color: '#666' }}>Пока пусто</p>
+            <p style={{ fontFamily: MONO, fontSize: 12, color: '#666' }}>{t('activity_empty')}</p>
           ) : (
             <div>
               {recentActivity.map((a, i) => (
@@ -939,7 +948,7 @@ function PaidHome({
         </div>
 
         <div className="lg:col-span-2">
-          <ActivateCodeSection userId={userId} onActivated={() => window.location.reload()} compact />
+          <ActivateCodeSection userId={userId} onActivated={() => window.location.reload()} compact t={t} />
         </div>
       </div>
     </>
@@ -952,7 +961,7 @@ function PaidHome({
 function FreeHome({
   courses, progress, accessMap, hasAccess, role, completedIds,
   getCourseLessons, getUnlockedLessons, getFirstIncomplete,
-  upcomingLives, liveCountdown, now, onOpenLesson, onSelectCourse, userId,
+  upcomingLives, liveCountdown, now, onOpenLesson, onSelectCourse, userId, t,
 }: {
   courses: Course[];
   progress: ProgressMap;
@@ -969,6 +978,7 @@ function FreeHome({
   onOpenLesson: (id: string) => void;
   onSelectCourse: (id: string) => void;
   userId?: string;
+  t: TFn;
 }) {
   const freeCourse = courses.find(c => c.is_free) || null;
   const freeLessons = freeCourse ? getCourseLessons(freeCourse.id) : [];
@@ -987,9 +997,9 @@ function FreeHome({
   const mainPaidTotal = mainPaid ? getCourseLessons(mainPaid.id).length : 0;
 
   const lockedLabelFor = (c: Course) => {
-    if (c.title.toLowerCase().includes('master')) return 'Допуск через куратора';
-    if (c.title.toLowerCase().includes('elite') || c.title.toLowerCase().includes('vip')) return 'По приглашению';
-    return 'После TM 4.5';
+    if (c.title.toLowerCase().includes('master')) return t('free_locked_master');
+    if (c.title.toLowerCase().includes('elite') || c.title.toLowerCase().includes('vip')) return t('free_locked_elite');
+    return t('free_locked_other');
   };
 
   return (
@@ -997,10 +1007,10 @@ function FreeHome({
       {/* Hero */}
       <div className="mb-12">
         <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(38px, 5.5vw, 64px)', lineHeight: 1.02, letterSpacing: '-0.025em', color: FG }}>
-          {renderHeroTitle('Добро пожаловать в *систему*.')}
+          {renderHeroTitle(t('free_hero_title'))}
         </h1>
         <p className="mt-4" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '60ch' }}>
-          Вы получили доступ к {total || 'нескольким'} вводным занятиям TLT. Они показывают, как устроена система. Основная программа TRADE MASTER 4.5 открывается по коду доступа от администратора.
+          {t('free_hero_subtitle_template', { total: total || 'нескольким' })}
         </p>
       </div>
 
@@ -1008,7 +1018,7 @@ function FreeHome({
       <div className="mb-10 grid grid-cols-1 sm:grid-cols-2 gap-px" style={{ backgroundColor: BORDER, border: `1px solid ${BORDER}` }}>
         <div className="p-6" style={{ backgroundColor: BG }}>
           <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 14 }}>
-            Вводный курс
+            {t('free_kpi_intro_label')}
           </div>
           <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 32, lineHeight: 1, color: FG, marginBottom: 12, fontVariantNumeric: 'tabular-nums' }}>
             {completed}<span style={{ color: '#666', fontSize: 22 }}> / {total}</span>
@@ -1021,14 +1031,14 @@ function FreeHome({
         </div>
         <div className="p-6 flex flex-col justify-between" style={{ backgroundColor: BG }}>
           <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 14 }}>
-            Основная программа
+            {t('free_kpi_main_label')}
           </div>
           <div>
             <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: '#666', marginBottom: 8 }}>
-              {mainPaidTotal} занятий · TM 4.5
+              {mainPaidTotal} {t('free_kpi_main_value_suffix')}
             </div>
             <div className="flex items-center gap-2" style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666' }}>
-              <Lock size={11} /> Закрыто · нужен код
+              <Lock size={11} /> {t('free_kpi_main_locked')}
             </div>
           </div>
         </div>
@@ -1050,14 +1060,14 @@ function FreeHome({
               <div className="flex items-center gap-2 mb-3" style={{ position: 'relative' }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: ACCENT, display: 'inline-block', animation: 'tlyPulse 2.4s ease-out infinite' }} />
                 <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT }}>
-                  Доступ открыт · начните здесь
+                  {t('free_intro_eyebrow')}
                 </span>
               </div>
               <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 28, lineHeight: 1.1, color: FG, marginBottom: 14, letterSpacing: '-0.02em', position: 'relative' }}>
-                Допуск получают <em style={{ color: ACCENT, fontStyle: 'italic' }}>не все</em>. Начните с первого занятия.
+                {renderHeroTitle(t('free_intro_title'))}
               </h2>
               <p style={{ fontFamily: SANS, fontSize: 14, color: '#a8a090', lineHeight: 1.55, marginBottom: 22, maxWidth: '52ch', position: 'relative' }}>
-                Это вводная программа. Она показывает, как устроены правила. Если поймёте — будет основная.
+                {t('free_intro_subtitle')}
               </p>
               <button
                 onClick={() => onOpenLesson(freeNext.id)}
@@ -1068,7 +1078,7 @@ function FreeHome({
                   display: 'inline-flex', alignItems: 'center', gap: 10,
                 }}
               >
-                Перейти к занятию 1 <ArrowRight size={14} />
+                {t('free_intro_cta')} <ArrowRight size={14} />
               </button>
             </div>
           ) : !completedAll && freeNext ? (
@@ -1083,25 +1093,25 @@ function FreeHome({
                 </div>
               )}
               <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 10 }}>
-                Продолжить · занятие {freeLessons.indexOf(freeNext) + 1}
+                {t('free_continue_eyebrow')} {freeLessons.indexOf(freeNext) + 1}
               </div>
               <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG, marginBottom: 8 }}>
                 {freeNext.title}
               </h2>
               <div className="flex items-center gap-2 transition-transform group-hover:translate-x-1" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: ACCENT }}>
-                Открыть <ArrowRight size={14} />
+                {t('free_continue_open')} <ArrowRight size={14} />
               </div>
             </button>
           ) : (
             <div className="p-7" style={{ border: `1px solid ${ACCENT}66`, background: 'linear-gradient(135deg, #1a1408 0%, #0f0d08 60%)', borderRadius: 10 }}>
               <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
-                ◆ Готовы к следующему шагу
+                {t('free_done_eyebrow')}
               </div>
               <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 28, lineHeight: 1.1, color: FG, marginBottom: 14 }}>
-                Вы готовы к <em style={{ color: ACCENT, fontStyle: 'italic' }}>основной</em> программе.
+                {renderHeroTitle(t('free_done_title'))}
               </h2>
               <p style={{ fontFamily: SANS, fontSize: 14, color: '#a8a090', lineHeight: 1.55, marginBottom: 22, maxWidth: '52ch' }}>
-                Свяжитесь с автором — он подскажет как получить доступ.
+                {t('free_done_subtitle')}
               </p>
               <a
                 href="https://t.me/rav_999"
@@ -1114,20 +1124,20 @@ function FreeHome({
                   display: 'inline-flex', alignItems: 'center', gap: 10,
                 }}
               >
-                <MessageCircle size={14} /> Написать Сергею
+                <MessageCircle size={14} /> {t('free_done_cta')}
               </a>
             </div>
           )}
         </div>
 
-        <LiveStreamsCard upcoming={upcomingLives} countdown={liveCountdown} now={now} />
+        <LiveStreamsCard upcoming={upcomingLives} countdown={liveCountdown} now={now} t={t} />
       </div>
 
       {/* Locked paid programs */}
       {lockedPaid.length > 0 && (
         <div className="mb-12">
           <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 16 }}>
-            Программы по допуску
+            {t('free_locked_label')}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {lockedPaid.map(c => (
@@ -1138,7 +1148,7 @@ function FreeHome({
               >
                 <div className="flex items-center justify-between mb-2">
                   <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#666' }}>
-                    Программа
+                    {t('programs_card_eyebrow')}
                   </div>
                   <Lock size={12} style={{ color: '#555' }} />
                 </div>
@@ -1160,7 +1170,7 @@ function FreeHome({
       )}
 
       {/* Code section */}
-      <ActivateCodeSection userId={userId} onActivated={() => window.location.reload()} />
+      <ActivateCodeSection userId={userId} onActivated={() => window.location.reload()} t={t} />
     </>
   );
 }
@@ -1231,23 +1241,23 @@ function KpiCellDual({
   );
 }
 
-function LiveStreamsCard({ upcoming, countdown, now }: { upcoming: Date[]; countdown: { d: number; h: number; m: number; s: number } | null; now: Date }) {
+function LiveStreamsCard({ upcoming, countdown, now, t }: { upcoming: Date[]; countdown: { d: number; h: number; m: number; s: number } | null; now: Date; t: TFn }) {
   return (
     <div className="p-6" style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 10 }}>
       <div className="flex items-center gap-2 mb-4">
         <span style={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: ACCENT, animation: 'tlyPulse 2.4s ease-out infinite' }} />
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT }}>
-          Закрытые прямые эфиры
+          {t('live_label')}
         </div>
       </div>
 
       {countdown && (
         <div className="grid grid-cols-4 gap-2 mb-5">
           {[
-            { v: countdown.d, l: 'д' },
-            { v: countdown.h, l: 'ч' },
-            { v: countdown.m, l: 'м' },
-            { v: countdown.s, l: 'с' },
+            { v: countdown.d, l: t('live_unit_d') },
+            { v: countdown.h, l: t('live_unit_h') },
+            { v: countdown.m, l: t('live_unit_m') },
+            { v: countdown.s, l: t('live_unit_s') },
           ].map((x, i) => (
             <div key={i} className="text-center">
               <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, lineHeight: 1, color: FG, fontVariantNumeric: 'tabular-nums' }}>
@@ -1263,7 +1273,7 @@ function LiveStreamsCard({ upcoming, countdown, now }: { upcoming: Date[]; count
 
       <div className="space-y-2 mb-5">
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 4 }}>
-          Расписание
+          {t('live_schedule_label')}
         </div>
         {upcoming.map((d, i) => {
           const isNext = i === 0;
@@ -1288,7 +1298,7 @@ function LiveStreamsCard({ upcoming, countdown, now }: { upcoming: Date[]; count
               </div>
               {isNext && (
                 <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: ACCENT, padding: '2px 8px', border: `1px solid ${ACCENT}66`, borderRadius: 4 }}>
-                  Скоро
+                  {t('live_soon_badge')}
                 </span>
               )}
             </div>
@@ -1297,15 +1307,13 @@ function LiveStreamsCard({ upcoming, countdown, now }: { upcoming: Date[]; count
       </div>
 
       <p style={{ fontFamily: SANS, fontSize: 12, color: '#888', lineHeight: 1.5 }}>
-        Эфир в группе{' '}
-        <span style={{ color: ACCENT }}>Telegram</span>{' '}/{' '}
-        <span style={{ color: ACCENT }}>YouTube</span>
+        {t('live_footer_text')}
       </p>
     </div>
   );
 }
 
-function ActivateCodeSection({ userId, onActivated, compact }: { userId?: string; onActivated: () => void; compact?: boolean }) {
+function ActivateCodeSection({ userId, onActivated, compact, t }: { userId?: string; onActivated: () => void; compact?: boolean; t: TFn }) {
   const [code, setCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ text: string; success: boolean } | null>(null);
@@ -1318,16 +1326,16 @@ function ActivateCodeSection({ userId, onActivated, compact }: { userId?: string
       const { data: isValid, error: err } = await supabase.rpc('validate_invite_code', { _code: code.trim() });
       if (err) throw err;
       if (!isValid) {
-        setMessage({ text: 'Код недействителен или уже использован', success: false });
+        setMessage({ text: t('code_invalid'), success: false });
         setLoading(false);
         return;
       }
       await supabase.rpc('use_invite_code', { _code: code.trim(), _user_id: userId });
-      setMessage({ text: 'Доступ открыт', success: true });
+      setMessage({ text: t('code_success'), success: true });
       setCode('');
       setTimeout(onActivated, 1500);
     } catch {
-      setMessage({ text: 'Произошла ошибка', success: false });
+      setMessage({ text: t('code_error'), success: false });
     } finally {
       setLoading(false);
     }
@@ -1338,18 +1346,18 @@ function ActivateCodeSection({ userId, onActivated, compact }: { userId?: string
       <div className="flex items-center gap-2 mb-3">
         <Ticket size={14} style={{ color: ACCENT }} />
         <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT }}>
-          Код доступа
+          {t('code_label')}
         </span>
       </div>
       <p style={{ fontFamily: SANS, fontSize: 12, color: '#888', lineHeight: 1.55, marginBottom: 14 }}>
-        {compact ? 'Получили код? Откройте программу.' : 'Получили код доступа? Введите его, чтобы открыть основную программу.'}
+        {compact ? t('code_description_compact') : t('code_description_full')}
       </p>
       <div className="flex gap-2 mb-2">
         <input
           type="text"
           value={code}
           onChange={e => setCode(e.target.value)}
-          placeholder="Введите код"
+          placeholder={t('code_placeholder')}
           className="flex-1 px-3 py-2.5"
           style={{ backgroundColor: '#0a0a0a', border: `1px solid #1f1f1f`, borderRadius: 6, color: FG, fontFamily: MONO, fontSize: 12 }}
           onKeyDown={e => e.key === 'Enter' && activate()}
@@ -1363,7 +1371,7 @@ function ActivateCodeSection({ userId, onActivated, compact }: { userId?: string
             padding: '0 18px', borderRadius: 6, opacity: loading ? 0.6 : 1, whiteSpace: 'nowrap',
           }}
         >
-          {loading ? '...' : 'Открыть'}
+          {loading ? '...' : t('code_submit')}
         </button>
       </div>
       {message && (
@@ -1378,7 +1386,7 @@ function ActivateCodeSection({ userId, onActivated, compact }: { userId?: string
         className="mt-auto pt-3 hover:opacity-80 transition"
         style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#666' }}
       >
-        Нет кода? → Написать Сергею
+        {t('code_help_link')}
       </a>
     </div>
   );
