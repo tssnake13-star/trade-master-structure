@@ -1150,6 +1150,45 @@ function KpiCell({ label, value, accent, pulse, mono }: { label: string; value: 
   );
 }
 
+function KpiCellDual({
+  label,
+  primary,
+  secondary,
+}: {
+  label: string;
+  primary: { caption: string; value: string; pct: number };
+  secondary: { caption: string; value: string; pct: number };
+}) {
+  const Row = ({ caption, value, pct }: { caption: string; value: string; pct: number }) => (
+    <div>
+      <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666', marginBottom: 4 }}>
+        {caption}
+      </div>
+      <div className="flex items-baseline gap-2">
+        <span style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, lineHeight: 1, color: FG, letterSpacing: '-0.02em', fontVariantNumeric: 'tabular-nums' }}>
+          {value}
+        </span>
+        <span style={{ fontFamily: MONO, fontSize: 11, color: ACCENT, fontVariantNumeric: 'tabular-nums' }}>
+          {pct}%
+        </span>
+      </div>
+    </div>
+  );
+  return (
+    <div className="p-5 sm:p-6" style={{ backgroundColor: BG }}>
+      <div className="flex items-center gap-2 mb-3">
+        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555' }}>
+          {label}
+        </div>
+      </div>
+      <div className="space-y-3">
+        <Row {...primary} />
+        <Row {...secondary} />
+      </div>
+    </div>
+  );
+}
+
 function LiveStreamsCard({ upcoming, countdown, now }: { upcoming: Date[]; countdown: { d: number; h: number; m: number; s: number } | null; now: Date }) {
   return (
     <div className="p-6" style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD, borderRadius: 10 }}>
