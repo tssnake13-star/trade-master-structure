@@ -715,6 +715,20 @@ function PaidHome({
   const heroText = `${greetingName}, *система* ждёт вас.`;
   const remaining = tmProgress ? Math.max(0, tmProgress.total - tmProgress.completed) : 0;
   const completed = tmProgress?.completed ?? 0;
+  const tmTotal = tmProgress?.total ?? 0;
+  const tmPct = tmTotal > 0 ? Math.round((completed / tmTotal) * 100) : 0;
+
+  // Дополнительные курсы — все доступные, кроме основного TRADE MASTER 4.5
+  const extraCourses = courses.filter(c => !tmCourse || c.id !== tmCourse.id);
+  let extraCompleted = 0;
+  let extraTotal = 0;
+  for (const c of extraCourses) {
+    const cp = progress[c.id];
+    if (!cp) continue;
+    extraCompleted += cp.completed;
+    extraTotal += cp.total;
+  }
+  const extraPct = extraTotal > 0 ? Math.round((extraCompleted / extraTotal) * 100) : 0;
 
   return (
     <>
@@ -739,7 +753,11 @@ function PaidHome({
       <div className="mb-10 grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: BORDER, border: `1px solid ${BORDER}` }}>
         <KpiCell label="День в системе" value={String(daysInSystem)} />
         <KpiCell label="Осталось уроков" value={String(remaining)} />
-        <KpiCell label="Завершено уроков" value={String(completed)} />
+        <KpiCellDual
+          label="Завершено уроков"
+          primary={{ caption: 'Основные', value: `${completed}/${tmTotal}`, pct: tmPct }}
+          secondary={{ caption: 'Дополнительные', value: `${extraCompleted}/${extraTotal}`, pct: extraPct }}
+        />
         <KpiCell
           label="До завершения обучения"
           value={programCountdown ? `${programCountdown.d}д ${String(programCountdown.h).padStart(2,'0')}:${String(programCountdown.m).padStart(2,'0')}:${String(programCountdown.s).padStart(2,'0')}` : '—'}
