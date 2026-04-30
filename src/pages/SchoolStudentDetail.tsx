@@ -4,7 +4,9 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, ShieldOff, ShieldCheck, Trash2, Plus, ChevronRight, Unlock, ShieldPlus, ShieldMinus, KeyRound, Eye, EyeOff, RefreshCw, Copy, Check } from 'lucide-react';
 
-const SUPER_ADMIN_EMAIL = 'tssnake13@gmail.com';
+const SUPER_ADMIN_EMAILS = ['tssnake13@gmail.com', 'tssnake@list.ru'];
+const isSuperAdminEmail = (email?: string | null) =>
+  !!email && SUPER_ADMIN_EMAILS.includes(email.toLowerCase());
 
 const font = { heading: "'Inter', sans-serif", mono: "'Inter', sans-serif" };
 
@@ -79,6 +81,10 @@ export default function SchoolStudentDetail() {
   useEffect(() => { load(); }, [studentId]);
 
   const isSelf = user?.id === studentId;
+  const callerIsSuperAdmin = isSuperAdminEmail(user?.email);
+  const targetIsSuperAdmin = isSuperAdminEmail(profile?.email);
+  // Только супер-админ может менять/блокировать/удалять супер-админа
+  const canModifySuperAdminTarget = !targetIsSuperAdmin || callerIsSuperAdmin;
 
   const toggleBlock = async () => {
     if (!profile) return;
@@ -130,7 +136,7 @@ export default function SchoolStudentDetail() {
   };
 
   const toggleAdminRole = async () => {
-    if (!studentId || isSelf || profile?.email === SUPER_ADMIN_EMAIL) return;
+    if (!studentId || isSelf || !canModifySuperAdminTarget) return;
     const newRole = studentRole === 'admin' ? 'student' : 'admin';
     const { data: existing } = await supabase
       .from('user_roles')
@@ -256,7 +262,7 @@ export default function SchoolStudentDetail() {
                 <span className="text-xs" style={{ color: studentRole === 'admin' ? '#4a8a4a' : '#e8e0d0', fontFamily: font.mono }}>
                   {studentRole}
                 </span>
-                {!isSelf && profile.email !== SUPER_ADMIN_EMAIL && (
+                {!isSelf && canModifySuperAdminTarget && (
                   <button
                     onClick={toggleAdminRole}
                     className="text-[11px] px-2.5 py-1 rounded flex items-center gap-1 hover:opacity-80 transition"
@@ -366,7 +372,7 @@ export default function SchoolStudentDetail() {
         </section>
 
         {/* ======== ACTIONS BLOCK ======== */}
-        {!isSelf && (
+        {!isSelf && canModifySuperAdminTarget && (
           <section className="rounded-lg border p-5" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
             <h2 className="text-sm mb-4" style={{ fontFamily: font.heading, color: '#888' }}>Действия</h2>
             <div className="flex flex-wrap gap-2">
