@@ -159,6 +159,15 @@ export default function SchoolDashboard() {
     const start = new Date(_tmAccessEarly.granted_at).getTime();
     return Math.max(0, Math.floor((now.getTime() - start) / 86400000));
   }, [_tmAccessEarly?.granted_at, now]);
+  const timeInSystem = useMemo(() => {
+    if (!_tmAccessEarly?.granted_at) return null;
+    const start = new Date(_tmAccessEarly.granted_at).getTime();
+    const diff = Math.max(0, now.getTime() - start);
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    return { h, m, s };
+  }, [_tmAccessEarly?.granted_at, now]);
   const upcomingLives = useMemo(() => nextLiveStream(now), [now]);
   const recentActivity = useMemo(() => {
     return [...completions]
@@ -520,6 +529,8 @@ export default function SchoolDashboard() {
               tmNextLesson={tmNextLesson}
               programCountdown={programCountdown}
               daysInSystem={daysInSystem}
+              timeInSystem={timeInSystem}
+              isAdmin={role === 'admin'}
               upcomingLives={upcomingLives}
               liveCountdown={liveCountdown}
               recentActivity={recentActivity}
@@ -690,7 +701,7 @@ function SelectedCourseView({
 // ====================================================================
 function PaidHome({
   welcomeTitle, profileName, tmCourse, tmLessons, tmProgress, tmNextLesson,
-  programCountdown, daysInSystem, upcomingLives, liveCountdown, recentActivity,
+  programCountdown, daysInSystem, timeInSystem, isAdmin, upcomingLives, liveCountdown, recentActivity,
   courses, progress, now, onOpenLesson, onSelectCourse, userId,
 }: {
   welcomeTitle: string;
@@ -701,6 +712,8 @@ function PaidHome({
   tmNextLesson: Lesson | null;
   programCountdown: { d: number; h: number; m: number; s: number } | null;
   daysInSystem: number;
+  timeInSystem: { h: number; m: number; s: number } | null;
+  isAdmin: boolean;
   upcomingLives: Date[];
   liveCountdown: { d: number; h: number; m: number; s: number } | null;
   recentActivity: { lesson_id: string; completed_at: string; lesson?: Lesson }[];
@@ -760,7 +773,16 @@ function PaidHome({
 
       {/* KPI strip */}
       <div className="mb-10 grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: BORDER, border: `1px solid ${BORDER}` }}>
-        <KpiCell label="День в системе" value={String(daysInSystem)} />
+        <KpiCell
+          label="День в системе"
+          value={
+            isAdmin
+              ? '∞'
+              : daysInSystem < 1 && timeInSystem
+                ? `${timeInSystem.h}ч ${String(timeInSystem.m).padStart(2, '0')}:${String(timeInSystem.s).padStart(2, '0')}`
+                : String(daysInSystem)
+          }
+        />
         <KpiCell label="Осталось уроков" value={String(remaining)} />
         <KpiCellDual
           label="Завершено уроков"
