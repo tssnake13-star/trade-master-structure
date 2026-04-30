@@ -748,6 +748,9 @@ function PaidHome({
             const nextIdx = tmNextLesson ? tmLessons.indexOf(tmNextLesson) + 1 : 0;
             const nextNum = String(nextIdx).padStart(2, '0');
             const nextTitle = tmNextLesson?.title?.toLowerCase() ?? '';
+            if (tmTotal > 0 && completed >= tmTotal) {
+              return 'Вы прошли 100% основной программы. Приступайте к тренировкам и наработке опыта насмотренности.';
+            }
             return tmNextLesson
               ? `Вы прошли ${tmPct}% основной программы. Сегодня — занятие ${nextNum}: ${nextTitle}. Войдите в режим, повторите состояние, нажмите кнопку.`
               : `Вы прошли ${tmPct}% основной программы. Войдите в режим, повторите состояние, нажмите кнопку.`;
