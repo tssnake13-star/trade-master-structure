@@ -104,16 +104,24 @@ function formatCountdown(target: Date, now: Date) {
 function useNow(_intervalMs = 1000) {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
-    let timeoutId: number;
-    const tick = () => {
-      const n = new Date();
-      setNow(n);
-      const delay = 1000 - (n.getTime() % 1000);
-      timeoutId = window.setTimeout(tick, delay);
+    // Используем requestAnimationFrame и ререндерим только при смене секунды.
+    // Это убирает «прыгающие» секунды: setTimeout/​setInterval дрейфуют,
+    // когда вкладка под нагрузкой или JS занят, и следующий тик может прийти
+    // через 2 секунды. rAF гарантирует обновление каждый кадр, а сравнение
+    // по секундам не даёт лишних рендеров.
+    let rafId = 0;
+    let lastSec = Math.floor(Date.now() / 1000);
+    const loop = () => {
+      const t = Date.now();
+      const sec = Math.floor(t / 1000);
+      if (sec !== lastSec) {
+        lastSec = sec;
+        setNow(new Date(t));
+      }
+      rafId = requestAnimationFrame(loop);
     };
-    const first = 1000 - (Date.now() % 1000);
-    timeoutId = window.setTimeout(tick, first);
-    return () => window.clearTimeout(timeoutId);
+    rafId = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafId);
   }, []);
   return now;
 }
