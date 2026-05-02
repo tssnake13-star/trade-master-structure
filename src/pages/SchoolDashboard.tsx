@@ -36,7 +36,7 @@ interface CompletionRecord {
 const ACCENT = '#caa472';
 const BG = '#080808';
 const FG = '#e8e0d0';
-const CARD = '#0c0c0c';
+const CARD = '#111111';
 const BORDER = '#1a1a1a';
 const MONO = "'JetBrains Mono', ui-monospace, monospace";
 const SANS = "'Inter', sans-serif";
