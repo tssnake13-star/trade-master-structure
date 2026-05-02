@@ -37,8 +37,8 @@ const ConstellationBg = () => {
         nodes.push({
           x: Math.random() * w,
           y: Math.random() * h,
-          vx: (Math.random() - 0.5) * 0.22,
-          vy: (Math.random() - 0.5) * 0.22,
+          vx: (Math.random() - 0.5) * 0.05,
+          vy: (Math.random() - 0.5) * 0.05,
           r: warm ? 2.2 : 1.6,
           warm,
           phase: Math.random() * Math.PI * 2,
@@ -68,7 +68,7 @@ const ConstellationBg = () => {
           const dist = Math.sqrt(dx * dx + dy * dy);
           const thresh = 160;
           if (dist < thresh) {
-            const alpha = (1 - dist / thresh) * 0.09;
+            const alpha = (1 - dist / thresh) * 0.08;
             const isWarm = a.warm || b.warm;
             ctx.strokeStyle = isWarm
               ? `oklch(0.78 0.09 70 / ${alpha})`
@@ -84,8 +84,8 @@ const ConstellationBg = () => {
 
       // dots with breathing pulse
       nodes.forEach(n => {
-        const pulse = 0.5 + 0.5 * Math.sin(t * 1.1 + n.phase);
-        const alpha = 0.22 + pulse * 0.18;
+        const pulse = 0.5 + 0.5 * Math.sin(t * 0.25 + n.phase);
+        const alpha = 0.04 + pulse * 0.04;
         ctx.beginPath();
         ctx.arc(n.x, n.y, n.r + pulse * 0.8, 0, Math.PI * 2);
         ctx.fillStyle = n.warm
