@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, Lock } from 'lucide-react';
+import ConstellationBg from '@/components/ConstellationBg';
 
 interface Lesson {
   id: string;
@@ -76,7 +77,8 @@ export default function SchoolCourse() {
   const total = lessons.length;
   const pct = total > 0 ? Math.round((completed / total) * 100) : 0;
   return (
-    <div data-school-skin className="min-h-screen" style={{ backgroundColor: BG, color: FG }}>
+    <div data-school-skin className="min-h-screen relative z-10" style={{ backgroundColor: BG, color: FG }}>
+      <ConstellationBg />
       {/* Top bar */}
       <header
         className="sticky top-0 z-30 border-b backdrop-blur"

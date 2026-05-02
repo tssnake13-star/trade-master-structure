@@ -30,6 +30,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import ConstellationBg from '@/components/ConstellationBg';
 
 const font = { heading: "'Inter', sans-serif", mono: "'Inter', sans-serif" };
 const tabStyle = (active: boolean) => ({
@@ -63,13 +64,15 @@ export default function SchoolAdmin() {
   if (authLoading || role !== 'admin') {
     return (
       <div data-school-skin className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
+        <ConstellationBg />
         <p style={{ fontFamily: font.mono }}>Загрузка...</p>
       </div>
     );
   }
 
   return (
-    <div data-school-skin className="min-h-screen" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
+    <div data-school-skin className="min-h-screen relative z-10" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
+      <ConstellationBg />
       <header className="border-b px-4 py-3 flex items-center justify-between" style={{ borderColor: '#1a1a1a' }}>
         <div className="flex items-center gap-3">
           <button onClick={() => navigate('/school/dashboard')} className="hover:opacity-70 transition">

@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useEffect } from 'react';
 import logoFallback from '@/assets/logo-tradeliketyo.png';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
+import ConstellationBg from '@/components/ConstellationBg';
 
 export default function SchoolAuth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -133,7 +134,8 @@ export default function SchoolAuth() {
   }
 
   return (
-    <div data-school-skin className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#080808' }}>
+    <div data-school-skin className="min-h-screen flex items-center justify-center px-4 relative z-10" style={{ backgroundColor: '#080808' }}>
+      <ConstellationBg />
       <div className="w-full max-w-md">
         <LogoBlock />
         {!isLogin && (

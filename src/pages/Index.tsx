@@ -28,6 +28,7 @@ import AuthorSection from '@/components/landing/AuthorSection';
 import DualCTASection from '@/components/landing/DualCTASection';
 import LogoSection from '@/components/landing/LogoSection';
 import Footer from '@/components/landing/Footer';
+import ConstellationBg from '@/components/ConstellationBg';
 
 
 const Index = () => {
@@ -35,6 +36,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background landing-skin">
+      <ConstellationBg />
       <Header />
       <StickyHeader />
       <SideNav />
