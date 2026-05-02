@@ -128,14 +128,6 @@
   --rule-color: hsl(var(--rule));
 }
 
-.landing-skin header,
-.landing-skin main,
-.landing-skin footer,
-.landing-skin nav {
-  position: relative;
-  z-index: 1;
-}
-
 .landing-skin h1,
 .landing-skin h2 {
   font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
