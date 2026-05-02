@@ -6,6 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, ArrowRight, MessageCircle, CheckCircle, Download } from 'lucide-react';
 import YouTubePlayer from '@/components/school/YouTubePlayer';
 import FloatingWatermark from '@/components/school/FloatingWatermark';
+import ConstellationBg from '@/components/ConstellationBg';
 
 interface LessonData {
   id: string;
@@ -165,7 +166,8 @@ export default function SchoolLesson() {
   const playableVideos = videos.filter(v => v.video_url);
 
   return (
-    <div data-school-skin className="min-h-screen flex flex-col" style={{ backgroundColor: BG, color: FG }}>
+    <div data-school-skin className="min-h-screen flex flex-col relative z-10" style={{ backgroundColor: BG, color: FG }}>
+      <ConstellationBg />
       {/* Top bar */}
       <header
         className="sticky top-0 z-30 border-b backdrop-blur"

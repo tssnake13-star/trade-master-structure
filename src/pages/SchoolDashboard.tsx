@@ -6,6 +6,7 @@ import { Lock, Settings, LogOut, ArrowRight, Menu, Ticket, Home as HomeIcon, Mes
 import logoVideoFallback from '@/assets/logo-dashboard.mp4';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 import { useDashboardTexts, type DashboardTextKey } from '@/lib/dashboardTexts';
+import ConstellationBg from '@/components/ConstellationBg';
 
 interface Course {
   id: string;
@@ -265,6 +266,7 @@ export default function SchoolDashboard() {
   if (authLoading || loading) {
     return (
       <div data-school-skin className="min-h-screen flex items-center justify-center" style={{ backgroundColor: BG, color: FG }}>
+        <ConstellationBg />
         <p style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#666' }}>{t('loading_label')}</p>
       </div>
     );
@@ -333,7 +335,8 @@ export default function SchoolDashboard() {
 
   // ============= RENDER =============
   return (
-    <div data-school-skin className="min-h-screen flex flex-col sm:flex-row" style={{ backgroundColor: BG, color: FG }}>
+    <div data-school-skin className="min-h-screen flex flex-col sm:flex-row relative z-10" style={{ backgroundColor: BG, color: FG }}>
+      <ConstellationBg />
       {mobileSidebarOpen && (
         <div className="sm:hidden fixed inset-0 z-40" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }} onClick={() => setMobileSidebarOpen(false)} />
       )}
