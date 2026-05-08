@@ -27,7 +27,6 @@ const ConstellationBg = () => {
       canvas.style.width = w + 'px';
       canvas.style.height = h + 'px';
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      initNodes();
     }
 
     function initNodes() {
@@ -98,12 +97,27 @@ const ConstellationBg = () => {
     }
 
     resize();
-    window.addEventListener('resize', resize);
+    initNodes();
+
+    let lastW = window.innerWidth;
+    let resizeTimer: number | undefined;
+    const onResize = () => {
+      // Ignore height-only changes (mobile address bar show/hide)
+      if (window.innerWidth === lastW) return;
+      lastW = window.innerWidth;
+      window.clearTimeout(resizeTimer);
+      resizeTimer = window.setTimeout(() => {
+        resize();
+        initNodes();
+      }, 200);
+    };
+    window.addEventListener('resize', onResize);
     animId = requestAnimationFrame(draw);
 
     return () => {
       cancelAnimationFrame(animId);
-      window.removeEventListener('resize', resize);
+      window.removeEventListener('resize', onResize);
+      window.clearTimeout(resizeTimer);
     };
   }, []);
 
