@@ -10,8 +10,8 @@ import { useEffect, useRef, useState } from 'react';
 const stats = [
   { value: 14, suffix: '', label: 'лет в рынке' },
   { value: 750, suffix: '+', label: 'эталонных сделок в архиве' },
-  { value: 7, suffix: '–8:1', label: 'минимальный риск-реворд' },
-  { value: 6, suffix: '–7', label: 'сделок из 15–18 сигналов/мес' },
+   { value: 7, suffix: ':1', label: 'минимальный риск-реворд' },
+   { value: 6, suffix: '–7', label: 'сделок из 15–20 сигналов/мес' },
 ];
 
 const useCountUp = (end: number, duration = 1500, start = false) => {
