@@ -10,7 +10,7 @@ const isSuperAdminEmail = (email?: string | null) =>
 
 const font = { heading: "'Inter', sans-serif", mono: "'Inter', sans-serif" };
 
-interface Profile { user_id: string; email: string; full_name: string | null; created_at: string; is_blocked: boolean; }
+interface Profile { user_id: string; email: string; full_name: string | null; created_at: string; is_blocked: boolean; last_seen_at: string | null; }
 interface Course { id: string; title: string; subtitle: string | null; is_free: boolean; sort_order: number; }
 interface Lesson { id: string; course_id: string; title: string; sort_order: number; }
 interface Access { id: string; user_id: string; course_id: string; granted_at: string; expires_at: string | null; unlocked_lessons: number[]; }
@@ -251,10 +251,13 @@ export default function SchoolStudentDetail() {
             />
             <CopyField
               label="Последняя активность"
-              value={formatDateTime(authMeta?.last_sign_in_at ?? null)}
-              copyValue={authMeta?.last_sign_in_at ?? ''}
-              copied={copiedField === 'last_sign_in'}
-              onCopy={() => authMeta?.last_sign_in_at && copyValue('last_sign_in', authMeta.last_sign_in_at)}
+              value={formatDateTime(profile.last_seen_at ?? authMeta?.last_sign_in_at ?? null)}
+              copyValue={profile.last_seen_at ?? authMeta?.last_sign_in_at ?? ''}
+              copied={copiedField === 'last_seen'}
+              onCopy={() => {
+                const v = profile.last_seen_at ?? authMeta?.last_sign_in_at;
+                if (v) copyValue('last_seen', v);
+              }}
             />
             <div>
               <span className="text-[10px] block mb-0.5" style={{ color: '#555', fontFamily: font.mono }}>Роль</span>
