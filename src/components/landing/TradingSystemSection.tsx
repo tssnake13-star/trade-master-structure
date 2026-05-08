@@ -66,7 +66,7 @@ const sharedNodes = [
 ];
 
 const stats = [
-  { value: 'H4', label: 'Таймфрейм сигнала', sublabel: 'Тактика 1 — Архив' },
+   { value: 'H4', label: 'Таймфрейм триггера', sublabel: 'Тактика 1 — Архив' },
    { value: 'M15', label: 'Таймфрейм триггера', sublabel: 'Тактика 2 — Резонанс' },
    { value: '7:1+', label: 'R:R резонансных сделок', sublabel: 'наблюдение с июня 2020' },
 ];
