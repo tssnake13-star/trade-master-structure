@@ -62,6 +62,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             setRole((roleData?.role as UserRole) ?? 'student');
             setLoading(false);
+
+            // Update last_seen_at (throttled to once per 2 minutes per browser)
+            try {
+              const key = `last_seen_at:${session.user.id}`;
+              const last = Number(localStorage.getItem(key) || '0');
+              const now = Date.now();
+              if (now - last > 2 * 60 * 1000) {
+                localStorage.setItem(key, String(now));
+                supabase
+                  .from('profiles')
+                  .update({ last_seen_at: new Date(now).toISOString() })
+                  .eq('user_id', session.user.id)
+                  .then(() => {});
+              }
+            } catch (_) {}
           }, 0);
         } else {
           setRole(null);
