@@ -1,14 +1,14 @@
 const tactics = [
   {
     id: 'archive',
-    step: 'Тактика 1|4',
+    step: 'NEXUS GRAVITY',
     name: 'Архив / H4',
     description: 'Вход через память рынка. Геометрическое совпадение с паттернами архива.',
   },
   {
     id: 'resonance',
     step: 'Тактика 1|2',
-    name: 'Резонанс / H1',
+    name: 'Резонанс / M15',
     description: 'Вход через состояние рынка. Сканирование валютного резонанса на импульс.',
   },
 ];
@@ -41,7 +41,7 @@ const flows = [
         step: 'Шаг 1',
         name: 'Resonance Scanner',
         description: 'Сканирует инструменты и формирует топ по резонансу W1 / D1.',
-        badge: '1.5x — 4.6x импульс',
+        badge: '1.23x — 1.49x импульс',
       },
       {
         step: 'Шаг 2',
@@ -67,8 +67,8 @@ const sharedNodes = [
 
 const stats = [
     { value: 'H4', label: 'Таймфрейм триггера', sublabel: 'TRADE MASTER - Архив' },
-   { value: 'M15', label: 'Таймфрейм триггера', sublabel: 'Тактика 2 — Резонанс' },
-   { value: '7:1+', label: 'R:R резонансных сделок', sublabel: 'наблюдение с июня 2020' },
+    { value: 'M15', label: 'Таймфрейм триггера', sublabel: 'торговля с 2012 года' },
+    { value: '7:1+', label: 'Среднее соотношение в сделках', sublabel: 'наблюдение с июня 2020' },
 ];
 
 const ArrowDown = () => (
