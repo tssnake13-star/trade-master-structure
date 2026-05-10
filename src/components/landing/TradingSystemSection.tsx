@@ -139,7 +139,7 @@ const TradingSystemSection = () => {
                   Ecosystem
                 </div>
                 <p className="mt-3 text-sm md:text-[13px] tracking-[0.04em] text-muted-foreground">
-                  Две тактики — одна экосистема — единый риск-менеджмент
+                  Две стратегии — одна экосистема — единый риск-менеджмент
                 </p>
               </div>
 
