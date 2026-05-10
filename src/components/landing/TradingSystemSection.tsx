@@ -61,7 +61,7 @@ const sharedNodes = [
   {
     step: 'Защита счёта',
     name: 'Risk Sentinel',
-    description: 'Контроль лимитов, Pyramid Gate и блокировка при превышении риска.',
+    description: 'Контроль лимитов, 4 уровня защиты и блокировка при превышении риска.',
   },
 ];
 
