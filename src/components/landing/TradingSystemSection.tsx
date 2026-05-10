@@ -68,7 +68,7 @@ const sharedNodes = [
 const stats = [
     { value: 'H4', label: 'Таймфрейм триггера', sublabel: 'TRADE MASTER - Архив' },
     { value: 'M15', label: 'Таймфрейм триггера', sublabel: 'торговля с 2012 года' },
-    { value: '7:1+', label: 'Среднее соотношение в сделках', sublabel: 'наблюдение с июня 2020' },
+    { value: '7:1+', label: 'Среднее соотношение в сделках', sublabel: 'Торговля с 2012 года' },
 ];
 
 const ArrowDown = () => (
