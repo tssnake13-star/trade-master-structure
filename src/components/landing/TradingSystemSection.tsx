@@ -1,7 +1,7 @@
 const tactics = [
   {
     id: 'archive',
-    step: 'NEXUS GRAVITY',
+    step: 'TRADE MASTER',
     name: 'Архив / H4',
     description: 'Вход через память рынка. Геометрическое совпадение с паттернами архива.',
   },
