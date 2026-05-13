@@ -2,7 +2,7 @@ const tactics = [
   {
     id: 'archive',
     step: 'TRADE MASTER',
-    name: 'Архив / H4',
+    name: 'Архив',
     description: 'Вход через память рынка. Геометрическое совпадение с паттернами архива.',
   },
   {
