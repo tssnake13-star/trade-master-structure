@@ -8,7 +8,7 @@ const tactics = [
   {
     id: 'resonance',
     step: 'NEXUS GRAVITY',
-    name: 'Резонанс / M15',
+    name: 'Резонанс',
     description: 'Вход через состояние рынка. Сканирование валютного резонанса на импульс.',
   },
 ];
