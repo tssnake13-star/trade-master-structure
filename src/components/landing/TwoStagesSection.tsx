@@ -61,7 +61,7 @@ const TwoStagesSection = () => {
               Профессиональная среда торговли
             </p>
             <p className="mt-6 text-base md:text-lg text-muted-foreground">
-              Только для выпускников школы. Инструменты, которые автоматизируют исполнение — вы остаётесь стратегом. Echo-Gate, TRADE MASTER, NEXUS GRAVITY, HunterBot, Risk Sentinel.
+              Только для выпускников школы. Инструменты, которые автоматизируют исполнение — вы остаётесь стратегом. Echo-Gate, TRADE MASTER, NEXUS GRAVITY.
             </p>
             <div
               className="mt-8 text-[10px] uppercase tracking-[0.22em]"
