@@ -9,9 +9,13 @@
     { "source": "/warm", "destination": "https://t.me/New_TradeLikeTYO_bot?start=warm", "permanent": false },
     { "source": "/p-telegram", "destination": "https://t.me/New_TradeLikeTYO_bot?start=posevT", "permanent": false },
     { "source": "/telegram", "destination": "https://t.me/New_TradeLikeTYO_bot?start=telegram", "permanent": false },
-    { "source": "/start", "destination": "https://t.me/New_TradeLikeTYO_bot", "permanent": false }
+    { "source": "/start", "destination": "https://t.me/New_TradeLikeTYO_bot", "permanent": false },
+    { "source": "/viktor", "destination": "https://t.me/New_TradeLikeTYO_bot?start=viktor", "permanent": false },
+    { "source": "/vk", "destination": "https://t.me/New_TradeLikeTYO_bot?start=vk", "permanent": false },
+    { "source": "/facebook", "destination": "https://t.me/New_TradeLikeTYO_bot?start=facebook", "permanent": false }
   ],
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
+
