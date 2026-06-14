@@ -208,6 +208,7 @@ export default function SchoolDashboard() {
   const [profileEmail, setProfileEmail] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [welcomeTitle, setWelcomeTitle] = useState('Добро пожаловать в систему');
+  const [mainCourseId, setMainCourseId] = useState<string | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const logoVideo = useSiteAsset(SITE_ASSET_KEYS.schoolDashboardLogo, logoVideoFallback);
@@ -215,7 +216,21 @@ export default function SchoolDashboard() {
 
   // hasAccess needs role/accessMap — compute inline below as well
   const _hasAccessEarly = (c: Course) => role === 'admin' || c.is_free || accessMap.has(c.id);
-  const _tmCourseEarly = courses.find(c => c.title === 'TRADE MASTER 4.5' && _hasAccessEarly(c)) || null;
+  // Основной курс задаётся в админке (site_settings → dashboard_main_course_id).
+  // Фолбэк, если не выбран: TRADE MASTER 4.5 → первый платный → первый доступный.
+  const pickMainCourse = (list: Course[], has: (c: Course) => boolean): Course | null => {
+    if (mainCourseId) {
+      const chosen = list.find(c => c.id === mainCourseId && has(c));
+      if (chosen) return chosen;
+    }
+    return (
+      list.find(c => c.title === 'TRADE MASTER 4.5' && has(c)) ||
+      list.find(c => !c.is_free && has(c)) ||
+      list.find(c => has(c)) ||
+      null
+    );
+  };
+  const _tmCourseEarly = pickMainCourse(courses, _hasAccessEarly);
   const _tmAccessEarly = _tmCourseEarly ? accessMap.get(_tmCourseEarly.id) : null;
 
   const programEnd = useMemo(() => {
@@ -259,16 +274,18 @@ export default function SchoolDashboard() {
     if (authLoading) return;
     if (!user) return;
     const load = async () => {
-      const [coursesRes, accessRes, lessonsRes, progressRes, profileRes, titleRes] = await Promise.all([
+      const [coursesRes, accessRes, lessonsRes, progressRes, profileRes, titleRes, mainRes] = await Promise.all([
         supabase.from('courses').select('*').order('sort_order'),
         supabase.from('course_access').select('course_id, unlocked_lessons, granted_at, expires_at').eq('user_id', user.id),
         supabase.from('lessons').select('id, course_id, title, description, sort_order').order('sort_order'),
         supabase.from('lesson_progress').select('lesson_id, completed_at').eq('user_id', user.id),
         supabase.from('profiles').select('full_name, email').eq('user_id', user.id).single(),
         supabase.from('site_settings').select('value').eq('key', 'dashboard_welcome_title').single(),
+        supabase.from('site_settings').select('value').eq('key', 'dashboard_main_course_id').maybeSingle(),
       ]);
 
       if (titleRes.data?.value) setWelcomeTitle(titleRes.data.value);
+      if (mainRes.data?.value) setMainCourseId(mainRes.data.value);
       if (profileRes.data) {
         setProfileName(profileRes.data.full_name || '');
         setProfileEmail(profileRes.data.email || '');
@@ -380,8 +397,8 @@ export default function SchoolDashboard() {
     setMobileSidebarOpen(false);
   };
 
-  // -------- main course (TM 4.5 if available, else first paid course) --------
-  const tmCourse = courses.find(c => c.title === 'TRADE MASTER 4.5' && hasAccess(c)) || null;
+  // -------- main course (выбран в админке, иначе фолбэк) --------
+  const tmCourse = pickMainCourse(courses, hasAccess);
   const tmLessons = tmCourse ? getCourseLessons(tmCourse.id) : [];
   const tmProgress = tmCourse ? (progress[tmCourse.id] || { completed: 0, total: 0 }) : null;
   const tmNextLesson = tmCourse ? getFirstIncomplete(tmCourse, tmLessons) : null;
@@ -633,6 +650,7 @@ export default function SchoolDashboard() {
           {!selectedCourse && isFreeUser && (
             <FreeHome
               courses={courses}
+              mainCourseId={mainCourseId}
               progress={progress}
               accessMap={accessMap}
               hasAccess={hasAccess}
@@ -1036,11 +1054,12 @@ function PaidHome({
 //   FREE HOME
 // ====================================================================
 function FreeHome({
-  courses, progress, accessMap, hasAccess, role, completedIds,
+  courses, mainCourseId, progress, accessMap, hasAccess, role, completedIds,
   getCourseLessons, getUnlockedLessons, getFirstIncomplete,
   upcomingLives, liveCountdown, now, onOpenLesson, onSelectCourse, userId, t,
 }: {
   courses: Course[];
+  mainCourseId?: string | null;
   progress: ProgressMap;
   accessMap: Map<string, any>;
   hasAccess: (c: Course) => boolean;
@@ -1070,7 +1089,7 @@ function FreeHome({
   const lockedPaid = courses.filter(c => !c.is_free && !hasAccess(c));
 
   // Largest paid program total for the locked KPI cell
-  const mainPaid = courses.find(c => c.title === 'TRADE MASTER 4.5') || courses.find(c => !c.is_free) || null;
+  const mainPaid = (mainCourseId && courses.find(c => c.id === mainCourseId)) || courses.find(c => c.title === 'TRADE MASTER 4.5') || courses.find(c => !c.is_free) || null;
   const mainPaidTotal = mainPaid ? getCourseLessons(mainPaid.id).length : 0;
 
   const lockedLabelFor = (c: Course) => {

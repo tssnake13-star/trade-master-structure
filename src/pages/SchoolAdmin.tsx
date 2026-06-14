@@ -112,6 +112,8 @@ export default function SchoolAdmin() {
 function SettingsTab() {
   const [welcomeTitle, setWelcomeTitle] = useState('');
   const [welcomeSubtitle, setWelcomeSubtitle] = useState('');
+  const [mainCourseId, setMainCourseId] = useState('');
+  const [courses, setCourses] = useState<{ id: string; title: string }[]>([]);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -119,9 +121,13 @@ function SettingsTab() {
     Promise.all([
       supabase.from('site_settings').select('value').eq('key', 'dashboard_welcome_title').single(),
       supabase.from('site_settings').select('value').eq('key', 'dashboard_welcome_subtitle').single(),
-    ]).then(([titleRes, subtitleRes]) => {
+      supabase.from('site_settings').select('value').eq('key', 'dashboard_main_course_id').maybeSingle(),
+      supabase.from('courses').select('id, title').order('sort_order'),
+    ]).then(([titleRes, subtitleRes, mainRes, coursesRes]) => {
       setWelcomeTitle(titleRes.data?.value || '');
       setWelcomeSubtitle(subtitleRes.data?.value || '');
+      setMainCourseId(mainRes.data?.value || '');
+      setCourses((coursesRes.data as { id: string; title: string }[]) || []);
     });
   }, []);
 
@@ -131,6 +137,7 @@ function SettingsTab() {
     await Promise.all([
       supabase.from('site_settings').upsert({ key: 'dashboard_welcome_title', value: welcomeTitle, updated_at: now }, { onConflict: 'key' }),
       supabase.from('site_settings').upsert({ key: 'dashboard_welcome_subtitle', value: welcomeSubtitle, updated_at: now }, { onConflict: 'key' }),
+      supabase.from('site_settings').upsert({ key: 'dashboard_main_course_id', value: mainCourseId, updated_at: now }, { onConflict: 'key' }),
     ]);
     setSaving(false);
     setSaved(true);
@@ -168,6 +175,25 @@ function SettingsTab() {
             className="w-full px-3 py-2 rounded border text-sm"
             style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
           />
+        </div>
+        <div>
+          <label className="block text-xs mb-1" style={{ color: '#999', fontFamily: font.mono }}>
+            Основной курс
+          </label>
+          <select
+            value={mainCourseId}
+            onChange={e => setMainCourseId(e.target.value)}
+            className="w-full px-3 py-2 rounded border text-sm"
+            style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
+          >
+            <option value="">Авто (по умолчанию)</option>
+            {courses.map(c => (
+              <option key={c.id} value={c.id}>{c.title}</option>
+            ))}
+          </select>
+          <p className="text-[11px] mt-1.5 leading-relaxed" style={{ color: '#666', fontFamily: font.mono }}>
+            Какой курс показывать главным в кабинете: кольцо прогресса, обратный отсчёт и карточка «Продолжить». Меняешь основной курс — просто выбери новый здесь.
+          </p>
         </div>
         <div className="flex items-center gap-3">
           <button onClick={save} disabled={saving} className="text-xs px-4 py-2 rounded" style={{ backgroundColor: '#4a8a4a', color: '#e8e0d0', fontFamily: font.mono, opacity: saving ? 0.6 : 1 }}>

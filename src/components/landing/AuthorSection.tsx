@@ -12,7 +12,7 @@ const AuthorSection = () => {
           
           <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-start">
             <div className="flex-shrink-0">
-              <div className="w-48 h-48 md:w-56 md:h-56 rounded-xl overflow-hidden bg-secondary">
+              <div className="w-64 h-64 md:w-80 md:h-80 rounded-xl overflow-hidden bg-secondary">
                 <img 
                   alt="Сергей Тё" 
                   className="w-full h-full object-cover" 
