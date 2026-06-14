@@ -8,7 +8,6 @@ import InstrumentTicker from '@/components/landing/InstrumentTicker';
 import StatsCounter from '@/components/landing/StatsCounter';
 import TwoStagesSection from '@/components/landing/TwoStagesSection';
 import CoreProblemSection from '@/components/landing/CoreProblemSection';
-import StructureDiagram from '@/components/landing/StructureDiagram';
 import IncludedSection from '@/components/landing/IncludedSection';
 import TradingSystemSection from '@/components/landing/TradingSystemSection';
 import CapitalProtectionSection from '@/components/landing/CapitalProtectionSection';
@@ -45,7 +44,6 @@ const Index = () => {
         <CoreProblemSection />
 
         {/* Решение */}
-        <StructureDiagram />
         <IncludedSection />
         <TradingSystemSection />
 
