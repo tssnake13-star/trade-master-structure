@@ -15,7 +15,7 @@ const RedesignFinalCTA = () => {
             <span>ADMISSION · ДОПУСК</span>
           </div>
 
-          <h2 className="font-['Fraunces'] text-4xl md:text-6xl lg:text-7xl text-foreground leading-[1.02] tracking-tight mb-10">
+          <h2 className="font-['Bricolage_Grotesque'] text-4xl md:text-6xl lg:text-7xl text-foreground leading-[1.02] tracking-tight mb-10">
             Заберите <em className="italic text-[hsl(var(--warm))] font-light">систему</em><br />
             допуска
           </h2>

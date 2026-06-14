@@ -25,7 +25,7 @@ const cases = [
 ];
 
 const monoLabel: React.CSSProperties = {
-  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+  fontFamily: "'Martian Mono', ui-monospace, monospace",
   fontSize: 10,
   letterSpacing: '0.22em',
   textTransform: 'uppercase',
@@ -79,7 +79,7 @@ const RedesignProof = () => {
 
                 {/* Center: name + before/after */}
                 <div>
-                  <div className="text-foreground" style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: 24, lineHeight: 1.2 }}>
+                  <div className="text-foreground" style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif", fontSize: 24, lineHeight: 1.2 }}>
                     {item.name}
                   </div>
 
@@ -103,7 +103,7 @@ const RedesignProof = () => {
                 <div className="flex flex-col items-start md:items-end justify-between h-full text-right">
                   <p
                     style={{
-                      fontFamily: "'Fraunces', Georgia, serif",
+                      fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
                       fontStyle: 'italic',
                       fontSize: 19,
                       lineHeight: 1.3,
@@ -128,7 +128,7 @@ const RedesignProof = () => {
                   <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                 </div>
                 <div>
-                  <div className="text-foreground" style={{ fontFamily: "'Fraunces', Georgia, serif", fontSize: 19, lineHeight: 1.2 }}>
+                  <div className="text-foreground" style={{ fontFamily: "'Bricolage Grotesque', system-ui, sans-serif", fontSize: 19, lineHeight: 1.2 }}>
                     {item.name}
                   </div>
                   <div className="mt-3 space-y-2">
@@ -144,7 +144,7 @@ const RedesignProof = () => {
                   <p
                     className="mt-3"
                     style={{
-                      fontFamily: "'Fraunces', Georgia, serif",
+                      fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
                       fontStyle: 'italic',
                       fontSize: 15,
                       color: 'hsl(var(--warm))',

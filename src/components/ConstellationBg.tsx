@@ -17,6 +17,8 @@ const ConstellationBg = () => {
       phase: number;
     }[] = [];
     let w = 0, h = 0, animId = 0;
+    const mouse = { x: -9999, y: -9999, active: false };
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     function resize() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -81,23 +83,50 @@ const ConstellationBg = () => {
         }
       }
 
-      // dots with breathing pulse
+      // cursor links (lines only) + breathing dots, with highlight near cursor
       nodes.forEach(n => {
+        let near = 0;
+        if (mouse.active) {
+          const dx = mouse.x - n.x, dy = mouse.y - n.y;
+          const d = Math.sqrt(dx * dx + dy * dy);
+          const R = 190;
+          if (d < R) {
+            near = 1 - d / R;
+            ctx.strokeStyle = `oklch(0.82 0.10 75 / ${near * 0.45})`;
+            ctx.lineWidth = 0.9;
+            ctx.beginPath();
+            ctx.moveTo(n.x, n.y);
+            ctx.lineTo(mouse.x, mouse.y);
+            ctx.stroke();
+          }
+        }
         const pulse = 0.5 + 0.5 * Math.sin(t * 0.25 + n.phase);
-        const alpha = 0.05 + pulse * 0.05;
+        const alpha = 0.05 + pulse * 0.05 + near * 0.45;
         ctx.beginPath();
-        ctx.arc(n.x, n.y, n.r + pulse * 0.8, 0, Math.PI * 2);
+        ctx.arc(n.x, n.y, n.r + pulse * 0.8 + near * 1.4, 0, Math.PI * 2);
         ctx.fillStyle = n.warm
-          ? `oklch(0.78 0.09 70 / ${alpha})`
-          : `oklch(0.72 0.07 230 / ${alpha * 0.85})`;
+          ? `oklch(0.80 0.10 72 / ${alpha})`
+          : `oklch(0.74 0.07 230 / ${alpha * 0.85})`;
         ctx.fill();
       });
 
-      animId = requestAnimationFrame(draw);
+      if (!reduce && !document.hidden) animId = requestAnimationFrame(draw);
     }
 
     resize();
     initNodes();
+
+    const onMove = (e: PointerEvent) => { mouse.x = e.clientX; mouse.y = e.clientY; mouse.active = true; };
+    const onLeave = () => { mouse.active = false; };
+    const onVisible = () => {
+      cancelAnimationFrame(animId);
+      if (!reduce && !document.hidden) animId = requestAnimationFrame(draw);
+    };
+    if (!reduce) {
+      window.addEventListener('pointermove', onMove, { passive: true });
+      window.addEventListener('pointerleave', onLeave);
+      document.addEventListener('visibilitychange', onVisible);
+    }
 
     let lastW = window.innerWidth;
     let resizeTimer: number | undefined;
@@ -112,11 +141,15 @@ const ConstellationBg = () => {
       }, 200);
     };
     window.addEventListener('resize', onResize);
-    animId = requestAnimationFrame(draw);
+    if (reduce) draw(0);
+    else animId = requestAnimationFrame(draw);
 
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener('resize', onResize);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerleave', onLeave);
+      document.removeEventListener('visibilitychange', onVisible);
       window.clearTimeout(resizeTimer);
     };
   }, []);

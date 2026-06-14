@@ -1,7 +1,41 @@
 import { ArrowRight, MessageCircle } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
+import Magnetic from '@/components/Magnetic';
 import heroAuthorFallback from '@/assets/hero-author.jpg';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
+
+// Positioning offer with word-by-word cascade + drawn underline on the key phrase
+const OFFER_SEGMENTS: { text: string; cls?: string }[] = [
+  { text: 'Помогаю трейдерам заменить ' },
+  { text: 'хаос в решениях', cls: 'mute' },
+  { text: ' на ' },
+  { text: 'чёткий алгоритм', cls: 'gold' },
+  { text: ' — чтобы вход разрешала ' },
+  { text: 'система, а не эмоция', cls: 'gold uline' },
+  { text: '.' },
+];
+
+const OfferLine = () => {
+  let wordIndex = 0;
+  return (
+    <p className="offer-line mt-6 md:mt-7 text-xl md:text-2xl lg:text-[1.8rem] text-foreground/90">
+      {OFFER_SEGMENTS.map((seg, si) => {
+        const parts = seg.text.split(/(\s+)/);
+        return (
+          <span key={si} className={seg.cls}>
+            {parts.map((part, j) => {
+              if (part.trim() === '') return <span key={j}>{part}</span>;
+              const delay = (wordIndex++ * 0.06).toFixed(2);
+              return (
+                <span key={j} className="ow" style={{ animationDelay: `${delay}s` }}>{part}</span>
+              );
+            })}
+          </span>
+        );
+      })}
+    </p>
+  );
+};
 
 const HeroSection = () => {
   const heroAuthor = useSiteAsset(SITE_ASSET_KEYS.heroAuthor, heroAuthorFallback);
@@ -15,29 +49,27 @@ const HeroSection = () => {
             <h1 className="leading-tight text-foreground fade-in-up">
               Вы читаете <em>рынок.</em> <span className="mute">Но теряете на решениях.</span>
             </h1>
-            <div className="mt-4 md:mt-6 space-y-3 fade-in-up fade-in-up-delay-1">
-              <p className="text-base md:text-lg lg:text-xl text-foreground/90 leading-snug">
-                Структура есть. Анализ есть. <strong className="font-bold">В момент входа всё ломается</strong> — потому что решение принимает не система, а состояние.
-              </p>
-            </div>
-            
+            <OfferLine />
+
             {/* CTA */}
-            <div className="mt-8 md:mt-10 flex flex-col gap-3 fade-in-up fade-in-up-delay-2">
-              <a
-                href={TELEGRAM_LINKS.bot}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-primary group text-base md:text-lg"
-              >
-                Получить систему допуска
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </a>
+            <div className="mt-8 md:mt-10 flex flex-col items-start gap-3 fade-in-up fade-in-up-delay-2">
+              <Magnetic>
+                <a
+                  href={TELEGRAM_LINKS.bot}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-primary group text-base md:text-lg"
+                >
+                  Получить систему допуска
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </a>
+              </Magnetic>
               
               <a
                 href={TELEGRAM_LINKS.dm}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 px-5 py-3 text-sm text-muted-foreground font-medium rounded-lg border border-border/50 hover:text-foreground hover:border-border transition-all duration-200"
+                className="inline-flex items-center gap-2 text-sm text-muted-foreground font-medium hover:text-foreground transition-colors duration-200"
               >
                 <MessageCircle className="w-4 h-4" />
                 Написать Сергею

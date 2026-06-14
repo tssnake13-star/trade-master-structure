@@ -23,7 +23,7 @@ const RedesignAuthor = () => {
               />
             </div>
             <div className="mt-4 flex items-baseline justify-between border-t border-[hsl(var(--rule-soft))] pt-3">
-              <p className="font-['Fraunces'] text-xl text-foreground tracking-tight">Сергей Тё</p>
+              <p className="font-['Bricolage_Grotesque'] text-xl text-foreground tracking-tight">Сергей Тё</p>
               <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground font-mono">
                 FIG_05 · PORTRAIT
               </p>
@@ -54,15 +54,15 @@ const RedesignAuthor = () => {
             <div className="mt-10 grid grid-cols-3 gap-4 border-t border-[hsl(var(--rule-soft))] pt-6">
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground font-mono mb-1">Роль</p>
-                <p className="font-['Fraunces'] text-foreground">Архитектор</p>
+                <p className="font-['Bricolage_Grotesque'] text-foreground">Архитектор</p>
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground font-mono mb-1">Метод</p>
-                <p className="font-['Fraunces'] text-foreground">Структура</p>
+                <p className="font-['Bricolage_Grotesque'] text-foreground">Структура</p>
               </div>
               <div>
                 <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground font-mono mb-1">Принцип</p>
-                <p className="font-['Fraunces'] text-foreground italic">Допуск</p>
+                <p className="font-['Bricolage_Grotesque'] text-foreground italic">Допуск</p>
               </div>
             </div>
           </div>

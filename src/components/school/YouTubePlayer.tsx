@@ -378,7 +378,7 @@ export default function YouTubePlayer({ url, watermark }: Props) {
             </button>
 
             {/* Time */}
-            <span style={{ fontSize: '12px', color: '#fff', fontFamily: "'JetBrains Mono', monospace", whiteSpace: 'nowrap' }}>
+            <span style={{ fontSize: '12px', color: '#fff', fontFamily: "'Martian Mono', monospace", whiteSpace: 'nowrap' }}>
               {formatTime(currentTime)} / {formatTime(duration)}
             </span>
 
@@ -446,7 +446,7 @@ export default function YouTubePlayer({ url, watermark }: Props) {
                 style={{
                   background: 'none', border: '1px solid rgba(255,255,255,0.3)', borderRadius: '4px',
                   color: '#fff', fontSize: '11px', padding: '2px 6px', cursor: 'pointer',
-                  fontFamily: "'JetBrains Mono', monospace",
+                  fontFamily: "'Martian Mono', monospace",
                 }}
               >
                 {speed}x
@@ -464,7 +464,7 @@ export default function YouTubePlayer({ url, watermark }: Props) {
                         display: 'block', width: '100%', padding: '4px 12px', border: 'none',
                         background: s === speed ? 'rgba(255,255,255,0.15)' : 'none',
                         color: '#fff', fontSize: '12px', cursor: 'pointer', textAlign: 'left',
-                        fontFamily: "'JetBrains Mono', monospace",
+                        fontFamily: "'Martian Mono', monospace",
                       }}
                     >
                       {s}x

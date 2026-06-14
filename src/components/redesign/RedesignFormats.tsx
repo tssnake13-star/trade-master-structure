@@ -30,7 +30,7 @@ const RedesignFormats = () => {
             <div
               className="flex items-center justify-between mb-8"
               style={{
-                fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                fontFamily: "'Martian Mono', ui-monospace, monospace",
                 fontSize: 11,
                 letterSpacing: '0.22em',
                 textTransform: 'uppercase',
@@ -45,7 +45,7 @@ const RedesignFormats = () => {
             <p
               className="text-foreground"
               style={{
-                fontFamily: "'Fraunces', Georgia, serif",
+                fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
                 fontSize: 'clamp(22px, 2.4vw, 32px)',
                 lineHeight: 1.25,
                 fontWeight: 400,
@@ -59,7 +59,7 @@ const RedesignFormats = () => {
             <p
               className="mt-6 italic"
               style={{
-                fontFamily: "'Fraunces', Georgia, serif",
+                fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
                 color: 'hsl(var(--muted-foreground))',
                 fontSize: 17,
                 lineHeight: 1.5,
@@ -74,7 +74,7 @@ const RedesignFormats = () => {
             <div
               className="flex items-center justify-between mb-8"
               style={{
-                fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                fontFamily: "'Martian Mono', ui-monospace, monospace",
                 fontSize: 11,
                 letterSpacing: '0.22em',
                 textTransform: 'uppercase',
@@ -89,7 +89,7 @@ const RedesignFormats = () => {
             <p
               className="text-foreground"
               style={{
-                fontFamily: "'Fraunces', Georgia, serif",
+                fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
                 fontSize: 'clamp(22px, 2.4vw, 32px)',
                 lineHeight: 1.25,
                 fontWeight: 400,
@@ -102,7 +102,7 @@ const RedesignFormats = () => {
             <ul
               className="mt-8 space-y-0"
               style={{
-                fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                fontFamily: "'Martian Mono', ui-monospace, monospace",
                 fontSize: 11,
                 letterSpacing: '0.16em',
                 textTransform: 'uppercase',
@@ -145,7 +145,7 @@ const RedesignFormats = () => {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-3 group"
             style={{
-              fontFamily: "'Fraunces', Georgia, serif",
+              fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
               fontSize: 22,
               color: 'hsl(var(--foreground))',
               borderBottom: '1px solid hsl(var(--warm))',

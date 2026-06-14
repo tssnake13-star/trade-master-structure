@@ -1,6 +1,6 @@
 import { Plus, Trash2 } from 'lucide-react';
 
-const font = { mono: "'JetBrains Mono', monospace" };
+const font = { mono: "'Martian Mono', monospace" };
 const inputStyle: React.CSSProperties = { backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono };
 
 interface VideoItem {

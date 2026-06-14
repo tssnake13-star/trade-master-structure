@@ -46,7 +46,7 @@ const SideProgress = () => {
             href={`#${s.id}`}
             className="group flex items-center gap-3 text-[10px] uppercase tracking-[0.22em]"
             style={{
-              fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+              fontFamily: "'Martian Mono', ui-monospace, monospace",
               color: isActive ? 'hsl(var(--warm))' : 'hsl(var(--muted-foreground) / 0.45)',
               transition: 'color 0.4s ease',
             }}

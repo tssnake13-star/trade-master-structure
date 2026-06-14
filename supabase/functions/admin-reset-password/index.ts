@@ -58,6 +58,21 @@ Deno.serve(async (req) => {
     }
 
     const adminClient = createClient(supabaseUrl, serviceKey);
+
+    // Защита супер-админа: обычный админ не может сбросить пароль супер-админа.
+    // (Триггеры БД защищают роли/профиль/удаление, но смена пароля идёт через
+    // service-role в auth.users и их не затрагивает — поэтому проверяем здесь.)
+    const SUPER_ADMIN_EMAILS = ['tssnake13@gmail.com', 'tssnake@list.ru'];
+    const isSuperAdmin = (email?: string | null) =>
+      !!email && SUPER_ADMIN_EMAILS.includes(email.toLowerCase());
+    const { data: targetData } = await adminClient.auth.admin.getUserById(targetUserId);
+    if (isSuperAdmin(targetData?.user?.email) && !isSuperAdmin(userData.user.email)) {
+      return new Response(JSON.stringify({ error: 'Forbidden: cannot reset super admin password' }), {
+        status: 403,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const { error: updErr } = await adminClient.auth.admin.updateUserById(targetUserId, {
       password: newPassword,
     });

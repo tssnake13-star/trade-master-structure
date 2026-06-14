@@ -32,7 +32,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import ConstellationBg from '@/components/ConstellationBg';
 
-const font = { heading: "'Inter', sans-serif", mono: "'Inter', sans-serif" };
+const font = { heading: "'Hanken Grotesk', sans-serif", mono: "'Hanken Grotesk', sans-serif" };
 const tabStyle = (active: boolean) => ({
   fontFamily: font.mono,
   fontSize: '12px',
@@ -93,6 +93,7 @@ export default function SchoolAdmin() {
         <button style={tabStyle(tab === 'courses')} onClick={() => setTab('courses')}>Программы</button>
         <button style={tabStyle(tab === 'students')} onClick={() => setTab('students')}>Аккаунты</button>
         <button style={tabStyle(tab === 'invites')} onClick={() => setTab('invites')}>Инвайт-коды</button>
+        <button style={tabStyle(tab === 'access')} onClick={() => setTab('access')}>Доступы</button>
         <button style={tabStyle(tab === 'settings')} onClick={() => setTab('settings')}>Настройки</button>
       </div>
 
@@ -613,6 +614,7 @@ function CoursesTab() {
   };
 
   const deleteCourse = async (id: string) => {
+    if (!window.confirm('Удалить программу вместе со всеми её уроками? Это действие необратимо.')) return;
     await supabase.from('lessons').delete().eq('course_id', id);
     await supabase.from('courses').delete().eq('id', id);
     load();
@@ -654,6 +656,37 @@ function CoursesTab() {
         }))
       );
     }
+
+    // Новый урок (добавленный в конец) сразу открываем тем ученикам, у кого уже
+    // открыты все прежние уроки курса. Поэтапность для остальных сохраняется:
+    // тем, у кого открыта только часть уроков, новый урок не добавляем.
+    // unlocked_lessons хранит позиции уроков (1-й, 2-й, ...), поэтому новый
+    // урок в конце имеет позицию prevCount + 1.
+    try {
+      const prevCount = courseLessons.length;
+      const newPosition = prevCount + 1;
+      const { data: accessRows } = await supabase
+        .from('course_access')
+        .select('id, unlocked_lessons')
+        .eq('course_id', courseId);
+      // «Открыт весь курс» = реально открыты все позиции 1..prevCount (а не просто
+      // длина списка — иначе список с пропуском вроде [1,2,4] ошибочно считался бы полным).
+      const fullyUnlocked = (accessRows || []).filter(a => {
+        const u = a.unlocked_lessons || [];
+        for (let i = 1; i <= prevCount; i++) if (!u.includes(i)) return false;
+        return true;
+      });
+      await Promise.all(fullyUnlocked.map(a =>
+        supabase
+          .from('course_access')
+          .update({ unlocked_lessons: [...new Set([...(a.unlocked_lessons || []), newPosition])] })
+          .eq('id', a.id)
+      ));
+    } catch (e) {
+      // Не блокируем создание урока, если авто-открытие не удалось.
+      console.error('auto-unlock new lesson failed', e);
+    }
+
     setLessonForm({ title: '', description: '', sort_order: 0 });
     setLessonVideos([]);
     setShowAddLesson(null);
@@ -709,6 +742,7 @@ function CoursesTab() {
   };
 
   const deleteLesson = async (id: string) => {
+    if (!window.confirm('Удалить урок? Это действие необратимо.')) return;
     await supabase.from('lessons').delete().eq('id', id);
     load();
   };
@@ -775,10 +809,10 @@ function CoursesTab() {
                     </div>
                     <div className="flex items-center gap-1">
                       <button onClick={e => { e.stopPropagation(); startEdit(c); }} className="p-1 hover:opacity-70">
-                        <Pencil size={14} style={{ color: '#666' }} />
+                        <Pencil size={18} style={{ color: '#666' }} />
                       </button>
                       <button onClick={e => { e.stopPropagation(); deleteCourse(c.id); }} className="p-1 hover:opacity-70">
-                        <Trash2 size={14} style={{ color: '#666' }} />
+                        <Trash2 size={18} style={{ color: '#666' }} />
                       </button>
                     </div>
                   </div>
@@ -823,8 +857,8 @@ function CoursesTab() {
                               <div className="flex items-center justify-between text-xs py-1.5" style={{ fontFamily: font.mono, color: '#999' }}>
                                 <span>{l.sort_order + 1}. {l.title}</span>
                                 <div className="flex items-center gap-1">
-                                  <button onClick={() => startEditLesson(l)} className="hover:opacity-70"><Pencil size={12} style={{ color: '#444' }} /></button>
-                                  <button onClick={() => deleteLesson(l.id)} className="hover:opacity-70"><Trash2 size={12} style={{ color: '#444' }} /></button>
+                                  <button onClick={() => startEditLesson(l)} className="hover:opacity-70"><Pencil size={16} style={{ color: '#444' }} /></button>
+                                  <button onClick={() => deleteLesson(l.id)} className="hover:opacity-70"><Trash2 size={16} style={{ color: '#444' }} /></button>
                                 </div>
                               </div>
                               {editingLessonId === l.id && (
@@ -991,6 +1025,7 @@ function AccessTab() {
   const getCourse = (cid: string) => courses.find(c => c.id === cid)?.title || cid;
 
   const removeAccess = async (id: string) => {
+    if (!window.confirm('Отозвать доступ ученика к этому курсу?')) return;
     await supabase.from('course_access').delete().eq('id', id);
     setAccesses(prev => prev.filter(a => a.id !== id));
   };
@@ -1023,7 +1058,7 @@ function AccessTab() {
                 </td>
                 <td className="py-2.5">
                   <button onClick={() => removeAccess(a.id)} className="hover:opacity-70">
-                    <Trash2 size={12} style={{ color: '#666' }} />
+                    <Trash2 size={16} style={{ color: '#666' }} />
                   </button>
                 </td>
               </tr>
@@ -1120,6 +1155,7 @@ function InviteCodesTab() {
   };
 
   const deleteCode = async (id: string) => {
+    if (!window.confirm('Удалить инвайт-код?')) return;
     await supabase.from('invite_codes').delete().eq('id', id);
     setCodes(prev => prev.filter(c => c.id !== id));
   };
@@ -1195,7 +1231,7 @@ function InviteCodesTab() {
                     <span
                       onClick={() => copyCode(c.code, c.id)}
                       className="cursor-pointer hover:opacity-70 transition-opacity"
-                      style={{ color: '#e8e0d0', fontFamily: "'JetBrains Mono', monospace" }}
+                      style={{ color: '#e8e0d0', fontFamily: "'Martian Mono', monospace" }}
                     >
                       {c.code}
                       {copiedId === c.id && <span className="ml-2 text-[10px]" style={{ color: '#4a8a4a' }}>Скопировано</span>}
@@ -1210,7 +1246,7 @@ function InviteCodesTab() {
                   <td className="py-2.5 pr-4" style={{ color: '#666' }}>{getEmail(c.used_by)}</td>
                   <td className="py-2.5">
                     <button onClick={() => deleteCode(c.id)} className="hover:opacity-70">
-                      <Trash2 size={12} style={{ color: '#666' }} />
+                      <Trash2 size={16} style={{ color: '#666' }} />
                     </button>
                   </td>
                 </tr>

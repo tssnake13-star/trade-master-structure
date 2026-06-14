@@ -16,9 +16,9 @@ const ACCENT = '#caa472';
 const BG = '#080808';
 const FG = '#e8e0d0';
 const BORDER = '#1a1a1a';
-const MONO = "'JetBrains Mono', ui-monospace, monospace";
-const SANS = "'Inter', sans-serif";
-const DISPLAY = "'Fraunces', Georgia, serif";
+const MONO = "'Martian Mono', ui-monospace, monospace";
+const SANS = "'Hanken Grotesk', sans-serif";
+const DISPLAY = "'Bricolage Grotesque', system-ui, sans-serif";
 
 export default function SchoolCourse() {
   const { id } = useParams<{ id: string }>();
@@ -67,9 +67,11 @@ export default function SchoolCourse() {
   const isUnlocked = (index: number) => {
     const lesson = lessons[index];
     if (!lesson) return false;
-    if (completedIds.has(lesson.id)) return true;
     if (role === 'admin') return true;
-    if (isFree) return index === 0 || (lessons[index - 1] && completedIds.has(lessons[index - 1].id));
+    // Бесплатный курс — поэтапно по прохождению: 1-й урок и каждый следующий
+    // после завершения предыдущего (а уже пройденный остаётся открытым).
+    if (isFree) return index === 0 || completedIds.has(lesson.id) || (lessons[index - 1] && completedIds.has(lessons[index - 1].id));
+    // Платный курс — строго по списку открытых уроков (как на дашборде).
     return unlockedSortOrders.includes(index + 1);
   };
 

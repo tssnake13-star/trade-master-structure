@@ -1,4 +1,5 @@
 import useScrollAnimate from '@/hooks/useScrollAnimate';
+import ConstellationBg from '@/components/ConstellationBg';
 import Header from '@/components/landing/Header';
 import StickyHeader from '@/components/landing/StickyHeader';
 import SideNav from '@/components/landing/SideNav';
@@ -34,6 +35,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background landing-skin">
+      <ConstellationBg />
       <Header />
       <StickyHeader />
       <SideNav />

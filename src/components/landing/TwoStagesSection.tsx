@@ -17,7 +17,7 @@ const TwoStagesSection = () => {
           >
             <div
               className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground"
-              style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}
+              style={{ fontFamily: "'Martian Mono', ui-monospace, monospace" }}
             >
               01 · Обучение
             </div>
@@ -30,7 +30,7 @@ const TwoStagesSection = () => {
             </p>
             <div
               className="mt-8 text-[10px] uppercase tracking-[0.22em] text-muted-foreground"
-              style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}
+              style={{ fontFamily: "'Martian Mono', ui-monospace, monospace" }}
             >
               Вход открыт
             </div>
@@ -52,7 +52,7 @@ const TwoStagesSection = () => {
           >
             <div
               className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground"
-              style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}
+              style={{ fontFamily: "'Martian Mono', ui-monospace, monospace" }}
             >
               02 · Инфраструктура
             </div>
@@ -66,7 +66,7 @@ const TwoStagesSection = () => {
             <div
               className="mt-8 text-[10px] uppercase tracking-[0.22em]"
               style={{
-                fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                fontFamily: "'Martian Mono', ui-monospace, monospace",
                 color: 'hsl(var(--accent))',
               }}
             >
@@ -78,12 +78,12 @@ const TwoStagesSection = () => {
         <p
           className="mt-10 md:mt-14 text-center italic"
           style={{
-            fontFamily: "'Fraunces', 'Cormorant Garamond', Georgia, serif",
+            fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
             fontSize: '20px',
             color: 'hsl(var(--muted-foreground))',
           }}
         >
-          Школа учит думать как трейдер. Экосистема помогает работать как трейдер.
+          Школа научила вас принимать решения. Экосистема следит за тем, чтобы вы их не нарушали.
         </p>
       </div>
     </section>

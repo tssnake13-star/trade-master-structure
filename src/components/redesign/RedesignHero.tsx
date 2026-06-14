@@ -52,7 +52,7 @@ const RedesignHero = () => {
                   <em
                     className="ml-2 not-italic"
                     style={{
-                      fontFamily: "'Fraunces', Georgia, serif",
+                      fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
                       fontStyle: 'italic',
                       fontWeight: 400,
                     }}
@@ -91,7 +91,7 @@ const RedesignHero = () => {
         <div
           className="flex items-center justify-center gap-3 md:gap-6 flex-wrap text-center"
           style={{
-            fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+            fontFamily: "'Martian Mono', ui-monospace, monospace",
             fontSize: 10,
             letterSpacing: '0.22em',
             textTransform: 'uppercase',

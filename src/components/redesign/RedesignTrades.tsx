@@ -24,7 +24,7 @@ const trades = [
 ];
 
 const monoStyle: React.CSSProperties = {
-  fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+  fontFamily: "'Martian Mono', ui-monospace, monospace",
   fontSize: 10,
   letterSpacing: '0.22em',
   textTransform: 'uppercase',
@@ -96,7 +96,7 @@ const RedesignTrades = () => {
               </span>
               <span
                 style={{
-                  fontFamily: "'Fraunces', Georgia, serif",
+                  fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
                   fontStyle: 'italic',
                   fontSize: 22,
                   color: 'hsl(var(--foreground))',

@@ -12,7 +12,7 @@ const RedesignFooter = () => {
         <div className="grid md:grid-cols-12 gap-10 md:gap-14">
           {/* Wordmark */}
           <div className="md:col-span-5">
-            <p className="font-['Fraunces'] text-3xl md:text-4xl text-foreground tracking-tight">
+            <p className="font-['Bricolage_Grotesque'] text-3xl md:text-4xl text-foreground tracking-tight">
               TRADELIKETYO
             </p>
             <p className="mt-3 text-sm text-muted-foreground max-w-xs">

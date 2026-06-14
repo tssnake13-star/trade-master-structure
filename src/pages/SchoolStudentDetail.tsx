@@ -8,7 +8,7 @@ const SUPER_ADMIN_EMAILS = ['tssnake13@gmail.com', 'tssnake@list.ru'];
 const isSuperAdminEmail = (email?: string | null) =>
   !!email && SUPER_ADMIN_EMAILS.includes(email.toLowerCase());
 
-const font = { heading: "'Inter', sans-serif", mono: "'Inter', sans-serif" };
+const font = { heading: "'Hanken Grotesk', sans-serif", mono: "'Hanken Grotesk', sans-serif" };
 
 interface Profile { user_id: string; email: string; full_name: string | null; created_at: string; is_blocked: boolean; last_seen_at: string | null; }
 interface Course { id: string; title: string; subtitle: string | null; is_free: boolean; sort_order: number; }
@@ -115,10 +115,14 @@ export default function SchoolStudentDetail() {
   const unlockNext = async (access: Access) => {
     const courseLessons = lessons.filter(l => l.course_id === access.course_id);
     const current = access.unlocked_lessons || [1];
-    const maxUnlocked = Math.max(...current, 0);
-    const nextOrder = maxUnlocked + 1;
-    if (nextOrder > courseLessons.length) return;
-    await supabase.from('course_access').update({ unlocked_lessons: [...current, nextOrder] }).eq('id', access.id);
+    // Открываем наименьший ещё не открытый урок — заполняем пропуски, а не просто max+1,
+    // иначе урок в середине мог бы остаться навсегда закрытым.
+    let nextOrder = 0;
+    for (let i = 1; i <= courseLessons.length; i++) {
+      if (!current.includes(i)) { nextOrder = i; break; }
+    }
+    if (nextOrder === 0) return; // все уроки уже открыты
+    await supabase.from('course_access').update({ unlocked_lessons: [...new Set([...current, nextOrder])] }).eq('id', access.id);
     load();
   };
 

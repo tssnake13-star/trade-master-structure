@@ -1,8 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@300;400;500;600;700&family=Martian+Mono:wght@300;400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..600,30..100;1,9..144,300..600,30..100&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
 @layer base {
   :root {
@@ -94,7 +94,7 @@
   
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Hanken Grotesk', sans-serif;
   }
   
   html {
@@ -103,7 +103,7 @@
 
   /* Display headings on landing pick up Fraunces with italic accents */
   h1, h2 {
-    font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+    font-family: 'Bricolage Grotesque', system-ui, sans-serif;
     font-variation-settings: 'opsz' 144, 'SOFT' 30;
     letter-spacing: -0.02em;
     font-weight: 350;
@@ -130,7 +130,7 @@
 
 .landing-skin h1,
 .landing-skin h2 {
-  font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
   font-variation-settings: 'opsz' 144, 'SOFT' 60;
   font-weight: 400;
   letter-spacing: -0.02em;
@@ -151,13 +151,13 @@
   font-size: clamp(36px, 5vw, 68px) !important;
   line-height: 1.05 !important;
   font-weight: 400 !important;
-  font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif !important;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif !important;
   letter-spacing: -0.02em !important;
   text-transform: none !important;
 }
 
 .landing-skin h3 {
-  font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
   font-weight: 400;
   font-size: clamp(22px, 2.4vw, 34px);
   line-height: 1.15;
@@ -168,14 +168,14 @@
   font-size: clamp(40px, 6vw, 96px) !important;
   line-height: 0.96 !important;
   font-weight: 400 !important;
-  font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif !important;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif !important;
   letter-spacing: -0.025em !important;
 }
 
 .landing-skin h1 em,
 .landing-skin h2 em,
 .landing-skin h3 em {
-  font-family: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
   font-style: italic;
   font-weight: 400;
   font-variation-settings: 'opsz' 144, 'SOFT' 100;
@@ -189,7 +189,7 @@
 }
 
 .landing-skin .section-label {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: 'Martian Mono', ui-monospace, monospace;
   font-size: 11px;
   font-weight: 500;
   text-transform: uppercase;
@@ -206,7 +206,7 @@
 }
 
 .landing-skin .stat-number {
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
   font-weight: 300;
   font-size: clamp(48px, 6vw, 96px);
   line-height: 1;
@@ -215,7 +215,7 @@
 }
 
 .landing-skin .stat-label {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: 'Martian Mono', ui-monospace, monospace;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.16em;
@@ -225,7 +225,7 @@
 
 /* Header nav links: small uppercase mono */
 .landing-skin header nav a {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: 'Martian Mono', ui-monospace, monospace;
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.16em;
@@ -233,7 +233,7 @@
 
 /* Lede paragraph helper (optional class) */
 .landing-skin .lede {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Hanken Grotesk', sans-serif;
   font-size: clamp(17px, 1.4vw, 20px);
   line-height: 1.55;
   opacity: 0.78;
@@ -270,7 +270,7 @@
   }
   
   .text-mono {
-    font-family: 'JetBrains Mono', monospace;
+    font-family: 'Martian Mono', monospace;
     @apply text-sm tracking-wide;
   }
   
@@ -340,6 +340,35 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Hero offer line — word cascade + drawn underline */
+.landing-skin .offer-line {
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
+  font-weight: 400;
+  letter-spacing: -0.015em;
+  line-height: 1.34;
+}
+.landing-skin .offer-line .gold { color: hsl(36 29% 46%); }
+.landing-skin .offer-line .ow {
+  display: inline-block;
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+.landing-skin .offer-line .uline {
+  background-image: linear-gradient(hsl(36 29% 46%), hsl(36 29% 46%));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 2px;
+  padding-bottom: 2px;
+  animation: offerUnderline 0.7s ease 0.85s forwards;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+@keyframes offerUnderline { to { background-size: 100% 2px; } }
+@media (prefers-reduced-motion: reduce) {
+  .landing-skin .offer-line .ow { animation: none; opacity: 1; }
+  .landing-skin .offer-line .uline { animation: none; background-size: 100% 2px; }
 }
 
 @keyframes ctaGlow {
@@ -419,7 +448,7 @@
    ===================================================== */
 
 .landing-skin .kicker {
-  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-family: 'Martian Mono', ui-monospace, monospace;
   font-size: 11px;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -442,7 +471,7 @@
 }
 
 .wordmark {
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
   font-size: clamp(80px, 18vw, 280px);
   line-height: 0.9;
   font-weight: 320;
@@ -459,7 +488,7 @@
 }
 
 .drop-cap::first-letter {
-  font-family: 'Fraunces', Georgia, serif;
+  font-family: 'Bricolage Grotesque', system-ui, sans-serif;
   font-size: 86px;
   line-height: 0.85;
   float: left;

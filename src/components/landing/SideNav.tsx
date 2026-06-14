@@ -56,7 +56,7 @@ const SideNav = () => {
     <nav
       aria-label="Навигация по разделам"
       className="hidden xl:flex fixed left-8 top-1/2 -translate-y-1/2 z-40 flex-col gap-2.5"
-      style={{ fontFamily: "'JetBrains Mono', ui-monospace, monospace" }}
+      style={{ fontFamily: "'Martian Mono', ui-monospace, monospace" }}
     >
       {sections.map((s) => {
         const isActive = s.id === active;

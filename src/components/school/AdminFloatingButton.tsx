@@ -36,7 +36,7 @@ export default function AdminFloatingButton() {
         boxShadow: '0 4px 12px rgba(0,0,0,0.5)',
       }}
     >
-      <Settings size={18} />
+      <Settings size={22} />
     </button>
   );
 }

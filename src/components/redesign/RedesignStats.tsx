@@ -54,7 +54,7 @@ const StatItem = ({
       <div
         className="text-foreground"
         style={{
-          fontFamily: "'Fraunces', Georgia, serif",
+          fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
           fontWeight: 320,
           fontSize: 'clamp(48px, 5.5vw, 80px)',
           lineHeight: 1,
@@ -75,7 +75,7 @@ const StatItem = ({
       <div
         className="mt-3"
         style={{
-          fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+          fontFamily: "'Martian Mono', ui-monospace, monospace",
           fontSize: 11,
           textTransform: 'uppercase',
           letterSpacing: '0.16em',

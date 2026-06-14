@@ -297,7 +297,7 @@ const ArchitectureSVG = () => {
         x={cx}
         y={cy - outerRy - 18}
         textAnchor="middle"
-        fontFamily="'JetBrains Mono', ui-monospace, monospace"
+        fontFamily="'Martian Mono', ui-monospace, monospace"
         fontSize="22"
         letterSpacing="6"
         fill="hsl(var(--cool))"
@@ -321,7 +321,7 @@ const ArchitectureSVG = () => {
         x={cx + innerRx + 14}
         y={cy - innerRy + 18}
         textAnchor="start"
-        fontFamily="'JetBrains Mono', ui-monospace, monospace"
+        fontFamily="'Martian Mono', ui-monospace, monospace"
         fontSize="18"
         letterSpacing="5"
         fill="hsl(var(--warm))"
@@ -359,7 +359,7 @@ const ArchitectureSVG = () => {
           x={cx}
           y={cy - 18}
           textAnchor="middle"
-          fontFamily="'Fraunces', Georgia, serif"
+          fontFamily="'Bricolage Grotesque', system-ui, sans-serif"
           fontSize="38"
           fontStyle="italic"
           fill="hsl(var(--warm))"
@@ -370,7 +370,7 @@ const ArchitectureSVG = () => {
           x={cx}
           y={cy + 10}
           textAnchor="middle"
-          fontFamily="'JetBrains Mono', ui-monospace, monospace"
+          fontFamily="'Martian Mono', ui-monospace, monospace"
           fontSize="11"
           letterSpacing="3"
           fill="hsl(var(--foreground))"
@@ -382,7 +382,7 @@ const ArchitectureSVG = () => {
           x={cx}
           y={cy + 32}
           textAnchor="middle"
-          fontFamily="'JetBrains Mono', ui-monospace, monospace"
+          fontFamily="'Martian Mono', ui-monospace, monospace"
           fontSize="10"
           letterSpacing="3"
           fill="hsl(var(--muted-foreground))"
@@ -407,7 +407,7 @@ const ArchitectureSVG = () => {
             x={n.x}
             y={n.y - 4}
             textAnchor="middle"
-            fontFamily="'Fraunces', Georgia, serif"
+            fontFamily="'Bricolage Grotesque', system-ui, sans-serif"
             fontSize="22"
             fill="hsl(var(--cool))"
           >
@@ -417,7 +417,7 @@ const ArchitectureSVG = () => {
             x={n.x}
             y={n.y + 16}
             textAnchor="middle"
-            fontFamily="'JetBrains Mono', ui-monospace, monospace"
+            fontFamily="'Martian Mono', ui-monospace, monospace"
             fontSize="9"
             letterSpacing="2.5"
             fill="hsl(var(--muted-foreground))"
@@ -449,7 +449,7 @@ const ArchitectureSVG = () => {
             <text
               x={x + 16}
               y={y + 28}
-              fontFamily="'JetBrains Mono', ui-monospace, monospace"
+              fontFamily="'Martian Mono', ui-monospace, monospace"
               fontSize="11"
               letterSpacing="3"
               fill="hsl(var(--cool))"
@@ -462,7 +462,7 @@ const ArchitectureSVG = () => {
             <text
               x={x + 16}
               y={y + 54}
-              fontFamily="'Fraunces', Georgia, serif"
+              fontFamily="'Bricolage Grotesque', system-ui, sans-serif"
               fontSize="18"
               fill="hsl(var(--muted-foreground))"
               opacity="0.85"

@@ -63,7 +63,7 @@ export default function FloatingWatermark({ email, fullName }: Props) {
         opacity: 0.35,
         color: '#fff',
         fontSize: '21px',
-        fontFamily: "'JetBrains Mono', monospace",
+        fontFamily: "'Martian Mono', monospace",
         whiteSpace: 'nowrap',
         pointerEvents: 'none',
         zIndex: 15,

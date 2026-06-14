@@ -4,7 +4,7 @@
    scoped to elements under [data-school-skin].
    ===================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..600,30..100;1,9..144,300..600,30..100&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@300;400;500;600;700&family=Martian+Mono:wght@300;400;500&display=swap');
 
 [data-school-skin] {
   /* Mapped to landing tokens (src/index.css) for full palette parity */
@@ -35,9 +35,9 @@
   --tly-danger:    hsl(var(--destructive));
 
   /* Type */
-  --tly-font-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
-  --tly-font-sans:    'Inter', system-ui, -apple-system, sans-serif;
-  --tly-font-mono:    'JetBrains Mono', ui-monospace, monospace;
+  --tly-font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --tly-font-sans:    'Hanken Grotesk', system-ui, -apple-system, sans-serif;
+  --tly-font-mono:    'Martian Mono', ui-monospace, monospace;
 
   --tly-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
@@ -253,6 +253,26 @@
   0%   { box-shadow: oklch(0.82 0.09 78 / 0.4) 0 0 0 0; }
   70%  { box-shadow: oklch(0.82 0.09 78 / 0)   0 0 0 12px; }
   100% { box-shadow: oklch(0.82 0.09 78 / 0)   0 0 0 0; }
+}
+
+/* Section reveal on mount */
+@keyframes tlyRise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: none; }
+}
+.tly-rise { animation: tlyRise 0.6s ease-out both; }
+
+/* Skeleton shimmer for loading states */
+@keyframes tlySkeleton { 100% { background-position: 200% 0; } }
+.tly-skel {
+  background: linear-gradient(90deg, #141310 25%, #1c1a16 37%, #141310 63%);
+  background-size: 200% 100%;
+  animation: tlySkeleton 1.4s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tly-rise, .tly-skel, .tly-pulse { animation: none; }
+  .tly-skel { background: #16140f; }
 }
 
 .tly-display {

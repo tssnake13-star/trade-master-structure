@@ -28,9 +28,9 @@ const ACCENT = '#caa472';
 const BG = '#080808';
 const FG = '#e8e0d0';
 const BORDER = '#1a1a1a';
-const MONO = "'JetBrains Mono', ui-monospace, monospace";
-const SANS = "'Inter', sans-serif";
-const DISPLAY = "'Fraunces', Georgia, serif";
+const MONO = "'Martian Mono', ui-monospace, monospace";
+const SANS = "'Hanken Grotesk', sans-serif";
+const DISPLAY = "'Bricolage Grotesque', system-ui, sans-serif";
 
 function isYouTubeUrl(val: string): boolean { return /youtube\.com|youtu\.be/i.test(val); }
 function extractSrcFromIframe(html: string): string | null {
@@ -243,6 +243,24 @@ export default function SchoolLesson() {
                 <div style={{ border: `1px solid ${BORDER}`, borderRadius: 8, overflow: 'hidden', backgroundColor: '#000' }}>
                   {renderPlayer(v.video_url, watermark)}
                 </div>
+                {v.video_url_alt && (
+                  <a
+                    href={v.video_url_alt}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-block',
+                      marginTop: 10,
+                      fontFamily: MONO,
+                      fontSize: 11,
+                      letterSpacing: '0.1em',
+                      color: ACCENT,
+                      textDecoration: 'underline',
+                    }}
+                  >
+                    Видео не открывается? Смотреть на RuTube / Дзен →
+                  </a>
+                )}
               </div>
             ))}
           </div>

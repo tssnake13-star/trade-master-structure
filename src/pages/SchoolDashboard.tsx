@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -34,13 +34,76 @@ interface CompletionRecord {
 }
 
 const ACCENT = '#caa472';
+const COOL = '#8aa6d6'; // холодный акцент — для «системных»/статусных состояний
 const BG = '#080808';
 const FG = '#e8e0d0';
 const CARD = '#111111';
 const BORDER = '#1a1a1a';
-const MONO = "'JetBrains Mono', ui-monospace, monospace";
-const SANS = "'Inter', sans-serif";
-const DISPLAY = "'Fraunces', Georgia, serif";
+const MONO = "'Martian Mono', ui-monospace, monospace";
+const SANS = "'Hanken Grotesk', sans-serif";
+const DISPLAY = "'Bricolage Grotesque', system-ui, sans-serif";
+
+// Premium glass surface for cards (correct for dark theme).
+// NB: no backdrop-filter — the dashboard re-renders every second (live timers),
+// and blur recomputation on each repaint causes flicker. A translucent fill over
+// the near-black background gives the same lifted "glass" look without the cost.
+const GLASS: CSSProperties = {
+  backgroundColor: 'rgba(255,255,255,0.045)',
+  border: '0.5px solid rgba(255,255,255,0.10)',
+  borderRadius: 14,
+};
+
+// Radial progress ring for course completion %, with count-up on mount
+function ProgressRing({ pct, label }: { pct: number; label: string }) {
+  const r = 40;
+  const c = 2 * Math.PI * r;
+  const target = Math.max(0, Math.min(100, Math.round(pct)));
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { setVal(target); return; }
+    let raf = 0, start = 0;
+    const dur = 900;
+    const step = (t: number) => {
+      if (!start) start = t;
+      const p = Math.min(1, (t - start) / dur);
+      setVal(Math.round(target * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [target]);
+  const offset = c * (1 - val / 100);
+  return (
+    <div className="p-5 sm:p-6 flex flex-col items-center justify-center" style={GLASS}>
+      <svg width={108} height={108} viewBox="0 0 108 108">
+        <circle cx={54} cy={54} r={r} fill="none" stroke="#26221b" strokeWidth={8} />
+        <circle cx={54} cy={54} r={r} fill="none" stroke={ACCENT} strokeWidth={8} strokeLinecap="round" strokeDasharray={c} strokeDashoffset={offset} transform="rotate(-90 54 54)" />
+        <text x={54} y={60} textAnchor="middle" fill={FG} fontSize={22} fontFamily={MONO} style={{ fontVariantNumeric: 'tabular-nums' }}>{val}%</text>
+      </svg>
+      <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#8a857c', marginTop: 10 }}>{label}</div>
+    </div>
+  );
+}
+
+// Skeleton loading screen for the dashboard (replaces the bare "Загрузка" text)
+function DashSkeleton() {
+  return (
+    <div data-school-skin className="min-h-screen" style={{ backgroundColor: BG, color: FG }}>
+      <ConstellationBg />
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
+        <div className="tly-skel" style={{ height: 40, width: '60%', borderRadius: 8, marginBottom: 14 }} />
+        <div className="tly-skel" style={{ height: 16, width: '40%', borderRadius: 6, marginBottom: 28 }} />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-3">
+          <div className="tly-skel lg:col-span-2" style={{ height: 150, borderRadius: 14 }} />
+          <div className="tly-skel" style={{ height: 150, borderRadius: 14 }} />
+        </div>
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          {[0, 1, 2, 3].map(i => <div key={i} className="tly-skel" style={{ height: 96, borderRadius: 14 }} />)}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // Hero title with *italic accent* / ~muted~ markup
 function renderHeroTitle(text: string) {
@@ -212,7 +275,19 @@ export default function SchoolDashboard() {
       }
 
       const courseList = (coursesRes.data || []) as Course[];
-      const accessData = (accessRes.data || []) as { course_id: string; unlocked_lessons: number[]; granted_at: string; expires_at: string | null }[];
+      const allAccessData = (accessRes.data || []) as { course_id: string; unlocked_lessons: number[]; granted_at: string; expires_at: string | null }[];
+      // После завершения срока обучения доступ к курсу гаснет: просроченная строка
+      // course_access считается неактивной, и курс снова выглядит заблокированным —
+      // как у только что зарегистрировавшегося пользователя. Срок = expires_at,
+      // либо granted_at + 90 дней (то же правило, что и в обратном отсчёте).
+      // Прогресс (lesson_progress) хранится отдельно и здесь не затрагивается.
+      const nowMs = Date.now();
+      const accessData = allAccessData.filter(a => {
+        const endMs = a.expires_at
+          ? new Date(a.expires_at).getTime()
+          : (a.granted_at ? new Date(a.granted_at).getTime() + 90 * 86400000 : null);
+        return endMs === null || endMs > nowMs;
+      });
       const accessSet = new Set(accessData.map(a => a.course_id));
       const aMap = new Map(accessData.map(a => [a.course_id, { courseId: a.course_id, unlocked: a.unlocked_lessons || [1], granted_at: a.granted_at, expires_at: a.expires_at }]));
       const lessons = (lessonsRes.data || []) as Lesson[];
@@ -264,12 +339,7 @@ export default function SchoolDashboard() {
   }, [authLoading, user, role, location.state]);
 
   if (authLoading || loading) {
-    return (
-      <div data-school-skin className="min-h-screen flex items-center justify-center" style={{ backgroundColor: BG, color: FG }}>
-        <ConstellationBg />
-        <p style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#666' }}>{t('loading_label')}</p>
-      </div>
-    );
+    return <DashSkeleton />;
   }
 
   const hasAccess = (c: Course) => role === 'admin' || c.is_free || accessMap.has(c.id);
@@ -446,13 +516,13 @@ export default function SchoolDashboard() {
               <div className="truncate" style={{ fontFamily: SANS, fontSize: 12, color: FG }}>
                 {profileName || profileEmail || t('sidebar_default_name')}
               </div>
-              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666', marginTop: 2 }}>
+              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: isFreeUser ? '#666' : COOL, marginTop: 2 }}>
                 {isFreeUser ? t('sidebar_status_intro') : t('sidebar_status_active')}
               </div>
             </div>
             {role === 'admin' && (
               <button onClick={() => navigate('/school/admin')} className="p-1.5 hover:bg-white/5 rounded transition" title="Админ">
-                <Settings size={18} style={{ color: '#666' }} />
+                <Settings size={22} style={{ color: '#666' }} />
               </button>
             )}
           </div>
@@ -769,7 +839,7 @@ function PaidHome({
   return (
     <>
       {/* Hero */}
-      <div className="mb-12">
+      <div className="mb-12 tly-rise">
         <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 14 }}>
           {t('paid_hero_eyebrow')}
         </div>
@@ -794,12 +864,12 @@ function PaidHome({
         </p>
       </div>
 
-      {/* Continue card (на всю ширину, выше всех) */}
-      <div className="mb-10">
+      {/* Continue card + progress ring (bento) */}
+      <div className="mb-10 grid grid-cols-1 lg:grid-cols-3 gap-3">
         <button
           onClick={() => tmNextLesson && onOpenLesson(tmNextLesson.id)}
           disabled={!tmNextLesson}
-          className="w-full text-left p-7 transition-all hover:border-[#2a2a2a] group relative overflow-hidden"
+          className="lg:col-span-2 w-full h-full text-left p-7 transition-all hover:border-[#2a2a2a] group relative overflow-hidden"
           style={{
             border: `1px solid ${BORDER}`,
             backgroundColor: CARD,
@@ -849,10 +919,11 @@ function PaidHome({
             </div>
           )}
         </button>
+        <ProgressRing pct={tmPct} label={t('kpi_completed_primary')} />
       </div>
 
       {/* KPI strip */}
-      <div className="mb-10 grid grid-cols-2 lg:grid-cols-4 gap-px" style={{ backgroundColor: BORDER, border: `1px solid ${BORDER}` }}>
+      <div className="mb-10 grid grid-cols-2 lg:grid-cols-4 gap-3">
         <KpiCell
           label={t('kpi_days_label')}
           value={
@@ -1011,7 +1082,7 @@ function FreeHome({
   return (
     <>
       {/* Hero */}
-      <div className="mb-12">
+      <div className="mb-12 tly-rise">
         <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(38px, 5.5vw, 64px)', lineHeight: 1.02, letterSpacing: '-0.025em', color: FG }}>
           {renderHeroTitle(t('free_hero_title'))}
         </h1>
@@ -1186,7 +1257,7 @@ function FreeHome({
 // ====================================================================
 function KpiCell({ label, value, accent, pulse, mono, valueSize, hint }: { label: string; value: string; accent?: boolean; pulse?: boolean; mono?: boolean; valueSize?: number; hint?: string }) {
   return (
-    <div className="p-5 sm:p-6" style={{ backgroundColor: BG }}>
+    <div className="p-5 sm:p-6" style={{ ...GLASS, ...(accent ? { borderColor: 'rgba(202,164,114,0.28)' } : null) }}>
       <div className="flex items-center gap-2 mb-3">
         {pulse && <span style={{ width: 5, height: 5, borderRadius: '50%', backgroundColor: ACCENT, animation: 'tlyPulse 2.4s ease-out infinite' }} />}
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555' }}>
@@ -1221,16 +1292,8 @@ function KpiCell({ label, value, accent, pulse, mono, valueSize, hint }: { label
   );
 }
 
-function KpiCellDual({
-  label,
-  primary,
-  secondary,
-}: {
-  label: string;
-  primary: { caption: string; value: string; pct: number };
-  secondary: { caption: string; value: string; pct: number };
-}) {
-  const Row = ({ caption, value, pct }: { caption: string; value: string; pct: number }) => (
+function KpiCellDualRow({ caption, value, pct }: { caption: string; value: string; pct: number }) {
+  return (
     <div>
       <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666', marginBottom: 4 }}>
         {caption}
@@ -1245,16 +1308,27 @@ function KpiCellDual({
       </div>
     </div>
   );
+}
+
+function KpiCellDual({
+  label,
+  primary,
+  secondary,
+}: {
+  label: string;
+  primary: { caption: string; value: string; pct: number };
+  secondary: { caption: string; value: string; pct: number };
+}) {
   return (
-    <div className="p-5 sm:p-6" style={{ backgroundColor: BG }}>
+    <div className="p-5 sm:p-6" style={GLASS}>
       <div className="flex items-center gap-2 mb-3">
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555' }}>
           {label}
         </div>
       </div>
       <div className="space-y-3">
-        <Row {...primary} />
-        <Row {...secondary} />
+        <KpiCellDualRow {...primary} />
+        <KpiCellDualRow {...secondary} />
       </div>
     </div>
   );
