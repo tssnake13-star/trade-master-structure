@@ -4,28 +4,23 @@ import Header from '@/components/landing/Header';
 import StickyHeader from '@/components/landing/StickyHeader';
 import SideNav from '@/components/landing/SideNav';
 import HeroSection from '@/components/landing/HeroSection';
-import StatsCounter from '@/components/landing/StatsCounter';
 import InstrumentTicker from '@/components/landing/InstrumentTicker';
+import StatsCounter from '@/components/landing/StatsCounter';
 import TwoStagesSection from '@/components/landing/TwoStagesSection';
-import NotBeginnersSection from '@/components/landing/NotBeginnersSection';
-import WhyCoursesFailSection from '@/components/landing/WhyCoursesFailSection';
-import DecisionProcessSection from '@/components/landing/DecisionProcessSection';
-
-
-import ProblemSection from '@/components/landing/ProblemSection';
-import WhatGoesWrongSection from '@/components/landing/WhatGoesWrongSection';
+import CoreProblemSection from '@/components/landing/CoreProblemSection';
 import StructureDiagram from '@/components/landing/StructureDiagram';
+import IncludedSection from '@/components/landing/IncludedSection';
 import TradingSystemSection from '@/components/landing/TradingSystemSection';
-
+import CapitalProtectionSection from '@/components/landing/CapitalProtectionSection';
+import SystemStatsSection from '@/components/landing/SystemStatsSection';
 import ProofSection from '@/components/landing/ProofSection';
 import TradesSection from '@/components/landing/TradesSection';
+import WorkWeekSection from '@/components/landing/WorkWeekSection';
 import StagesSection from '@/components/landing/StagesSection';
-
-import ResultsSection from '@/components/landing/ResultsSection';
 import FitSection from '@/components/landing/FitSection';
-import FormatsSection from '@/components/landing/FormatsSection';
+import LevelsSection from '@/components/landing/LevelsSection';
 import AuthorSection from '@/components/landing/AuthorSection';
-
+import PrincipleSection from '@/components/landing/PrincipleSection';
 import DualCTASection from '@/components/landing/DualCTASection';
 import LogoSection from '@/components/landing/LogoSection';
 import Footer from '@/components/landing/Footer';
@@ -40,34 +35,41 @@ const Index = () => {
       <StickyHeader />
       <SideNav />
       <main>
+        {/* Внимание */}
         <HeroSection />
         <InstrumentTicker />
         <StatsCounter />
         <TwoStagesSection />
-        <NotBeginnersSection />
-        <WhyCoursesFailSection />
-        <DecisionProcessSection />
-        
-        
-        <ProblemSection />
-        <WhatGoesWrongSection />
+
+        {/* Боль */}
+        <CoreProblemSection />
+
+        {/* Решение */}
         <StructureDiagram />
+        <IncludedSection />
         <TradingSystemSection />
 
+        {/* Доверие / доказательства */}
+        <CapitalProtectionSection />
+        <SystemStatsSection />
         <ProofSection />
         <TradesSection />
+
+        {/* Образ жизни */}
+        <WorkWeekSection />
+
+        {/* Путь и фильтр */}
         <StagesSection />
-        
-        <ResultsSection />
         <FitSection />
-        <FormatsSection />
+
+        {/* Оффер и действие */}
+        <LevelsSection />
         <AuthorSection />
-        
+        <PrincipleSection />
         <DualCTASection />
         <LogoSection />
       </main>
       <Footer />
-      
     </div>
   );
 };

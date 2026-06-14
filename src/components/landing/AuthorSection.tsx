@@ -45,7 +45,16 @@ const AuthorSection = () => {
                   Где вы перестаёте действовать на ощущениях
                 </p>
               </div>
-              
+
+              <div className="flex flex-wrap gap-x-6 gap-y-2 mb-3">
+                {['14 лет в рынке', 'Практикующий трейдер', 'Не сигнальщик, не инфобизнесмен'].map((s) => (
+                  <span key={s} className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--accent))' }}>{s}</span>
+                ))}
+              </div>
+              <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                Торгует по той же системе, которой обучает.
+              </p>
+
             </div>
           </div>
         </div>

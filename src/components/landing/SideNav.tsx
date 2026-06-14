@@ -2,18 +2,18 @@ import { useEffect, useState } from 'react';
 
 const sections = [
   { id: 'hero', num: '00', label: 'Главная' },
-  { id: 'experience', num: '01', label: 'Опыт' },
-  { id: 'learning', num: '02', label: 'Обучение' },
-  { id: 'rules', num: '03', label: 'Правила' },
-  { id: 'errors', num: '04', label: 'Ошибки' },
-  { id: 'what-goes-wrong', num: '05', label: 'Фаза' },
-  { id: 'trading-system', num: '06', label: 'Архитектура' },
-  { id: 'proof', num: '07', label: 'Доказательства' },
+  { id: 'problem', num: '01', label: 'Проблема' },
+  { id: 'algorithm', num: '02', label: 'Решение' },
+  { id: 'included', num: '03', label: 'Что входит' },
+  { id: 'trading-system', num: '04', label: 'Архитектура' },
+  { id: 'protection', num: '05', label: 'Защита' },
+  { id: 'stats', num: '06', label: 'Результаты' },
+  { id: 'proof', num: '07', label: 'Отзывы' },
   { id: 'trades', num: '08', label: 'Сделки' },
-  { id: 'stages', num: '09', label: 'Путь' },
-  { id: 'results', num: '10', label: 'Результат' },
+  { id: 'week', num: '09', label: 'Неделя' },
+  { id: 'stages', num: '10', label: 'Путь' },
   { id: 'filter', num: '11', label: 'Фильтр' },
-  { id: 'formats', num: '12', label: 'Сотрудничество' },
+  { id: 'formats', num: '12', label: 'Уровни' },
   { id: 'author', num: '13', label: 'Автор' },
 ];
 
