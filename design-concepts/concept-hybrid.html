@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Гибрид Institutional × Quant — превью</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#f5f1e8; --surface:#fbf8f1; --ink:#1a1712; --muted:#6b6256; --faint:#9a8f78;
+    --line:#e6dfce; --green:#2f5d3e; --green2:#3c7350; --up:#2f5d3e; --dn:#a23b34;
+    --serif:'Newsreader',Georgia,serif; --sans:'Inter',sans-serif; --mono:'IBM Plex Mono',monospace;
+  }
+  *{margin:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 32px}
+  .mono{font-family:var(--mono)}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint)}
+  h1,h2,h3{font-family:var(--serif);font-weight:400;letter-spacing:-.01em}
+  h1{font-size:clamp(40px,6vw,76px);line-height:1.02}
+  h2{font-size:clamp(30px,4vw,50px);line-height:1.06}
+  em{font-style:italic;color:var(--green)}
+  .sec{padding:72px 0;border-top:1px solid var(--line)}
+  .sub{color:var(--muted);font-size:17px;max-width:54ch}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:500;border:1px solid var(--ink);color:var(--ink);padding:13px 24px;border-radius:999px;text-decoration:none;transition:.2s}
+  .btn:hover{background:var(--ink);color:var(--bg)}
+  .btn-g{border-color:var(--green);background:var(--green);color:#fff}
+  .btn-g:hover{background:var(--green2);color:#fff}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px}
+  .kn{font-family:var(--mono);font-size:40px;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  .kl{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint);margin-top:8px}
+  .ring{transform:rotate(-90deg)}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  @media(max-width:820px){.grid3,.grid4{grid-template-columns:1fr 1fr}}
+
+  /* nav */
+  nav.top{position:sticky;top:0;z-index:10;background:rgba(245,241,232,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  nav.top .row{display:flex;align-items:center;justify-content:space-between;height:70px}
+  nav.top .links{display:flex;gap:26px;font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+  .brand{font-family:var(--serif);font-size:22px}
+
+  /* hero */
+  .hero{padding:72px 0 64px}
+  .ticker{font-family:var(--mono);font-size:12px;color:var(--muted);display:flex;gap:22px;flex-wrap:wrap;margin-top:26px;padding-top:18px;border-top:1px solid var(--line)}
+  .ticker .u{color:var(--up)} .ticker .d{color:var(--dn)}
+
+  .lbl{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--green)}
+  .pill{display:inline-block;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--green);background:var(--green-soft,#eef3ee);border:1px solid #d4e2d6;border-radius:999px;padding:5px 12px}
+  .li{display:flex;gap:10px;color:var(--muted);padding:6px 0}
+  .li::before{content:"—";color:var(--green)}
+  .cabinet{background:#efe9dc}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="top"><div class="wrap row">
+  <span class="brand">TRADE<span style="font-style:italic">LIKE</span>TYO</span>
+  <span class="links"><span>Как работает</span><span>Результаты</span><span>Отзывы</span><span>Уровни</span><span>Автор</span></span>
+  <a class="btn btn-g" href="#" style="padding:9px 18px;font-size:13px">Получить доступ</a>
+</div></nav>
+
+<!-- HERO -->
+<header class="wrap hero">
+  <div class="eyebrow">TLT · Structural Trading · Admission System</div>
+  <h1 style="margin-top:18px;max-width:15ch">Вы читаете рынок. Но теряете на <em>решениях.</em></h1>
+  <p class="sub" style="margin-top:22px;font-size:19px">Помогаю заменить хаос в решениях на чёткий алгоритм — чтобы вход разрешала <em style="font-style:normal">система, а не эмоция.</em></p>
+  <div style="margin-top:28px;display:flex;gap:14px;align-items:center">
+    <a class="btn btn-g" href="#">Получить систему допуска →</a>
+    <a class="btn" href="#" style="border-color:var(--line)">Написать Сергею</a>
+  </div>
+  <div class="ticker">
+    <span>EUR/USD <span class="u">+0.42%</span></span><span>XAU/USD <span class="u">+1.18%</span></span>
+    <span>GBP/JPY <span class="d">−0.31%</span></span><span>BTC/USDT <span class="d">−2.04%</span></span>
+    <span>R:R <span class="u">10:1</span></span><span>WIN <span>23%</span></span>
+  </div>
+</header>
+
+<!-- STATS -->
+<section class="sec"><div class="wrap grid4">
+  <div><div class="kn">14</div><div class="kl">лет в рынке</div></div>
+  <div><div class="kn">200+</div><div class="kl">благодарных учеников</div></div>
+  <div><div class="kn">1000+</div><div class="kl">эталонных сделок</div></div>
+  <div><div class="kn">10:1</div><div class="kl">среднее R:R</div></div>
+</div></section>
+
+<!-- PROBLEM -->
+<section class="sec"><div class="wrap">
+  <div class="eyebrow">01 · Проблема</div>
+  <h2 style="margin-top:14px;max-width:18ch">Дело не в <em>стратегии</em></h2>
+  <p class="sub" style="margin-top:18px">У большинства трейдеров с опытом есть знания и хорошие сделки. Но в ключевой момент — сомнение, импульс, вход на эмоциях. Один такой период — и результат месяцев уничтожен. Нет механизма, который говорит ДА или НЕТ — и которому можно доверять.</p>
+</div></section>
+
+<!-- INCLUDED -->
+<section class="sec"><div class="wrap">
+  <div class="eyebrow">02 · Что входит</div>
+  <h2 style="margin-top:14px">Три компонента <em>одной системы</em></h2>
+  <div class="grid3" style="margin-top:28px">
+    <div class="card"><span class="pill">Стратегия</span><h3 style="font-size:24px;margin:12px 0 8px">Trade Master</h3><p style="color:var(--muted);font-size:14px">Алгоритм из 4 шагов: контекст → подтверждение → точка входа → потенциал.</p></div>
+    <div class="card"><span class="pill">Анализ</span><h3 style="font-size:24px;margin:12px 0 8px">Nexus Gravity</h3><p style="color:var(--muted);font-size:14px">Инструмент анализа, не сигналы. Резонанс двух источников = выше вероятность хода.</p></div>
+    <div class="card"><span class="pill">Инфраструктура</span><h3 style="font-size:24px;margin:12px 0 8px">Echo-Gate</h3><p style="color:var(--muted);font-size:14px">Исполнение под ключ: скрининг, лот, ордер, сопровождение, контроль риска.</p></div>
+  </div>
+</div></section>
+
+<!-- RESULTS -->
+<section class="sec"><div class="wrap">
+  <div class="eyebrow">03 · Результаты системы</div>
+  <h2 style="margin-top:14px;max-width:20ch">Цифры, которые не зависят от <em>настроения</em></h2>
+  <p class="sub" style="margin-top:14px">За 17 месяцев · 299 сделок · риск 0.25% на сделку, без компаундинга.</p>
+  <div class="grid4" style="margin-top:28px">
+    <div class="card"><div class="kn" style="color:var(--green)">+85.6%</div><div class="kl">доходность · 17 мес</div></div>
+    <div class="card"><div class="kn">2.50</div><div class="kl">profit factor</div></div>
+    <div class="card"><div class="kn" style="color:var(--dn)">−2.23%</div><div class="kl">макс. просадка</div></div>
+    <div class="card"><div class="kn">14/17</div><div class="kl">прибыльных месяцев</div></div>
+  </div>
+</div></section>
+
+<!-- PROOF -->
+<section class="sec"><div class="wrap">
+  <div class="eyebrow">04 · Отзывы</div>
+  <h2 style="margin-top:14px">Что меняется, когда появляется <em>система</em></h2>
+  <div class="grid3" style="margin-top:28px">
+    <div class="card"><p style="font-family:var(--serif);font-size:18px;line-height:1.45">«Структура вместо хаоса. Перестал сливать и вышел в плюс за 3 месяца.»</p><div class="kl" style="margin-top:14px">Андрей · поток 12</div></div>
+    <div class="card"><p style="font-family:var(--serif);font-size:18px;line-height:1.45">«Наконец понял, ЗА ЧТО плачу. Всё по полочкам.»</p><div class="kl" style="margin-top:14px">Марина · поток 14</div></div>
+    <div class="card"><p style="font-family:var(--serif);font-size:18px;line-height:1.45">«Риск-менеджмент из модуля 3 окупил весь курс за две недели.»</p><div class="kl" style="margin-top:14px">Дмитрий · поток 11</div></div>
+  </div>
+</div></section>
+
+<!-- LEVELS -->
+<section class="sec"><div class="wrap">
+  <div class="eyebrow">05 · Уровни</div>
+  <h2 style="margin-top:14px">Три уровня <em>глубины</em></h2>
+  <p class="sub" style="margin-top:14px">От алгоритма принятия решений — до полного доступа. Стоимость — индивидуально, после короткой фильтрации.</p>
+  <div class="grid3" style="margin-top:28px">
+    <div class="card"><span class="lbl">Level 1</span><h3 style="font-size:26px;margin:8px 0 8px">Trade System</h3><p style="color:var(--muted);font-size:14px">Алгоритм решений, мышление трейдера, фундамент.</p></div>
+    <div class="card" style="border-color:var(--green)"><span class="lbl">Level 2 · популярный</span><h3 style="font-size:26px;margin:8px 0 8px">Trade OS</h3><p style="color:var(--muted);font-size:14px">Система в полном объёме, сценарии, дисциплинарная группа.</p></div>
+    <div class="card"><span class="lbl">Level 3</span><h3 style="font-size:26px;margin:8px 0 8px">Trade OS Plus</h3><p style="color:var(--muted);font-size:14px">Полный доступ ко всей базе и инструментам.</p></div>
+  </div>
+  <div style="margin-top:24px"><a class="btn btn-g" href="#">Узнать стоимость и условия →</a></div>
+</div></section>
+
+<!-- CABINET -->
+<section class="sec cabinet"><div class="wrap">
+  <div class="eyebrow">Личный кабинет</div>
+  <h2 style="margin-top:14px">Сергей, <em>система</em> ждёт вас</h2>
+  <p class="sub" style="margin-top:12px">Вы прошли 78% основной программы — продолжайте с урока 8.</p>
+  <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-top:28px">
+    <div class="card" style="display:flex;flex-direction:column;justify-content:space-between">
+      <div><span class="lbl">Продолжить · урок 8</span><h3 style="font-size:26px;margin:10px 0 6px">Структура импульса и коррекции</h3><div class="kl" style="color:var(--muted)">видео · конспект pdf</div></div>
+      <div style="margin-top:18px"><a class="btn btn-g" href="#" style="padding:10px 18px">Открыть →</a></div>
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+      <svg width="118" height="118" viewBox="0 0 118 118"><circle cx="59" cy="59" r="48" fill="none" stroke="var(--line)" stroke-width="8"/><circle class="ring" cx="59" cy="59" r="48" fill="none" stroke="var(--green)" stroke-width="8" stroke-linecap="round" stroke-dasharray="301.6" stroke-dashoffset="66"/><text x="59" y="65" text-anchor="middle" fill="var(--ink)" font-size="26" font-family="Newsreader">78%</text></svg>
+      <div class="kl" style="margin-top:10px">основная программа</div>
+    </div>
+  </div>
+  <div class="grid4" style="margin-top:16px">
+    <div class="card"><div class="kl">день в системе</div><div class="kn" style="font-size:30px;margin-top:6px">42</div></div>
+    <div class="card"><div class="kl">завершено</div><div class="kn" style="font-size:30px;margin-top:6px">7/10</div></div>
+    <div class="card"><div class="kl">до завершения</div><div class="kn" style="font-size:24px;margin-top:8px;color:var(--green)">31д 04:12</div></div>
+    <div class="card"><div class="kl">эфир</div><div class="kn" style="font-size:24px;margin-top:8px">чт 19:00</div></div>
+  </div>
+</div></section>
+
+<!-- FOOTER -->
+<footer class="sec" style="text-align:center">
+  <div class="wrap">
+    <div class="brand" style="font-size:26px">TRADE<span style="font-style:italic">LIKE</span>TYO</div>
+    <div class="kl" style="margin-top:8px">Система допуска к сделке · © 2026</div>
+  </div>
+</footer>
+
+</body>
+</html>

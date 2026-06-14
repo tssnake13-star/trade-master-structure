@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Концепты дизайна — превью</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@300;400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Sora:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  *{margin:0;box-sizing:border-box}
+  body{font-family:'Inter',sans-serif;background:#0d0d0f;color:#fff}
+  .band{padding:54px 0}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 28px}
+  .meta{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.8;margin-bottom:6px}
+  .mname{font-size:22px;font-weight:600;margin-bottom:4px}
+  .mdesc{font-size:13px;opacity:.65;max-width:70ch;line-height:1.6;margin-bottom:8px}
+  .sw{display:inline-block;width:30px;height:30px;border-radius:7px;margin-right:6px;vertical-align:middle}
+  .grid{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;margin-top:22px}
+  .mock{border-radius:16px;overflow:hidden;min-height:300px;position:relative}
+  .ring{transform:rotate(-90deg)}
+  @media(max-width:780px){.grid{grid-template-columns:1fr}}
+
+  /* ===== Concept 1 — QUANT TERMINAL ===== */
+  .c1{background:#07080a;color:#e6e8ea}
+  .c1 .hero{background:
+     linear-gradient(#11131600 0,#11131600 100%),
+     repeating-linear-gradient(0deg,#0e1013 0,#0e1013 1px,transparent 1px,transparent 34px),
+     repeating-linear-gradient(90deg,#0e1013 0,#0e1013 1px,transparent 1px,transparent 34px),#07080a;
+     border:1px solid #15171b;padding:30px}
+  .c1 .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;color:#c6f24e}
+  .c1 .h{font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:clamp(28px,4vw,46px);line-height:1.02;letter-spacing:-.02em;margin:14px 0}
+  .c1 .h b{color:#c6f24e;font-weight:600}
+  .c1 .tick{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8a9099;display:flex;gap:18px;flex-wrap:wrap;margin:14px 0}
+  .c1 .tick .up{color:#c6f24e}.c1 .tick .dn{color:#ff5a5a}
+  .c1 .btn{display:inline-block;font-family:'IBM Plex Mono',monospace;font-size:13px;background:#c6f24e;color:#07080a;font-weight:600;padding:11px 18px;border-radius:4px}
+  .c1 .card{background:#0c0e11;border:1px solid #15171b;border-radius:14px;padding:20px}
+  .c1 .kn{font-family:'Space Grotesk',sans-serif;font-size:34px;font-weight:600;font-variant-numeric:tabular-nums}
+  .c1 .kl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#6b7280;margin-top:4px}
+
+  /* ===== Concept 2 — LIGHT INSTITUTIONAL ===== */
+  .c2{background:#f4f0e7;color:#1a1712}
+  .c2 .meta,.c2 .mdesc{color:#5d564a}.c2 .mname{color:#1a1712}
+  .c2 .hero{background:#fbf8f1;border:1px solid #e4ddcd;padding:34px;border-radius:16px}
+  .c2 .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#9a8f78}
+  .c2 .h{font-family:'Newsreader',serif;font-weight:400;font-size:clamp(30px,4.4vw,52px);line-height:1.05;letter-spacing:-.01em;margin:16px 0;color:#1a1712}
+  .c2 .h em{font-style:italic;color:#2f5d3e}
+  .c2 .sub{font-size:15px;color:#5d564a;max-width:36ch;line-height:1.6}
+  .c2 .btn{display:inline-block;margin-top:20px;font-size:14px;font-weight:500;border:1px solid #1a1712;color:#1a1712;padding:12px 22px;border-radius:999px}
+  .c2 .card{background:#fbf8f1;border:1px solid #e4ddcd;border-radius:16px;padding:24px}
+  .c2 .kn{font-family:'Newsreader',serif;font-size:40px;color:#1a1712}
+  .c2 .kl{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#9a8f78;margin-top:4px}
+
+  /* ===== Concept 3 — AURORA FINTECH ===== */
+  .c3{background:#0a0913;color:#eceaf6}
+  .c3 .hero{position:relative;border:1px solid #211d3a;border-radius:16px;padding:32px;overflow:hidden;background:
+     radial-gradient(60% 70% at 10% 0%, rgba(139,92,246,.30), transparent 60%),
+     radial-gradient(50% 60% at 100% 30%, rgba(34,211,238,.20), transparent 55%),#0b0a16}
+  .c3 .eyebrow{font-family:'Plus Jakarta Sans',sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#a78bfa;font-weight:600}
+  .c3 .h{font-family:'Sora',sans-serif;font-weight:600;font-size:clamp(28px,4.2vw,48px);line-height:1.04;letter-spacing:-.02em;margin:14px 0}
+  .c3 .h b{font-weight:700;background:linear-gradient(90deg,#a78bfa,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .c3 .sub{font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;color:#b5b1c9;max-width:38ch;line-height:1.6}
+  .c3 .btn{display:inline-block;margin-top:20px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:14px;color:#0a0913;background:linear-gradient(90deg,#a78bfa,#22d3ee);padding:12px 22px;border-radius:12px}
+  .c3 .card{border-radius:16px;padding:24px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);backdrop-filter:blur(8px)}
+  .c3 .kn{font-family:'Sora',sans-serif;font-size:34px;font-weight:600}
+  .c3 .kl{font-family:'Plus Jakarta Sans',sans-serif;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#8e8aa6;margin-top:4px}
+</style>
+</head>
+<body>
+
+<!-- CONCEPT 1 -->
+<section class="band c1">
+  <div class="wrap">
+    <div class="meta">Концепт 01</div>
+    <div class="mname">Quant Terminal</div>
+    <div class="mdesc">«Торговый терминал»: почти чёрный фон, тонкая сетка, моноширинные цифры, один электрический акцент (лайм). Максимально «профессионально-трейдерски», ноль декоративности.</div>
+    <div><span class="sw" style="background:#07080a;border:1px solid #15171b"></span><span class="sw" style="background:#c6f24e"></span><span class="sw" style="background:#e6e8ea"></span><span class="sw" style="background:#6b7280"></span><span class="mdesc" style="display:inline">Space Grotesk · IBM Plex Mono · Inter</span></div>
+    <div class="grid">
+      <div class="mock hero">
+        <div class="eyebrow">TLT // STRUCTURAL TRADING // ADMISSION</div>
+        <div class="h">Вход разрешает <b>система.</b> Не эмоция.</div>
+        <div class="tick"><span>EUR/USD <span class="up">+0.42%</span></span><span>XAU/USD <span class="up">+1.18%</span></span><span>BTC <span class="dn">−2.04%</span></span><span>R:R <span class="up">10:1</span></span></div>
+        <span class="btn">ПОЛУЧИТЬ ДОСТУП →</span>
+      </div>
+      <div class="mock card">
+        <div class="kl">Кабинет · основная программа</div>
+        <div style="display:flex;align-items:center;gap:18px;margin-top:14px">
+          <svg width="92" height="92" viewBox="0 0 92 92"><circle cx="46" cy="46" r="38" fill="none" stroke="#15171b" stroke-width="6"/><circle class="ring" cx="46" cy="46" r="38" fill="none" stroke="#c6f24e" stroke-width="6" stroke-linecap="butt" stroke-dasharray="238.7" stroke-dashoffset="52"/><text x="46" y="51" text-anchor="middle" fill="#e6e8ea" font-size="20" font-family="IBM Plex Mono">78%</text></svg>
+          <div>
+            <div class="kn">7<span style="color:#6b7280;font-size:18px">/10</span></div><div class="kl">уроков</div>
+            <div class="kn" style="margin-top:10px;color:#c6f24e">31д</div><div class="kl">до конца</div>
+          </div>
+        </div>
+        <div style="height:4px;background:#15171b;border-radius:2px;margin-top:16px;overflow:hidden"><div style="width:78%;height:100%;background:#c6f24e"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPT 2 -->
+<section class="band c2">
+  <div class="wrap">
+    <div class="meta">Концепт 02</div>
+    <div class="mname">Light Institutional</div>
+    <div class="mdesc">Светлый, «как у частного банка / делового издания»: кремовый фон, чернильный текст, благородный серип с италиком, много воздуха, один сдержанный акцент (глубокий зелёный). Полная противоположность тёмному — выглядит дорого и спокойно.</div>
+    <div><span class="sw" style="background:#f4f0e7;border:1px solid #e4ddcd"></span><span class="sw" style="background:#1a1712"></span><span class="sw" style="background:#2f5d3e"></span><span class="sw" style="background:#9a8f78"></span><span class="mdesc" style="display:inline">Newsreader · Inter</span></div>
+    <div class="grid">
+      <div class="mock hero">
+        <div class="eyebrow">TLT · Structural Trading</div>
+        <div class="h">Вы читаете рынок.<br/>Но теряете на <em>решениях.</em></div>
+        <div class="sub">Помогаю заменить хаос в решениях на чёткий алгоритм — чтобы вход разрешала система.</div>
+        <span class="btn">Получить систему допуска →</span>
+      </div>
+      <div class="mock card">
+        <div class="kl">Основная программа</div>
+        <div style="display:flex;align-items:center;gap:18px;margin-top:14px">
+          <svg width="92" height="92" viewBox="0 0 92 92"><circle cx="46" cy="46" r="38" fill="none" stroke="#e4ddcd" stroke-width="6"/><circle class="ring" cx="46" cy="46" r="38" fill="none" stroke="#2f5d3e" stroke-width="6" stroke-linecap="round" stroke-dasharray="238.7" stroke-dashoffset="52"/><text x="46" y="51" text-anchor="middle" fill="#1a1712" font-size="20" font-family="Newsreader">78%</text></svg>
+          <div><div class="kn">7<span style="color:#9a8f78;font-size:20px">/10</span></div><div class="kl">уроков пройдено</div></div>
+        </div>
+        <div style="height:3px;background:#e4ddcd;border-radius:2px;margin-top:16px;overflow:hidden"><div style="width:78%;height:100%;background:#2f5d3e"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONCEPT 3 -->
+<section class="band c3">
+  <div class="wrap">
+    <div class="meta">Концепт 03</div>
+    <div class="mname">Aurora Fintech</div>
+    <div class="mdesc">Современный финтех-продукт: глубокий индиго с управляемым «северным сиянием», стеклянные карточки, градиентный акцент (фиолетовый→циан), мягкое свечение, скруглённые формы. Ощущение премиального приложения.</div>
+    <div><span class="sw" style="background:#0a0913;border:1px solid #211d3a"></span><span class="sw" style="background:linear-gradient(90deg,#a78bfa,#22d3ee)"></span><span class="sw" style="background:#eceaf6"></span><span class="sw" style="background:#8e8aa6"></span><span class="mdesc" style="display:inline">Sora · Plus Jakarta Sans</span></div>
+    <div class="grid">
+      <div class="mock hero">
+        <div class="eyebrow">Structural Trading System</div>
+        <div class="h">Торгуйте как <b>система,</b> а не как настроение.</div>
+        <div class="sub">Алгоритм принятия решений + инфраструктура исполнения. Вы — стратег, машина — рутина.</div>
+        <span class="btn">Начать →</span>
+      </div>
+      <div class="mock card">
+        <div class="kl">Основная программа</div>
+        <div style="display:flex;align-items:center;gap:18px;margin-top:14px">
+          <svg width="92" height="92" viewBox="0 0 92 92"><defs><linearGradient id="g3" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#a78bfa"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs><circle cx="46" cy="46" r="38" fill="none" stroke="rgba(255,255,255,.12)" stroke-width="6"/><circle class="ring" cx="46" cy="46" r="38" fill="none" stroke="url(#g3)" stroke-width="6" stroke-linecap="round" stroke-dasharray="238.7" stroke-dashoffset="52"/><text x="46" y="51" text-anchor="middle" fill="#eceaf6" font-size="20" font-family="Sora">78%</text></svg>
+          <div><div class="kn">7<span style="color:#8e8aa6;font-size:18px">/10</span></div><div class="kl">уроков</div></div>
+        </div>
+        <div style="height:6px;background:rgba(255,255,255,.1);border-radius:3px;margin-top:16px;overflow:hidden"><div style="width:78%;height:100%;background:linear-gradient(90deg,#a78bfa,#22d3ee)"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>

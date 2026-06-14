@@ -154,6 +154,9 @@ const ConstellationBg = () => {
     };
   }, []);
 
+  // Приглушаем фон-созвездие, чтобы текст поверх читался; на мобиле сильнее.
+  const bgOpacity = typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches ? 0.4 : 0.6;
+
   return (
     <canvas
       ref={canvasRef}
@@ -165,6 +168,7 @@ const ConstellationBg = () => {
         pointerEvents: 'none',
         touchAction: 'none',
         userSelect: 'none',
+        opacity: bgOpacity,
         zIndex: 0,
       }}
     />
