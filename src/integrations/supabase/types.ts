@@ -53,6 +53,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_archived: boolean
           is_free: boolean
           sort_order: number
           subtitle: string | null
@@ -61,6 +62,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          is_archived?: boolean
           is_free?: boolean
           sort_order?: number
           subtitle?: string | null
@@ -69,6 +71,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          is_archived?: boolean
           is_free?: boolean
           sort_order?: number
           subtitle?: string | null
