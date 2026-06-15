@@ -21,7 +21,7 @@ const IncludedSection = () => {
     <section id="included" className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <span className="section-label">Что входит</span>
+          <span className="section-label">02 · Что входит</span>
           <h2 className="text-foreground">
             Три компонента <em>одной системы</em>
           </h2>

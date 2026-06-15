@@ -10,7 +10,7 @@ const SystemStatsSection = () => {
     <section id="stats" className="section-animate py-12 md:py-20 bg-card/50 border-y border-border">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <span className="section-label">Результаты системы</span>
+          <span className="section-label">05 · Результаты системы</span>
           <h2 className="text-foreground">
             Цифры, которые <em>не зависят</em> от настроения
           </h2>

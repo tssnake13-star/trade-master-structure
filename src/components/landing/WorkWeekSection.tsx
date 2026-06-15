@@ -9,7 +9,7 @@ const WorkWeekSection = () => {
     <section id="week" className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <span className="section-label">Рабочая неделя</span>
+          <span className="section-label">08 · Рабочая неделя</span>
           <h2 className="text-foreground">
             Система работает. <em>Вы живёте.</em>
           </h2>
