@@ -714,7 +714,7 @@ function SelectedCourseView({
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 14 }}>
           {t('course_eyebrow')}
         </div>
-        <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(36px, 5vw, 56px)', lineHeight: 1.02, letterSpacing: '-0.025em', color: FG }}>
+        <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(28px, 5vw, 56px)', lineHeight: 1.05, letterSpacing: '-0.025em', color: FG, overflowWrap: 'anywhere', wordBreak: 'break-word', maxWidth: '100%' }}>
           {course.title}
         </h1>
         {course.subtitle && (
