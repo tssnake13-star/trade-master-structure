@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, Plus, Trash2, Pencil, GripVertical, Upload, X } from 'lucide-react';
+import { ArrowLeft, Plus, Trash2, Pencil, GripVertical, Upload, X, Archive, ArchiveRestore } from 'lucide-react';
 import VideoBlockEditor from '@/components/school/VideoBlockEditor';
 import { SITE_ASSET_KEYS, notifySiteAssetChange } from '@/hooks/useSiteAsset';
 import {
@@ -44,7 +44,7 @@ const tabStyle = (active: boolean) => ({
   transition: 'all 0.2s',
 });
 
-interface Course { id: string; title: string; subtitle: string | null; is_free: boolean; sort_order: number; }
+interface Course { id: string; title: string; subtitle: string | null; is_free: boolean; sort_order: number; is_archived?: boolean; }
 interface Lesson { id: string; course_id: string; title: string; description: string | null; sort_order: number; }
 interface LessonVideo { id?: string; title: string; video_url: string; video_url_alt: string; sort_order: number; }
 interface Profile { user_id: string; email: string; full_name: string | null; created_at: string; is_blocked: boolean; }
@@ -639,6 +639,11 @@ function CoursesTab() {
     load();
   };
 
+  const toggleArchive = async (c: Course) => {
+    await supabase.from('courses').update({ is_archived: !c.is_archived }).eq('id', c.id);
+    load();
+  };
+
   const deleteCourse = async (id: string) => {
     if (!window.confirm('Удалить программу вместе со всеми её уроками? Это действие необратимо.')) return;
     await supabase.from('lessons').delete().eq('course_id', id);
@@ -828,12 +833,20 @@ function CoursesTab() {
                     onClick={() => setExpandedCourse(expandedCourse === c.id ? null : c.id)}
                   >
                     <div>
-                      <span className="text-sm" style={{ fontFamily: font.mono }}>{c.title}</span>
-                      <span className="ml-2 text-xs" style={{ color: c.is_free ? '#4a8a4a' : '#666', fontFamily: font.mono }}>
-                        {c.is_free ? 'бесплатная' : ''}
-                      </span>
+                      <span className="text-sm" style={{ fontFamily: font.mono, color: c.is_archived ? '#777' : '#e8e0d0' }}>{c.title}</span>
+                      {c.is_free && (
+                        <span className="ml-2 text-xs" style={{ color: '#4a8a4a', fontFamily: font.mono }}>бесплатная</span>
+                      )}
+                      {c.is_archived && (
+                        <span className="ml-2 text-xs" style={{ color: '#caa472', fontFamily: font.mono }}>архив</span>
+                      )}
                     </div>
                     <div className="flex items-center gap-1">
+                      <button onClick={e => { e.stopPropagation(); toggleArchive(c); }} className="p-1 hover:opacity-70" title={c.is_archived ? 'Вернуть из архива' : 'В архив (виден только админу)'}>
+                        {c.is_archived
+                          ? <ArchiveRestore size={18} style={{ color: '#caa472' }} />
+                          : <Archive size={18} style={{ color: '#666' }} />}
+                      </button>
                       <button onClick={e => { e.stopPropagation(); startEdit(c); }} className="p-1 hover:opacity-70">
                         <Pencil size={18} style={{ color: '#666' }} />
                       </button>
