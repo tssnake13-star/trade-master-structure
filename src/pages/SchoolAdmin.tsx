@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, Plus, Trash2, Pencil, GripVertical, Upload, X, Archive, ArchiveRestore } from 'lucide-react';
 import VideoBlockEditor from '@/components/school/VideoBlockEditor';
 import { SITE_ASSET_KEYS, notifySiteAssetChange } from '@/hooks/useSiteAsset';
+import { exportBackup } from '@/lib/exportBackup';
 import {
   DASHBOARD_TEXT_DEFAULTS,
   DASHBOARD_TEXT_GROUPS,
@@ -108,6 +109,52 @@ export default function SchoolAdmin() {
   );
 }
 
+/* ========= BACKUP SECTION ========= */
+function BackupSection() {
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const run = async () => {
+    setBusy(true);
+    setResult(null);
+    setError(null);
+    try {
+      const { fileName, counts } = await exportBackup();
+      const total = Object.values(counts).reduce((a, b) => a + b, 0);
+      setResult(`Скачан файл ${fileName} · записей: ${total}`);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Не удалось сделать бэкап');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="rounded-lg border p-4 mb-6" style={{ borderColor: '#2a2a1a', backgroundColor: '#0d0d0d' }}>
+      <h3 className="text-sm mb-1" style={{ fontFamily: font.heading, color: '#caa472' }}>
+        Резервная копия данных
+      </h3>
+      <p className="text-[11px] mb-3 leading-relaxed" style={{ color: '#888', fontFamily: font.mono }}>
+        Скачивает один файл со всеми данными школы (ученики, курсы, уроки, доступы, прогресс, инвайты, настройки).
+        Только чтение — ничего не меняет. Делайте периодически и храните у себя.
+      </p>
+      <div className="flex items-center gap-3 flex-wrap">
+        <button
+          onClick={run}
+          disabled={busy}
+          className="text-xs px-4 py-2 rounded"
+          style={{ backgroundColor: '#caa472', color: '#0a0a0a', fontFamily: font.mono, opacity: busy ? 0.6 : 1, cursor: busy ? 'default' : 'pointer' }}
+        >
+          {busy ? 'Готовлю...' : 'Скачать резервную копию'}
+        </button>
+        {result && <span className="text-xs" style={{ color: '#4a8a4a', fontFamily: font.mono }}>{result}</span>}
+        {error && <span className="text-xs" style={{ color: '#d06666', fontFamily: font.mono }}>{error}</span>}
+      </div>
+    </div>
+  );
+}
+
 /* ========= SETTINGS TAB ========= */
 function SettingsTab() {
   const [welcomeTitle, setWelcomeTitle] = useState('');
@@ -147,6 +194,9 @@ function SettingsTab() {
   return (
     <div>
       <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Настройки</h2>
+
+      <BackupSection />
+
       <div className="rounded-lg border p-4 space-y-4 mb-6" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
         <div>
           <label className="block text-xs mb-1" style={{ color: '#999', fontFamily: font.mono }}>
