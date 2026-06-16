@@ -118,6 +118,30 @@ export default function YouTubePlayer({ url, watermark }: Props) {
     return () => clearInterval(interval);
   }, []);
 
+  // Watermark watchdog: pause playback if the watermark is removed or hidden.
+  useEffect(() => {
+    if (!watermark) return;
+    const check = () => {
+      const container = containerRef.current;
+      const p = playerRef.current;
+      if (!container || !p?.getPlayerState) return;
+      const wm = container.querySelector('[data-wm-guard]') as HTMLElement | null;
+      let tampered = !wm;
+      if (wm) {
+        const cs = getComputedStyle(wm);
+        if (cs.display === 'none' || cs.visibility === 'hidden' || Number(cs.opacity) < 0.02) {
+          tampered = true;
+        }
+      }
+      // Only act while playing, to avoid fighting normal paused state.
+      if (tampered && p.getPlayerState() === 1) {
+        p.pauseVideo();
+      }
+    };
+    const interval = setInterval(check, 800);
+    return () => clearInterval(interval);
+  }, [watermark]);
+
   // Exit fake fullscreen on Escape key
   useEffect(() => {
     if (!fakeFullscreen) return;
