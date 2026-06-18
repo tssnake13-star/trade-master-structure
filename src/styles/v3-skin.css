@@ -193,6 +193,10 @@
 /* live quote (HUD ticker): drop below the header whenever the hamburger menu
    is shown (< lg), so it never overlaps the 3-line menu icon */
 .v3-skin .v3h-ticker-wrap { position: absolute; top: 22px; right: 26px; z-index: 3; }
+/* shrink the quote so it doesn't crowd the stacked photo below lg */
 @media (max-width: 1023px) {
-  .v3-skin .v3h-ticker-wrap { top: 88px; right: 16px; }
+  .v3-skin .v3h-ticker-wrap { top: 84px; right: 16px; transform: scale(0.84); transform-origin: top right; }
+}
+@media (max-width: 640px) {
+  .v3-skin .v3h-ticker-wrap { top: 74px; right: 10px; transform: scale(0.62); transform-origin: top right; }
 }
