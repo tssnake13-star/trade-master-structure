@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import { ArrowRight, MessageCircle } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import heroAuthorFallback from '@/assets/hero-author.jpg';
@@ -33,43 +32,17 @@ const OFFER: { t: string; cls?: 'gold' | 'mute' | 'uline' }[] = [
 
 export default function HeroSectionV3() {
   const heroAuthor = useSiteAsset(SITE_ASSET_KEYS.heroAuthor, heroAuthorFallback);
-  const rootRef = useRef<HTMLElement>(null);
   const { price, dir, changePct } = useFxPrice();
   const priceStr = price.toLocaleString('ru-RU', { minimumFractionDigits: 3, maximumFractionDigits: 3 });
   const up = dir === 1;
 
-  // custom cursor dot, scoped to the hero
-  const cursorRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const root = rootRef.current, dot = cursorRef.current;
-    if (!root || !dot) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const move = (e: PointerEvent) => {
-      dot.style.opacity = '1';
-      dot.style.transform = `translate(${e.clientX}px, ${e.clientY}px) translate(-50%, -50%)`;
-    };
-    const leave = () => { dot.style.opacity = '0'; };
-    root.addEventListener('pointermove', move);
-    root.addEventListener('pointerleave', leave);
-    return () => { root.removeEventListener('pointermove', move); root.removeEventListener('pointerleave', leave); };
-  }, []);
-
   return (
-    <section ref={rootRef} id="hero" className="v3h relative min-h-[100svh] flex flex-col justify-center pt-16 md:pt-20 pb-12 md:pb-16">
-      <div
-        ref={cursorRef}
-        style={{
-          position: 'fixed', top: 0, left: 0, zIndex: 95, width: 12, height: 12,
-          borderRadius: '50%', background: 'var(--v3-gold)', pointerEvents: 'none',
-          mixBlendMode: 'difference', transform: 'translate(-50%, -50%)', opacity: 0,
-        }}
-      />
-
+    <section id="hero" className="v3h relative min-h-[100svh] flex flex-col justify-center pt-16 md:pt-20 pb-12 md:pb-16">
       {/* moving gold candle field */}
       <CandleField />
 
-      {/* author photo flush to the right edge */}
-      <div className="v3h-photo absolute top-0 right-0 h-full w-[52%] hidden md:block" style={{ zIndex: 1 }}>
+      {/* author photo flush to the right edge (desktop ≥lg only) */}
+      <div className="v3h-photo absolute top-0 right-0 h-full w-[52%] hidden lg:block" style={{ zIndex: 1 }}>
         <img src={heroAuthor} alt="Сергей — автор системы TRADELIKETYO" />
       </div>
 
@@ -92,8 +65,8 @@ export default function HeroSectionV3() {
         </div>
       </div>
 
-      {/* mobile photo — stacked above the text (desktop uses the flush-right one) */}
-      <div className="md:hidden relative w-full mb-7" style={{ height: '40vh', zIndex: 1 }}>
+      {/* stacked centered photo for mobile + tablet (desktop ≥lg uses flush-right) */}
+      <div className="lg:hidden relative w-full mb-7" style={{ height: '40vh', zIndex: 1 }}>
         <img
           src={heroAuthor}
           alt="Сергей — автор системы TRADELIKETYO"
@@ -105,7 +78,7 @@ export default function HeroSectionV3() {
 
       {/* text */}
       <div className="container-landing relative" style={{ zIndex: 2 }}>
-        <div className="w-full md:max-w-[56%]">
+        <div className="w-full lg:max-w-[56%]">
           <div className="v3h-eyebrow v3h-mono mb-7">
             <span className="dot" /> TLT · Structural trading · Admission system
           </div>
