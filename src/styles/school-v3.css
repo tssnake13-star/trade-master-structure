@@ -1,0 +1,94 @@
+/* =====================================================================
+   V3 "editorial terminal" skin for the student cabinet PREVIEW
+   (/school/preview). Demo data only — the live dashboard is untouched.
+   Scoped under .lkv3.
+   ===================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Syne:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
+.lkv3 {
+  --bg:    oklch(0.09 0.012 70);
+  --bg2:   oklch(0.12 0.01 75);
+  --surf:  oklch(0.14 0.01 75);
+  --surf2: oklch(0.17 0.012 75);
+  --line:  oklch(0.22 0.008 255);
+  --fg:    oklch(0.92 0.02 80);
+  --mut:   oklch(0.62 0.02 75);
+  --faint: oklch(0.46 0.015 75);
+  --gold:  oklch(0.82 0.14 72);
+  --gold-dim: oklch(0.55 0.10 72);
+  --good:  oklch(0.72 0.16 150);
+  --display: 'Cormorant', Georgia, 'Times New Roman', serif;
+  --ui: 'Syne', system-ui, sans-serif;
+  --mono: 'Space Mono', ui-monospace, monospace;
+
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--ui);
+  -webkit-font-smoothing: antialiased;
+}
+
+.lkv3 ::selection { background: var(--gold); color: var(--bg); }
+
+.lkv3 .lk-display {
+  font-family: var(--display);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 0.98;
+}
+.lkv3 .lk-display em { font-style: italic; font-weight: 400; color: var(--gold); }
+.lkv3 .lk-display .mut { color: var(--mut); }
+
+.lkv3 .lk-mono {
+  font-family: var(--mono);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.lkv3 .lk-card {
+  background: var(--surf);
+  border: 1px solid var(--line);
+  border-radius: 0;            /* sharp, like the landing v3 */
+  transition: border-color .35s ease, background .35s ease, transform .35s ease;
+}
+.lkv3 .lk-card:hover { border-color: var(--gold-dim); }
+
+.lkv3 .lk-navitem {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 10px 12px;
+  font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--mut); border-left: 2px solid transparent;
+  cursor: pointer; transition: all .25s ease;
+}
+.lkv3 .lk-navitem:hover { color: var(--fg); background: var(--bg2); }
+.lkv3 .lk-navitem[data-active='true'] { color: var(--fg); border-left-color: var(--gold); background: var(--bg2); }
+.lkv3 .lk-navitem .n { font-size: 9px; color: var(--faint); }
+
+.lkv3 .lk-btn {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-family: var(--ui); font-weight: 600; font-size: 12px;
+  letter-spacing: 0.05em; text-transform: uppercase;
+  padding: 12px 20px; border-radius: 0; border: 1px solid transparent; cursor: pointer;
+  transition: all .35s ease;
+}
+.lkv3 .lk-btn--gold { background: var(--gold); color: var(--bg); }
+.lkv3 .lk-btn--gold:hover { filter: brightness(1.08); }
+.lkv3 .lk-btn .arr { transition: transform .35s ease; }
+.lkv3 .lk-btn:hover .arr { transform: translateX(3px); }
+
+.lkv3 .lk-pulse {
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--gold); box-shadow: 0 0 8px var(--gold);
+  animation: lkPulse 2.4s ease-out infinite;
+}
+@keyframes lkPulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+@keyframes lkRise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.lkv3 .lk-rise { animation: lkRise .6s cubic-bezier(0.16,1,0.3,1) both; }
+
+.lkv3 *::-webkit-scrollbar { width: 8px; height: 8px; }
+.lkv3 *::-webkit-scrollbar-thumb { background: var(--line); }
+.lkv3 *::-webkit-scrollbar-track { background: transparent; }
+
+@media (prefers-reduced-motion: reduce) {
+  .lkv3 .lk-pulse, .lkv3 .lk-rise { animation: none !important; }
+}

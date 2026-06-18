@@ -33,15 +33,15 @@ interface CompletionRecord {
   completed_at: string;
 }
 
-const ACCENT = '#caa472';
+const ACCENT = '#e1a84d'; // rich v3 gold (≈ oklch(0.82 0.14 72))
 const COOL = '#8aa6d6'; // холодный акцент — для «системных»/статусных состояний
 const BG = '#080808';
 const FG = '#e8e0d0';
-const CARD = '#111111';
+const CARD = '#181410'; // warm dark card (matches --tly-bg-elev)
 const BORDER = '#1a1a1a';
-const MONO = "'Martian Mono', ui-monospace, monospace";
-const SANS = "'Hanken Grotesk', sans-serif";
-const DISPLAY = "'Bricolage Grotesque', system-ui, sans-serif";
+const MONO = "'Space Mono', ui-monospace, monospace";
+const SANS = "'Syne', system-ui, sans-serif";
+const DISPLAY = "'Cormorant', Georgia, 'Times New Roman', serif";
 
 // Premium glass surface for cards (correct for dark theme).
 // NB: no backdrop-filter — the dashboard re-renders every second (live timers),
@@ -570,6 +570,10 @@ export default function SchoolDashboard() {
               <button onClick={() => setMobileSidebarOpen(true)} className="sm:hidden p-1.5 hover:bg-white/5 rounded transition">
                 <Menu size={18} style={{ color: FG }} />
               </button>
+              {/* video logo — top-left corner on mobile (desktop has it in the sidebar) */}
+              <div className="sm:hidden" style={{ width: 30, height: 30, overflow: 'hidden', flexShrink: 0, backgroundColor: '#000' }}>
+                <video key={logoVideo} src={logoVideo} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+              </div>
               <span className="inline-block" style={{
                 width: 6, height: 6, borderRadius: '50%',
                 backgroundColor: isFreeUser ? '#888' : ACCENT,

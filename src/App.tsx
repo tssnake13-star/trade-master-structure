@@ -15,6 +15,7 @@ import SchoolStudentDetail from "./pages/SchoolStudentDetail";
 import SchoolResetPassword from "./pages/SchoolResetPassword";
 import PreviewRedesign from "./pages/PreviewRedesign";
 import PreviewNext from "./pages/PreviewNext";
+import SchoolPreview from "./pages/SchoolPreview";
 import SiteAssetsApplier from "./components/SiteAssetsApplier";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/preview-redesign" element={<PreviewRedesign />} />
             <Route path="/preview-next" element={<PreviewNext />} />
+            <Route path="/school/preview" element={<SchoolPreview />} />
             <Route path="/school" element={<SchoolAuth />} />
             <Route path="/school/dashboard" element={<SchoolDashboard />} />
             <Route path="/school/course/:id" element={<SchoolCourse />} />

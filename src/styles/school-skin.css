@@ -5,29 +5,33 @@
    ===================================================================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@300;400;500;600;700&family=Martian+Mono:wght@300;400;500&display=swap');
+/* v3 fonts (editorial terminal) */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Syne:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
 
 [data-school-skin] {
-  /* Mapped to landing tokens (src/index.css) for full palette parity */
-  /* Surfaces */
-  --tly-bg:        hsl(var(--background));
-  --tly-bg-elev:   hsl(var(--card));
-  --tly-bg-soft:   hsl(var(--secondary));
-  --tly-bg-deep:   hsl(206 14% 4%);
+  /* v3 "editorial terminal" palette — warm near-black, rich gold, cool lines.
+     Defined explicitly here (not via landing tokens) so the cabinet gets the
+     warmer v3 colour temperature without touching the live landing. */
+  /* Surfaces — warm deep */
+  --tly-bg:        oklch(0.105 0.012 72);
+  --tly-bg-elev:   oklch(0.145 0.013 74);
+  --tly-bg-soft:   oklch(0.195 0.014 74);
+  --tly-bg-deep:   oklch(0.082 0.010 72);
 
-  /* Text */
-  --tly-fg:        hsl(var(--foreground));
-  --tly-fg-mute:   hsl(var(--muted-foreground));
-  --tly-fg-dim:    hsl(var(--muted-foreground) / 0.6);
-  --tly-fg-faint:  hsl(var(--muted-foreground) / 0.4);
+  /* Text — warm cream */
+  --tly-fg:        oklch(0.93 0.025 85);
+  --tly-fg-mute:   oklch(0.67 0.020 80);
+  --tly-fg-dim:    oklch(0.56 0.015 78);
+  --tly-fg-faint:  oklch(0.44 0.012 78);
 
-  /* Lines */
-  --tly-line:      hsl(var(--border));
-  --tly-line-soft: hsl(var(--rule-soft));
+  /* Lines — cool, desaturated (v3 contrast accent) */
+  --tly-line:      oklch(0.26 0.010 255);
+  --tly-line-soft: oklch(0.19 0.008 255);
 
-  /* Accent — warm (matches landing --warm / --accent) */
-  --tly-accent:        hsl(var(--accent));
-  --tly-accent-dim:    hsl(var(--accent-dim));
-  --tly-accent-soft:   hsl(var(--accent) / 0.16);
+  /* Accent — rich v3 gold */
+  --tly-accent:        oklch(0.82 0.14 72);
+  --tly-accent-dim:    oklch(0.55 0.10 72);
+  --tly-accent-soft:   oklch(0.82 0.14 72 / 0.16);
 
   /* Status */
   --tly-success:   hsl(150 35% 55%);
@@ -35,9 +39,9 @@
   --tly-danger:    hsl(var(--destructive));
 
   /* Type */
-  --tly-font-display: 'Bricolage Grotesque', system-ui, sans-serif;
-  --tly-font-sans:    'Hanken Grotesk', system-ui, -apple-system, sans-serif;
-  --tly-font-mono:    'Martian Mono', ui-monospace, monospace;
+  --tly-font-display: 'Cormorant', Georgia, 'Times New Roman', serif;
+  --tly-font-sans:    'Syne', system-ui, -apple-system, sans-serif;
+  --tly-font-mono:    'Space Mono', ui-monospace, monospace;
 
   --tly-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
 
@@ -185,15 +189,14 @@
 [data-school-skin] h1,
 [data-school-skin] h2 {
   font-family: var(--tly-font-display) !important;
-  font-weight: 350;
-  letter-spacing: -0.02em;
+  font-weight: 500 !important;
+  letter-spacing: -0.018em;
   line-height: 1.02;
-  font-variation-settings: 'opsz' 144, 'SOFT' 30;
 }
 
 [data-school-skin] h3 {
   font-family: var(--tly-font-display) !important;
-  font-weight: 400;
+  font-weight: 500 !important;
   letter-spacing: -0.012em;
 }
 
@@ -443,4 +446,13 @@
 }
 [data-school-skin] *::-webkit-scrollbar-thumb:hover {
   background: var(--tly-fg-faint);
+}
+
+/* v3: square the cards & buttons (avatars 50% and thin bars 2-4px keep theirs) */
+[data-school-skin] [style*="border-radius: 14px"],
+[data-school-skin] [style*="border-radius: 12px"],
+[data-school-skin] [style*="border-radius: 10px"],
+[data-school-skin] [style*="border-radius: 8px"],
+[data-school-skin] [style*="border-radius: 6px"] {
+  border-radius: 0 !important;
 }
