@@ -1,0 +1,198 @@
+/* =====================================================================
+   V3 "editorial terminal" skin for the PRODUCTION landing ("/").
+   Applies the shared TRADELIKETYO Redesign v3 identity site-wide:
+   Cormorant display serif, Space Mono labels, sharp buttons, warm gold.
+   Scoped to .v3-skin so /school (the cabinet / counters) is untouched.
+   Original copy is preserved — this only restyles.
+   ===================================================================== */
+@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Syne:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+
+.v3-skin {
+  --v3-bg:       oklch(0.09 0.012 70);
+  --v3-fg:       oklch(0.92 0.02 80);
+  --v3-mut:      oklch(0.62 0.02 75);
+  --v3-faint:    oklch(0.40 0.015 75);
+  --v3-gold:     oklch(0.82 0.14 72);
+  --v3-gold-dim: oklch(0.52 0.10 72);
+  --v3-line:     oklch(0.20 0.01 75);
+  --font-display: 'Cormorant', Georgia, 'Times New Roman', serif;
+  --font-ui:      'Syne', system-ui, sans-serif;
+  --font-mono:    'Space Mono', ui-monospace, monospace;
+}
+
+/* ---- display headings → Cormorant (high specificity beats landing-skin) -- */
+.v3-skin.landing-skin h1,
+.v3-skin.landing-skin h2,
+.v3-skin.landing-skin h3,
+.v3-skin.landing-skin .heading-section,
+.v3-skin.landing-skin .heading-hero,
+.v3-skin.landing-skin .heading-block {
+  font-family: var(--font-display) !important;
+  font-weight: 500 !important;
+  letter-spacing: -0.012em !important;
+}
+.v3-skin.landing-skin h1 em,
+.v3-skin.landing-skin h2 em,
+.v3-skin.landing-skin h3 em {
+  font-style: italic !important;
+  font-weight: 400 !important;
+  color: var(--v3-gold) !important;
+}
+
+/* ---- mono labels → Space Mono --------------------------------------- */
+.v3-skin.landing-skin .section-label,
+.v3-skin.landing-skin .text-mono,
+.v3-skin.landing-skin .stat-label,
+.v3-skin.landing-skin .kicker,
+.v3-skin.landing-skin header nav a {
+  font-family: var(--font-mono) !important;
+}
+
+/* ---- sharp, decisive buttons (no radius) ---------------------------- */
+.v3-skin .btn-primary,
+.v3-skin .btn-secondary,
+.v3-skin .tly-btn {
+  border-radius: 0 !important;
+}
+
+/* =====================================================================
+   V3 HERO (production) — original copy, gold candle field, HUD ticker.
+   ===================================================================== */
+.v3h {
+  position: relative;
+  background: var(--v3-bg);
+  color: var(--v3-fg);
+  overflow: hidden;
+}
+
+.v3h-mono {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--v3-mut);
+}
+
+.v3h-eyebrow { display: inline-flex; align-items: center; gap: 10px; }
+.v3h-eyebrow .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--v3-gold); box-shadow: 0 0 10px var(--v3-gold);
+  animation: v3hPulse 2.6s ease-out infinite;
+}
+@keyframes v3hPulse { 0%,100%{opacity:1} 50%{opacity:0.35} }
+
+.v3h-h1 {
+  font-family: var(--font-display) !important;
+  font-weight: 500 !important;
+  font-size: clamp(52px, 8vw, 132px) !important;
+  line-height: 0.94 !important;
+  letter-spacing: -0.015em !important;
+  color: var(--v3-fg);
+}
+.v3h-h1 em { font-style: italic; font-weight: 400; color: var(--v3-gold); }
+.v3h-h1 .mute { color: var(--v3-mut); }
+.v3h-h1 .word {
+  display: inline-block; opacity: 0; transform: translateY(0.35em);
+  animation: v3hRise 0.9s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+@keyframes v3hRise { to { opacity: 1; transform: none; } }
+
+.v3h-offer {
+  font-family: var(--font-ui);
+  font-size: clamp(16px, 1.5vw, 21px);
+  line-height: 1.5;
+  color: var(--v3-mut);
+  max-width: 46ch;
+}
+.v3h-offer .gold { color: var(--v3-gold); }
+.v3h-offer .mute { color: var(--v3-faint); }
+.v3h-offer .uline {
+  color: var(--v3-fg);
+  border-bottom: 1px solid var(--v3-gold-dim);
+  padding-bottom: 1px;
+}
+
+.v3h-btn {
+  display: inline-flex; align-items: center; gap: 12px;
+  font-family: var(--font-ui);
+  font-weight: 600; font-size: 13px;
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 16px 26px; border-radius: 0;
+  border: 1px solid transparent;
+  transition: all 0.4s cubic-bezier(0.22,0.61,0.36,1);
+  cursor: pointer;
+}
+.v3h-btn--solid { background: var(--v3-fg); color: var(--v3-bg); }
+.v3h-btn--solid:hover { background: var(--v3-gold); }
+.v3h-btn--ghost { background: transparent; color: var(--v3-mut); border-color: var(--v3-line); }
+.v3h-btn--ghost:hover { color: var(--v3-fg); border-color: var(--v3-mut); }
+.v3h-btn .arr { transition: transform 0.4s cubic-bezier(0.22,0.61,0.36,1); }
+.v3h-btn:hover .arr { transform: translateX(4px); }
+
+/* author photo flush to the right edge, fading into the background */
+.v3h-photo { position: relative; }
+.v3h-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; }
+.v3h-photo::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, var(--v3-bg) 0%, transparent 34%),
+              linear-gradient(0deg, var(--v3-bg) 2%, transparent 26%);
+}
+
+/* HUD */
+.v3h-hud { font-family: var(--font-mono); color: var(--v3-faint); font-size: 10px; letter-spacing: 0.2em; }
+.v3h-ticker__price { font-family: var(--font-mono); font-size: 20px; color: var(--v3-fg); letter-spacing: 0.02em; }
+.v3h-live .dot {
+  display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--v3-gold); margin-right: 7px;
+  animation: v3hPulse 2s ease-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .v3h-eyebrow .dot, .v3h-live .dot { animation: none !important; }
+  .v3h-h1 .word { animation: none !important; opacity: 1 !important; transform: none !important; }
+}
+
+/* =====================================================================
+   Giant "thought" wordmark dividers between sections (kinetic on scroll).
+   Reuses the WordmarkKinetic component (.pn-wordmark / .pn-wm-letter),
+   restyled here in Cormorant so it lives on the production landing too.
+   ===================================================================== */
+.v3-skin .pn-wordmark {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(58px, 14vw, 220px);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+  text-align: center;
+  color: oklch(0.21 0.012 75);   /* faint — a background thought */
+  user-select: none;
+  white-space: nowrap;
+}
+.v3-skin .pn-wordmark em {
+  color: var(--v3-gold-dim);
+  font-style: italic;
+}
+.v3-skin .pn-wordmark .pn-wm-letter {
+  display: inline-block;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease;
+}
+
+/* below lg (where the hamburger appears): shrink + wrap the giant thought so
+   even the longest fits, and don't run the per-letter wave */
+@media (max-width: 1023px) {
+  .v3-skin .pn-wordmark {
+    white-space: normal;
+    font-size: clamp(26px, 7.5vw, 104px);
+    line-height: 1.02;
+    padding: 0 16px;
+    overflow-wrap: break-word;
+  }
+  .v3-skin .pn-wordmark .pn-wm-letter { display: inline; transform: none !important; }
+}
+
+/* live quote (HUD ticker): drop below the header whenever the hamburger menu
+   is shown (< lg), so it never overlaps the 3-line menu icon */
+.v3-skin .v3h-ticker-wrap { position: absolute; top: 22px; right: 26px; z-index: 3; }
+@media (max-width: 1023px) {
+  .v3-skin .v3h-ticker-wrap { top: 88px; right: 16px; }
+}

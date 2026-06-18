@@ -1,9 +1,9 @@
+import '@/styles/v3-skin.css';
 import useScrollAnimate from '@/hooks/useScrollAnimate';
-import ConstellationBg from '@/components/ConstellationBg';
 import Header from '@/components/landing/Header';
 import StickyHeader from '@/components/landing/StickyHeader';
 import SideNav from '@/components/landing/SideNav';
-import HeroSection from '@/components/landing/HeroSection';
+import HeroSectionV3 from '@/components/landing/HeroSectionV3';
 import InstrumentTicker from '@/components/landing/InstrumentTicker';
 import StatsCounter from '@/components/landing/StatsCounter';
 import TwoStagesSection from '@/components/landing/TwoStagesSection';
@@ -23,25 +23,28 @@ import PrincipleSection from '@/components/landing/PrincipleSection';
 import DualCTASection from '@/components/landing/DualCTASection';
 import LogoSection from '@/components/landing/LogoSection';
 import Footer from '@/components/landing/Footer';
+import WordmarkKinetic from '@/components/preview-next/WordmarkKinetic';
 
 const Index = () => {
   useScrollAnimate();
 
   return (
-    <div className="min-h-screen bg-background landing-skin">
-      <ConstellationBg />
+    <div className="min-h-screen bg-background landing-skin v3-skin">
       <Header />
       <StickyHeader />
       <SideNav />
       <main>
         {/* Внимание */}
-        <HeroSection />
+        <HeroSectionV3 />
         <InstrumentTicker />
         <StatsCounter />
         <TwoStagesSection />
 
         {/* Боль */}
         <CoreProblemSection />
+
+        {/* Мысль-делитель */}
+        <WordmarkKinetic text="Структура " emphasis="важнее сигнала" />
 
         {/* Решение */}
         <IncludedSection />
@@ -53,12 +56,18 @@ const Index = () => {
         <ProofSection />
         <TradesSection />
 
+        {/* Мысль-делитель */}
+        <WordmarkKinetic text="Система, " emphasis="не эмоция" />
+
         {/* Образ жизни */}
         <WorkWeekSection />
 
         {/* Путь и фильтр */}
         <StagesSection />
         <FitSection />
+
+        {/* Мысль-делитель */}
+        <WordmarkKinetic text="Допуск, " emphasis="не сигнал" />
 
         {/* Оффер и действие */}
         <LevelsSection />
