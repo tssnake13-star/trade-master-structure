@@ -6,14 +6,15 @@ const M = 84;                 // outer margin
 const CW = W - 2 * M;         // content width 912
 const HANDLE = '@tradeliketyo';
 
-// palette — Engineered Editorial
-const BG = '#0C0E11';
-const PAPER = '#ECE9E3';      // warm off-white
-const SAND = '#CBB18C';       // warm sand accent
-const STEEL = '#7E9CB5';      // cool steel-blue accent
-const MUTE = '#878C93';       // muted mono
-const HAIR = 'rgba(236,233,227,0.10)';
-const GRID = 'rgba(236,233,227,0.035)';
+// palette — Engineered Editorial (vivid)
+const BG = '#0A0B0E';
+const PAPER = '#F6F3ED';      // bright warm off-white
+const SAND = '#F2B43C';       // vivid warm gold-sand accent
+const STEEL = '#46B6EC';      // vivid steel-blue accent
+const BODY = '#D7DBE0';       // body text
+const MUTE = '#9AA0A8';       // muted mono
+const HAIR = 'rgba(246,243,237,0.18)';
+const GRID = 'rgba(246,243,237,0.055)';
 
 const SERIF = 'Playfair Display';
 const MONO = 'JetBrains Mono';
@@ -74,7 +75,7 @@ function headline(lines, x, y, size, lh, anchor) {
 function body(lines, x, y, size, lh) {
   let s = '', cy = y;
   for (const line of lines) {
-    s += `<text x="${x}" y="${cy}" font-family="${MONO}" font-weight="500" font-size="${size}">${spans(line, '#B9BCC1')}</text>`;
+    s += `<text x="${x}" y="${cy}" font-family="${MONO}" font-weight="500" font-size="${size}">${spans(line, BODY)}</text>`;
     cy += lh;
   }
   return s;
@@ -304,8 +305,8 @@ SLIDES.push(slide(
     [{ t: 'Система на честной' }],
     [{ t: 'проверке — ', }, { t: 'в боте', color: SAND }],
   ], W / 2, 640, 60, 74, 'middle') +
-  `<text x="${W / 2}" y="760" text-anchor="middle" font-family="${MONO}" font-weight="500" font-size="26" fill="#B9BCC1">Показываю, как выглядит стратегия,</text>` +
-  `<text x="${W / 2}" y="800" text-anchor="middle" font-family="${MONO}" font-weight="500" font-size="26" fill="#B9BCC1">построенная на честной проверке.</text>` +
+  `<text x="${W / 2}" y="760" text-anchor="middle" font-family="${MONO}" font-weight="500" font-size="26" fill="${BODY}">Показываю, как выглядит стратегия,</text>` +
+  `<text x="${W / 2}" y="800" text-anchor="middle" font-family="${MONO}" font-weight="500" font-size="26" fill="${BODY}">построенная на честной проверке.</text>` +
   // CTA bar
   `<rect x="${M}" y="900" width="${CW}" height="150" fill="none" stroke="${SAND}" stroke-width="2"/>` +
   `<text xml:space="preserve" x="${W / 2}" y="965" text-anchor="middle" font-family="${MONO}" font-weight="700" font-size="22" letter-spacing="3" fill="${MUTE}">ССЫЛКА В ПРОФИЛЕ →</text>` +
