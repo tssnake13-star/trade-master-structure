@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, Send } from 'lucide-react';
 import { NAV_ITEMS, TELEGRAM_LINKS } from '@/lib/constants';
-import logoVideoFallback from '@/assets/logo-video.mp4';
+import logoVideoFallback from '@/assets/logo-header.mp4';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 
 const Header = () => {
