@@ -7,14 +7,14 @@ const CW = W - 2 * M;         // content width 912
 const HANDLE = '@tradeliketyo';
 
 // palette — Engineered Editorial (vivid)
-const BG = '#0A0B0E';
-const PAPER = '#F6F3ED';      // bright warm off-white
-const SAND = '#F2B43C';       // vivid warm gold-sand accent
-const STEEL = '#46B6EC';      // vivid steel-blue accent
-const BODY = '#D7DBE0';       // body text
+const BG = '#07080A';
+const PAPER = '#F8F5EF';      // bright warm off-white
+const SAND = '#FFB627';       // juicy warm gold accent
+const STEEL = '#33B7F2';      // juicy steel-blue accent
+const BODY = '#DCE0E5';       // body text
 const MUTE = '#9AA0A8';       // muted mono
-const HAIR = 'rgba(246,243,237,0.18)';
-const GRID = 'rgba(246,243,237,0.055)';
+const HAIR = 'rgba(248,245,239,0.20)';
+const GRID = 'rgba(248,245,239,0.05)';
 
 const SERIF = 'Playfair Display';
 const MONO = 'JetBrains Mono';
@@ -155,8 +155,13 @@ function lookaheadFig(x, y, w, h) {
 const arrowDef = `<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0 L6 3 L0 6 z" fill="${SAND}"/></marker></defs>`;
 
 // ---------- assemble a slide ----------
+const vignette = `<defs><radialGradient id="vig" cx="0.5" cy="0.42" r="0.75">
+    <stop offset="0.55" stop-color="#000000" stop-opacity="0"/>
+    <stop offset="1" stop-color="#000000" stop-opacity="0.55"/>
+  </radialGradient></defs>`;
+
 function slide(fgInner, opts = {}) {
-  const bg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="${BG}"/>${grid()}</svg>`;
+  const bg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">${vignette}<rect width="${W}" height="${H}" fill="${BG}"/>${grid()}<rect width="${W}" height="${H}" fill="url(#vig)"/></svg>`;
   const fg = `<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">${arrowDef}${fgInner}</svg>`
     .replace(/<text (?!xml:space)/g, '<text xml:space="preserve" ');
   return { bg, fg, ...opts };
@@ -239,7 +244,7 @@ SLIDES.push(slide(
     [{ t: 'перепроверял, пока не нашёл.' }],
   ], M, 700, 27, 44) +
   // photo frame stroke + caption (photo composited under)
-  `<rect x="${PHOTO_BOX.x}" y="${PHOTO_BOX.y}" width="${PHOTO_BOX.w}" height="${PHOTO_BOX.h}" fill="none" stroke="${HAIR}" stroke-width="1.5"/>` +
+  `<rect x="${PHOTO_BOX.x}" y="${PHOTO_BOX.y}" width="${PHOTO_BOX.w}" height="${PHOTO_BOX.h}" fill="none" stroke="${SAND}" stroke-width="2" stroke-opacity="0.9"/>` +
   `<line x1="${PHOTO_BOX.x}" y1="${PHOTO_BOX.y - 12}" x2="${PHOTO_BOX.x + 120}" y2="${PHOTO_BOX.y - 12}" stroke="${SAND}" stroke-width="2"/>` +
   `<text xml:space="preserve" x="${PHOTO_BOX.x}" y="${PHOTO_BOX.y + PHOTO_BOX.h + 26}" font-family="${MONO}" font-weight="600" font-size="17" letter-spacing="1" fill="${MUTE}">FIG. 04 — АВТОР</text>` +
   footer('FIG. 04 — n = 701'),

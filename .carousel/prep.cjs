@@ -34,16 +34,14 @@ const OUT = '/home/user/trade-master-structure/.carousel/assets/';
   const em = await sharp(OUT + 'emblem.png').metadata();
   console.log('emblem.png', em.width + 'x' + em.height);
 
-  // ---- PHOTO: keep COLOR, tone-map so the dark figure reads on dark bg ----
+  // ---- PHOTO: keep the rich original look, only deepen color slightly ----
   const photo = U + 'e6e7d5fe-IMG_5804.jpeg';
   await sharp(photo)
     .resize({ width: 1000 })
-    .normalise()                                  // stretch histogram to full range
-    .linear(1.12, 4)                              // gentle contrast + lift
-    .modulate({ brightness: 1.5, saturation: 1.25 }) // brighten + richer color
-    .gamma(1.12)
+    .modulate({ brightness: 1.08, saturation: 1.22 }) // richer color, barely brighter
+    .linear(1.06, 0)                                   // gentle contrast
     .toColourspace('srgb')
     .png()
     .toFile(OUT + 'portrait.png');
-  console.log('portrait.png done (color)');
+  console.log('portrait.png done (rich color)');
 })();
