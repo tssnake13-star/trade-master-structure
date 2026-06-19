@@ -2,7 +2,7 @@ import { ArrowRight, MessageCircle } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import heroAuthorFallback from '@/assets/hero-author.jpg';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
-import CandleField from '@/components/preview-next/CandleField';
+import StructureField from '@/components/landing/StructureField';
 
 /**
  * HeroSectionV3 — production landing hero in the v3 "editorial terminal" style.
@@ -34,8 +34,8 @@ export default function HeroSectionV3() {
 
   return (
     <section id="hero" className="v3h relative min-h-[100svh] flex flex-col justify-start lg:justify-center pt-16 md:pt-20 pb-12 md:pb-16">
-      {/* moving gold candle field */}
-      <CandleField />
+      {/* abstract market-structure field (nodes + levels) */}
+      <StructureField />
 
       {/* author photo flush to the right edge (desktop ≥lg only) */}
       <div className="v3h-photo absolute top-0 right-0 h-full w-[52%] hidden lg:block" style={{ zIndex: 1 }}>
