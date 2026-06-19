@@ -1,7 +1,8 @@
 const sharp = require('sharp');
 
 const W = 1080, H = 1350, SCALE = 2;
-const PORTRAIT_SIT = '/root/.claude/uploads/0726fffc-ce6e-5d4b-af9c-689cb46b36aa/a3fc77de-B1B0D309C2E641159D38EA86E3D95AF9.png';
+const PHOTO_CROSS = '/root/.claude/uploads/0726fffc-ce6e-5d4b-af9c-689cb46b36aa/a3fc77de-B1B0D309C2E641159D38EA86E3D95AF9.png'; // arms crossed
+const PHOTO_SIT = '/root/.claude/uploads/0726fffc-ce6e-5d4b-af9c-689cb46b36aa/e6e7d5fe-IMG_5804.jpeg';               // sitting
 const MONO = 'JetBrains Mono', SANS = 'Montserrat';
 const M = 56;
 
@@ -97,7 +98,7 @@ function card({ idx, kick, title, tsize, body, fig, foot }) {
 
 // S1 COVER — portrait bg + lower glass card
 SLIDES.push(async () => {
-  let base = await sharp(PORTRAIT_SIT).resize({ width: W * SCALE, height: H * SCALE, fit: 'cover', position: 'attention', kernel: 'lanczos3' })
+  let base = await sharp(PHOTO_SIT).resize({ width: W * SCALE, height: H * SCALE, fit: 'cover', position: 'attention', kernel: 'lanczos3' })
     .modulate({ brightness: 0.82, saturation: 1.12 }).toBuffer();
   // ambient tint top
   base = await sharp(base).composite([{ input: await R(`<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><defs><radialGradient id="g" cx="0.2" cy="0.15" r="0.6"><stop offset="0" stop-color="#22D3EE" stop-opacity="0.25"/><stop offset="1" stop-color="#22D3EE" stop-opacity="0"/></radialGradient></defs><rect width="${W}" height="${H}" fill="url(#g)"/></svg>`) }]).toBuffer();
@@ -134,7 +135,7 @@ SLIDES.push(async (base) => {
   const px = x + 48;
   // portrait framed inside
   const pbx = x + w - 48 - 320, pby = y + 250, pbw = 320, pbh = 420;
-  const photo = await sharp(PORTRAIT_SIT).resize({ width: pbw * SCALE, height: pbh * SCALE, fit: 'cover', position: 'top', kernel: 'lanczos3' }).modulate({ brightness: 1.02, saturation: 1.08 }).toBuffer();
+  const photo = await sharp(PHOTO_CROSS).resize({ width: pbw * SCALE, height: pbh * SCALE, fit: 'cover', position: 'top', kernel: 'lanczos3' }).modulate({ brightness: 1.02, saturation: 1.08 }).toBuffer();
   const pmask = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${pbw * SCALE}" height="${pbh * SCALE}"><rect width="${pbw * SCALE}" height="${pbh * SCALE}" rx="${24 * SCALE}" fill="#fff"/></svg>`);
   const photoR = await sharp(photo).composite([{ input: pmask, blend: 'dest-in' }]).png().toBuffer();
   let fg = panelBorder(x, y, w, h) + headRow('04', px, y + 70, w - 96);
