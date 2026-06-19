@@ -24,14 +24,12 @@ function hl(line) { const s = []; let last = 0, m; NUM.lastIndex = 0; while ((m 
 const tsp = (segs, def) => segs.map(s => `<tspan fill="${s.c || def}"${s.it ? ' font-style="italic"' : ''}>${esc(s.t)}</tspan>`).join('');
 
 function head(idx) {
-  return emb(M, 50, 40)
-    + `<text x="${M + 72}" y="84" font-family="${MONO}" font-weight="600" font-size="19" letter-spacing="3" fill="${PAPER}" fill-opacity="0.85">@tradeliketyo</text>`
-    + `<text x="${W - M}" y="84" text-anchor="end" font-family="${MONO}" font-weight="500" font-size="17" letter-spacing="2" fill="${GOLD}">${idx} / 09</text>`
-    + `<line x1="${M}" y1="106" x2="${W - M}" y2="106" stroke="${HAIR}" stroke-width="1"/>`;
+  return emb(M, 40, 64)
+    + `<text x="${W - M}" y="92" text-anchor="end" font-family="${MONO}" font-weight="500" font-size="17" letter-spacing="2" fill="${GOLD}">${idx} / 09</text>`
+    + `<line x1="${M}" y1="118" x2="${W - M}" y2="118" stroke="${HAIR}" stroke-width="1"/>`;
 }
 function foot(fig) {
   return `<line x1="${M}" y1="${H - 92}" x2="${W - M}" y2="${H - 92}" stroke="${HAIR}" stroke-width="1"/>`
-    + `<text x="${M}" y="${H - 56}" font-family="${MONO}" font-weight="600" font-size="18" letter-spacing="1" fill="${GOLD}">@tradeliketyo</text>`
     + `<text x="${W - M}" y="${H - 56}" text-anchor="end" font-family="${MONO}" font-weight="500" font-size="16" letter-spacing="2" fill="${MUTE}">${esc(fig)}</text>`;
 }
 function titleBlock(lines, y, size, lh) {
@@ -89,10 +87,9 @@ SL.push({
   mode: 'photo', src: PORTRAIT, pos: 'attention',
   overlay: `<defs><linearGradient id="b" x1="0" x2="0" y1="0" y2="1"><stop offset="0.32" stop-color="#000" stop-opacity="0"/><stop offset="0.7" stop-color="#0a0603" stop-opacity="0.72"/><stop offset="1" stop-color="#070402" stop-opacity="0.97"/></linearGradient><radialGradient id="vg" cx="0.5" cy="0.4" r="0.8"><stop offset="0.55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.5"/></radialGradient></defs><rect width="${W}" height="${H}" fill="url(#b)"/><rect width="${W}" height="${H}" fill="url(#vg)"/>`,
   fg: fgWrap(
-    emb(M, 56, 42)
-    + `<text x="${M + 74}" y="92" font-family="${MONO}" font-weight="600" font-size="20" letter-spacing="3" fill="${PAPER}" fill-opacity="0.85">@tradeliketyo</text>`
-    + `<text x="${W - M}" y="92" text-anchor="end" font-family="${MONO}" font-weight="500" font-size="18" letter-spacing="2" fill="${GOLD}">EST. 14Y</text>`
-    + `<line x1="${M}" y1="112" x2="${W - M}" y2="112" stroke="rgba(244,236,222,0.18)" stroke-width="1"/>`
+    emb(M, 44, 68)
+    + `<text x="${W - M}" y="98" text-anchor="end" font-family="${MONO}" font-weight="500" font-size="18" letter-spacing="2" fill="${GOLD}">EST. 14Y</text>`
+    + `<line x1="${M}" y1="124" x2="${W - M}" y2="124" stroke="rgba(244,236,222,0.18)" stroke-width="1"/>`
     + `<text x="${M}" y="1000" font-family="${MONO}" font-weight="600" font-size="22" letter-spacing="4" fill="${GOLD}">14 ЛЕТ В ТРЕЙДИНГЕ</text>`
     + `<text x="${M - 4}" y="1104" font-family="${SERIF}" font-weight="700" font-size="98" fill="${PAPER}">7 вещей,</text>`
     + `<text x="${M - 4}" y="1192" font-family="${SERIF}" font-weight="700" font-size="64" font-style="italic" fill="${PAPER}">которые я усвоил</text>`
@@ -143,6 +140,7 @@ SL.push({
     + `<text x="${W / 2}" y="1024" text-anchor="middle" font-family="${MONO}" font-weight="500" font-size="23" fill="${BODY}">Бесплатно. Ссылка в описании профиля.</text>`
     + `<rect x="${W / 2 - 250}" y="1080" width="500" height="78" rx="39" fill="none" stroke="${GOLD}" stroke-width="1.5"/>`
     + `<text x="${W / 2}" y="1129" text-anchor="middle" font-family="${MONO}" font-weight="700" font-size="24" letter-spacing="2" fill="${GOLD}">СМОТРЕТЬ СИСТЕМУ →</text>`
+    + `<text x="${W / 2}" y="1216" text-anchor="middle" font-family="${SERIF}" font-weight="700" font-size="42" fill="${PAPER}">@tradeliketyo</text>`
     + foot('IX — CTA')
   )
 });

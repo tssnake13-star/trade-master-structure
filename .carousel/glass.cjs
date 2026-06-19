@@ -47,8 +47,7 @@ function panelBorder(x, y, w, h, rad = 34) {
     + `<rect x="${x + 1}" y="${y + 1}" width="${w - 2}" height="${h - 2}" rx="${rad - 1}" fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="1"/>`;
 }
 function headRow(idx, x, y, w) {
-  return emb(x, y - 30, 38)
-    + `<text x="${x + 66}" y="${y}" font-family="${MONO}" font-weight="700" font-size="20" letter-spacing="2" fill="${TEXT}">@tradeliketyo</text>`
+  return emb(x, y - 48, 62)
     + `<text x="${x + w}" y="${y}" text-anchor="end" font-family="${MONO}" font-weight="500" font-size="18" fill="${ACC}">${idx} / 07</text>`;
 }
 function titleSans(lines, x, y, size, lh) { let s = '', cy = y; for (const ln of lines) { s += `<text xml:space="preserve" x="${x}" y="${cy}" font-family="${SANS}" font-weight="800" font-size="${size}" fill="${TEXT}">${tsp(ln, TEXT)}</text>`; cy += lh; } return s; }
@@ -97,7 +96,6 @@ function card({ idx, kick, title, tsize, body, fig, foot }) {
     if (body) fg += bodySans(body, px, by, 46);
     if (fig) fg += fig(px, y + h - 360, w - 96, 250);
     fg += `<text x="${px}" y="${y + h - 44}" font-family="${MONO}" font-weight="600" font-size="17" fill="${MUT}">${esc(foot)}</text>`;
-    fg += `<text x="${x + w - 48}" y="${y + h - 44}" text-anchor="end" font-family="${MONO}" font-weight="600" font-size="17" fill="${ACC}">tradeliketyo</text>`;
     return sharp(base).composite([panel, { input: await R(fgWrap(fg)) }]);
   };
 }
@@ -111,14 +109,14 @@ SLIDES.push(async () => {
   const x = M, y = 700, w = W - 2 * M, h = 510;
   const panel = await frost(base, x, y, w, h, 36, 0.14);
   const px = x + 48;
-  let fg = emb(M, 62, 40) + `<text x="${M + 70}" y="92" font-family="${MONO}" font-weight="700" font-size="20" letter-spacing="2" fill="${TEXT}">@tradeliketyo</text>`;
-  fg += `<text x="${W - M}" y="92" text-anchor="end" font-family="${MONO}" font-weight="600" font-size="18" fill="${ACC}">FIG. 01</text>`;
+  let fg = emb(M, 44, 66);
+  fg += `<text x="${W - M}" y="98" text-anchor="end" font-family="${MONO}" font-weight="600" font-size="18" fill="${ACC}">FIG. 01</text>`;
   fg += panelBorder(x, y, w, h, 36);
-  fg += kicker('РАЗБОР · BACKTESTING', px, y + 86);
-  fg += titleSans([[{ t: 'Почему ' }, { t: '9 из 10', c: ACC }], [{ t: 'бэктестов врут' }]], px, y + 176, 72, 84);
-  fg += bodySans('Красивые цифры в тестере не равны рабочей стратегии. Разбираю, почему — и как проверять честно.', px, y + 330, 50);
-  fg += `<rect x="${px}" y="${y + h - 116}" width="300" height="72" rx="36" fill="#FFFFFF" fill-opacity="0.16" stroke="#FFFFFF" stroke-opacity="0.4" stroke-width="1.5"/>`;
-  fg += `<text x="${px + 150}" y="${y + h - 70}" text-anchor="middle" font-family="${MONO}" font-weight="700" font-size="22" fill="${TEXT}">СМОТРЕТЬ →</text>`;
+  fg += kicker('РАЗБОР · BACKTESTING', px, y + 84);
+  fg += titleSans([[{ t: 'Почему ' }, { t: '9 из 10', c: ACC }], [{ t: 'бэктестов врут' }]], px, y + 174, 72, 84);
+  fg += bodySans('Красивые цифры в тестере не равны рабочей стратегии. Разбираю, как проверять честно.', px, y + 326, 44);
+  fg += `<rect x="${px}" y="${y + h - 112}" width="300" height="72" rx="36" fill="#FFFFFF" fill-opacity="0.16" stroke="#FFFFFF" stroke-opacity="0.4" stroke-width="1.5"/>`;
+  fg += `<text x="${px + 150}" y="${y + h - 66}" text-anchor="middle" font-family="${MONO}" font-weight="700" font-size="22" fill="${TEXT}">СМОТРЕТЬ →</text>`;
   return sharp(base).composite([panel, { input: await R(fgWrap(fg)) }]);
 });
 
@@ -154,7 +152,6 @@ SLIDES.push(async (base) => {
   fg += `<rect x="${pbx}" y="${pby}" width="${pbw}" height="${pbh}" rx="24" fill="none" stroke="#FFFFFF" stroke-opacity="0.4" stroke-width="1.5"/>`;
   fg += `<text x="${pbx}" y="${pby + pbh + 30}" font-family="${MONO}" font-weight="600" font-size="16" fill="${MUT}">FIG. 04 — АВТОР</text>`;
   fg += `<text x="${px}" y="${y + h - 44}" font-family="${MONO}" font-weight="600" font-size="17" fill="${MUT}">n = 701</text>`;
-  fg += `<text x="${x + w - 48}" y="${y + h - 44}" text-anchor="end" font-family="${MONO}" font-weight="600" font-size="17" fill="${ACC}">tradeliketyo</text>`;
   return sharp(base).composite([panel, { input: photoR, left: pbx * SCALE, top: pby * SCALE }, { input: await R(fgWrap(fg)) }]);
 });
 
@@ -177,7 +174,6 @@ SLIDES.push(async (base) => {
     fg += `<line x1="${px}" y1="${iy - 46}" x2="${x + w - 48}" y2="${iy - 46}" stroke="#FFFFFF" stroke-opacity="0.12"/>`;
   }
   fg += `<text x="${px}" y="${y + h - 44}" font-family="${MONO}" font-weight="600" font-size="17" fill="${MUT}">CHECKLIST</text>`;
-  fg += `<text x="${x + w - 48}" y="${y + h - 44}" text-anchor="end" font-family="${MONO}" font-weight="600" font-size="17" fill="${ACC}">tradeliketyo</text>`;
   return sharp(base).composite([panel, { input: await R(fgWrap(fg)) }]);
 });
 
@@ -192,7 +188,7 @@ SLIDES.push(async (base) => {
   const x = M, y = 300, w = W - 2 * M, h = 760;
   const panel = await frost(base, x, y, w, h, 40, 0.14);
   const px = x + 48, cx = W / 2;
-  let fg = emb(M, 120, 40) + `<text x="${M + 70}" y="150" font-family="${MONO}" font-weight="700" font-size="20" letter-spacing="2" fill="${TEXT}">@tradeliketyo</text>`;
+  let fg = emb(M, 104, 64);
   fg += `<text x="${W - M}" y="150" text-anchor="end" font-family="${MONO}" font-weight="600" font-size="18" fill="${ACC}">07 / 07</text>`;
   fg += panelBorder(x, y, w, h, 40);
   fg += kicker('ЧТО ДАЛЬШЕ', cx, y + 110).replace(`x="${cx}"`, `x="${cx}" text-anchor="middle"`);
