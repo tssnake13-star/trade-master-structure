@@ -48,12 +48,12 @@ export default function HeroSectionV3() {
       </div>
 
       {/* stacked centered photo for mobile + tablet (desktop ≥lg uses flush-right) */}
-      <div className="lg:hidden relative w-full mb-6" style={{ height: '38vh', zIndex: 1 }}>
+      <div className="lg:hidden relative w-full mb-6" style={{ height: '44vh', zIndex: 1 }}>
         <img
           src={heroAuthor}
           alt="Сергей — автор системы TRADELIKETYO"
           className="w-full h-full object-cover"
-          style={{ objectPosition: '50% 22%' }}
+          style={{ objectPosition: '50% 16%' }}
         />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 32%, var(--v3-bg) 96%)' }} />
       </div>

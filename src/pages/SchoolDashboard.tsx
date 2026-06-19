@@ -444,8 +444,9 @@ export default function SchoolDashboard() {
             <video key={logoVideo} src={logoVideo} autoPlay loop muted playsInline className="w-full h-full object-cover" />
           </div>
           <div className="min-w-0">
-            <div style={{ fontFamily: MONO, fontSize: 14, letterSpacing: '0.18em', textTransform: 'uppercase', color: FG }}>
-              {t('sidebar_brand')}
+            {/* wordmark: TRADE·LIKE·TYO with LIKE in gold (replaces plain brand text) */}
+            <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 15, letterSpacing: '0.04em', textTransform: 'uppercase', color: FG, whiteSpace: 'nowrap' }}>
+              TRADE<span style={{ color: ACCENT }}>LIKE</span>TYO
             </div>
           </div>
         </button>
