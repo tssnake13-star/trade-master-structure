@@ -1,7 +1,7 @@
 const sharp = require('sharp');
 const fs = require('fs');
 
-const EMB = `data:image/png;base64,${fs.readFileSync('.carousel/assets/emblem.png').toString('base64')}`;
+const EMB = `data:image/png;base64,${fs.readFileSync('.carousel/assets/emblem-gold.png').toString('base64')}`;
 const EMBR = 1833 / 1151;
 const emb = (x, y, h) => `<image href="${EMB}" x="${x}" y="${y}" height="${h}" width="${h * EMBR}"/>`;
 
