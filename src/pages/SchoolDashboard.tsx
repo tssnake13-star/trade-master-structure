@@ -571,10 +571,6 @@ export default function SchoolDashboard() {
               <button onClick={() => setMobileSidebarOpen(true)} className="sm:hidden p-1.5 hover:bg-white/5 rounded transition">
                 <Menu size={18} style={{ color: FG }} />
               </button>
-              {/* video logo — top-left corner on mobile (desktop has it in the sidebar) */}
-              <div className="sm:hidden" style={{ width: 30, height: 30, overflow: 'hidden', flexShrink: 0, backgroundColor: '#000' }}>
-                <video key={logoVideo} src={logoVideo} autoPlay loop muted playsInline className="w-full h-full object-cover" />
-              </div>
               <span className="inline-block" style={{
                 width: 6, height: 6, borderRadius: '50%',
                 backgroundColor: isFreeUser ? '#888' : ACCENT,
