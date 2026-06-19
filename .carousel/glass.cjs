@@ -1,4 +1,9 @@
 const sharp = require('sharp');
+const fs = require('fs');
+
+const EMB = `data:image/png;base64,${fs.readFileSync('.carousel/assets/emblem.png').toString('base64')}`;
+const EMBR = 1833 / 1151;
+const emb = (x, y, h) => `<image href="${EMB}" x="${x}" y="${y}" height="${h}" width="${h * EMBR}"/>`;
 
 const W = 1080, H = 1350, SCALE = 2;
 const PHOTO_CROSS = '/root/.claude/uploads/0726fffc-ce6e-5d4b-af9c-689cb46b36aa/a3fc77de-B1B0D309C2E641159D38EA86E3D95AF9.png'; // arms crossed
@@ -42,7 +47,8 @@ function panelBorder(x, y, w, h, rad = 34) {
     + `<rect x="${x + 1}" y="${y + 1}" width="${w - 2}" height="${h - 2}" rx="${rad - 1}" fill="none" stroke="#FFFFFF" stroke-opacity="0.06" stroke-width="1"/>`;
 }
 function headRow(idx, x, y, w) {
-  return `<text x="${x}" y="${y}" font-family="${MONO}" font-weight="700" font-size="20" letter-spacing="2" fill="${TEXT}">@tradeliketyo</text>`
+  return emb(x, y - 30, 38)
+    + `<text x="${x + 66}" y="${y}" font-family="${MONO}" font-weight="700" font-size="20" letter-spacing="2" fill="${TEXT}">@tradeliketyo</text>`
     + `<text x="${x + w}" y="${y}" text-anchor="end" font-family="${MONO}" font-weight="500" font-size="18" fill="${ACC}">${idx} / 07</text>`;
 }
 function titleSans(lines, x, y, size, lh) { let s = '', cy = y; for (const ln of lines) { s += `<text xml:space="preserve" x="${x}" y="${cy}" font-family="${SANS}" font-weight="800" font-size="${size}" fill="${TEXT}">${tsp(ln, TEXT)}</text>`; cy += lh; } return s; }
@@ -105,7 +111,7 @@ SLIDES.push(async () => {
   const x = M, y = 700, w = W - 2 * M, h = 510;
   const panel = await frost(base, x, y, w, h, 36, 0.14);
   const px = x + 48;
-  let fg = `<text x="${M}" y="92" font-family="${MONO}" font-weight="700" font-size="20" letter-spacing="2" fill="${TEXT}">@tradeliketyo</text>`;
+  let fg = emb(M, 62, 40) + `<text x="${M + 70}" y="92" font-family="${MONO}" font-weight="700" font-size="20" letter-spacing="2" fill="${TEXT}">@tradeliketyo</text>`;
   fg += `<text x="${W - M}" y="92" text-anchor="end" font-family="${MONO}" font-weight="600" font-size="18" fill="${ACC}">FIG. 01</text>`;
   fg += panelBorder(x, y, w, h, 36);
   fg += kicker('РАЗБОР · BACKTESTING', px, y + 86);
@@ -186,7 +192,7 @@ SLIDES.push(async (base) => {
   const x = M, y = 300, w = W - 2 * M, h = 760;
   const panel = await frost(base, x, y, w, h, 40, 0.14);
   const px = x + 48, cx = W / 2;
-  let fg = `<text x="${M}" y="150" font-family="${MONO}" font-weight="700" font-size="20" letter-spacing="2" fill="${TEXT}">@tradeliketyo</text>`;
+  let fg = emb(M, 120, 40) + `<text x="${M + 70}" y="150" font-family="${MONO}" font-weight="700" font-size="20" letter-spacing="2" fill="${TEXT}">@tradeliketyo</text>`;
   fg += `<text x="${W - M}" y="150" text-anchor="end" font-family="${MONO}" font-weight="600" font-size="18" fill="${ACC}">07 / 07</text>`;
   fg += panelBorder(x, y, w, h, 40);
   fg += kicker('ЧТО ДАЛЬШЕ', cx, y + 110).replace(`x="${cx}"`, `x="${cx}" text-anchor="middle"`);

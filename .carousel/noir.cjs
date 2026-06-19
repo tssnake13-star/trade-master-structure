@@ -1,4 +1,9 @@
 const sharp = require('sharp');
+const fs = require('fs');
+
+const EMB = `data:image/png;base64,${fs.readFileSync('.carousel/assets/emblem.png').toString('base64')}`;
+const EMBR = 1833 / 1151;
+const emb = (x, y, h) => `<image href="${EMB}" x="${x}" y="${y}" height="${h}" width="${h * EMBR}"/>`;
 
 const W = 1080, H = 1350, SCALE = 2;
 const PORTRAIT = '/root/.claude/uploads/0726fffc-ce6e-5d4b-af9c-689cb46b36aa/a3fc77de-B1B0D309C2E641159D38EA86E3D95AF9.png';
@@ -19,7 +24,8 @@ function hl(line) { const s = []; let last = 0, m; NUM.lastIndex = 0; while ((m 
 const tsp = (segs, def) => segs.map(s => `<tspan fill="${s.c || def}"${s.it ? ' font-style="italic"' : ''}>${esc(s.t)}</tspan>`).join('');
 
 function head(idx) {
-  return `<text x="${M}" y="84" font-family="${MONO}" font-weight="600" font-size="19" letter-spacing="3" fill="${PAPER}" fill-opacity="0.85">@tradeliketyo</text>`
+  return emb(M, 50, 40)
+    + `<text x="${M + 72}" y="84" font-family="${MONO}" font-weight="600" font-size="19" letter-spacing="3" fill="${PAPER}" fill-opacity="0.85">@tradeliketyo</text>`
     + `<text x="${W - M}" y="84" text-anchor="end" font-family="${MONO}" font-weight="500" font-size="17" letter-spacing="2" fill="${GOLD}">${idx} / 09</text>`
     + `<line x1="${M}" y1="106" x2="${W - M}" y2="106" stroke="${HAIR}" stroke-width="1"/>`;
 }
@@ -83,7 +89,8 @@ SL.push({
   mode: 'photo', src: PORTRAIT, pos: 'attention',
   overlay: `<defs><linearGradient id="b" x1="0" x2="0" y1="0" y2="1"><stop offset="0.32" stop-color="#000" stop-opacity="0"/><stop offset="0.7" stop-color="#0a0603" stop-opacity="0.72"/><stop offset="1" stop-color="#070402" stop-opacity="0.97"/></linearGradient><radialGradient id="vg" cx="0.5" cy="0.4" r="0.8"><stop offset="0.55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity="0.5"/></radialGradient></defs><rect width="${W}" height="${H}" fill="url(#b)"/><rect width="${W}" height="${H}" fill="url(#vg)"/>`,
   fg: fgWrap(
-    `<text x="${M}" y="92" font-family="${MONO}" font-weight="600" font-size="20" letter-spacing="3" fill="${PAPER}" fill-opacity="0.85">@tradeliketyo</text>`
+    emb(M, 56, 42)
+    + `<text x="${M + 74}" y="92" font-family="${MONO}" font-weight="600" font-size="20" letter-spacing="3" fill="${PAPER}" fill-opacity="0.85">@tradeliketyo</text>`
     + `<text x="${W - M}" y="92" text-anchor="end" font-family="${MONO}" font-weight="500" font-size="18" letter-spacing="2" fill="${GOLD}">EST. 14Y</text>`
     + `<line x1="${M}" y1="112" x2="${W - M}" y2="112" stroke="rgba(244,236,222,0.18)" stroke-width="1"/>`
     + `<text x="${M}" y="1000" font-family="${MONO}" font-weight="600" font-size="22" letter-spacing="4" fill="${GOLD}">14 ЛЕТ В ТРЕЙДИНГЕ</text>`
