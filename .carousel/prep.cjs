@@ -37,7 +37,7 @@ const OUT = '/home/user/trade-master-structure/.carousel/assets/';
   // ---- PHOTO: keep the rich original look, only deepen color slightly ----
   const photo = U + 'e6e7d5fe-IMG_5804.jpeg';
   await sharp(photo)
-    .resize({ width: 1000 })
+    .resize({ width: 1600, kernel: 'lanczos3' })
     .modulate({ brightness: 1.08, saturation: 1.22 }) // richer color, barely brighter
     .linear(1.06, 0)                                   // gentle contrast
     .toColourspace('srgb')

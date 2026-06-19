@@ -321,23 +321,32 @@ SLIDES.push(slide(
 ));
 
 // ---------- render ----------
+const SCALE = 2;                 // supersample factor -> 2160x2700 output
+const DPI = 72 * SCALE;          // SVG render density
+
+// render an SVG string to a crisp raster at SCALE
+const renderSvg = (svg) => sharp(Buffer.from(svg), { density: DPI })
+  .resize(W * SCALE, H * SCALE).png().toBuffer();
+
 (async () => {
   for (let i = 0; i < SLIDES.length; i++) {
     const sl = SLIDES[i];
-    const base = await sharp(Buffer.from(sl.bg)).png().toBuffer();
+    const base = await renderSvg(sl.bg);
     const layers = [];
     if (sl.photo) {
       const p = sl.photo;
-      const plate = await sharp({ create: { width: p.w, height: p.h, channels: 3, background: '#161B20' } }).png().toBuffer();
-      layers.push({ input: plate, left: p.x, top: p.y });
+      const pw = p.w * SCALE, ph = p.h * SCALE, px = p.x * SCALE, py = p.y * SCALE;
+      const plate = await sharp({ create: { width: pw, height: ph, channels: 3, background: '#161B20' } }).png().toBuffer();
+      layers.push({ input: plate, left: px, top: py });
       const photo = await sharp('.carousel/assets/portrait.png')
-        .resize({ width: p.w, height: p.h, fit: 'cover', position: 'top' })
+        .resize({ width: pw, height: ph, fit: 'cover', position: 'top', kernel: 'lanczos3' })
+        .sharpen({ sigma: 0.6 })
         .toBuffer();
-      layers.push({ input: photo, left: p.x, top: p.y });
+      layers.push({ input: photo, left: px, top: py });
     }
-    layers.push({ input: Buffer.from(sl.fg) });
+    layers.push({ input: await renderSvg(sl.fg) });
     const file = `.carousel/out/eng-${String(i + 1).padStart(2, '0')}.png`;
-    await sharp(base).composite(layers).png().toFile(file);
-    console.log('rendered', file);
+    await sharp(base).composite(layers).png({ compressionLevel: 9 }).toFile(file);
+    console.log('rendered', file, `${W * SCALE}x${H * SCALE}`);
   }
 })();
