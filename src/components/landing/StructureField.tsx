@@ -9,7 +9,19 @@ import { useEffect, useRef } from 'react';
  */
 const GOLD = '225,168,77'; // v3 gold (#e1a84d) rgb
 
-export default function StructureField() {
+const DEFAULT_MASK = 'radial-gradient(120% 90% at 42% 50%, #000 35%, transparent 80%)';
+
+export default function StructureField({
+  position = 'absolute',
+  opacity = 1,
+  mask = DEFAULT_MASK,
+  zIndex = 0,
+}: {
+  position?: 'absolute' | 'fixed';
+  opacity?: number;
+  mask?: string;
+  zIndex?: number;
+} = {}) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -104,9 +116,9 @@ export default function StructureField() {
       ref={ref}
       aria-hidden
       style={{
-        position: 'absolute', inset: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none',
-        maskImage: 'radial-gradient(120% 90% at 42% 50%, #000 35%, transparent 80%)',
-        WebkitMaskImage: 'radial-gradient(120% 90% at 42% 50%, #000 35%, transparent 80%)',
+        position, inset: 0, width: '100%', height: '100%', zIndex, pointerEvents: 'none', opacity,
+        maskImage: mask,
+        WebkitMaskImage: mask,
       }}
     />
   );

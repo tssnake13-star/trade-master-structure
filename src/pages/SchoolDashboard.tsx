@@ -6,7 +6,17 @@ import { Lock, Settings, LogOut, ArrowRight, Menu, Ticket, Home as HomeIcon, Mes
 import logoVideoFallback from '@/assets/logo-header.mp4';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 import { useDashboardTexts, type DashboardTextKey } from '@/lib/dashboardTexts';
-import ConstellationBg from '@/components/ConstellationBg';
+import StructureField from '@/components/landing/StructureField';
+
+// v3 structure background for the cabinet — full-screen, faint, centred.
+const CabinetBg = () => (
+  <StructureField
+    position="fixed"
+    opacity={0.5}
+    zIndex={0}
+    mask="radial-gradient(150% 120% at 50% 38%, #000 45%, transparent 92%)"
+  />
+);
 
 interface Course {
   id: string;
@@ -89,7 +99,7 @@ function ProgressRing({ pct, label }: { pct: number; label: string }) {
 function DashSkeleton() {
   return (
     <div data-school-skin className="min-h-screen" style={{ backgroundColor: BG, color: FG }}>
-      <ConstellationBg />
+      <CabinetBg />
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
         <div className="tly-skel" style={{ height: 40, width: '60%', borderRadius: 8, marginBottom: 14 }} />
         <div className="tly-skel" style={{ height: 16, width: '40%', borderRadius: 6, marginBottom: 28 }} />
@@ -423,7 +433,7 @@ export default function SchoolDashboard() {
   // ============= RENDER =============
   return (
     <div data-school-skin className="min-h-screen flex flex-col sm:flex-row relative z-10" style={{ backgroundColor: BG, color: FG }}>
-      <ConstellationBg />
+      <CabinetBg />
       {mobileSidebarOpen && (
         <div className="sm:hidden fixed inset-0 z-40" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }} onClick={() => setMobileSidebarOpen(false)} />
       )}
