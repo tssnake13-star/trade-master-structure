@@ -10,6 +10,6 @@ export const NAV_ITEMS = [
   { label: 'Как работает', href: '#trading-system' },
   { label: 'Результаты', href: '#stats' },
   { label: 'Отзывы', href: '#proof' },
-  { label: 'Уровни', href: '#formats' },
+  { label: 'Сотрудничество', href: '#formats' },
   { label: 'Автор', href: '#author' },
 ] as const;
