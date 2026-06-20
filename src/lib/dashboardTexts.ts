@@ -39,19 +39,19 @@ export const DASHBOARD_TEXT_DEFAULTS = {
   paid_hero_completed_text: 'Вы прошли 100% основной программы. Приступайте к тренировкам и наработке опыта насмотренности.',
 
   // ===== Continue card =====
-  continue_eyebrow: 'Продолжить · занятие',
+  continue_eyebrow: 'Продолжить · блок',
   continue_meta_video: '● Видео',
   continue_meta_pdf: '● PDF',
   continue_open: 'Открыть',
   continue_pending_eyebrow: 'Ожидает открытия',
-  continue_pending_title: 'Следующее занятие откроет наставник',
+  continue_pending_title: 'Следующий блок откроет наставник',
   continue_done_eyebrow: 'Программа завершена',
-  continue_done_title: 'Все занятия пройдены ✓',
+  continue_done_title: 'Все блоки пройдены ✓',
 
   // ===== KPI cells (paid) =====
   kpi_days_label: 'День в системе',
-  kpi_remaining_label: 'Осталось уроков',
-  kpi_completed_label: 'Завершено уроков',
+  kpi_remaining_label: 'Осталось блоков',
+  kpi_completed_label: 'Завершено блоков',
   kpi_completed_primary: 'Основные',
   kpi_completed_secondary: 'Дополнительные',
   kpi_countdown_label: 'До завершения обучения',
@@ -66,16 +66,16 @@ export const DASHBOARD_TEXT_DEFAULTS = {
 
   // ===== Free home =====
   free_hero_title: 'Добро пожаловать в *систему*.',
-  free_hero_subtitle_template: 'Вы получили доступ к {total} вводным занятиям TLT. Они показывают, как устроена система. Основная программа TRADE MASTER 4.5 открывается по коду доступа от администратора.',
+  free_hero_subtitle_template: 'Вы получили доступ к {total} вводным блокам TLT. Они показывают, как устроена система. Основная программа TRADE MASTER 4.5 открывается по коду доступа от администратора.',
   free_kpi_intro_label: 'Вводный курс',
   free_kpi_main_label: 'Основная программа',
-  free_kpi_main_value_suffix: 'занятий · TM 4.5',
+  free_kpi_main_value_suffix: 'блоков · TM 4.5',
   free_kpi_main_locked: 'Закрыто · нужен код',
   free_intro_eyebrow: 'Доступ открыт · начните здесь',
-  free_intro_title: 'Допуск получают *не все*. Начните с первого занятия.',
+  free_intro_title: 'Допуск получают *не все*. Начните с первого блока.',
   free_intro_subtitle: 'Это вводная программа. Она показывает, как устроены правила. Если поймёте — будет основная.',
-  free_intro_cta: 'Перейти к занятию 1',
-  free_continue_eyebrow: 'Продолжить · занятие',
+  free_intro_cta: 'Перейти к блоку 1',
+  free_continue_eyebrow: 'Продолжить · блок',
   free_continue_open: 'Открыть',
   free_done_eyebrow: '◆ Готовы к следующему шагу',
   free_done_title: 'Вы готовы к *основной* программе.',
@@ -192,7 +192,7 @@ export const DASHBOARD_TEXT_GROUPS: { title: string; keys: DashboardTextKey[] }[
     ],
   },
   {
-    title: 'Карточки занятий и состояния',
+    title: 'Карточки блоков и состояния',
     keys: [
       'course_eyebrow', 'course_lesson_locked', 'course_lesson_repeat', 'course_lesson_open',
       'loading_label', 'locked_program_message',

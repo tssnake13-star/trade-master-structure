@@ -136,7 +136,7 @@ function BackupSection() {
         Резервная копия данных
       </h3>
       <p className="text-[11px] mb-3 leading-relaxed" style={{ color: '#888', fontFamily: font.mono }}>
-        Скачивает один файл со всеми данными школы (ученики, курсы, уроки, доступы, прогресс, инвайты, настройки).
+        Скачивает один файл со всеми данными школы (ученики, курсы, блоки, доступы, прогресс, инвайты, настройки).
         Только чтение — ничего не меняет. Делайте периодически и храните у себя.
       </p>
       <div className="flex items-center gap-3 flex-wrap">
@@ -952,7 +952,7 @@ function CoursesTab() {
                               </div>
                               {editingLessonId === l.id && (
                                 <div className="space-y-2 pt-2 pb-3 pl-4 border-l" style={{ borderColor: '#1a1a1a' }}>
-                                  <input placeholder="Название занятия" value={editLessonForm.title} onChange={e => setEditLessonForm({ ...editLessonForm, title: e.target.value })}
+                                  <input placeholder="Название блока" value={editLessonForm.title} onChange={e => setEditLessonForm({ ...editLessonForm, title: e.target.value })}
                                     className="w-full px-3 py-2 rounded border text-xs" style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
                                   <textarea placeholder="Описание" value={editLessonForm.description} onChange={e => setEditLessonForm({ ...editLessonForm, description: e.target.value })}
                                     className="w-full px-3 py-2 rounded border text-xs" rows={2} style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
@@ -970,7 +970,7 @@ function CoursesTab() {
 
                       {showAddLesson === c.id ? (
                         <div className="space-y-2 pt-2">
-                          <input placeholder="Название занятия" value={lessonForm.title} onChange={e => setLessonForm({ ...lessonForm, title: e.target.value })}
+                          <input placeholder="Название блока" value={lessonForm.title} onChange={e => setLessonForm({ ...lessonForm, title: e.target.value })}
                             className="w-full px-3 py-2 rounded border text-xs" style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
                           <textarea placeholder="Описание" value={lessonForm.description} onChange={e => setLessonForm({ ...lessonForm, description: e.target.value })}
                             className="w-full px-3 py-2 rounded border text-xs" rows={2} style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }} />
@@ -986,7 +986,7 @@ function CoursesTab() {
                           className="flex items-center gap-1 text-xs mt-1"
                           style={{ color: '#4a8a4a', fontFamily: font.mono }}
                         >
-                          <Plus size={12} /> Добавить занятие
+                          <Plus size={12} /> Добавить блок
                         </button>
                       )}
                     </div>

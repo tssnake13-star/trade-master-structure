@@ -368,7 +368,7 @@ export default function SchoolLesson() {
                     textAlign: 'center', letterSpacing: '0.04em',
                   }}
                 >
-                  Напишите Сергею, чтобы выполнить задание и получить доступ к следующему занятию.
+                  Напишите Сергею, чтобы выполнить задание и получить доступ к следующему блоку.
                 </p>
               )}
             </div>
@@ -392,7 +392,7 @@ export default function SchoolLesson() {
                 opacity: marking ? 0.6 : 1,
               }}
             >
-              <CheckCircle size={14} /> {isCompleted ? 'Урок завершён' : marking ? '...' : 'Завершить урок'}
+              <CheckCircle size={14} /> {isCompleted ? 'Блок завершён' : marking ? '...' : 'Завершить блок'}
             </button>
           )}
 

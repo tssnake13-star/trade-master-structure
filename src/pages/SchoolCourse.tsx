@@ -96,7 +96,7 @@ export default function SchoolCourse() {
             Главная / <span style={{ color: ACCENT }}>{courseTitle}</span>
           </button>
           <span style={{ fontFamily: MONO, fontSize: 11, color: '#666', fontVariantNumeric: 'tabular-nums' }} className="hidden sm:inline">
-            {completed}/{total} занятий · {pct}%
+            {completed}/{total} блоков · {pct}%
           </span>
         </div>
       </header>

@@ -186,14 +186,14 @@ export default function SchoolPreview() {
               {DEMO.name}, <em>система ждёт допуска.</em>
             </h1>
             <p style={{ fontFamily: 'var(--ui)', fontSize: 15, lineHeight: 1.6, color: MUT, maxWidth: '60ch', marginTop: 16 }}>
-              Вы прошли <span style={{ color: FG }}>{PCT}%</span> основной программы и стоите на этапе фильтрации входов. Сегодня — занятие {pad(DEMO.nextNum)}. Войдите в режим, повторите состояние, захватите цель.
+              Вы прошли <span style={{ color: FG }}>{PCT}%</span> основной программы и стоите на этапе фильтрации входов. Сегодня — блок {pad(DEMO.nextNum)}. Войдите в режим, повторите состояние, захватите цель.
             </p>
           </div>
 
           {/* Continue + Ring */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-3" style={{ marginBottom: 14 }}>
             <button className="lk-card lg:col-span-2 text-left lk-rise" style={{ padding: 30, background: `radial-gradient(circle at 0% 0%, oklch(0.82 0.14 72 / 0.10), ${SURF} 60%)` }}>
-              <div style={{ ...eyebrow, marginBottom: 12 }}>▶ Продолжить · занятие {pad(DEMO.nextNum)}</div>
+              <div style={{ ...eyebrow, marginBottom: 12 }}>▶ Продолжить · блок {pad(DEMO.nextNum)}</div>
               <h2 className="lk-display" style={{ fontSize: 27, marginBottom: 10 }}>{DEMO.nextTitle}</h2>
               <p style={{ fontFamily: 'var(--ui)', fontSize: 13.5, lineHeight: 1.55, color: MUT, maxWidth: '52ch', marginBottom: 18 }}>{DEMO.nextDesc}</p>
               <div className="flex items-center justify-between flex-wrap gap-3">
@@ -210,8 +210,8 @@ export default function SchoolPreview() {
           {/* KPI strip */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3" style={{ marginBottom: 14 }}>
             <div style={cell}><div style={kLabel}>День в системе</div><div style={kNum}>{DEMO.daysIn}<span style={{ color: FAINT, fontSize: 20 }}> / {DEMO.daysTotal}</span></div></div>
-            <div style={cell}><div style={kLabel}>Завершено уроков</div><div style={kNum}>{DEMO.completed}<span style={{ color: FAINT, fontSize: 20 }}> / {DEMO.total}</span></div></div>
-            <div style={cell}><div style={kLabel}>Осталось уроков</div><div style={kNum}>{DEMO.total - DEMO.completed}<span style={{ color: FAINT, fontSize: 20 }}> / {DEMO.total}</span></div></div>
+            <div style={cell}><div style={kLabel}>Завершено блоков</div><div style={kNum}>{DEMO.completed}<span style={{ color: FAINT, fontSize: 20 }}> / {DEMO.total}</span></div></div>
+            <div style={cell}><div style={kLabel}>Осталось блоков</div><div style={kNum}>{DEMO.total - DEMO.completed}<span style={{ color: FAINT, fontSize: 20 }}> / {DEMO.total}</span></div></div>
             <div style={{ ...cell, borderColor: 'oklch(0.55 0.10 72)' }}><div style={kLabel}>До финальной сессии</div><div style={{ ...kNum, color: GOLD }}>{DEMO.finalInDays}<span style={{ color: FAINT, fontSize: 20 }}> дней</span></div></div>
           </div>
 
