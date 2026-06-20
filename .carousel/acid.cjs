@@ -2,8 +2,8 @@ const sharp = require('sharp');
 const fs = require('fs');
 
 const W = 1080, H = 1350, SCALE = 2, M = 56;
-const CROSS = '/root/.claude/uploads/0726fffc-ce6e-5d4b-af9c-689cb46b36aa/a3fc77de-B1B0D309C2E641159D38EA86E3D95AF9.png';
-const SIT = '/root/.claude/uploads/0726fffc-ce6e-5d4b-af9c-689cb46b36aa/e6e7d5fe-IMG_5804.jpeg';
+const CHIN = '/root/.claude/uploads/0726fffc-ce6e-5d4b-af9c-689cb46b36aa/6664f77e-IMG_0325.png';   // hand on chin -> cover
+const HANDS = '/root/.claude/uploads/0726fffc-ce6e-5d4b-af9c-689cb46b36aa/ea3e7b52-IMG_6639.jpeg'; // hands clasped -> CTA
 const MONO = 'JetBrains Mono', GROTESK = 'Oswald';
 
 const INK = '#06070A', LIME = '#C6F24E', CYAN = '#22D3EE', WHITE = '#F2F5EC', BODY = '#CDD2C8', MUT = '#828892', RED = '#FF5C5C';
@@ -43,7 +43,7 @@ function body(text, x, y, max, size = 27, lh = 44, anc) { let s = '', cy = y; fo
 function candles(x, y, w, n = 16) {
   let r = 9; const rnd = () => { r = (r * 9301 + 49297) % 233280; return r / 233280; };
   const step = w / n; let s = `<g opacity="0.9">`; let mid = y;
-  for (let i = 0; i < n; i++) { const cx = x + i * step + step / 2; mid += (rnd() - 0.5) * 22; mid = Math.max(y - 26, Math.min(y + 26, mid)); const bh = 8 + rnd() * 24, up = rnd() > 0.42, c = up ? LIME : RED, wick = bh + 8 + rnd() * 14; s += `<line x1="${cx}" y1="${mid - wick / 2}" x2="${cx}" y2="${mid + wick / 2}" stroke="${c}" stroke-width="2"/>`; s += `<rect x="${cx - step * 0.26}" y="${mid - bh / 2}" width="${step * 0.52}" height="${bh}" fill="${up ? c : 'none'}" stroke="${c}" stroke-width="2"/>`; }
+  for (let i = 0; i < n; i++) { const cx = x + i * step + step / 2; mid += (rnd() - 0.5) * 22; mid = Math.max(y - 26, Math.min(y + 26, mid)); const bh = 8 + rnd() * 24, up = rnd() > 0.42, c = up ? LIME : RED, wick = bh + 8 + rnd() * 14; s += `<line x1="${cx}" y1="${mid - wick / 2}" x2="${cx}" y2="${mid + wick / 2}" stroke="${c}" stroke-width="2"/>`; s += `<rect x="${cx - step * 0.26}" y="${mid - bh / 2}" width="${step * 0.52}" height="${bh}" fill="${c}" stroke="${c}" stroke-width="2"/>`; }
   return s + `</g>`;
 }
 function statCells(items, x, y, w, perRow) {
@@ -63,7 +63,7 @@ const fgWrap = (inner) => `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" 
 
 async function feather(src, w, h, dir = 'l') {
   const pw = w * SCALE, ph = h * SCALE;
-  let buf = await sharp(src).resize({ width: pw, height: ph, fit: 'cover', position: 'centre', kernel: 'lanczos3' }).modulate({ brightness: 1.05, saturation: 1.12 }).linear(1.06, 0).sharpen({ sigma: 0.6 }).png().toBuffer();
+  let buf = await sharp(src).resize({ width: pw, height: ph, fit: 'cover', position: 'top', kernel: 'lanczos3' }).modulate({ brightness: 1.05, saturation: 1.12 }).linear(1.06, 0).sharpen({ sigma: 0.6 }).png().toBuffer();
   const grad = dir === 'l' ? `<linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="0.34" stop-color="#fff" stop-opacity="1"/></linearGradient>`
     : `<linearGradient id="g" x1="1" x2="0"><stop offset="0" stop-color="#fff" stop-opacity="0"/><stop offset="0.34" stop-color="#fff" stop-opacity="1"/></linearGradient>`;
   const mask = Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${pw}" height="${ph}"><defs>${grad}</defs><rect width="${pw}" height="${ph}" fill="url(#g)"/></svg>`);
@@ -87,7 +87,7 @@ function slide({ idx, kick, title, tsize, lh, text, max = 50, tag, stats, perRow
 
 // S1 COVER (photo)
 SL.push({
-  type: 'photo', src: CROSS, w: 520, h: 1350, x: 560,
+  type: 'photo', src: CHIN, w: 520, h: 1350, x: 560,
   fg: fgWrap(
     header('01')
     + kicker('// РАЗБОР · МЫШЛЕНИЕ', 230)
@@ -134,7 +134,7 @@ SL.push(slide({ idx: '07', kick: '// ЧТО МЕНЯЕТСЯ', tag: '07 — SYST
 
 // S8 CTA (photo + handle)
 SL.push({
-  type: 'photo', src: SIT, w: 470, h: 1350, x: 610, dir: 'l',
+  type: 'photo', src: HANDS, w: 470, h: 1350, x: 610, dir: 'l',
   fg: fgWrap(
     header('08')
     + kicker('// ДОСТУП ОТКРЫТ', 240)
