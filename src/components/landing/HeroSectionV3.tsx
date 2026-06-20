@@ -47,15 +47,17 @@ export default function HeroSectionV3() {
         8V8<br />01
       </div>
 
-      {/* stacked centered photo for mobile + tablet (desktop ≥lg uses flush-right) */}
-      <div className="lg:hidden relative w-full mb-6" style={{ height: '44vh', zIndex: 1 }}>
+      {/* stacked centered photo for mobile + tablet (desktop ≥lg uses flush-right).
+          -mt-16 pulls it up behind the fixed header so there's no black top band;
+          the top of the gradient keeps the logo/menu legible and blends smoothly. */}
+      <div className="lg:hidden relative w-full mb-6 -mt-16" style={{ height: '46vh', zIndex: 1 }}>
         <img
           src={heroAuthor}
           alt="Сергей — автор системы TRADELIKETYO"
           className="w-full h-full object-cover"
           style={{ objectPosition: '50% 16%' }}
         />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, transparent 32%, var(--v3-bg) 96%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, var(--v3-bg) 0%, transparent 26%, transparent 66%, var(--v3-bg) 96%)' }} />
       </div>
 
       {/* text */}
