@@ -99,7 +99,7 @@
 
 .v3h-offer {
   font-family: var(--font-ui);
-  font-size: clamp(18px, 1.85vw, 25px);
+  font-size: clamp(20px, 2.2vw, 25px);
   line-height: 1.5;
   color: var(--v3-mut);
   max-width: 46ch;

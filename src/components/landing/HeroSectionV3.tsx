@@ -15,17 +15,17 @@ import StructureField from '@/components/landing/StructureField';
 // Original headline, split for the per-word rise.
 const HEAD: { t: string; cls?: 'em' | 'mute' }[] = [
   { t: 'Вы' }, { t: 'читаете' }, { t: 'рынок.', cls: 'em' },
-  { t: 'Но', cls: 'mute' }, { t: 'теряете', cls: 'mute' }, { t: 'на', cls: 'mute' }, { t: 'решениях.', cls: 'mute' },
+  { t: 'Но', cls: 'mute' }, { t: 'теряете', cls: 'mute' }, { t: 'из-за', cls: 'mute' }, { t: 'эмоций.', cls: 'mute' },
 ];
 
 // Original positioning offer.
 const OFFER: { t: string; cls?: 'gold' | 'mute' | 'uline' }[] = [
-  { t: 'Помогаю трейдерам заменить ' },
-  { t: 'хаос в решениях', cls: 'mute' },
-  { t: ' на ' },
-  { t: 'чёткий алгоритм', cls: 'gold' },
-  { t: ' — чтобы вход разрешала ' },
-  { t: 'система, а не эмоция', cls: 'uline' },
+  { t: 'Помогаю опытным трейдерам перейти от ' },
+  { t: 'хаотичных входов', cls: 'mute' },
+  { t: ' к системе, где каждую сделку разрешает ' },
+  { t: 'алгоритм', cls: 'gold' },
+  { t: ', а не ' },
+  { t: 'настроение в моменте', cls: 'uline' },
   { t: '.' },
 ];
 
