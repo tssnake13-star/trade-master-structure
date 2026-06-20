@@ -55,7 +55,7 @@ export default function HeroSectionV3() {
           src={heroAuthor}
           alt="Сергей — автор системы TRADELIKETYO"
           className="w-full h-full object-cover"
-          style={{ objectPosition: '50% 10%' }}
+          style={{ objectPosition: '50% 6%' }}
         />
         <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, var(--v3-bg) 0%, transparent 20%, transparent 66%, var(--v3-bg) 96%)' }} />
       </div>
