@@ -67,9 +67,9 @@ const PACKAGES: Pkg[] = [
   },
 ];
 
-const ECOSYSTEM = [
+const ECOSYSTEM: { price: string; period: string; desc: string; gift?: string; featured: boolean }[] = [
   { price: '$447', period: '3 месяца', desc: 'Echo Gate, HunterBot и Risk Sentinel в аренду. Попробовать инфраструктуру.', featured: false },
-  { price: '$1490', period: '365 дней', desc: 'Echo Gate, HunterBot и Risk Sentinel в аренду на год.', featured: true },
+  { price: '$1490', period: '365 дней', desc: 'Echo Gate, HunterBot и Risk Sentinel в аренду на год', gift: '+ 2 месяца в подарок', featured: true },
 ];
 
 const GOLD = 'hsl(var(--accent))';
@@ -152,7 +152,9 @@ export default function PackageCards({
                   {showPrices ? `/ ${e.period}` : e.period}
                 </span>
               </div>
-              <p className="mt-1.5 text-xs text-muted-foreground">{e.desc}</p>
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                {e.desc}{e.gift && <> <b className="text-foreground/90">{e.gift}</b>.</>}
+              </p>
             </div>
           ))}
         </div>
