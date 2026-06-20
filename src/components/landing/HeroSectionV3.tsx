@@ -50,14 +50,14 @@ export default function HeroSectionV3() {
       {/* stacked centered photo for mobile + tablet (desktop ≥lg uses flush-right).
           -mt-16 pulls it up behind the fixed header so there's no black top band;
           the top of the gradient keeps the logo/menu legible and blends smoothly. */}
-      <div className="lg:hidden relative w-full mb-6 -mt-16" style={{ height: '46vh', zIndex: 1 }}>
+      <div className="lg:hidden relative w-full mb-6 -mt-16" style={{ height: '48vh', zIndex: 1 }}>
         <img
           src={heroAuthor}
           alt="Сергей — автор системы TRADELIKETYO"
           className="w-full h-full object-cover"
-          style={{ objectPosition: '50% 16%' }}
+          style={{ objectPosition: '50% 10%' }}
         />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, var(--v3-bg) 0%, transparent 26%, transparent 66%, var(--v3-bg) 96%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, var(--v3-bg) 0%, transparent 20%, transparent 66%, var(--v3-bg) 96%)' }} />
       </div>
 
       {/* text */}
