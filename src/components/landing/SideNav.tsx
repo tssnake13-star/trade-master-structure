@@ -12,7 +12,7 @@ const sections = [
   { id: 'week', num: '08', label: 'Неделя' },
   { id: 'stages', num: '09', label: 'Путь' },
   { id: 'filter', num: '10', label: 'Фильтр' },
-  { id: 'formats', num: '11', label: 'Уровни' },
+  { id: 'formats', num: '11', label: 'Сотрудничество' },
   { id: 'author', num: '12', label: 'Автор' },
 ];
 
