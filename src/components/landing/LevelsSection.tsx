@@ -56,7 +56,7 @@ const PACKAGES: Pkg[] = [
       'Risk Sentinel — защита капитала',
     ],
     outcome: 'Система работает — решения за вами.',
-    oldPrice: '$3000',
+    oldPrice: '$3499',
     price: '$2990',
     period: 'всё включено',
   },
