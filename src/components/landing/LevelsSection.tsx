@@ -168,7 +168,7 @@ const LevelsSection = () => {
                 <span style={{ fontFamily: "'Cormorant', serif", fontWeight: 500, fontSize: 26, color: 'hsl(var(--foreground))' }}>$1490</span>
                 <span className="text-mono" style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'hsl(var(--muted-foreground))' }}>/ 365 дней</span>
               </div>
-              <p className="mt-1.5 text-xs text-muted-foreground">Echo-Gate в аренду; HunterBot и Risk Sentinel — навсегда. +2 месяца.</p>
+              <p className="mt-1.5 text-xs text-muted-foreground">Echo-Gate в аренду; HunterBot и Risk Sentinel — навсегда. <b className="text-foreground/90">+2 месяца в подарок</b>.</p>
             </div>
           </div>
         </div>
