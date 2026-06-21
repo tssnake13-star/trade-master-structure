@@ -18,6 +18,8 @@ import PreviewNext from "./pages/PreviewNext";
 import PreviewCandles from "./pages/PreviewCandles";
 import Access from "./pages/Access";
 import SchoolPreview from "./pages/SchoolPreview";
+import SchoolLadderPreview from "./pages/SchoolLadderPreview";
+import SchoolHomePreview from "./pages/SchoolHomePreview";
 import SiteAssetsApplier from "./components/SiteAssetsApplier";
 
 const queryClient = new QueryClient();
@@ -37,6 +39,8 @@ const App = () => (
             <Route path="/preview-next" element={<PreviewNext />} />
             <Route path="/preview-candles" element={<PreviewCandles />} />
             <Route path="/school/preview" element={<SchoolPreview />} />
+            <Route path="/school/ladder-preview" element={<SchoolLadderPreview />} />
+            <Route path="/school/home-preview" element={<SchoolHomePreview />} />
             <Route path="/school" element={<SchoolAuth />} />
             <Route path="/school/dashboard" element={<SchoolDashboard />} />
             <Route path="/school/course/:id" element={<SchoolCourse />} />

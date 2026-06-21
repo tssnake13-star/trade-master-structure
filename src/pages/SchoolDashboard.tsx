@@ -18,7 +18,7 @@ const CabinetBg = () => (
   />
 );
 
-interface Course {
+export interface Course {
   id: string;
   title: string;
   subtitle: string | null;
@@ -26,7 +26,7 @@ interface Course {
   sort_order: number;
 }
 
-interface Lesson {
+export interface Lesson {
   id: string;
   course_id: string;
   title: string;
@@ -706,7 +706,7 @@ type TFn = (key: DashboardTextKey, vars?: Record<string, string | number>) => st
 // ====================================================================
 //   SELECTED COURSE DETAIL
 // ====================================================================
-function SelectedCourseView({
+export function SelectedCourseView({
   course, lessons, unlockedSortOrders, completedIds, progress, pct, nextLesson, onOpen, t,
 }: {
   course: Course;
@@ -745,73 +745,13 @@ function SelectedCourseView({
         )}
       </div>
 
-      <div className="space-y-1">
-        {lessons.map((l, i) => {
-          const done = completedIds.has(l.id);
-          const unlocked = unlockedSortOrders.includes(i + 1);
-          return (
-            <div
-              key={l.id}
-              className="flex items-start gap-3 px-0 sm:px-2 py-3 transition-all"
-              style={{
-                borderTop: i === 0 ? `1px solid ${BORDER}` : 'none',
-                borderBottom: `1px solid ${BORDER}`,
-                opacity: unlocked ? 1 : 0.45,
-              }}
-            >
-              <div
-                className="flex items-center justify-center flex-shrink-0"
-                style={{
-                  width: 36, height: 36,
-                  border: `1px solid ${done ? ACCENT : BORDER}`,
-                  backgroundColor: done ? `${ACCENT}11` : 'transparent',
-                  color: done ? ACCENT : (unlocked ? '#888' : '#444'),
-                  fontFamily: MONO, fontSize: 12, fontVariantNumeric: 'tabular-nums',
-                }}
-              >
-                {done ? '✓' : !unlocked ? <Lock size={12} /> : i + 1}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div
-                  style={{
-                    fontFamily: SANS,
-                    fontSize: 14,
-                    fontWeight: 500,
-                    color: unlocked ? FG : '#555',
-                    lineHeight: 1.35,
-                    whiteSpace: 'normal',
-                    overflowWrap: 'anywhere',
-                    wordBreak: 'break-word',
-                  }}
-                >
-                  {l.title}
-                </div>
-              </div>
-              {!unlocked ? (
-                <span className="flex-shrink-0 pt-1" style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#444' }}>
-                  {t('course_lesson_locked')}
-                </span>
-              ) : done ? (
-                <button onClick={() => onOpen(l.id)} className="flex-shrink-0 pt-1 hover:opacity-70 transition" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT }}>
-                  {t('course_lesson_repeat')}
-                </button>
-              ) : (
-                <button
-                  onClick={() => onOpen(l.id)}
-                  className="flex-shrink-0"
-                  style={{
-                    fontFamily: MONO, fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', fontWeight: 500,
-                    backgroundColor: ACCENT, color: '#0a0a0a',
-                    padding: '8px 16px', borderRadius: 6,
-                  }}
-                >
-                  {t('course_lesson_open')}
-                </button>
-              )}
-            </div>
-          );
-        })}
-      </div>
+      <CourseLadder
+        lessons={lessons}
+        completedIds={completedIds}
+        unlockedSortOrders={unlockedSortOrders}
+        onOpen={onOpen}
+        t={t}
+      />
     </>
   );
 }
@@ -819,7 +759,7 @@ function SelectedCourseView({
 // ====================================================================
 //   PAID HOME
 // ====================================================================
-function PaidHome({
+export function PaidHome({
   welcomeTitle, profileName, tmCourse, tmLessons, tmProgress, tmNextLesson,
   programCountdown, programEnd, daysInSystem, timeInSystem, isAdmin, upcomingLives, liveCountdown, recentActivity,
   courses, progress, now, onOpenLesson, onSelectCourse, userId, t,
@@ -852,18 +792,6 @@ function PaidHome({
   const completed = tmProgress?.completed ?? 0;
   const tmTotal = tmProgress?.total ?? 0;
   const tmPct = tmTotal > 0 ? Math.round((completed / tmTotal) * 100) : 0;
-
-  // Дополнительные курсы — все доступные, кроме основного TRADE MASTER 4.5
-  const extraCourses = courses.filter(c => !tmCourse || c.id !== tmCourse.id);
-  let extraCompleted = 0;
-  let extraTotal = 0;
-  for (const c of extraCourses) {
-    const cp = progress[c.id];
-    if (!cp) continue;
-    extraCompleted += cp.completed;
-    extraTotal += cp.total;
-  }
-  const extraPct = extraTotal > 0 ? Math.round((extraCompleted / extraTotal) * 100) : 0;
 
   return (
     <>
@@ -951,38 +879,69 @@ function PaidHome({
         <ProgressRing pct={tmPct} label={t('kpi_completed_primary')} />
       </div>
 
-      {/* KPI strip */}
+      {/* KPI strip — 4 cells (день / завершено / осталось / до финала) */}
       <div className="mb-10 grid grid-cols-2 lg:grid-cols-4 gap-3">
-        <KpiCell
-          label={t('kpi_days_label')}
-          value={
-            isAdmin
-              ? '∞'
-              : daysInSystem < 1 && timeInSystem
-                ? `${timeInSystem.h}ч ${String(timeInSystem.m).padStart(2, '0')}:${String(timeInSystem.s).padStart(2, '0')}`
-                : String(daysInSystem)
-          }
-        />
-        <KpiCell label={t('kpi_remaining_label')} value={String(remaining)} />
-        <KpiCellDual
-          label={t('kpi_completed_label')}
-          primary={{ caption: t('kpi_completed_primary'), value: `${completed}/${tmTotal}`, pct: tmPct }}
-          secondary={{ caption: t('kpi_completed_secondary'), value: `${extraCompleted}/${extraTotal}`, pct: extraPct }}
-        />
-        <KpiCell
-          label={t('kpi_countdown_label')}
-          value={programCountdown ? `${programCountdown.d}д ${String(programCountdown.h).padStart(2,'0')}:${String(programCountdown.m).padStart(2,'0')}:${String(programCountdown.s).padStart(2,'0')}` : '—'}
-          accent
-          pulse
-          mono
-          valueSize={26}
-          hint={programEnd ? programEnd.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' }) : undefined}
-        />
+        <div style={{ padding: '20px 22px', border: `1px solid ${BORDER}`, backgroundColor: CARD }}>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 14 }}>{t('kpi_days_label')}</div>
+          <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 34, lineHeight: 1, color: FG, fontVariantNumeric: 'tabular-nums' }}>
+            {isAdmin ? '∞' : daysInSystem}
+            {!isAdmin && programCountdown && <span style={{ color: '#666', fontSize: 20 }}> / {daysInSystem + programCountdown.d}</span>}
+          </div>
+        </div>
+        <div style={{ padding: '20px 22px', border: `1px solid ${BORDER}`, backgroundColor: CARD }}>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 14 }}>{t('kpi_completed_label')}</div>
+          <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 34, lineHeight: 1, color: FG, fontVariantNumeric: 'tabular-nums' }}>
+            {completed}<span style={{ color: '#666', fontSize: 20 }}> / {tmTotal}</span>
+          </div>
+        </div>
+        <div style={{ padding: '20px 22px', border: `1px solid ${BORDER}`, backgroundColor: CARD }}>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 14 }}>{t('kpi_remaining_label')}</div>
+          <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 34, lineHeight: 1, color: FG, fontVariantNumeric: 'tabular-nums' }}>
+            {remaining}<span style={{ color: '#666', fontSize: 20 }}> / {tmTotal}</span>
+          </div>
+        </div>
+        <div style={{ padding: '20px 22px', border: `1px solid rgba(202,164,114,0.28)`, backgroundColor: CARD }}>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 14 }}>{t('kpi_countdown_label')}</div>
+          <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 34, lineHeight: 1, color: ACCENT, fontVariantNumeric: 'tabular-nums' }}>
+            {programCountdown ? <>{programCountdown.d}<span style={{ color: '#666', fontSize: 20 }}> дней</span></> : '—'}
+          </div>
+        </div>
       </div>
 
-      {/* Live card */}
-      <div className="mb-10">
-        <LiveStreamsCard upcoming={upcomingLives} countdown={liveCountdown} now={now} t={t} />
+      {/* Live streams — horizontal countdown + schedule */}
+      <div className="mb-10 p-6" style={{ border: `1px solid ${BORDER}`, backgroundColor: CARD }}>
+        <div className="flex items-start justify-between flex-wrap gap-6">
+          <div>
+            <div className="flex items-center gap-2 mb-4">
+              <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: ACCENT, animation: 'tlyPulse 2.4s ease-out infinite' }} />
+              <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT }}>{t('live_label')}</span>
+            </div>
+            {liveCountdown && (
+              <div className="flex gap-4">
+                {[{ v: liveCountdown.d, l: t('live_unit_d') }, { v: liveCountdown.h, l: t('live_unit_h') }, { v: liveCountdown.m, l: t('live_unit_m') }, { v: liveCountdown.s, l: t('live_unit_s') }].map((x, i) => (
+                  <div key={i} style={{ textAlign: 'center' }}>
+                    <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 40, lineHeight: 1, color: FG, fontVariantNumeric: 'tabular-nums' }}>{String(x.v).padStart(2, '0')}</div>
+                    <div style={{ fontFamily: MONO, fontSize: 9, color: '#666', marginTop: 4 }}>{x.l}</div>
+                  </div>
+                ))}
+              </div>
+            )}
+            <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#555', marginTop: 12 }}>{t('live_schedule_label')}</div>
+          </div>
+          <div className="flex flex-col gap-2" style={{ minWidth: 220 }}>
+            {upcomingLives.map((dt, i) => {
+              const dow = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'][(dt.getDay() + 6) % 7];
+              const time = dt.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+              return (
+                <div key={i} className="flex items-center justify-between" style={{ borderTop: i ? `1px solid #141414` : 'none', padding: '8px 0' }}>
+                  <span style={{ fontFamily: SANS, fontSize: 13, color: i === 0 ? FG : '#888' }}>{dow} {dt.getDate()}</span>
+                  <span style={{ fontFamily: MONO, fontSize: 10, color: '#666' }}>{time} · GMT+5</span>
+                  {i === 0 && <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase', color: ACCENT, marginLeft: 8 }}>{t('live_soon_badge')}</span>}
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Programs grid */}
@@ -1279,6 +1238,118 @@ function FreeHome({
       {/* Code section */}
       <ActivateCodeSection userId={userId} onActivated={() => window.location.reload()} t={t} />
     </>
+  );
+}
+
+// ====================================================================
+//   COURSE LADDER — v3 vertical progress ladder for a course's blocks.
+//   Rendered inside SelectedCourseView (the per-course detail page).
+// ====================================================================
+function CourseLadder({
+  lessons, completedIds, unlockedSortOrders, onOpen, t,
+}: {
+  lessons: Lesson[];
+  completedIds: Set<string>;
+  unlockedSortOrders: number[];
+  onOpen: (id: string) => void;
+  t: TFn;
+}) {
+  const total = lessons.length;
+  if (total === 0) return null;
+  const currentIdx = lessons.findIndex((l, i) => unlockedSortOrders.includes(i + 1) && !completedIds.has(l.id));
+  const pad = (n: number) => String(n).padStart(2, '0');
+
+  return (
+    <div style={{ position: 'relative' }}>
+      {lessons.map((l, i) => {
+        const num = i + 1;
+        const done = completedIds.has(l.id);
+        const unlocked = unlockedSortOrders.includes(num);
+        const current = i === currentIdx;
+        const openable = unlocked && !done; // current, or a later already-unlocked block
+        const last = i === total - 1;
+        const node = done
+          ? { border: ACCENT, bg: `${ACCENT}1a`, color: ACCENT }
+          : current
+            ? { border: ACCENT, bg: ACCENT, color: '#0a0a0a' }
+            : openable
+              ? { border: `${ACCENT}66`, bg: 'transparent', color: ACCENT }
+              : { border: '#2a2a2a', bg: 'transparent', color: '#55504a' };
+        return (
+          <div
+            key={l.id}
+            style={{ position: 'relative', paddingLeft: 72, paddingBottom: last ? 0 : 28, opacity: !unlocked && !done ? 0.5 : 1 }}
+          >
+            {!last && (
+              <span style={{ position: 'absolute', left: 23, top: 46, bottom: -2, width: 2, backgroundColor: done ? ACCENT : '#2a2620' }} />
+            )}
+            <span
+              style={{
+                position: 'absolute', left: 2, top: 0, width: 44, height: 44, borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: `1.5px solid ${node.border}`, backgroundColor: node.bg, color: node.color,
+                fontFamily: MONO, fontWeight: 700, fontSize: 14, fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {done ? '✓' : unlocked ? pad(num) : <Lock size={15} />}
+            </span>
+
+            {current ? (
+              <button
+                onClick={() => onOpen(l.id)}
+                className="w-full text-left"
+                style={{
+                  marginTop: -4, padding: '18px 20px', border: `1px solid ${ACCENT}`,
+                  backgroundColor: CARD, borderRadius: 10,
+                  background: `radial-gradient(circle at 0% 0%, ${ACCENT}24 0%, ${CARD} 62%)`,
+                }}
+              >
+                <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 5 }}>
+                  {t('course_eyebrow')} · этап {pad(num)} · сейчас
+                </div>
+                <h3 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 25, lineHeight: 1.15, color: FG, marginBottom: l.description ? 10 : 14 }}>{l.title}</h3>
+                {l.description && (
+                  <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.55, color: '#a8a090', maxWidth: '54ch', marginBottom: 16 }}>{l.description}</p>
+                )}
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                  <span style={{ fontFamily: MONO, fontSize: 11, color: '#666' }}>{t('continue_meta_video')} · {t('continue_meta_pdf')}</span>
+                  <span
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 8,
+                      fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
+                      backgroundColor: ACCENT, color: '#0a0a0a', padding: '9px 16px', borderRadius: 6,
+                    }}
+                  >
+                    {t('course_lesson_open')} <ArrowRight size={14} />
+                  </span>
+                </div>
+              </button>
+            ) : (
+              <button
+                onClick={() => (done || openable) && onOpen(l.id)}
+                disabled={!done && !openable}
+                className="w-full text-left flex items-center justify-between gap-4"
+                style={{ minHeight: 44, cursor: done || openable ? 'pointer' : 'default' }}
+              >
+                <div className="min-w-0">
+                  <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: done ? '#888' : openable ? ACCENT : '#55504a', marginBottom: 3 }}>
+                    Этап {pad(num)}{done ? ' · пройден' : openable ? '' : ' · закрыто'}
+                  </div>
+                  <h3 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 24, lineHeight: 1.1, color: done ? '#cfc7b8' : openable ? FG : '#55504a', overflowWrap: 'anywhere' }}>{l.title}</h3>
+                </div>
+                {done ? (
+                  <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT, flexShrink: 0 }}>{t('course_lesson_repeat')}</span>
+                ) : openable ? (
+                  <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: ACCENT, flexShrink: 0 }}>{t('course_lesson_open')}</span>
+                ) : (
+                  <Lock size={13} style={{ color: '#444', flexShrink: 0 }} />
+                )}
+              </button>
+            )}
+          </div>
+        );
+      })}
+    </div>
   );
 }
 

@@ -50,6 +50,20 @@ const PROGRAMS = [
   { tag: 'Закрытый клуб', title: 'Inner circle', sub: 'Закрытая группа выпускников', locked: 'Доступ по приглашению' },
 ];
 
+// Demo "лестница этапов" — the v3 redesign of the course-detail view
+// (SelectedCourseView on the live dashboard). State: done | current | locked.
+type StageState = 'done' | 'current' | 'locked';
+const STAGES: { n: string; title: string; meta: string; state: StageState; desc?: string }[] = [
+  { n: '01', title: 'Архитектура рынка', meta: 'Модуль 1 · 3 урока', state: 'done' },
+  { n: '02', title: 'Психология капитала', meta: 'Модуль 1 · 4 урока', state: 'done' },
+  { n: '03', title: 'Echo Gate — допуск к сделке', meta: 'Модуль 2 · 4 урока', state: 'done' },
+  { n: '04', title: 'Контекст и структура', meta: 'Модуль 2 · 3 урока', state: 'done' },
+  { n: '05', title: 'Точки разворота', meta: 'Модуль 2 · 2 урока', state: 'done' },
+  { n: '06', title: 'Фильтрация контекста', meta: 'Модуль 3 · 4 урока', state: 'current', desc: DEMO.nextDesc },
+  { n: '07', title: 'Hunter Bot — автоматизация входа', meta: 'Модуль 3 · 5 уроков', state: 'locked' },
+  { n: '08', title: 'Risk Sentinel — защита капитала', meta: 'Модуль 4 · 3 урока', state: 'locked' },
+];
+
 // next live: Mon (1) & Thu (4), 20:00 GMT+5
 function nextLive(now: Date) {
   const dur = 2 * 60 * 60 * 1000;
@@ -99,6 +113,78 @@ const cell: CSSProperties = { background: SURF, border: `1px solid ${LINE}`, pad
 const eyebrow: CSSProperties = { fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: GOLD };
 const kLabel: CSSProperties = { fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: FAINT };
 const kNum: CSSProperties = { fontFamily: DISPLAY, fontWeight: 500, fontSize: 34, color: FG, lineHeight: 1, marginTop: 10, fontVariantNumeric: 'tabular-nums' };
+
+// v3 "лестница этапов" — vertical progress ladder for a course's blocks.
+// Gold rail runs through completed stages and stops at the current one.
+function StageLadder() {
+  return (
+    <div style={{ position: 'relative' }}>
+      {STAGES.map((st, i) => {
+        const last = i === STAGES.length - 1;
+        const node =
+          st.state === 'done'
+            ? { border: GOLD, bg: 'oklch(0.82 0.14 72 / 0.10)', color: GOLD, glyph: '✓' as const }
+            : st.state === 'current'
+              ? { border: GOLD, bg: GOLD, color: BG2, glyph: st.n }
+              : { border: LINE, bg: 'transparent', color: FAINT, glyph: 'lock' as const };
+        // Connector below this node is gold once the stage is passed (done).
+        const connectorGold = st.state === 'done';
+        return (
+          <div
+            key={st.n}
+            className="lk-rise"
+            style={{ position: 'relative', paddingLeft: 72, paddingBottom: last ? 0 : 30, opacity: st.state === 'locked' ? 0.5 : 1 }}
+          >
+            {/* connector */}
+            {!last && (
+              <span style={{ position: 'absolute', left: 23, top: 46, bottom: -2, width: 2, background: connectorGold ? GOLD : LINE }} />
+            )}
+            {/* node */}
+            <span
+              style={{
+                position: 'absolute', left: 2, top: 0, width: 44, height: 44, borderRadius: '50%',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                border: `1.5px solid ${node.border}`, background: node.bg, color: node.color,
+                fontFamily: MONO, fontWeight: 700, fontSize: 14, fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {node.glyph === 'lock' ? <Lock size={15} /> : node.glyph === '✓' ? '✓' : node.glyph}
+            </span>
+
+            {st.state === 'current' ? (
+              <div
+                className="lk-card"
+                style={{ padding: '18px 20px', marginTop: -4, background: `radial-gradient(circle at 0% 0%, oklch(0.82 0.14 72 / 0.14), ${SURF} 62%)`, borderColor: 'oklch(0.55 0.10 72)' }}
+              >
+                <div style={{ ...eyebrow, marginBottom: 5 }}>Этап {st.n} · сейчас</div>
+                <h3 className="lk-display" style={{ fontSize: 27, marginBottom: 10 }}>{st.title}</h3>
+                {st.desc && <p style={{ fontFamily: 'var(--ui)', fontSize: 13, lineHeight: 1.55, color: MUT, maxWidth: '54ch', marginBottom: 16 }}>{st.desc}</p>}
+                <div className="flex items-center justify-between flex-wrap gap-3">
+                  <span style={{ fontFamily: MONO, fontSize: 11, color: FAINT }}>{st.meta} · ◷ 24 мин</span>
+                  <span className="lk-btn lk-btn--gold">Открыть <ArrowRight className="arr" size={15} /></span>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between gap-4" style={{ minHeight: 44 }}>
+                <div className="min-w-0">
+                  <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: st.state === 'done' ? MUT : FAINT, marginBottom: 3 }}>
+                    Этап {st.n} · {st.state === 'done' ? 'пройден' : 'закрыто'}
+                  </div>
+                  <h3 className="lk-display" style={{ fontSize: 25, color: st.state === 'done' ? 'oklch(0.82 0.02 80)' : FAINT }}>{st.title}</h3>
+                </div>
+                {st.state === 'done' ? (
+                  <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: GOLD, flexShrink: 0 }}>Повторить</span>
+                ) : (
+                  <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: FAINT, flexShrink: 0 }}>{st.meta}</span>
+                )}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function SchoolPreview() {
   const now = useNow();
@@ -277,7 +363,31 @@ export default function SchoolPreview() {
             </div>
           </div>
 
-          <footer className="flex items-center justify-between" style={{ marginTop: 48, paddingTop: 20, borderTop: `1px solid ${LINE}`, fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: FAINT }}>
+          {/* Wordmark divider — "мысли крупными буквами", как на лендинге */}
+          <div style={{ margin: '56px 0 30px', textAlign: 'center' }}>
+            <div style={{ fontFamily: DISPLAY, fontWeight: 500, fontSize: 'clamp(40px, 7vw, 84px)', letterSpacing: '-0.03em', color: 'oklch(0.30 0.012 75)', lineHeight: 1 }}>
+              путь <em style={{ fontStyle: 'italic', color: 'oklch(0.50 0.10 72)' }}>системы</em>
+            </div>
+          </div>
+
+          {/* ===== Лестница этапов (v3 course-detail) ===== */}
+          <div>
+            <div className="flex items-end justify-between flex-wrap gap-3" style={{ marginBottom: 24 }}>
+              <div>
+                <div style={{ ...eyebrow, marginBottom: 8 }}>Программа · этап 06 из 08</div>
+                <h2 className="lk-display" style={{ fontSize: 'clamp(30px, 4vw, 46px)' }}>
+                  TRADE <em>MASTER</em> 4.5
+                </h2>
+              </div>
+              <div className="flex items-center gap-3" style={{ minWidth: 200 }}>
+                <div className="flex-1" style={{ height: 2, background: LINE }}><div style={{ width: `${Math.round((5 / 8) * 100)}%`, height: '100%', background: GOLD }} /></div>
+                <span style={{ fontFamily: MONO, fontSize: 11, color: MUT, fontVariantNumeric: 'tabular-nums' }}>5/8</span>
+              </div>
+            </div>
+            <StageLadder />
+          </div>
+
+          <footer className="flex items-center justify-between" style={{ marginTop: 56, paddingTop: 20, borderTop: `1px solid ${LINE}`, fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: FAINT }}>
             <span>© TRADELIKETYO · 2026</span>
             <span style={{ color: MUT }}>Telegram автора →</span>
           </footer>
