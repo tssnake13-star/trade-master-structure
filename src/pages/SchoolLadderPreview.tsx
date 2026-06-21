@@ -35,7 +35,7 @@ const CabinetBg = () => (
 // --- shared demo data (the same Course/Lesson shape the live dashboard uses) ---
 const DEMO_COURSE: Course = {
   id: 'demo-tm45',
-  title: 'TRADE MASTER 4.5',
+  title: 'TRADE MASTER 5.0',
   subtitle: 'Основная программа · 8 блоков системы допуска к сделке',
   is_free: false,
   sort_order: 1,
@@ -80,7 +80,7 @@ function LadderV3() {
       <div className="mb-9">
         <div style={eyebrow({ marginBottom: 14 })}>Программа · этап 06 из 08</div>
         <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(30px, 5vw, 54px)', lineHeight: 1.04, letterSpacing: '-0.025em', color: FG }}>
-          TRADE <em style={{ fontStyle: 'italic', color: ACCENT, fontWeight: 350 }}>Master</em> 4.5
+          TRADE <em style={{ fontStyle: 'italic', color: ACCENT, fontWeight: 350 }}>Master</em> 5.0
         </h1>
         <p className="mt-3" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '58ch' }}>
           Вы прошли {PCT}% системы. Пять этапов закрыто, сейчас — фильтрация контекста.

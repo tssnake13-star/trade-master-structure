@@ -6,7 +6,7 @@ import { CountUp, KineticHeadline, useInView } from './primitives';
  */
 const STATS: { to: number; suffix?: string; prefix?: string; decimals?: number; label: string }[] = [
   { to: 1200, suffix: '+', label: 'Учеников в системе' },
-  { to: 4.5, decimals: 1, label: 'Версия Trade Master' },
+  { to: 5.0, decimals: 1, label: 'Версия Trade Master' },
   { to: 68, suffix: '%', label: 'Винрейт по системе' },
   { to: 6, label: 'Лет на рынке' },
 ];

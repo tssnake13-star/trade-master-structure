@@ -227,14 +227,14 @@ export default function SchoolDashboard() {
   // hasAccess needs role/accessMap — compute inline below as well
   const _hasAccessEarly = (c: Course) => role === 'admin' || c.is_free || accessMap.has(c.id);
   // Основной курс задаётся в админке (site_settings → dashboard_main_course_id).
-  // Фолбэк, если не выбран: TRADE MASTER 4.5 → первый платный → первый доступный.
+  // Фолбэк, если не выбран: TRADE MASTER 5.0 → первый платный → первый доступный.
   const pickMainCourse = (list: Course[], has: (c: Course) => boolean): Course | null => {
     if (mainCourseId) {
       const chosen = list.find(c => c.id === mainCourseId && has(c));
       if (chosen) return chosen;
     }
     return (
-      list.find(c => c.title === 'TRADE MASTER 4.5' && has(c)) ||
+      list.find(c => c.title === 'TRADE MASTER 5.0' && has(c)) ||
       list.find(c => !c.is_free && has(c)) ||
       list.find(c => has(c)) ||
       null
@@ -1023,7 +1023,7 @@ export function PaidHome({
 // ====================================================================
 //   FREE HOME
 // ====================================================================
-function FreeHome({
+export function FreeHome({
   courses, mainCourseId, progress, accessMap, hasAccess, role, completedIds,
   getCourseLessons, getUnlockedLessons, getFirstIncomplete,
   upcomingLives, liveCountdown, now, onOpenLesson, onSelectCourse, userId, t,
@@ -1059,7 +1059,7 @@ function FreeHome({
   const lockedPaid = courses.filter(c => !c.is_free && !hasAccess(c));
 
   // Largest paid program total for the locked KPI cell
-  const mainPaid = (mainCourseId && courses.find(c => c.id === mainCourseId)) || courses.find(c => c.title === 'TRADE MASTER 4.5') || courses.find(c => !c.is_free) || null;
+  const mainPaid = (mainCourseId && courses.find(c => c.id === mainCourseId)) || courses.find(c => c.title === 'TRADE MASTER 5.0') || courses.find(c => !c.is_free) || null;
   const mainPaidTotal = mainPaid ? getCourseLessons(mainPaid.id).length : 0;
 
   const lockedLabelFor = (c: Course) => {

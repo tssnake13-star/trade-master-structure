@@ -24,8 +24,8 @@ const DISPLAY = "'Cormorant', Georgia, serif";
 const DEMO = {
   name: 'Александр',
   fullName: 'Александр Т.',
-  status: 'Платный · TM 4.5',
-  mainCourse: 'TRADE MASTER 4.5',
+  status: 'Платный · TM',
+  mainCourse: 'TRADE MASTER 5.0',
   completed: 14,
   total: 24,
   nextNum: 6,
@@ -44,9 +44,9 @@ const NAV = [
 ];
 
 const PROGRAMS = [
-  { tag: 'Платный · Основной', title: 'TRADE MASTER 4.5', sub: '24 занятия · 4 модуля · сертификация', done: 14, total: 24, state: 'В процессе' as const },
+  { tag: 'Платный · Основной', title: 'TRADE MASTER 5.0', sub: '24 занятия · 4 модуля · сертификация', done: 14, total: 24, state: 'В процессе' as const },
   { tag: 'Бесплатный · Старт', title: 'TLT · Допуск к сделке', sub: '5 занятий · вводная программа', done: 5, total: 5, state: 'Завершено' as const },
-  { tag: 'Премиум · 1-1', title: 'Менторство', sub: '8 сессий · персонально с Сергеем', locked: 'Доступ после TM 4.5' },
+  { tag: 'Премиум · 1-1', title: 'Менторство', sub: '8 сессий · персонально с Сергеем', locked: 'Доступ после TM' },
   { tag: 'Закрытый клуб', title: 'Inner circle', sub: 'Закрытая группа выпускников', locked: 'Доступ по приглашению' },
 ];
 
@@ -376,7 +376,7 @@ export default function SchoolPreview() {
               <div>
                 <div style={{ ...eyebrow, marginBottom: 8 }}>Программа · этап 06 из 08</div>
                 <h2 className="lk-display" style={{ fontSize: 'clamp(30px, 4vw, 46px)' }}>
-                  TRADE <em>MASTER</em> 4.5
+                  TRADE <em>MASTER</em> 5.0
                 </h2>
               </div>
               <div className="flex items-center gap-3" style={{ minWidth: 200 }}>
