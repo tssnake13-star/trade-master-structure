@@ -56,7 +56,7 @@ const StagesSection = () => {
             Как <em>выстраивается</em> <span className="mute">система</span>
           </h2>
           <p className="mt-3 text-sm text-muted-foreground">
-            Шаг за шагом — от понимания к стабильной работе.
+            Этап за этапом — от понимания к стабильной работе.
           </p>
           
           <div className="mt-8 md:mt-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
@@ -80,7 +80,7 @@ const StagesSection = () => {
           </div>
 
           <p className="mt-8 text-sm md:text-base text-muted-foreground leading-relaxed">
-            Пять шагов — и решения перестают быть случайными.
+            Пять этапов — и решения перестают быть случайными.
           </p>
         </div>
       </div>
