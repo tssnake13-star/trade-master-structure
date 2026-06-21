@@ -24,7 +24,7 @@ const DISPLAY = "'Cormorant', Georgia, serif";
 const DEMO = {
   name: 'Александр',
   fullName: 'Александр Т.',
-  status: 'Платный · TM',
+  status: 'Платный · Trade Master',
   mainCourse: 'TRADE MASTER 5.0',
   completed: 14,
   total: 24,
@@ -46,7 +46,7 @@ const NAV = [
 const PROGRAMS = [
   { tag: 'Платный · Основной', title: 'TRADE MASTER 5.0', sub: '24 занятия · 4 модуля · сертификация', done: 14, total: 24, state: 'В процессе' as const },
   { tag: 'Бесплатный · Старт', title: 'TLT · Допуск к сделке', sub: '5 занятий · вводная программа', done: 5, total: 5, state: 'Завершено' as const },
-  { tag: 'Премиум · 1-1', title: 'Менторство', sub: '8 сессий · персонально с Сергеем', locked: 'Доступ после TM' },
+  { tag: 'Премиум · 1-1', title: 'Менторство', sub: '8 сессий · персонально с Сергеем', locked: 'Доступ после Trade Master' },
   { tag: 'Закрытый клуб', title: 'Inner circle', sub: 'Закрытая группа выпускников', locked: 'Доступ по приглашению' },
 ];
 

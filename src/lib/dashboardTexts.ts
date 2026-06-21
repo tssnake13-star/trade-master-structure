@@ -69,7 +69,7 @@ export const DASHBOARD_TEXT_DEFAULTS = {
   free_hero_subtitle_template: 'Вы получили доступ к {total} вводным блокам TLT. Они показывают, как устроена система. Основная программа TRADE MASTER открывается по коду доступа от администратора.',
   free_kpi_intro_label: 'Вводный курс',
   free_kpi_main_label: 'Основная программа',
-  free_kpi_main_value_suffix: 'блоков · TM',
+  free_kpi_main_value_suffix: 'блоков · Trade Master',
   free_kpi_main_locked: 'Закрыто · нужен код',
   free_intro_eyebrow: 'Доступ открыт · начните здесь',
   free_intro_title: 'Допуск получают *не все*. Начните с первого блока.',
@@ -84,7 +84,7 @@ export const DASHBOARD_TEXT_DEFAULTS = {
   free_locked_label: 'Программы по допуску',
   free_locked_master: 'Допуск через куратора',
   free_locked_elite: 'По приглашению',
-  free_locked_other: 'После TM',
+  free_locked_other: 'После Trade Master',
 
   // ===== Live streams card =====
   live_label: 'Закрытые прямые эфиры',
