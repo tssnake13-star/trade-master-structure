@@ -82,7 +82,7 @@ export const DASHBOARD_TEXT_DEFAULTS = {
   free_done_subtitle: 'Свяжитесь с автором — он подскажет как получить доступ.',
   free_done_cta: 'Написать Сергею',
   free_locked_label: 'Программы по допуску',
-  free_locked_master: 'Допуск через куратора',
+  free_locked_master: 'Допуск через администратора',
   free_locked_elite: 'По приглашению',
   free_locked_other: 'После Trade Master',
 
