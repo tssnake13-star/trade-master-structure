@@ -79,8 +79,8 @@ const StagesSection = () => {
             ))}
           </div>
 
-          <p className="mt-8 text-sm text-muted-foreground leading-relaxed">
-            Сначала вы понимаете структуру. Потом учитесь видеть её на графике. Дальше — фильтруете входы. Потом закрепляете действия. И только после этого начинаете работать стабильно.
+          <p className="mt-8 text-sm md:text-base text-muted-foreground leading-relaxed">
+            Пять шагов — и решения перестают быть случайными.
           </p>
         </div>
       </div>

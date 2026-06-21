@@ -58,7 +58,7 @@ const PACKAGES: Pkg[] = [
     points: [
       'Всё из Trade OS',
       'Индикаторы, скрипты и таблицы системы',
-      'HunterBot и Risk Sentinel — навсегда, остаются у вас',
+      'Hunter Bot и Risk Sentinel — навсегда, остаются у вас',
     ],
     outcome: 'Система работает, решения за вами.',
     oldPrice: '$3499',
@@ -68,8 +68,8 @@ const PACKAGES: Pkg[] = [
 ];
 
 const ECOSYSTEM: { price: string; period: string; desc: string; gift?: string; featured: boolean }[] = [
-  { price: '$447', period: '3 месяца', desc: 'Echo Gate, HunterBot и Risk Sentinel в аренду. Попробовать инфраструктуру.', featured: false },
-  { price: '$1490', period: '365 дней', desc: 'Echo Gate, HunterBot и Risk Sentinel в аренду на год', gift: '+ 2 месяца в подарок', featured: true },
+  { price: '$447', period: '3 месяца', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду. Попробовать инфраструктуру.', featured: false },
+  { price: '$1490', period: '365 дней', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду на год', gift: '+ 2 месяца в подарок', featured: true },
 ];
 
 const GOLD = 'hsl(var(--accent))';
@@ -141,7 +141,7 @@ export default function PackageCards({
       <div className="mt-3 p-6 md:p-7" style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
         <div className="text-mono" style={{ ...MONO, color: 'hsl(var(--cool))' }}>Подписка на экосистему · только выпускникам</div>
         <p className="mt-3 text-sm md:text-base text-muted-foreground" style={{ maxWidth: '70ch' }}>
-          Доступ к инфраструктуре исполнения для выпускников: <b className="text-foreground/90">Echo-Gate</b> — сигнальный бот, <b className="text-foreground/90">HunterBot</b> — автоисполнение и сопровождение, <b className="text-foreground/90">Risk Sentinel</b> — защита капитала. Подписка — аренда на срок; решение всегда за вами.
+          Доступ к инфраструктуре исполнения для выпускников: <b className="text-foreground/90">Echo Gate</b> — сигнальный бот, <b className="text-foreground/90">Hunter Bot</b> — автоисполнение и сопровождение, <b className="text-foreground/90">Risk Sentinel</b> — защита капитала. Подписка — аренда на срок; решение всегда за вами.
         </p>
         <div className="mt-5 grid sm:grid-cols-2 gap-3">
           {ECOSYSTEM.map((e) => (
