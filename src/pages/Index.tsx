@@ -4,6 +4,7 @@ import Header from '@/components/landing/Header';
 import StickyHeader from '@/components/landing/StickyHeader';
 import SideNav from '@/components/landing/SideNav';
 import HeroSectionV3 from '@/components/landing/HeroSectionV3';
+import StructureField from '@/components/landing/StructureField';
 import InstrumentTicker from '@/components/landing/InstrumentTicker';
 import StatsCounter from '@/components/landing/StatsCounter';
 import TwoStagesSection from '@/components/landing/TwoStagesSection';
@@ -29,7 +30,9 @@ const Index = () => {
   useScrollAnimate();
 
   return (
-    <div className="min-h-screen bg-background landing-skin v3-skin">
+    <div className="min-h-screen bg-background landing-skin v3-skin relative isolate">
+      {/* site-wide "Структура" ambient field — behind all content (hero keeps its own) */}
+      <StructureField position="fixed" zIndex={-1} opacity={0.6} mask="radial-gradient(130% 110% at 50% 42%, #000 38%, transparent 90%)" />
       <Header />
       <StickyHeader />
       <SideNav />
