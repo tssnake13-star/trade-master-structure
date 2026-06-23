@@ -33,7 +33,7 @@ function headline(lines, x, y) {
     const it = ln.f === 's' ? ' font-style="italic"' : '';
     s += `<text xml:space="preserve" x="${x}" y="${cy}" font-family="${fam}" font-weight="700"${it} font-size="${ln.size}" fill="${WHITE}">${esc(ln.t)}</text>`;
     const next = lines[i + 1];
-    cy += next ? (ln.size * 0.30 + next.size * 0.72) : ln.size * 0.34;
+    cy += next ? (ln.size * 0.32 + next.size * 0.82) : ln.size * 0.34;
   }
   return { svg: s, endY: cy };
 }
