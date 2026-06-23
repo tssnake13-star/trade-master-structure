@@ -48,19 +48,21 @@ function pill(label, cx) {
     + `<text x="${X + 38 + w / 2}" y="${Y + CH - 65}" text-anchor="middle" font-family="${SANS}" font-weight="600" font-size="25" fill="${WHITE}">${esc(label)}</text>`;
 }
 function counter(idx) { return `<text x="${X + CW - 40}" y="${Y + CH - 60}" text-anchor="end" font-family="${MONO}" font-weight="600" font-size="20" letter-spacing="1" fill="${MUT}">${idx} — 08</text>`; }
+const ghostFolio = (idx) => `<g clip-path="url(#cc)"><text x="${X + CW - 30}" y="${Y + CH - 40}" text-anchor="end" font-family="${GROTESK}" font-weight="700" font-size="560" fill="#FFFFFF" fill-opacity="0.05">${esc(idx)}</text></g>`;
+function progress(cur) { const py = Y + CH - 150, seg = (CW - 80) / 8, gap = 12; let s = ''; for (let i = 0; i < 8; i++) { const xx = X + 40 + i * seg; s += `<rect x="${xx}" y="${py}" width="${seg - gap}" height="6" rx="3" fill="#FFFFFF" fill-opacity="${i === cur - 1 ? 0.95 : 0.18}"/>`; } return s; }
 function cardBorder() { return `<rect x="${X}" y="${Y}" width="${CW}" height="${CH}" rx="${CARD}" fill="none" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="1.5"/>`; }
 
 const fgWrap = (inner) => `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">${inner}</svg>`.replace(/<text (?!xml:space)/g, '<text xml:space="preserve" ');
 
 // ---- text slide (dark card) ----
 function textSlide({ idx, hl, sub, pillLabel = 'листай →' }) {
-  const grad = `<defs><radialGradient id="d" cx="0.35" cy="0.22" r="0.9"><stop offset="0" stop-color="#272727"/><stop offset="1" stop-color="#151515"/></radialGradient></defs>`;
+  const grad = `<defs><radialGradient id="d" cx="0.35" cy="0.22" r="0.9"><stop offset="0" stop-color="#272727"/><stop offset="1" stop-color="#151515"/></radialGradient><clipPath id="cc"><rect x="${X}" y="${Y}" width="${CW}" height="${CH}" rx="${CARD}"/></clipPath></defs>`;
   const card = `<rect x="${X}" y="${Y}" width="${CW}" height="${CH}" rx="${CARD}" fill="url(#d)"/>`;
-  let inner = grad + card + cardBorder() + topbar();
+  let inner = grad + card + ghostFolio(idx) + cardBorder() + topbar();
   const hb = headline(hl, X + 40, Y + 360);
   inner += hb.svg;
   if (sub) inner += body(sub, X + 40, hb.endY + 36, 50).svg;
-  inner += pill(pillLabel) + counter(idx);
+  inner += progress(parseInt(idx, 10)) + pill(pillLabel) + counter(idx);
   return { type: 'text', fg: fgWrap(inner) };
 }
 
