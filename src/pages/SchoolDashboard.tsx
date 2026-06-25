@@ -931,11 +931,11 @@ export function PaidHome({
           <div className="flex flex-col gap-2" style={{ minWidth: 220 }}>
             {upcomingLives.map((dt, i) => {
               const dow = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'][(dt.getDay() + 6) % 7];
-              const time = dt.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+              const time = dt.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
               return (
                 <div key={i} className="flex items-center justify-between" style={{ borderTop: i ? `1px solid #141414` : 'none', padding: '8px 0' }}>
                   <span style={{ fontFamily: SANS, fontSize: 13, color: i === 0 ? FG : '#888' }}>{dow} {dt.getDate()}</span>
-                  <span style={{ fontFamily: MONO, fontSize: 10, color: '#666' }}>{time} · GMT+5</span>
+                  <span style={{ fontFamily: MONO, fontSize: 10, color: '#666' }}>{time}</span>
                   {i === 0 && <span style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase', color: ACCENT, marginLeft: 8 }}>{t('live_soon_badge')}</span>}
                 </div>
               );
@@ -1474,7 +1474,7 @@ function LiveStreamsCard({ upcoming, countdown, now, t }: { upcoming: Date[]; co
           const dow = d.toLocaleDateString('ru-RU', { weekday: 'short' });
           const day = d.getDate();
           const month = d.toLocaleDateString('ru-RU', { month: 'short' }).replace('.', '');
-          const time = d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+          const time = d.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', timeZoneName: 'short' });
           return (
             <div key={i} className="flex items-center gap-3 py-2" style={{ borderTop: i > 0 ? `1px solid #141414` : 'none' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, minWidth: 64, justifyContent: 'flex-start', fontVariantNumeric: 'tabular-nums' }}>
