@@ -1,36 +1,41 @@
 /**
- * TradingSystemSection — «03 · Архитектура». v3 editorial-terminal вариант:
- * каждый путь — вертикальная «структурная линия» с нумерованными узлами
- * (как лестница в кабинете и фон «Структура»). Два пути сходятся в золотом
- * узле-ромбе → единая ось исполнения (Hunter Bot → Risk Sentinel). Острые
- * карточки, тонкие линии, без скруглений/теней. Тексты и смыслы прежние.
+ * TradingSystemSection — «03 · Архитектура». v3 editorial-terminal вариант.
+ * Группировка: триггер (Trend Hunter) сверху → две стратегии-фильтра в ряд
+ * (Echo Gate · Trade Master | Resonance Scanner · Nexus Gravity) → трейдер →
+ * золотой узел-слияние → единая ось исполнения (Hunter Bot → Risk Sentinel).
+ * Острые карточки, тонкие линии, без скруглений/теней. Тексты прежние.
  */
 
 const GOLD = 'hsl(var(--accent))';
 
-type FlowNode = { n: string; name: string; desc: string; badge?: string };
+type FlowNode = { n: string; name: string; desc: string; tag?: string; badge?: string };
 
-const tracks: { eyebrow: string; tf: string; nodes: FlowNode[] }[] = [
+const trigger: FlowNode = {
+  n: '01',
+  tag: 'Триггер · H4',
+  name: 'Trend Hunter',
+  desc: 'Сканирует H4, ищет триггер точки входа и отправляет сигнал дальше.',
+};
+
+const filters: FlowNode[] = [
   {
-    eyebrow: 'Архив · Trade Master',
-    tf: 'H4',
-    nodes: [
-      { n: '01', name: 'Trend Hunter', desc: 'Сканирует H4, ищет триггер точки входа и отправляет сигнал дальше.' },
-      { n: '02', name: 'Echo Gate', desc: 'Фильтрует триггер по архиву сделок, геометрии и контексту W1 / D1. Результат: допуск или отказ.' },
-    ],
+    n: '02',
+    tag: 'Trade Master',
+    name: 'Echo Gate',
+    desc: 'Фильтрует триггер по архиву сделок, геометрии и контексту W1 / D1. Результат: допуск или отказ.',
   },
   {
-    eyebrow: 'Резонанс · Nexus Gravity',
-    tf: 'M15',
-    nodes: [
-      { n: '01', name: 'Resonance Scanner', desc: 'Сканирует инструменты и формирует ТОП по резонансу W1 / D1.', badge: '1.23x — 1.49x импульс' },
-    ],
+    n: '02',
+    tag: 'Nexus Gravity · M15',
+    name: 'Resonance Scanner',
+    desc: 'Сканирует инструменты, отправляет сигналы по резонансу.',
+    badge: '1.23x — 1.49x импульс',
   },
 ];
 
-const spine: { tag: string; name: string; desc: string }[] = [
-  { tag: 'Автоисполнение', name: 'Hunter Bot', desc: 'Открывает сделку по распоряжению трейдера.' },
-  { tag: 'Защита счёта', name: 'Risk Sentinel', desc: 'Контроль лимитов, 4 уровня защиты и блокировка при превышении риска.' },
+const spine: FlowNode[] = [
+  { n: '▸', tag: 'Автоисполнение', name: 'Hunter Bot', desc: 'Открывает сделку по распоряжению трейдера.' },
+  { n: '◆', tag: 'Защита счёта', name: 'Risk Sentinel', desc: 'Контроль лимитов, 4 уровня защиты и блокировка при превышении риска.' },
 ];
 
 const stats = [
@@ -39,7 +44,7 @@ const stats = [
   { value: 'M15', label: 'Таймфрейм триггера', sub: 'Nexus Gravity' },
 ];
 
-const Node = ({ node, accent = false }: { node: FlowNode & { tag?: string }; accent?: boolean }) => (
+const Node = ({ node, accent = false }: { node: FlowNode; accent?: boolean }) => (
   <div className="relative" style={{ paddingLeft: 32, paddingBottom: 20 }}>
     <span
       className="absolute text-mono flex items-center justify-center"
@@ -52,7 +57,7 @@ const Node = ({ node, accent = false }: { node: FlowNode & { tag?: string }; acc
     >
       {node.n}
     </span>
-    <div className="p-4" style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
+    <div className="p-4 h-full" style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
       {node.tag && (
         <div className="text-mono" style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: GOLD, marginBottom: 3 }}>
           {node.tag}
@@ -69,16 +74,9 @@ const Node = ({ node, accent = false }: { node: FlowNode & { tag?: string }; acc
   </div>
 );
 
-const Track = ({ nodes, accent = false }: { nodes: (FlowNode & { tag?: string })[]; accent?: boolean }) => (
-  <div className="relative">
-    {/* structural line */}
-    <span
-      className="absolute"
-      style={{ left: 8, top: 8, bottom: 26, width: 2, background: accent ? `hsl(var(--accent) / 0.5)` : 'hsl(var(--border))' }}
-    />
-    {nodes.map((node) => (
-      <Node key={node.name} node={node} accent={accent} />
-    ))}
+const Conn = () => (
+  <div className="flex justify-center" style={{ marginTop: -6, marginBottom: 6 }}>
+    <span style={{ width: 2, height: 26, background: 'hsl(var(--border))' }} />
   </div>
 );
 
@@ -95,20 +93,21 @@ const TradingSystemSection = () => {
             Две стратегии · одна экосистема · единый риск-менеджмент
           </div>
 
-          {/* two strategy tracks */}
-          <div className="mt-10 md:mt-12 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
-            {tracks.map((track) => (
-              <div key={track.eyebrow}>
-                <div className="flex items-baseline gap-2 mb-4">
-                  <span className="text-mono" style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'hsl(var(--muted-foreground))' }}>
-                    {track.eyebrow}
-                  </span>
-                  <span className="text-mono" style={{ fontSize: 10, letterSpacing: '0.16em', color: 'hsl(var(--accent-dim))' }}>· {track.tf}</span>
-                </div>
-                <Track nodes={track.nodes} />
-              </div>
+          {/* trigger — Trend Hunter on top */}
+          <div className="mt-10 md:mt-12 mx-auto" style={{ maxWidth: 480 }}>
+            <Node node={trigger} />
+          </div>
+
+          <Conn />
+
+          {/* two strategy filters side by side */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 items-stretch">
+            {filters.map((f) => (
+              <Node key={f.name} node={f} />
             ))}
           </div>
+
+          <Conn />
 
           {/* trader decision divider */}
           <div className="flex items-center justify-center gap-3 text-center">
@@ -129,7 +128,12 @@ const TradingSystemSection = () => {
             <div className="text-mono text-center mb-5" style={{ fontSize: 10, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'hsl(var(--muted-foreground))' }}>
               Единый путь исполнения
             </div>
-            <Track nodes={spine.map((s, i) => ({ n: i === 0 ? '▸' : '◆', name: s.name, desc: s.desc, tag: s.tag }))} accent />
+            <div className="relative">
+              <span className="absolute" style={{ left: 8, top: 8, bottom: 26, width: 2, background: 'hsl(var(--accent) / 0.5)' }} />
+              {spine.map((node) => (
+                <Node key={node.name} node={node} accent />
+              ))}
+            </div>
           </div>
 
           {/* stats */}
