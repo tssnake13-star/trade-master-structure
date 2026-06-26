@@ -1,250 +1,146 @@
-const tactics = [
-  {
-    id: 'archive',
-    step: 'TRADE MASTER',
-    name: 'Архив',
-    description: 'Вход через память рынка. Геометрическое совпадение с паттернами архива.',
-  },
-  {
-    id: 'resonance',
-    step: 'NEXUS GRAVITY',
-    name: 'Резонанс',
-    description: 'Вход через состояние рынка. Сканирование валютного резонанса на импульс.',
-  },
-];
+/**
+ * TradingSystemSection — «03 · Архитектура». v3 editorial-terminal вариант:
+ * каждый путь — вертикальная «структурная линия» с нумерованными узлами
+ * (как лестница в кабинете и фон «Структура»). Два пути сходятся в золотом
+ * узле-ромбе → единая ось исполнения (Hunter Bot → Risk Sentinel). Острые
+ * карточки, тонкие линии, без скруглений/теней. Тексты и смыслы прежние.
+ */
 
-const flows = [
+const GOLD = 'hsl(var(--accent))';
+
+type FlowNode = { n: string; name: string; desc: string; badge?: string };
+
+const tracks: { eyebrow: string; tf: string; nodes: FlowNode[] }[] = [
   {
-    id: 'archive-path',
+    eyebrow: 'Архив · Trade Master',
+    tf: 'H4',
     nodes: [
-      {
-        step: 'Шаг 1',
-        name: 'Trend Hunter',
-        description: 'Сканирует H4, ищет триггер точки входа и отправляет сигнал дальше.',
-      },
-      {
-        step: 'Шаг 2',
-        name: 'Echo Gate',
-        description: 'Фильтрует триггер по архиву сделок, геометрии и контексту W1 / D1. Результат: допуск или отказ.',
-      },
-      {
-        step: 'Шаг 3',
-        name: 'Трейдер',
-        description: 'Получает допуск и принимает финальное решение по сделке.',
-      },
+      { n: '01', name: 'Trend Hunter', desc: 'Сканирует H4, ищет триггер точки входа и отправляет сигнал дальше.' },
+      { n: '02', name: 'Echo Gate', desc: 'Фильтрует триггер по архиву сделок, геометрии и контексту W1 / D1. Результат: допуск или отказ.' },
     ],
   },
   {
-    id: 'resonance-path',
+    eyebrow: 'Резонанс · Nexus Gravity',
+    tf: 'M15',
     nodes: [
-      {
-        step: 'Шаг 1',
-        name: 'Resonance Scanner',
-    description: 'Сканирует инструменты и формирует ТОП инструментов по резонансу W1 / D1.',
-        badge: '1.23x — 1.49x импульс',
-      },
-      {
-        step: 'Шаг 2',
-        name: 'Трейдер',
-        description: 'Изучает топ инструментов, проверяет их по общей стратегии и принимает финальное решение.',
-      },
+      { n: '01', name: 'Resonance Scanner', desc: 'Сканирует инструменты и формирует ТОП по резонансу W1 / D1.', badge: '1.23x — 1.49x импульс' },
     ],
   },
 ];
 
-const sharedNodes = [
-  {
-    step: 'Автоисполнение',
-    name: 'Hunter Bot',
-    description: 'Открывает сделку по распоряжению трейдера.',
-  },
-  {
-    step: 'Защита счёта',
-    name: 'Risk Sentinel',
-    description: 'Контроль лимитов, 4 уровня защиты и блокировка при превышении риска.',
-  },
+const spine: { tag: string; name: string; desc: string }[] = [
+  { tag: 'Автоисполнение', name: 'Hunter Bot', desc: 'Открывает сделку по распоряжению трейдера.' },
+  { tag: 'Защита счёта', name: 'Risk Sentinel', desc: 'Контроль лимитов, 4 уровня защиты и блокировка при превышении риска.' },
 ];
 
 const stats = [
-    { value: 'H4', label: 'Таймфрейм триггера', sublabel: 'TRADE MASTER' },
-    { value: 'M15', label: 'Таймфрейм триггера', sublabel: 'NEXUS GRAVITY' },
-    { value: '10:1', label: 'Среднее соотношение в сделках', sublabel: 'Торговля с 2012 года' },
+  { value: '10:1', label: 'Среднее соотношение в сделках', sub: 'Торговля с 2012 года' },
+  { value: 'H4', label: 'Таймфрейм триггера', sub: 'Trade Master' },
+  { value: 'M15', label: 'Таймфрейм триггера', sub: 'Nexus Gravity' },
 ];
 
-const ArrowDown = () => (
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="h-4 w-4 text-muted-foreground/40">
-    <path d="M12 5v14M6 13l6 6 6-6" />
-  </svg>
-);
-
-const TacticCard = ({ tactic }: { tactic: (typeof tactics)[number] }) => (
-  <div className="rounded-xl px-4 py-5 md:px-5 md:py-5 relative overflow-hidden bg-card border border-border shadow-[0_8px_28px_-10px_hsl(36_29%_40%/0.45)] border-l-2 border-l-accent/60 md:border-l md:border-l-border">
-    <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-foreground/30 to-transparent" />
-    <div className="text-mono text-[10px] uppercase tracking-[0.3em] mb-2 text-accent/80 md:text-muted-foreground">
-      {tactic.step}
+const Node = ({ node, accent = false }: { node: FlowNode & { tag?: string }; accent?: boolean }) => (
+  <div className="relative" style={{ paddingLeft: 32, paddingBottom: 20 }}>
+    <span
+      className="absolute text-mono flex items-center justify-center"
+      style={{
+        left: 0, top: 6, width: 18, height: 18, borderRadius: '50%', fontSize: 8,
+        color: accent ? 'hsl(var(--background))' : GOLD,
+        background: accent ? GOLD : 'hsl(var(--background))',
+        border: `1.5px solid ${GOLD}`,
+      }}
+    >
+      {node.n}
+    </span>
+    <div className="p-4" style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
+      {node.tag && (
+        <div className="text-mono" style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: GOLD, marginBottom: 3 }}>
+          {node.tag}
+        </div>
+      )}
+      <h4 className="font-serif" style={{ fontSize: 19, fontWeight: 500, lineHeight: 1.1, color: 'hsl(var(--foreground))' }}>{node.name}</h4>
+      <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{node.desc}</p>
+      {node.badge && (
+        <span className="mt-2.5 inline-flex text-mono" style={{ fontSize: 10, color: 'hsl(var(--foreground) / 0.7)', border: '1px solid hsl(var(--foreground) / 0.15)', padding: '2px 8px' }}>
+          {node.badge}
+        </span>
+      )}
     </div>
-    <h3 className="text-lg md:text-xl font-semibold leading-tight" style={{ color: 'hsl(36 29% 40%)' }}>
-      {tactic.name}
-    </h3>
-    <p className="mt-2 text-sm leading-relaxed max-w-md text-muted-foreground">
-      {tactic.description}
-    </p>
   </div>
 );
 
-const FlowCard = ({ node }: { node: (typeof flows)[number]['nodes'][number] }) => (
-  <div className="w-full rounded-xl p-4 md:p-5 bg-card border border-border">
-    <div className="text-mono text-[10px] uppercase tracking-[0.24em] mb-2 text-muted-foreground">
-      {node.step}
-    </div>
-    <h4 className="text-base md:text-lg font-semibold leading-tight text-foreground">
-      {node.name}
-    </h4>
-    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-      {node.description}
-    </p>
-    {node.badge && (
-      <span className="mt-3 inline-flex rounded-full px-3 py-1 text-mono text-[10px] text-foreground/70 border border-foreground/15 bg-foreground/[0.04]">
-        {node.badge}
-      </span>
-    )}
+const Track = ({ nodes, accent = false }: { nodes: (FlowNode & { tag?: string })[]; accent?: boolean }) => (
+  <div className="relative">
+    {/* structural line */}
+    <span
+      className="absolute"
+      style={{ left: 8, top: 8, bottom: 26, width: 2, background: accent ? `hsl(var(--accent) / 0.5)` : 'hsl(var(--border))' }}
+    />
+    {nodes.map((node) => (
+      <Node key={node.name} node={node} accent={accent} />
+    ))}
   </div>
 );
 
 const TradingSystemSection = () => {
-
   return (
     <section id="trading-system" className="py-16 md:py-24 section-animate">
       <div className="container-landing">
         <div className="max-w-4xl mx-auto">
           <span className="section-label">03 · Архитектура</span>
-          <h2 className="text-foreground mb-4">
+          <h2 className="text-foreground mb-3">
             Как работает <em>система</em> <span className="mute">изнутри</span>
           </h2>
-          <div className="mt-10 md:mt-14 rounded-2xl p-5 md:p-8 relative overflow-hidden bg-card/50 border border-border">
-            <div
-              className="absolute inset-0 opacity-[0.03]"
-              style={{
-                backgroundImage: `linear-gradient(hsl(var(--foreground)) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--foreground)) 1px, transparent 1px)`,
-                backgroundSize: '40px 40px',
-              }}
-            />
+          <div className="text-mono" style={{ fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'hsl(var(--muted-foreground))' }}>
+            Две стратегии · одна экосистема · единый риск-менеджмент
+          </div>
 
-            <div className="relative z-10">
-              <div className="mb-8 md:mb-10 text-center">
-                <div className="text-mono text-[11px] uppercase tracking-[0.4em] mb-2 text-muted-foreground">
-                  TradeLikeTyo
+          {/* two strategy tracks */}
+          <div className="mt-10 md:mt-12 grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-8">
+            {tracks.map((track) => (
+              <div key={track.eyebrow}>
+                <div className="flex items-baseline gap-2 mb-4">
+                  <span className="text-mono" style={{ fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'hsl(var(--muted-foreground))' }}>
+                    {track.eyebrow}
+                  </span>
+                  <span className="text-mono" style={{ fontSize: 10, letterSpacing: '0.16em', color: 'hsl(var(--accent-dim))' }}>· {track.tf}</span>
                 </div>
-                <div className="font-serif text-4xl md:text-6xl font-normal italic leading-none" style={{ color: 'hsl(36 29% 40%)' }}>
-                  Ecosystem
-                </div>
-                <p className="mt-3 text-sm md:text-[13px] tracking-[0.04em] text-muted-foreground">
-                  Две стратегии — одна экосистема — единый риск-менеджмент
-                </p>
+                <Track nodes={track.nodes} />
               </div>
+            ))}
+          </div>
 
-              <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 mb-6 md:mb-8">
-                {tactics.map((tactic) => (
-                  <TacticCard key={tactic.id} tactic={tactic} />
-                ))}
-              </div>
+          {/* trader decision divider */}
+          <div className="flex items-center justify-center gap-3 text-center">
+            <span className="h-px flex-1 max-w-[120px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--foreground) / 0.25), transparent)' }} />
+            <span className="text-mono" style={{ fontSize: 10, letterSpacing: '0.26em', textTransform: 'uppercase', color: 'hsl(var(--muted-foreground))' }}>
+              Трейдер · финальное решение
+            </span>
+            <span className="h-px flex-1 max-w-[120px]" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--foreground) / 0.25), transparent)' }} />
+          </div>
 
-              <div className="md:hidden space-y-4">
-                {flows.map((flow, flowIndex) => (
-                  <div key={flow.id} className="flex flex-col items-center">
-                    <TacticCard tactic={tactics[flowIndex]} />
-                    <div className="flex h-8 items-center justify-center">
-                      <ArrowDown />
-                    </div>
-                    <div className="w-full flex flex-col items-center">
-                      {flow.nodes.map((node, index) => (
-                        <div key={node.name} className="w-full flex flex-col items-center">
-                          <FlowCard node={node} />
-                          {index < flow.nodes.length - 1 && (
-                            <div className="flex h-8 items-center justify-center">
-                              <ArrowDown />
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {/* merge node */}
+          <div className="flex justify-center my-6">
+            <span style={{ width: 10, height: 10, background: GOLD, transform: 'rotate(45deg)' }} />
+          </div>
 
-              <div className="hidden md:grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
-                {flows.map((flow) => (
-                  <div key={flow.id} className="flex flex-col items-center">
-                    {flow.nodes.map((node, index) => (
-                      <div key={node.name} className="w-full flex flex-col items-center">
-                        <FlowCard node={node} />
-                        {index < flow.nodes.length - 1 && (
-                          <div className="flex h-8 items-center justify-center">
-                            <ArrowDown />
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                    {flow.nodes.length < 3 && <div className="hidden md:block h-[132px]" />}
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 md:mt-8 hidden md:grid grid-cols-2 gap-6 h-8">
-                <div className="ml-[50%] border-r border-b border-border" />
-                <div className="mr-[50%] border-l border-b border-border" />
-              </div>
-
-              <div className="mt-4 md:mt-0 flex flex-col items-center">
-                <div className="flex h-8 items-center justify-center">
-                  <ArrowDown />
-                </div>
-                <div className="mb-4 flex items-center justify-center gap-3 text-center text-mono text-[10px] uppercase tracking-[0.28em] text-muted-foreground">
-                  <span className="h-px w-10 md:w-28 bg-gradient-to-r from-transparent via-foreground/30 to-transparent" />
-                  Единый путь исполнения
-                  <span className="h-px w-10 md:w-28 bg-gradient-to-r from-transparent via-foreground/30 to-transparent" />
-                </div>
-
-                <div className="w-full max-w-2xl space-y-3">
-                  {sharedNodes.map((node, index) => (
-                    <div key={node.name} className="flex flex-col items-center">
-                      <div className="w-full rounded-xl p-4 md:p-5 bg-card border border-foreground/20">
-                        <div className="text-mono text-[10px] uppercase tracking-[0.24em] mb-2 text-muted-foreground">
-                          {node.step}
-                        </div>
-                        <h4 className="text-base md:text-lg font-semibold leading-tight text-foreground">
-                          {node.name}
-                        </h4>
-                        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                          {node.description}
-                        </p>
-                      </div>
-                      {index < sharedNodes.length - 1 && (
-                        <div className="flex h-8 items-center justify-center">
-                          <ArrowDown />
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-8 md:mt-10 grid grid-cols-1 md:grid-cols-3 gap-3">
-                {stats.map((stat) => (
-                  <div key={stat.value} className="rounded-xl p-4 text-center bg-card border border-border">
-                    <div className="font-serif text-3xl md:text-4xl font-normal italic leading-none text-foreground">
-                      {stat.value}
-                    </div>
-                    <div className="mt-2 text-sm leading-snug text-foreground">
-                      {stat.label}
-                    </div>
-                    <div className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                      {stat.sublabel}
-                    </div>
-                  </div>
-                ))}
-              </div>
+          {/* unified execution spine */}
+          <div className="mx-auto" style={{ maxWidth: 480 }}>
+            <div className="text-mono text-center mb-5" style={{ fontSize: 10, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'hsl(var(--muted-foreground))' }}>
+              Единый путь исполнения
             </div>
+            <Track nodes={spine.map((s, i) => ({ n: i === 0 ? '▸' : '◆', name: s.name, desc: s.desc, tag: s.tag }))} accent />
+          </div>
+
+          {/* stats */}
+          <div className="mt-8 md:mt-10 grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {stats.map((stat) => (
+              <div key={stat.value} className="p-4 text-center" style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
+                <div className="font-serif" style={{ fontSize: 30, fontStyle: 'italic', lineHeight: 1, color: 'hsl(var(--foreground))' }}>{stat.value}</div>
+                <div className="mt-2 text-sm leading-snug text-foreground">{stat.label}</div>
+                <div className="mt-1 text-xs leading-relaxed text-muted-foreground">{stat.sub}</div>
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -112,7 +112,7 @@ export default function PackageCards({
               {p.outcome}
             </div>
 
-            {showPrices && (
+            {showPrices ? (
               <>
                 <div className="mt-5 flex items-baseline gap-3">
                   <span style={{ ...SERIF, fontSize: 38, lineHeight: 1, color: 'hsl(var(--foreground))' }}>{p.price}</span>
@@ -120,6 +120,13 @@ export default function PackageCards({
                 </div>
                 <div className="text-mono mt-1" style={{ ...MONO, letterSpacing: '0.14em', color: 'hsl(var(--muted-foreground))' }}>{p.period}</div>
               </>
+            ) : (
+              <div
+                className="text-mono mt-5 inline-flex items-center self-start px-3 py-1.5"
+                style={{ ...MONO, letterSpacing: '0.14em', color: GOLD, border: '1px solid hsl(var(--accent) / 0.3)', background: 'hsl(var(--accent) / 0.05)' }}
+              >
+                {p.period}
+              </div>
             )}
 
             <a
