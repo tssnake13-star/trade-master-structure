@@ -1008,16 +1008,19 @@ function StudentsTab() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [accesses, setAccesses] = useState<Access[]>([]);
+  const [courses, setCourses] = useState<{ id: string; is_free: boolean }[]>([]);
 
   const load = async () => {
-    const [p, r, a] = await Promise.all([
+    const [p, r, a, c] = await Promise.all([
       supabase.from('profiles').select('*').order('created_at', { ascending: false }),
       supabase.from('user_roles').select('*'),
       supabase.from('course_access').select('*'),
+      supabase.from('courses').select('id, is_free'),
     ]);
     setProfiles(p.data || []);
     setRoles(r.data || []);
     setAccesses((a.data as Access[]) || []);
+    setCourses((c.data as { id: string; is_free: boolean }[]) || []);
   };
 
   useEffect(() => { load(); }, []);
@@ -1035,12 +1038,28 @@ function StudentsTab() {
     return { days: minDays, hasAccess: true };
   };
 
+  // Платники — сверху (свежие, по дате выдачи доступа), бесплатники — снизу
+  // (по дате регистрации). «Платник» = есть доступ к платному (не is_free) курсу.
+  const paidCourseIds = new Set(courses.filter(c => !c.is_free).map(c => c.id));
+  const paidAccesses = (uid: string) => accesses.filter(a => a.user_id === uid && paidCourseIds.has(a.course_id));
+  const isPaid = (uid: string) => paidAccesses(uid).length > 0;
+  const paidFreshness = (uid: string) => {
+    const ts = paidAccesses(uid).map(a => new Date(a.granted_at).getTime());
+    return ts.length ? Math.max(...ts) : 0;
+  };
+  const sortedProfiles = [...profiles].sort((x, y) => {
+    const px = isPaid(x.user_id), py = isPaid(y.user_id);
+    if (px !== py) return px ? -1 : 1;                              // платники выше бесплатников
+    if (px) return paidFreshness(y.user_id) - paidFreshness(x.user_id); // новые платники — в самом верху
+    return new Date(y.created_at).getTime() - new Date(x.created_at).getTime(); // новые регистрации выше
+  });
+
   return (
     <div>
       <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Аккаунты</h2>
 
       <div className="space-y-2">
-        {profiles.map(p => {
+        {sortedProfiles.map(p => {
           const access = getAccessDaysLeft(p.user_id);
           return (
           <div
