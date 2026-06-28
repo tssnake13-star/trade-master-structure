@@ -35,6 +35,15 @@ function logoTR(yLogo = 52) {
 }
 const vlabel = (x, y) => `<g transform="translate(${x},${y}) rotate(-90)"><text x="0" y="0" font-family="${INTER}" font-weight="800" font-size="21" letter-spacing="3" fill="${INK}">TRADELIKETYO · ВЫПУСК 03</text></g>`;
 const ghostWord = (word, y = 1342, size = 300) => `<text x="-20" y="${y}" font-family="${SANS}" font-weight="900" font-size="${size}" letter-spacing="-8" fill="${GHOST}">${esc(word)}</text>`;
+// giant word split across two lines (fills empty space, fully readable)
+const ghostSplit = (word) => {
+  const n = word.length, a = word.slice(0, Math.ceil(n / 2)), b = word.slice(Math.ceil(n / 2));
+  const fit = s => Math.floor((W - 90) / (s.length * 0.74));
+  const size = Math.min(278, fit(a), fit(b));
+  const y1 = 1018, y2 = y1 + Math.round(size * 0.86);
+  return `<text x="${W / 2}" y="${y1}" text-anchor="middle" font-family="${SANS}" font-weight="900" font-size="${size}" letter-spacing="-4" fill="#E7E3DB">${esc(a)}</text>`
+    + `<text x="${W / 2}" y="${y2}" text-anchor="middle" font-family="${SANS}" font-weight="900" font-size="${size}" letter-spacing="-4" fill="#E7E3DB">${esc(b)}</text>`;
+};
 const redSpine = `<rect x="0" y="0" width="14" height="${H}" fill="${RED}"/>`;
 
 async function bwFeather(src, w, h) {
@@ -82,12 +91,12 @@ function content({ idx, kicker, ghost, head, body }) {
 }
 function contentBuf({ idx, kicker, ghost, head, body }) {
   let s = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="#FFFFFF"/>`;
-  s += ghostWord(ghost) + redSpine + logoTR();
+  s += ghostSplit(ghost) + redSpine + logoTR();
   s += `<text x="64" y="100" font-family="${INTER}" font-weight="800" font-size="22" letter-spacing="3" fill="${RED}">${esc(kicker)}</text>`;
   s += `<line x1="64" y1="132" x2="${W - 64}" y2="132" stroke="${INK}" stroke-opacity="0.12" stroke-width="1.4"/>`;
-  s += headline(head, 60, 268, 66, 80);
-  const hy = 268 + 80 * (head.length - 1) + 96;
-  s += bodyBlock(body, 64, hy, 50, 46);
+  s += headline(head, 60, 300, 72, 86);
+  const hy = 300 + 86 * (head.length - 1) + 102;
+  s += bodyBlock(body, 64, hy, 48, 48, 31);
   s += vlabel(46, 1170);
   s += `<text x="64" y="1292" font-family="${INTER}" font-weight="700" font-size="22" letter-spacing="1" fill="${GREY}">→ ЛИСТАЙ</text>`;
   s += `<text x="${W - 64}" y="1292" text-anchor="end" font-family="${SANS}" font-weight="900" font-size="30" fill="${INK}">${idx} / 08</text>`;
