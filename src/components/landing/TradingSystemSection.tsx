@@ -44,19 +44,21 @@ const stats = [
   { value: 'M15', label: 'Таймфрейм триггера', sub: 'Nexus Gravity' },
 ];
 
-const Node = ({ node, accent = false }: { node: FlowNode; accent?: boolean }) => (
-  <div className="relative" style={{ paddingLeft: 32, paddingBottom: 20 }}>
-    <span
-      className="absolute text-mono flex items-center justify-center"
-      style={{
-        left: 0, top: 6, width: 18, height: 18, borderRadius: '50%', fontSize: 8,
-        color: accent ? 'hsl(var(--background))' : GOLD,
-        background: accent ? GOLD : 'hsl(var(--background))',
-        border: `1.5px solid ${GOLD}`,
-      }}
-    >
-      {node.n}
-    </span>
+const Node = ({ node, accent = false, marker = true }: { node: FlowNode; accent?: boolean; marker?: boolean }) => (
+  <div className="relative" style={{ paddingLeft: marker ? 32 : 0, paddingBottom: 20 }}>
+    {marker && (
+      <span
+        className="absolute text-mono flex items-center justify-center"
+        style={{
+          left: 0, top: 6, width: 18, height: 18, borderRadius: '50%', fontSize: 8,
+          color: accent ? 'hsl(var(--background))' : GOLD,
+          background: accent ? GOLD : 'hsl(var(--background))',
+          border: `1.5px solid ${GOLD}`,
+        }}
+      >
+        {node.n}
+      </span>
+    )}
     <div className="p-4 h-full" style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
       {node.tag && (
         <div className="text-mono" style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: GOLD, marginBottom: 3 }}>
@@ -95,7 +97,7 @@ const TradingSystemSection = () => {
 
           {/* trigger — Trend Hunter on top */}
           <div className="mt-10 md:mt-12 mx-auto" style={{ maxWidth: 480 }}>
-            <Node node={trigger} />
+            <Node node={trigger} marker={false} />
           </div>
 
           <Conn />
@@ -103,7 +105,7 @@ const TradingSystemSection = () => {
           {/* two strategy filters side by side */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 items-stretch">
             {filters.map((f) => (
-              <Node key={f.name} node={f} />
+              <Node key={f.name} node={f} marker={false} />
             ))}
           </div>
 
