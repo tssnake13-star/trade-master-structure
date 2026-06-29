@@ -44,22 +44,16 @@ const stats = [
   { value: 'M15', label: 'Таймфрейм триггера', sub: 'Nexus Gravity' },
 ];
 
-const Node = ({ node, accent = false, marker = true }: { node: FlowNode; accent?: boolean; marker?: boolean }) => (
-  <div className="relative" style={{ paddingLeft: marker ? 32 : 0, paddingBottom: 20 }}>
-    {marker && (
-      <span
-        className="absolute text-mono flex items-center justify-center"
-        style={{
-          left: 0, top: 6, width: 18, height: 18, borderRadius: '50%', fontSize: 8,
-          color: accent ? 'hsl(var(--background))' : GOLD,
-          background: accent ? GOLD : 'hsl(var(--background))',
-          border: `1.5px solid ${GOLD}`,
-        }}
-      >
-        {node.n}
-      </span>
-    )}
-    <div className="p-4 h-full" style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
+const Node = ({ node, accent = false }: { node: FlowNode; accent?: boolean }) => (
+  <div style={{ paddingBottom: 20 }}>
+    <div
+      className="p-4 h-full"
+      style={{
+        background: 'hsl(var(--card))',
+        border: '1px solid hsl(var(--border))',
+        borderLeft: `2px solid hsl(var(--accent)${accent ? '' : ' / 0.45'})`,
+      }}
+    >
       {node.tag && (
         <div className="text-mono" style={{ fontSize: 9, letterSpacing: '0.2em', textTransform: 'uppercase', color: GOLD, marginBottom: 3 }}>
           {node.tag}
@@ -97,7 +91,7 @@ const TradingSystemSection = () => {
 
           {/* trigger — Trend Hunter on top */}
           <div className="mt-10 md:mt-12 mx-auto" style={{ maxWidth: 480 }}>
-            <Node node={trigger} marker={false} />
+            <Node node={trigger} />
           </div>
 
           <Conn />
@@ -105,7 +99,7 @@ const TradingSystemSection = () => {
           {/* two strategy filters side by side */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 items-stretch">
             {filters.map((f) => (
-              <Node key={f.name} node={f} marker={false} />
+              <Node key={f.name} node={f} />
             ))}
           </div>
 
@@ -130,8 +124,7 @@ const TradingSystemSection = () => {
             <div className="text-mono text-center mb-5" style={{ fontSize: 10, letterSpacing: '0.28em', textTransform: 'uppercase', color: 'hsl(var(--muted-foreground))' }}>
               Единый путь исполнения
             </div>
-            <div className="relative">
-              <span className="absolute" style={{ left: 8, top: 8, bottom: 26, width: 2, background: 'hsl(var(--accent) / 0.5)' }} />
+            <div>
               {spine.map((node) => (
                 <Node key={node.name} node={node} accent />
               ))}
