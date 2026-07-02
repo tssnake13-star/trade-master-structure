@@ -47,13 +47,13 @@ async function cover() {
   const bx = 596, by = 250, bw = 432, bh = 700;
   const photo = await framedPortrait(PHOTO_COVER, bw, bh);
   let bg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="#FFFFFF"/>`;
-  bg += `<text x="40" y="1230" font-family="${SANS}" font-weight="900" font-size="440" letter-spacing="-10" fill="#EFE9E2">23%</text>` + redSpine + `</svg>`;
+  bg += `<text x="40" y="1230" font-family="${SANS}" font-weight="900" font-size="440" letter-spacing="-10" fill="#EFE9E2">23%</text>` + redSpine
+    + `<rect x="${bx - 6}" y="${by - 6}" width="${bw + 12}" height="${bh + 12}" fill="${RED}"/>` + `</svg>`;
   let fg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">` + logoTR();
   fg += `<text x="64" y="250" font-family="${INTER}" font-weight="800" font-size="22" letter-spacing="3" fill="${RED}">РЕЗУЛЬТАТЫ · 18 МЕСЯЦЕВ</text>`;
   fg += headline([[{ t: 'Win rate ' }, { t: '23%', red: 1 }, { t: '.' }], [{ t: 'И счёт' }], [{ t: 'растёт.' }]], 60, 360, 72, 86);
   fg += `<text x="64" y="632" font-family="${INTER}" font-weight="500" font-size="27" fill="${GREY}">Низкий винрейт — не приговор.</text>`;
   fg += `<text x="64" y="668" font-family="${INTER}" font-weight="500" font-size="27" fill="${GREY}">Решает система.</text>`;
-  fg += `<rect x="${bx - 6}" y="${by - 6}" width="${bw + 12}" height="${bh + 12}" fill="${RED}"/>`;
   fg += `<text x="110" y="1292" font-family="${SANS}" font-weight="900" font-size="30" letter-spacing="1" fill="${INK}">MMXXVI</text>`;
   fg += `<text x="${W - 64}" y="1292" text-anchor="end" font-family="${INTER}" font-weight="700" font-size="22" letter-spacing="1" fill="${GREY}">→ ЛИСТАЙ · 01 / 08</text>`;
   fg += `</svg>`;
@@ -77,7 +77,8 @@ async function trade(idx, src, no) {
 async function last() {
   const bx = 596, by = 250, bw = 432, bh = 620;
   const photo = await framedPortrait(PHOTO_LAST, bw, bh);
-  let bg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="#FFFFFF"/>` + redSpine + `</svg>`;
+  let bg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}"><rect width="${W}" height="${H}" fill="#FFFFFF"/>` + redSpine
+    + `<rect x="${bx - 6}" y="${by - 6}" width="${bw + 12}" height="${bh + 12}" fill="${RED}"/>` + `</svg>`;
   let fg = `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}">` + logoTR() + kickerT('ХОТИТЕ ТАК ЖЕ?');
   fg += headline([[{ t: 'Торговать' }], [{ t: 'системно', red: 1 }, { t: '.' }]], 60, 268, 64, 78);
   // stat lines (left column, left of photo)
@@ -93,7 +94,6 @@ async function last() {
   fg += `<text x="287" y="815" text-anchor="middle" font-family="${INTER}" font-weight="800" font-size="24" letter-spacing="1" fill="#FFFFFF">ССЫЛКА В ШАПКЕ ПРОФИЛЯ →</text>`;
   fg += `<text x="64" y="910" font-family="${SANS}" font-weight="900" font-size="40" fill="${INK}">@tradeliketyo</text>`;
   fg += `<text x="64" y="947" font-family="${INTER}" font-weight="600" font-size="21" fill="${GREY}">если торгуете всерьёз</text>`;
-  fg += `<rect x="${bx - 6}" y="${by - 6}" width="${bw + 12}" height="${bh + 12}" fill="${RED}"/>`;
   fg += `<text x="${W - 64}" y="1292" text-anchor="end" font-family="${SANS}" font-weight="900" font-size="30" fill="${INK}">08 / 08</text>`;
   fg += `</svg>`;
   return sharp(await R(bg)).composite([{ input: photo, left: bx * SCALE, top: by * SCALE }, { input: await R(fg) }]);
