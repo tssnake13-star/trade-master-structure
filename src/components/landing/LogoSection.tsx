@@ -2,7 +2,7 @@ import logoAnimation from '@/assets/logo-animation.mp4';
 
 const LogoSection = () => {
   return (
-    <section className="py-8 md:py-12 bg-background">
+    <section className="py-8 md:py-12">
       <div className="container-landing flex justify-center">
         <video
           key={logoAnimation}
