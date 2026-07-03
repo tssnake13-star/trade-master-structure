@@ -18,6 +18,7 @@ import TradesSection from '@/components/landing/TradesSection';
 import WorkWeekSection from '@/components/landing/WorkWeekSection';
 import StagesSection from '@/components/landing/StagesSection';
 import FitSection from '@/components/landing/FitSection';
+import AdmissionCheckSection from '@/components/landing/AdmissionCheckSection';
 import LevelsSection from '@/components/landing/LevelsSection';
 import AuthorSection from '@/components/landing/AuthorSection';
 import PrincipleSection from '@/components/landing/PrincipleSection';
@@ -71,6 +72,9 @@ const Index = () => {
 
         {/* Мысль-делитель */}
         <WordmarkKinetic text="Допуск, " emphasis="не сигнал" />
+
+        {/* Интерактив: проверь сетап через допуск */}
+        <AdmissionCheckSection />
 
         {/* Оффер и действие */}
         <LevelsSection />

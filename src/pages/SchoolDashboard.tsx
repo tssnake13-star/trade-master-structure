@@ -750,6 +750,7 @@ export function SelectedCourseView({
         completedIds={completedIds}
         unlockedSortOrders={unlockedSortOrders}
         onOpen={onOpen}
+        showBridge={!course.is_free && progress.total > 0 && progress.completed >= progress.total}
         t={t}
       />
     </>
@@ -1246,12 +1247,14 @@ export function FreeHome({
 //   Rendered inside SelectedCourseView (the per-course detail page).
 // ====================================================================
 function CourseLadder({
-  lessons, completedIds, unlockedSortOrders, onOpen, t,
+  lessons, completedIds, unlockedSortOrders, onOpen, showBridge = false, t,
 }: {
   lessons: Lesson[];
   completedIds: Set<string>;
   unlockedSortOrders: number[];
   onOpen: (id: string) => void;
+  /** финальный узел «Программа завершена → экосистема» (курс пройден целиком) */
+  showBridge?: boolean;
   t: TFn;
 }) {
   const total = lessons.length;
@@ -1267,7 +1270,7 @@ function CourseLadder({
         const unlocked = unlockedSortOrders.includes(num);
         const current = i === currentIdx;
         const openable = unlocked && !done; // current, or a later already-unlocked block
-        const last = i === total - 1;
+        const last = i === total - 1 && !showBridge; // при мосте линия продолжается до финального узла
         const node = done
           ? { border: ACCENT, bg: `${ACCENT}1a`, color: ACCENT }
           : current
@@ -1349,6 +1352,51 @@ function CourseLadder({
           </div>
         );
       })}
+
+      {/* финальный узел: программа завершена → мост к экосистеме */}
+      {showBridge && (
+        <div style={{ position: 'relative', paddingLeft: 72 }}>
+          <span
+            style={{
+              position: 'absolute', left: 2, top: 0, width: 44, height: 44, borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              border: `1.5px solid ${ACCENT}`, backgroundColor: ACCENT, color: '#0a0a0a', fontSize: 15,
+            }}
+          >
+            ◆
+          </span>
+          <div
+            style={{
+              marginTop: -4, padding: '20px 22px', border: `1px solid ${ACCENT}`,
+              backgroundColor: CARD, borderRadius: 10,
+              background: `radial-gradient(circle at 50% 0%, ${ACCENT}26 0%, ${CARD} 65%)`,
+            }}
+          >
+            <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 6 }}>
+              Программа завершена
+            </div>
+            <h3 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 26, lineHeight: 1.15, color: FG, marginBottom: 10 }}>
+              Путь пройден. Дальше — экосистема.
+            </h3>
+            <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.55, color: '#a8a090', maxWidth: '56ch', marginBottom: 16 }}>
+              Все этапы закрыты. Следующий уровень — инфраструктура исполнения:
+              Echo Gate, Hunter Bot и Risk Sentinel в работе на вашем счёте.
+            </p>
+            <a
+              href="http://t.me/tradeliketyo"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-flex', alignItems: 'center', gap: 8,
+                fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
+                backgroundColor: ACCENT, color: '#0a0a0a', padding: '10px 18px', borderRadius: 6,
+              }}
+            >
+              Перейти в экосистему <ArrowRight size={14} />
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
