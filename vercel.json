@@ -12,7 +12,7 @@
     { "source": "/start", "destination": "https://t.me/New_TradeLikeTYO_bot", "permanent": false },
     { "source": "/viktor", "destination": "https://t.me/New_TradeLikeTYO_bot?start=viktor", "permanent": false },
     { "source": "/vk", "destination": "https://t.me/New_TradeLikeTYO_bot?start=vk", "permanent": false },
-    { "source": "/facebook", "destination": "https://t.me/New_TradeLikeTYO_bot?start=facebook", "permanent": false }
+    { "source": "/Facebook", "destination": "https://t.me/New_TradeLikeTYO_bot?start=facebook", "permanent": false }
   ],
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
