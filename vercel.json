@@ -1,7 +1,7 @@
 {
   "redirects": [
     { "source": "/reels", "destination": "https://t.me/New_TradeLikeTYO_bot?start=reels", "permanent": false },
-    { "source": "/youtube", "destination": "https://t.me/New_TradeLikeTYO_bot?start=youtube", "permanent": false },
+    { "source": "/YouTube", "destination": "https://t.me/New_TradeLikeTYO_bot?start=youtube", "permanent": false },
     { "source": "/shorts", "destination": "https://t.me/New_TradeLikeTYO_bot?start=shorts", "permanent": false },
     { "source": "/tiktok", "destination": "https://t.me/New_TradeLikeTYO_bot?start=tiktok", "permanent": false },
     { "source": "/site", "destination": "https://t.me/New_TradeLikeTYO_bot?start=site", "permanent": false },
