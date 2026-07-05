@@ -10,7 +10,7 @@ const CapitalProtectionSection = () => {
     <section id="protection" className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <span className="section-label">08 · Защита капитала</span>
+          <span className="section-label">09 · Защита капитала</span>
           <h2 className="text-foreground">
             Плохая неделя не <em>превращается</em> в плохой месяц
           </h2>

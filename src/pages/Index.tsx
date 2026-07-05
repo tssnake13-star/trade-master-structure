@@ -57,6 +57,9 @@ const Index = () => {
         <SystemStatsSection />
         <TradesSection />
 
+        {/* Фильтр: это подойдёт не всем — сразу после живой сделки */}
+        <FitSection />
+
         {/* Мысль-делитель */}
         <WordmarkKinetic text="Структура " emphasis="важнее сигнала" />
 
@@ -66,9 +69,8 @@ const Index = () => {
         <CapitalProtectionSection />
         <StagesSection />
 
-        {/* Структура оффера и фильтр */}
+        {/* Структура оффера */}
         <TwoStagesSection />
-        <FitSection />
 
         {/* Мысль-делитель */}
         <WordmarkKinetic text="Допуск, " emphasis="не сигнал" />
