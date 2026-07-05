@@ -332,8 +332,27 @@ export default function SchoolLesson() {
           </>
         )}
 
+        {/* Подсказка к кнопке «Завершить блок» — многие не понимают, зачем её жать */}
+        {!isCompleted && nextLessonId && lesson.course_id !== 'e2cad7c2-77fe-4159-a860-203eb8695e8d' && (
+          <div className="mt-12">
+            <div
+              style={{
+                display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                padding: '12px 18px', borderRadius: 10,
+                border: `1px solid ${ACCENT}59`, backgroundColor: `${ACCENT}12`,
+                fontFamily: MONO, fontSize: 12, letterSpacing: '0.06em', textTransform: 'uppercase',
+                color: ACCENT, textAlign: 'center', lineHeight: 1.5,
+              }}
+            >
+              <CheckCircle size={15} style={{ flexShrink: 0 }} />
+              <span>Нажмите «Завершить блок», чтобы открыть следующее занятие</span>
+              <span style={{ fontSize: 16, flexShrink: 0 }}>↓</span>
+            </div>
+          </div>
+        )}
+
         {/* Bottom action bar */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-12">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-4">
           <button
             onClick={() => prevLessonId && navigate(`/school/lesson/${prevLessonId}`)}
             disabled={!prevLessonId}

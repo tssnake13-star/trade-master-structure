@@ -750,7 +750,7 @@ export function SelectedCourseView({
         completedIds={completedIds}
         unlockedSortOrders={unlockedSortOrders}
         onOpen={onOpen}
-        showBridge={!course.is_free && progress.total > 0 && progress.completed >= progress.total}
+        showBridge={!course.is_free && lessons.length > 0 && lessons.every((_, i) => unlockedSortOrders.includes(i + 1))}
         t={t}
       />
     </>
