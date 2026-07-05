@@ -67,7 +67,7 @@ const TradesSection = () => {
     <section id="trades" className="py-12 md:py-20 section-animate">
       <div className="container-landing">
         <div className="max-w-4xl">
-          <span className="section-label">07 · Сделки</span>
+          <span className="section-label">05 · Сделки</span>
           <h2 className="text-foreground">
             Как выглядит <em>сделка</em>, <span className="mute">когда есть система</span>
           </h2>

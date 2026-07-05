@@ -74,17 +74,6 @@ const TwoStagesSection = () => {
             </div>
           </article>
         </div>
-
-        <p
-          className="mt-10 md:mt-14 text-center italic"
-          style={{
-            fontFamily: "'Bricolage Grotesque', system-ui, sans-serif",
-            fontSize: '20px',
-            color: 'hsl(var(--muted-foreground))',
-          }}
-        >
-          Школа научила вас принимать решения. Экосистема следит за тем, чтобы вы их не нарушали.
-        </p>
       </div>
     </section>
   );

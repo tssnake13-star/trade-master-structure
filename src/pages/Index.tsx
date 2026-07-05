@@ -15,7 +15,7 @@ import CapitalProtectionSection from '@/components/landing/CapitalProtectionSect
 import SystemStatsSection from '@/components/landing/SystemStatsSection';
 import ProofSection from '@/components/landing/ProofSection';
 import TradesSection from '@/components/landing/TradesSection';
-import WorkWeekSection from '@/components/landing/WorkWeekSection';
+import TransformationSection from '@/components/landing/TransformationSection';
 import StagesSection from '@/components/landing/StagesSection';
 import FitSection from '@/components/landing/FitSection';
 import AdmissionCheckSection from '@/components/landing/AdmissionCheckSection';
@@ -42,32 +42,32 @@ const Index = () => {
         <HeroSectionV3 />
         <InstrumentTicker />
         <StatsCounter />
-        <TwoStagesSection />
 
         {/* Боль */}
         <CoreProblemSection />
 
-        {/* Мысль-делитель */}
-        <WordmarkKinetic text="Структура " emphasis="важнее сигнала" />
-
-        {/* Решение */}
-        <IncludedSection />
-        <TradingSystemSection />
-
-        {/* Доверие / доказательства */}
-        <CapitalProtectionSection />
-        <SystemStatsSection />
-        <ProofSection />
-        <TradesSection />
+        {/* Состояние: что меняется в поведении (до механики) */}
+        <TransformationSection />
 
         {/* Мысль-делитель */}
         <WordmarkKinetic text="Система, " emphasis="не эмоция" />
 
-        {/* Образ жизни */}
-        <WorkWeekSection />
+        {/* Доверие / доказательства */}
+        <ProofSection />
+        <SystemStatsSection />
+        <TradesSection />
 
-        {/* Путь и фильтр */}
+        {/* Мысль-делитель */}
+        <WordmarkKinetic text="Структура " emphasis="важнее сигнала" />
+
+        {/* Механика системы */}
+        <IncludedSection />
+        <TradingSystemSection />
+        <CapitalProtectionSection />
         <StagesSection />
+
+        {/* Структура оффера и фильтр */}
+        <TwoStagesSection />
         <FitSection />
 
         {/* Мысль-делитель */}
