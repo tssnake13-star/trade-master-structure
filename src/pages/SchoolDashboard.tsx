@@ -321,6 +321,23 @@ export default function SchoolDashboard() {
       const completionList = (progressRes.data || []) as CompletionRecord[];
       const completedSet = new Set(completionList.map(p => p.lesson_id));
 
+      // Полный доступ = урок считается пройденным. Когда открыт ВЕСЬ курс (админ
+      // или доступ выдан сразу ко всем занятиям), помечаем все его уроки
+      // завершёнными: лестница вся в галочках, «текущий» не выделяется, счётчики
+      // = 100%. Это только отображение — в lesson_progress ничего не пишется, при
+      // снятии доступа вернётся фактический прогресс. Бесплатные курсы открываются
+      // по мере прохождения — их не трогаем.
+      {
+        const isAdminUser = role === 'admin';
+        for (const c of courseList) {
+          if (c.is_free) continue;
+          const cl = lessons.filter(l => l.course_id === c.id);
+          if (cl.length === 0) continue;
+          const unl = isAdminUser ? cl.map((_, i) => i + 1) : (aMap.get(c.id)?.unlocked || [1]);
+          if (cl.every((_, i) => unl.includes(i + 1))) cl.forEach(l => completedSet.add(l.id));
+        }
+      }
+
       setCourses(courseList);
       setAccessMap(aMap);
       setAllLessons(lessons);

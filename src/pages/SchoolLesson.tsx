@@ -118,12 +118,15 @@ export default function SchoolLesson() {
         const isFree = courseRes.data?.is_free || false;
         const unlocked = accessRes.data?.unlocked_lessons || [1];
         const isAdmin = role === 'admin';
+        // Полный доступ к курсу (админ или доступ выдан сразу ко всем занятиям) =
+        // все блоки считаются пройденными, кнопка «Завершить» — как уже нажатая.
+        const fullyUnlocked = !isFree && (isAdmin || allSorted.every((_, i) => unlocked.includes(i + 1)));
 
         setCourseTitle(courseRes.data?.title || '');
         setIsFreeCourse(isFree);
         setTotalLessons(allSorted.length);
         setCurrentIndex(currentIdx);
-        setIsCompleted((progressRes.data || []).length > 0);
+        setIsCompleted((progressRes.data || []).length > 0 || fullyUnlocked);
         setPrevLessonId(prev?.id || null);
         setNextLessonId(next?.id || null);
         setIsNextUnlocked(next ? (isAdmin || unlocked.includes(currentIdx + 2) || isFree) : false);
@@ -131,7 +134,7 @@ export default function SchoolLesson() {
 
         const courseLessonIds = new Set(allSorted.map(x => x.id));
         const completedInCourse = (allProgressRes.data || []).filter(p => courseLessonIds.has(p.lesson_id)).length;
-        setCompletedCount(completedInCourse);
+        setCompletedCount(fullyUnlocked ? allSorted.length : completedInCourse);
       }
       setLoading(false);
     };
