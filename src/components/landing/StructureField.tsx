@@ -91,24 +91,48 @@ export default function StructureField({
         }
       }
 
-      // nodes
+      // nodes — soft halo + core. Replaces per-node ctx.shadowBlur, which was the
+      // single most expensive per-frame op and the main cause of scroll flicker.
       for (const n of nodes) {
+        ctx.beginPath(); ctx.arc(n.x, n.y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${GOLD},0.12)`; ctx.fill();
         ctx.beginPath(); ctx.arc(n.x, n.y, 2.4, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${GOLD},0.7)`;
-        ctx.shadowColor = `rgb(${GOLD})`; ctx.shadowBlur = 8; ctx.fill(); ctx.shadowBlur = 0;
+        ctx.fillStyle = `rgba(${GOLD},0.7)`; ctx.fill();
       }
+    };
 
-      if (!reduce) raf = requestAnimationFrame(draw);
+    // Throttle to ~30fps. This background is slow and subtle, so half the frames
+    // are imperceptible while paint cost halves — far less scroll jank / flicker.
+    const frameMs = 1000 / 30;
+    let lastDraw = 0;
+    const frame = (now: number) => {
+      raf = requestAnimationFrame(frame);
+      if (now - lastDraw < frameMs) return;
+      lastDraw = now;
+      draw(now);
     };
 
     resize(); seed();
     if (reduce) draw(performance.now());
-    else raf = requestAnimationFrame(draw);
+    else raf = requestAnimationFrame(frame);
 
     let lastW = window.innerWidth;
     const onResize = () => { if (window.innerWidth === lastW) return; lastW = window.innerWidth; resize(); seed(); };
     window.addEventListener('resize', onResize);
-    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', onResize); };
+
+    // Pause the loop entirely while the tab is hidden — no wasted background CPU.
+    const onVisibility = () => {
+      if (reduce) return;
+      if (document.hidden) { if (raf) { cancelAnimationFrame(raf); raf = 0; } }
+      else if (!raf) { lastDraw = 0; raf = requestAnimationFrame(frame); }
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', onResize);
+      document.removeEventListener('visibilitychange', onVisibility);
+    };
   }, []);
 
   return (

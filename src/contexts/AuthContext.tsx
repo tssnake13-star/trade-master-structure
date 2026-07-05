@@ -37,17 +37,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (session?.user) {
           // Fetch role with setTimeout to avoid Supabase auth deadlock
           setTimeout(async () => {
-            const [{ data: roleData }, { data: profileData }] = await Promise.all([
+            const [{ data: roleRows }, { data: profileData }] = await Promise.all([
+              // NB: a user may hold several roles (e.g. 'student' from the signup
+              // trigger + 'admin' granted later). Fetch ALL rows — using .single()
+              // here throws on >1 row and silently demotes admins to 'student'.
               supabase
                 .from('user_roles')
                 .select('role')
-                .eq('user_id', session.user.id)
-                .single(),
+                .eq('user_id', session.user.id),
               supabase
                 .from('profiles')
                 .select('is_blocked')
                 .eq('user_id', session.user.id)
-                .single(),
+                .maybeSingle(),
             ]);
 
             if (profileData?.is_blocked) {
@@ -60,7 +62,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               return;
             }
 
-            setRole((roleData?.role as UserRole) ?? 'student');
+            const roles = (roleRows ?? []).map(r => r.role as UserRole);
+            setRole(roles.includes('admin') ? 'admin' : (roles[0] ?? 'student'));
             setLoading(false);
 
             // Update last_seen_at (throttled to once per 2 minutes per browser)
