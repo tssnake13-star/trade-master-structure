@@ -1236,8 +1236,10 @@ export function FreeHome({
         </div>
       )}
 
-      {/* Code section */}
-      <ActivateCodeSection userId={userId} onActivated={() => window.location.reload()} t={t} />
+      {/* Code section — обёртка с auto-высотой, чтобы h-full не растягивал карточку до низа экрана */}
+      <div style={{ maxWidth: 560 }}>
+        <ActivateCodeSection userId={userId} onActivated={() => window.location.reload()} t={t} />
+      </div>
     </>
   );
 }
