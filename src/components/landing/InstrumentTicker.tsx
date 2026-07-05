@@ -1,8 +1,13 @@
 const PAIRS = [
-  'EUR / USD', 'GBP / JPY', 'XAU / USD', 'USD / CAD',
-  'BTC / USDT', 'XAG / USD', 'AUD / USD', 'EUR / JPY',
-  'EUR / USD', 'GBP / JPY', 'XAU / USD', 'USD / CAD',
-  'BTC / USDT', 'XAG / USD', 'AUD / USD', 'EUR / JPY',
+  'DXY',
+  'EUR / USD', 'GBP / USD', 'AUD / USD', 'NZD / USD', 'USD / JPY', 'USD / CAD', 'USD / CHF',
+  'EUR / JPY', 'GBP / JPY', 'CAD / JPY', 'AUD / JPY', 'NZD / JPY',
+  'GBP / AUD', 'EUR / AUD',
+  'GBP / NZD', 'EUR / NZD',
+  'EUR / GBP', 'EUR / CHF', 'GBP / CHF', 'CAD / CHF', 'EUR / CAD', 'GBP / CAD', 'NZD / CAD', 'AUD / NZD',
+  'XAU / USD', 'XAG / USD',
+  'BRENT',
+  'BTC / USDT', 'ETH / USDT',
 ];
 
 const TickerRow = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (
