@@ -55,7 +55,7 @@ export default function SchoolStudentDetail() {
     if (!studentId) return;
     const [pRes, rRes, cRes, lRes, aRes, prRes, icRes] = await Promise.all([
       supabase.from('profiles').select('*').eq('user_id', studentId).single(),
-      supabase.from('user_roles').select('role').eq('user_id', studentId).single(),
+      supabase.from('user_roles').select('role').eq('user_id', studentId), // may hold several roles — no .single()
       supabase.from('courses').select('*').order('sort_order'),
       supabase.from('lessons').select('*').order('sort_order'),
       supabase.from('course_access').select('*').eq('user_id', studentId),
@@ -63,7 +63,8 @@ export default function SchoolStudentDetail() {
       supabase.from('invite_codes').select('code').eq('used_by', studentId).limit(1),
     ]);
     setProfile(pRes.data as Profile | null);
-    setStudentRole(rRes.data?.role || 'student');
+    const roleRows = (rRes.data ?? []) as { role: string }[];
+    setStudentRole(roleRows.some(r => r.role === 'admin') ? 'admin' : (roleRows[0]?.role || 'student'));
     setCourses(cRes.data || []);
     setLessons(lRes.data || []);
     setAccesses((aRes.data || []) as Access[]);
@@ -141,16 +142,21 @@ export default function SchoolStudentDetail() {
 
   const toggleAdminRole = async () => {
     if (!studentId || isSelf || !canModifySuperAdminTarget) return;
-    const newRole = studentRole === 'admin' ? 'student' : 'admin';
-    const { data: existing } = await supabase
-      .from('user_roles')
-      .select('id')
-      .eq('user_id', studentId)
-      .maybeSingle();
-    if (existing) {
-      await supabase.from('user_roles').update({ role: newRole }).eq('user_id', studentId);
+    // Multi-role model: promote = add an 'admin' row (keep 'student'); demote =
+    // remove only the 'admin' row. Never touch the base 'student' role.
+    const makeAdmin = studentRole !== 'admin';
+    if (makeAdmin) {
+      const { data: existingAdmin } = await supabase
+        .from('user_roles')
+        .select('id')
+        .eq('user_id', studentId)
+        .eq('role', 'admin')
+        .maybeSingle();
+      if (!existingAdmin) {
+        await supabase.from('user_roles').insert({ user_id: studentId, role: 'admin' });
+      }
     } else {
-      await supabase.from('user_roles').insert({ user_id: studentId, role: newRole });
+      await supabase.from('user_roles').delete().eq('user_id', studentId).eq('role', 'admin');
     }
     load();
   };

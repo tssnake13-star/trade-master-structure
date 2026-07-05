@@ -1025,7 +1025,13 @@ function StudentsTab() {
 
   useEffect(() => { load(); }, []);
 
-  const getRole = (uid: string) => roles.find(r => r.user_id === uid)?.role || 'student';
+  // NB: a user may hold several roles (e.g. 'student' from the signup trigger +
+  // 'admin' granted later). Prefer 'admin' — .find() alone returns whichever row
+  // came first (usually 'student') and mislabels admins.
+  const getRole = (uid: string) => {
+    const rs = roles.filter(r => r.user_id === uid).map(r => r.role);
+    return rs.includes('admin') ? 'admin' : (rs[0] || 'student');
+  };
 
   const getAccessDaysLeft = (uid: string): { days: number | null; hasAccess: boolean } => {
     const userAccesses = accesses.filter(a => a.user_id === uid);
