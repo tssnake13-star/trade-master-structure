@@ -3,7 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -25,14 +25,26 @@ import SiteAssetsApplier from "./components/SiteAssetsApplier";
 
 const queryClient = new QueryClient();
 
+// Renders children only after the first client mount. The toasters read client-only
+// state (Sonner resolves the theme via next-themes), which differs between the SSR
+// pre-render and the browser and would cause a hydration mismatch on "/". Mounting
+// them post-hydration keeps the SSR and initial client trees identical.
+function ClientOnly({ children }: { children: ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  return mounted ? <>{children}</> : null;
+}
+
 // Outer providers (no router). Reused by the browser entry (main.tsx) and by the
 // build-time SSR pre-render (entry-server.tsx) so both trees are identical.
 export function AppShell({ children }: { children: ReactNode }) {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Toaster />
-        <Sonner />
+        <ClientOnly>
+          <Toaster />
+          <Sonner />
+        </ClientOnly>
         {children}
       </TooltipProvider>
     </QueryClientProvider>
