@@ -110,6 +110,7 @@ export default function SchoolLadderPreview() {
           pct={pct}
           nextLesson={next}
           onOpen={() => {}}
+          onOpenCourse={() => {}}
           t={t}
         />
       </div>

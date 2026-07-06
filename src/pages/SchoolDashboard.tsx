@@ -53,6 +53,11 @@ const MONO = "'Space Mono', ui-monospace, monospace";
 const SANS = "'Syne', system-ui, sans-serif";
 const DISPLAY = "'Cormorant', Georgia, 'Times New Roman', serif";
 
+// Курс-экосистема (ECOSYSTEM: ECHO-GATE & NEXUS GRAVITY). Мостик «Перейти в
+// экосистему» из ДРУГИХ курсов ведёт СЮДА (открывает этот курс в кабинете);
+// а уже внутри него кнопка «Хочу в экосистему» ведёт в Telegram к автору.
+const ECOSYSTEM_COURSE_ID = '7280015b-be5f-4569-b6ea-0bbb69fc06ee';
+
 // Premium glass surface for cards (correct for dark theme).
 // NB: no backdrop-filter — the dashboard re-renders every second (live timers),
 // and blur recomputation on each repaint causes flicker. A translucent fill over
@@ -637,6 +642,7 @@ export default function SchoolDashboard() {
               pct={selectedPct}
               nextLesson={selectedNext}
               onOpen={(id) => navigate(`/school/lesson/${id}`)}
+              onOpenCourse={(id) => { selectCourse(id); try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { /* ignore */ } }}
               t={t}
             />
           )}
@@ -724,7 +730,7 @@ type TFn = (key: DashboardTextKey, vars?: Record<string, string | number>) => st
 //   SELECTED COURSE DETAIL
 // ====================================================================
 export function SelectedCourseView({
-  course, lessons, unlockedSortOrders, completedIds, progress, pct, nextLesson, onOpen, t,
+  course, lessons, unlockedSortOrders, completedIds, progress, pct, nextLesson, onOpen, onOpenCourse, t,
 }: {
   course: Course;
   lessons: Lesson[];
@@ -734,6 +740,7 @@ export function SelectedCourseView({
   pct: number;
   nextLesson: Lesson | null;
   onOpen: (id: string) => void;
+  onOpenCourse: (id: string) => void;
   t: TFn;
 }) {
   return (
@@ -768,6 +775,8 @@ export function SelectedCourseView({
         unlockedSortOrders={unlockedSortOrders}
         onOpen={onOpen}
         showBridge={!course.is_free && lessons.length > 0 && lessons.every((_, i) => unlockedSortOrders.includes(i + 1))}
+        bridgeToTelegram={course.id === ECOSYSTEM_COURSE_ID}
+        onOpenEcosystem={() => onOpenCourse(ECOSYSTEM_COURSE_ID)}
         t={t}
       />
     </>
@@ -1266,7 +1275,7 @@ export function FreeHome({
 //   Rendered inside SelectedCourseView (the per-course detail page).
 // ====================================================================
 function CourseLadder({
-  lessons, completedIds, unlockedSortOrders, onOpen, showBridge = false, t,
+  lessons, completedIds, unlockedSortOrders, onOpen, showBridge = false, bridgeToTelegram = false, onOpenEcosystem, t,
 }: {
   lessons: Lesson[];
   completedIds: Set<string>;
@@ -1274,6 +1283,9 @@ function CourseLadder({
   onOpen: (id: string) => void;
   /** финальный узел «Программа завершена → экосистема» (курс пройден целиком) */
   showBridge?: boolean;
+  /** true только в самом курсе-экосистеме: кнопка мостика ведёт в Telegram; иначе — открывает курс-экосистему */
+  bridgeToTelegram?: boolean;
+  onOpenEcosystem?: () => void;
   t: TFn;
 }) {
   const total = lessons.length;
@@ -1401,18 +1413,31 @@ function CourseLadder({
               Все этапы закрыты. Следующий уровень — инфраструктура исполнения:
               Echo Gate, Hunter Bot и Risk Sentinel в работе на вашем счёте.
             </p>
-            <a
-              href="http://t.me/tradeliketyo"
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: 8,
-                fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
-                backgroundColor: ACCENT, color: '#0a0a0a', padding: '10px 18px', borderRadius: 6,
-              }}
-            >
-              Перейти в экосистему <ArrowRight size={14} />
-            </a>
+            {bridgeToTelegram ? (
+              <a
+                href="http://t.me/tradeliketyo"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
+                  backgroundColor: ACCENT, color: '#0a0a0a', padding: '10px 18px', borderRadius: 6,
+                }}
+              >
+                Хочу в экосистему <ArrowRight size={14} />
+              </a>
+            ) : (
+              <button
+                onClick={onOpenEcosystem}
+                style={{
+                  display: 'inline-flex', alignItems: 'center', gap: 8,
+                  fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
+                  backgroundColor: ACCENT, color: '#0a0a0a', padding: '10px 18px', borderRadius: 6, cursor: 'pointer',
+                }}
+              >
+                Перейти в экосистему <ArrowRight size={14} />
+              </button>
+            )}
           </div>
         </div>
       )}
