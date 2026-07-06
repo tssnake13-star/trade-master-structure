@@ -15,7 +15,8 @@
     { "source": "/Facebook", "destination": "https://t.me/New_TradeLikeTYO_bot?start=facebook", "permanent": false }
   ],
   "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/", "destination": "/index.html" },
+    { "source": "/((?!api/).*)", "destination": "/app.html" }
   ]
 }
 
