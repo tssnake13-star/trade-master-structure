@@ -1,7 +1,7 @@
 {
   "redirects": [
     { "source": "/reels", "destination": "https://t.me/New_TradeLikeTYO_bot?start=reels", "permanent": false },
-    { "source": "/YouTube", "destination": "https://t.me/New_TradeLikeTYO_bot?start=youtube", "permanent": false },
+    { "source": "/([Yy][Oo][Uu][Tt][Uu][Bb][Ee])", "destination": "https://t.me/New_TradeLikeTYO_bot?start=youtube", "permanent": false },
     { "source": "/shorts", "destination": "https://t.me/New_TradeLikeTYO_bot?start=shorts", "permanent": false },
     { "source": "/tiktok", "destination": "https://t.me/New_TradeLikeTYO_bot?start=tiktok", "permanent": false },
     { "source": "/site", "destination": "https://t.me/New_TradeLikeTYO_bot?start=site", "permanent": false },
@@ -12,10 +12,9 @@
     { "source": "/start", "destination": "https://t.me/New_TradeLikeTYO_bot", "permanent": false },
     { "source": "/viktor", "destination": "https://t.me/New_TradeLikeTYO_bot?start=viktor", "permanent": false },
     { "source": "/vk", "destination": "https://t.me/New_TradeLikeTYO_bot?start=vk", "permanent": false },
-    { "source": "/Facebook", "destination": "https://t.me/New_TradeLikeTYO_bot?start=facebook", "permanent": false }
+    { "source": "/([Ff][Aa][Cc][Ee][Bb][Oo][Oo][Kk])", "destination": "https://t.me/New_TradeLikeTYO_bot?start=facebook", "permanent": false }
   ],
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }
-
