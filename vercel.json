@@ -1,6 +1,7 @@
 {
   "redirects": [
     { "source": "/reels", "destination": "https://t.me/New_TradeLikeTYO_bot?start=reels", "permanent": false },
+    { "source": "/razbor", "destination": "https://t.me/New_TradeLikeTYO_bot?start=razbor", "permanent": false },
     { "source": "/([Yy][Oo][Uu][Tt][Uu][Bb][Ee])", "destination": "https://t.me/New_TradeLikeTYO_bot?start=youtube", "permanent": false },
     { "source": "/shorts", "destination": "https://t.me/New_TradeLikeTYO_bot?start=shorts", "permanent": false },
     { "source": "/tiktok", "destination": "https://t.me/New_TradeLikeTYO_bot?start=tiktok", "permanent": false },
