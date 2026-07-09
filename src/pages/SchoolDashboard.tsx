@@ -1403,40 +1403,56 @@ function CourseLadder({
               background: `radial-gradient(circle at 50% 0%, ${ACCENT}26 0%, ${CARD} 65%)`,
             }}
           >
-            <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 6 }}>
-              Программа завершена
-            </div>
-            <h3 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 26, lineHeight: 1.15, color: FG, marginBottom: 10 }}>
-              Путь пройден. Дальше — экосистема.
-            </h3>
-            <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.55, color: '#a8a090', maxWidth: '56ch', marginBottom: 16 }}>
-              Все этапы закрыты. Следующий уровень — инфраструктура исполнения:
-              Echo Gate, Hunter Bot и Risk Sentinel в работе на вашем счёте.
-            </p>
             {bridgeToTelegram ? (
-              <a
-                href="http://t.me/tradeliketyo"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                  fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
-                  backgroundColor: ACCENT, color: '#0a0a0a', padding: '10px 18px', borderRadius: 6,
-                }}
-              >
-                Хочу в экосистему <ArrowRight size={14} />
-              </a>
+              /* Курс-экосистема: квинтэссенция всей экосистемы + CTA в Telegram */
+              <>
+                <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
+                  Экосистема
+                </div>
+                <h3 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 25, lineHeight: 1.28, color: FG, marginBottom: 12, maxWidth: '34ch' }}>
+                  Школа <span style={{ color: ACCENT }}>учит</span> вас принимать решения.<br />
+                  Экосистема <span style={{ color: ACCENT }}>следит</span> за тем, чтобы вы их не нарушали.
+                </h3>
+                <p style={{ fontFamily: SANS, fontSize: 12, lineHeight: 1.55, color: '#8a857c', maxWidth: '52ch', marginBottom: 18 }}>
+                  Echo Gate · Trade Master · Nexus Gravity — инфраструктура исполнения на вашем счёте.
+                </p>
+                <a
+                  href="http://t.me/tradeliketyo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                    fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
+                    backgroundColor: ACCENT, color: '#0a0a0a', padding: '10px 18px', borderRadius: 6,
+                  }}
+                >
+                  Хочу в экосистему <ArrowRight size={14} />
+                </a>
+              </>
             ) : (
-              <button
-                onClick={onOpenEcosystem}
-                style={{
-                  display: 'inline-flex', alignItems: 'center', gap: 8,
-                  fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
-                  backgroundColor: ACCENT, color: '#0a0a0a', padding: '10px 18px', borderRadius: 6, cursor: 'pointer',
-                }}
-              >
-                Перейти в экосистему <ArrowRight size={14} />
-              </button>
+              /* Другие курсы: мост, ведущий в курс-экосистему */
+              <>
+                <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 6 }}>
+                  Программа завершена
+                </div>
+                <h3 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 26, lineHeight: 1.15, color: FG, marginBottom: 10 }}>
+                  Путь пройден. Дальше — экосистема.
+                </h3>
+                <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.55, color: '#a8a090', maxWidth: '56ch', marginBottom: 16 }}>
+                  Все этапы закрыты. Следующий уровень — инфраструктура исполнения:
+                  Echo Gate, Hunter Bot и Risk Sentinel в работе на вашем счёте.
+                </p>
+                <button
+                  onClick={onOpenEcosystem}
+                  style={{
+                    display: 'inline-flex', alignItems: 'center', gap: 8,
+                    fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
+                    backgroundColor: ACCENT, color: '#0a0a0a', padding: '10px 18px', borderRadius: 6, cursor: 'pointer',
+                  }}
+                >
+                  Перейти в экосистему <ArrowRight size={14} />
+                </button>
+              </>
             )}
           </div>
         </div>
