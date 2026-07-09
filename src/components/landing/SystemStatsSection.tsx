@@ -1,8 +1,9 @@
 const stats = [
-  { n: '+85.6%', l: 'доходность · 17 мес' },
-  { n: '2.50', l: 'profit factor' },
+  { n: '+112.1%', l: 'доходность · 18 мес' },
+  { n: '2.85', l: 'profit factor' },
   { n: '−2.23%', l: 'макс. просадка' },
-  { n: '14/17', l: 'прибыльных месяцев' },
+  { n: '15/18', l: 'прибыльных месяцев' },
+  { n: '319', l: 'сделок за 18 мес' },
 ];
 
 const SystemStatsSection = () => {
@@ -15,13 +16,16 @@ const SystemStatsSection = () => {
             Цифры, которые <em>не зависят</em> от настроения
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            Статистика системы за 17 месяцев — 299 сделок. Риск 0.25% на сделку, без компаундинга.
+            Статистика системы за 18 месяцев — 319 сделок. Риск 0.25% на сделку, без компаундинга.
           </p>
         </div>
 
-        <div className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-3">
-          {stats.map((s) => (
-            <div key={s.l} className="border border-border rounded-xl bg-card p-5">
+        <div className="mt-8 grid grid-cols-2 lg:grid-cols-5 gap-3">
+          {stats.map((s, i) => (
+            <div
+              key={s.l}
+              className={`border border-border rounded-xl bg-card p-5 ${i === stats.length - 1 ? 'col-span-2 lg:col-span-1' : ''}`}
+            >
               <div className="font-['Bricolage_Grotesque'] text-3xl md:text-4xl tracking-tight tabular-nums text-foreground">{s.n}</div>
               <div className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.16em] text-muted-foreground mt-2">{s.l}</div>
             </div>
@@ -34,8 +38,8 @@ const SystemStatsSection = () => {
             <p className="mt-2 text-sm text-muted-foreground">Точка безубытка ~11%. Большинство думает, что нужно 70%+ побед — это миф. Важно не как часто ты прав, а сколько берёшь, когда прав.</p>
           </div>
           <div className="border border-border rounded-xl bg-card p-5">
-            <div className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--accent))' }}>Profit Factor 2.50</div>
-            <p className="mt-2 text-sm text-muted-foreground">На каждый потерянный $1 система возвращает $2.50. Результат на фиксированном риске — не «разгон депозита», а устойчивая работа.</p>
+            <div className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--accent))' }}>Profit Factor 2.85</div>
+            <p className="mt-2 text-sm text-muted-foreground">На каждый потерянный $1 система возвращает $2.85. Результат на фиксированном риске — не «разгон депозита», а устойчивая работа.</p>
           </div>
         </div>
       </div>
