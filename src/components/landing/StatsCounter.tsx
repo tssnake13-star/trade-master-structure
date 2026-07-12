@@ -4,7 +4,7 @@ const stats = [
   { value: 14, suffix: '', label: 'лет в рынке' },
   { value: 200, suffix: '+', label: 'учеников в системе' },
   { value: 1000, suffix: '+', label: 'эталонных сделок в архиве' },
-  { value: 10, suffix: ':1', label: 'среднее соотношение R:R в сделках' },
+  { value: 23, suffix: '%', label: 'Win Rate · среднее R:R 10:1' },
 ];
 
 const useCountUp = (end: number, duration = 1500, start = false) => {
