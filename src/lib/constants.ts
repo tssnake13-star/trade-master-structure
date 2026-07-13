@@ -12,4 +12,5 @@ export const NAV_ITEMS = [
   { label: 'Отзывы', href: '#proof' },
   { label: 'Сотрудничество', href: '#formats' },
   { label: 'Автор', href: '#author' },
+  { label: 'FAQ', href: '#faq' },
 ] as const;
