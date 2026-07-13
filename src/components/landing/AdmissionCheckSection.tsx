@@ -3,7 +3,7 @@ import { ArrowRight, RotateCcw } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 
 /**
- * AdmissionCheckSection — «11 · Допуск». Интерактивная мини-демка Echo Gate:
+ * AdmissionCheckSection — «12 · Допуск». Интерактивная мини-демка Echo Gate:
  * посетитель описывает свой сетап тремя ответами, система выносит вердикт.
  * Все ответы структурные → «Допуск» + CTA в бота. Любая ошибка → «Отказ», но
  * кнопка остаётся с другим текстом (отказ — продающий момент, лид не теряется).
@@ -53,7 +53,7 @@ export default function AdmissionCheckSection() {
     <section id="admission-check" className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <span className="section-label">11 · Допуск</span>
+          <span className="section-label">12 · Допуск</span>
           <h2 className="text-foreground">
             Проверьте сделку через <em>допуск</em>
           </h2>

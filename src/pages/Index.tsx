@@ -18,6 +18,8 @@ import TradesSection from '@/components/landing/TradesSection';
 import TransformationSection from '@/components/landing/TransformationSection';
 import StagesSection from '@/components/landing/StagesSection';
 import FitSection from '@/components/landing/FitSection';
+import ComparisonSection from '@/components/landing/ComparisonSection';
+import FAQSection from '@/components/landing/FAQSection';
 import AdmissionCheckSection from '@/components/landing/AdmissionCheckSection';
 import LevelsSection from '@/components/landing/LevelsSection';
 import AuthorSection from '@/components/landing/AuthorSection';
@@ -60,6 +62,9 @@ const Index = () => {
         {/* Фильтр: это подойдёт не всем — сразу после живой сделки */}
         <FitSection />
 
+        {/* Отстройка: чем система отличается от сигналов и «ещё одного курса» */}
+        <ComparisonSection />
+
         {/* Мысль-делитель */}
         <WordmarkKinetic text="Структура " emphasis="важнее сигнала" />
 
@@ -82,6 +87,10 @@ const Index = () => {
         <LevelsSection />
         <AuthorSection />
         <PrincipleSection />
+
+        {/* Последние сомнения перед действием */}
+        <FAQSection />
+
         <DualCTASection />
         <LogoSection />
       </main>

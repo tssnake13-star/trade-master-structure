@@ -92,9 +92,9 @@ export default function HeroSectionV3() {
             </a>
           </div>
 
-          {/* усилитель под кнопками — снимает страх звонка (инсайт «без звонков») */}
+          {/* усилитель под кнопками: снимает страх звонка + говорит, что будет после клика */}
           <p className="v3h-mono mt-5" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.55 }}>
-            Без звонков · всё общение в Telegram
+            Без звонков · бот за 2 минуты покажет, как работает допуск
           </p>
         </div>
       </div>

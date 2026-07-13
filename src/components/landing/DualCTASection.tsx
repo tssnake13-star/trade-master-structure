@@ -16,7 +16,7 @@ const DualCTASection = () => {
               Хочу разобраться
             </p>
             <p className="text-sm text-muted-foreground mb-6">
-              Начну с системы допуска
+              Бот за 2 минуты покажет, как работает допуск
             </p>
             <a
               href={TELEGRAM_LINKS.bot}

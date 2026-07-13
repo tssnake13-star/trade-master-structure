@@ -8,13 +8,15 @@ const sections = [
   { id: 'stats', num: '04', label: 'Результаты' },
   { id: 'trades', num: '05', label: 'Сделки' },
   { id: 'filter', num: '06', label: 'Фильтр' },
-  { id: 'included', num: '07', label: 'Что входит' },
-  { id: 'trading-system', num: '08', label: 'Архитектура' },
-  { id: 'protection', num: '09', label: 'Защита' },
-  { id: 'stages', num: '10', label: 'Путь' },
-  { id: 'admission-check', num: '11', label: 'Допуск' },
-  { id: 'formats', num: '12', label: 'Сотрудничество' },
-  { id: 'author', num: '13', label: 'Автор' },
+  { id: 'difference', num: '07', label: 'Отличие' },
+  { id: 'included', num: '08', label: 'Что входит' },
+  { id: 'trading-system', num: '09', label: 'Архитектура' },
+  { id: 'protection', num: '10', label: 'Защита' },
+  { id: 'stages', num: '11', label: 'Путь' },
+  { id: 'admission-check', num: '12', label: 'Допуск' },
+  { id: 'formats', num: '13', label: 'Сотрудничество' },
+  { id: 'author', num: '14', label: 'Автор' },
+  { id: 'faq', num: '15', label: 'Вопросы' },
 ];
 
 const SideNav = () => {
