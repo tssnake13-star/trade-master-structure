@@ -8,10 +8,20 @@ const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
-export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
-  auth: {
-    storage: localStorage,
-    persistSession: true,
-    autoRefreshToken: true,
+// SSR/pre-render safety: at build time the landing is rendered to static HTML in
+// Node (no `window`/`localStorage`). Fall back to memory storage and a placeholder
+// URL so createClient() never throws — the pre-rendered HTML never calls Supabase.
+// In the browser the real (build-injected) values and localStorage are always used.
+const isBrowser = typeof window !== 'undefined';
+
+export const supabase = createClient<Database>(
+  SUPABASE_URL || (isBrowser ? SUPABASE_URL : 'https://prerender-placeholder.supabase.co'),
+  SUPABASE_PUBLISHABLE_KEY || (isBrowser ? SUPABASE_PUBLISHABLE_KEY : 'prerender-placeholder'),
+  {
+    auth: {
+      storage: isBrowser ? window.localStorage : undefined,
+      persistSession: isBrowser,
+      autoRefreshToken: isBrowser,
+    },
   }
-});
+);

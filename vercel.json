@@ -1,4 +1,6 @@
 {
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
   "redirects": [
     { "source": "/reels", "destination": "https://t.me/New_TradeLikeTYO_bot?start=reels", "permanent": false },
     { "source": "/razbor", "destination": "https://t.me/New_TradeLikeTYO_bot?start=razbor", "permanent": false },
