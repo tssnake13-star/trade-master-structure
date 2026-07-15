@@ -1417,7 +1417,7 @@ function CourseLadder({
                   Echo Gate · Trade Master · Nexus Gravity — инфраструктура исполнения на вашем счёте.
                 </p>
                 <a
-                  href="http://t.me/tradeliketyo"
+                  href="/access"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
