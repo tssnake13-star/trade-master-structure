@@ -98,7 +98,7 @@ const ProofSection = () => {
         <div className="max-w-4xl">
           <span className="section-label">03 · Доказательства</span>
           <h2 className="text-foreground">
-            Что происходит, когда <em>появляется</em> <span className="mute">система</span>
+            Структура вместо <span className="mute">хаоса</span> — в каждом <em>решении</em>
           </h2>
           
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
