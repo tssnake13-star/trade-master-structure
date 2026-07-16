@@ -11,7 +11,7 @@ const CoreProblemSection = () => {
         <div className="max-w-3xl">
           <span className="section-label">01 · Проблема</span>
           <h2 className="text-foreground">
-            Дело не в <em>стратегии</em>
+            Дело не в стратегии — а в отсутствии <em>допуска</em>
           </h2>
 
           <div className="mt-6 md:mt-8 space-y-4">
