@@ -31,8 +31,11 @@ const AuthorSection = () => {
               </p>
               
               <div className="space-y-4 mb-6">
+                <p className="text-base md:text-lg text-foreground font-medium leading-relaxed">
+                  Мои лучшие сделки — те, которые я <span style={{ color: 'hsl(var(--accent))' }}>не совершил</span>
+                </p>
                 <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                  Я не учу искать входы
+                  Поэтому я не учу искать входы
                 </p>
                 <p className="text-sm md:text-base text-foreground font-medium leading-relaxed">
                   Я выстраиваю систему<br />
