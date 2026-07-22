@@ -14,6 +14,9 @@ const LevelsSection = () => {
             Не курс ради курса, а система, которая остаётся с вами. От алгоритма принятия решений —
             до полной инфраструктуры с автоисполнением и защитой капитала.
           </p>
+          <p className="mt-5 text-base md:text-lg text-foreground">
+            Обучение — <span style={{ color: 'hsl(var(--accent))', fontWeight: 500 }}>от&nbsp;$599 до&nbsp;$2990</span>, в зависимости от уровня.
+          </p>
         </div>
 
         <div className="mt-8 md:mt-12">
