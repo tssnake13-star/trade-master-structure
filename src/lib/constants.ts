@@ -3,6 +3,7 @@ export const TELEGRAM_LINKS = {
   bot: 'https://tradeliketyo.com/site',
   channel: 'https://t.me/+6utYXa4nAjMyNjNi',
   dm: 'http://t.me/tradeliketyo',
+  razbor: 'https://tradeliketyo.com/razbor',
 } as const;
 
 // Navigation items

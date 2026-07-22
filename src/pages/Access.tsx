@@ -29,7 +29,7 @@ export default function Access() {
 
           {/* для сомневающихся: вход через бесплатный разбор — перед ценами */}
           <a
-            href={TELEGRAM_LINKS.bot}
+            href={TELEGRAM_LINKS.razbor}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-8 flex items-start justify-between gap-4 max-w-2xl border border-border rounded-xl bg-card/60 p-5 hover:border-muted-foreground/50 transition-colors group"

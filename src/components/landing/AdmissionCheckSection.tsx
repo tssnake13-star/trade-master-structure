@@ -49,7 +49,7 @@ export default function AdmissionCheckSection() {
 
         <div className="mt-7">
           <a
-            href={TELEGRAM_LINKS.bot}
+            href={TELEGRAM_LINKS.razbor}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-primary inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm md:text-base font-medium group"
