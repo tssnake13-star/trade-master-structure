@@ -15,7 +15,7 @@ const LevelsSection = () => {
             до полной инфраструктуры с автоисполнением и защитой капитала.
           </p>
           <p className="mt-5 text-base md:text-lg text-foreground">
-            Обучение: <span style={{ color: 'hsl(var(--accent))', fontWeight: 500 }}>$599&nbsp;–&nbsp;$2990</span>, в зависимости от уровня.
+            Обучение: <span style={{ color: 'hsl(var(--accent))', fontWeight: 500 }}>$599+</span>, в зависимости от уровня.
           </p>
         </div>
 
