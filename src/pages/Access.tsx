@@ -27,6 +27,22 @@ export default function Access() {
             </p>
           </div>
 
+          {/* для сомневающихся: вход через бесплатный разбор — перед ценами */}
+          <a
+            href={TELEGRAM_LINKS.bot}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-8 flex items-start justify-between gap-4 max-w-2xl border border-border rounded-xl bg-card/60 p-5 hover:border-muted-foreground/50 transition-colors group"
+          >
+            <div>
+              <div className="text-foreground font-medium">Не готовы решать — начните с вердикта</div>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Пришлите 3 свои сделки — бесплатный личный видеоразбор через систему допуска.
+              </p>
+            </div>
+            <ArrowRight className="w-4 h-4 flex-shrink-0 mt-1 group-hover:translate-x-1 transition-transform" style={{ color: 'hsl(var(--accent))' }} />
+          </a>
+
           <div className="mt-10 md:mt-14">
             <PackageCards showPrices={true} ctaHref={TELEGRAM_LINKS.dm} />
           </div>

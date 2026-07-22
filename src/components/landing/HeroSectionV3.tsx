@@ -1,4 +1,4 @@
-import { ArrowRight, MessageCircle } from 'lucide-react';
+import { ArrowRight, ArrowDown, MessageCircle } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import heroAuthorFallback from '@/assets/hero-author.jpg';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
@@ -86,6 +86,9 @@ export default function HeroSectionV3() {
           <div className="mt-10 flex flex-wrap items-center gap-4">
             <a href={TELEGRAM_LINKS.bot} target="_blank" rel="noopener noreferrer" className="v3h-btn v3h-btn--solid">
               Получить систему допуска <ArrowRight className="arr w-4 h-4" />
+            </a>
+            <a href="#verdict" className="v3h-btn v3h-btn--ghost">
+              <ArrowDown className="w-4 h-4" /> Разбор моих сделок
             </a>
             <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" className="v3h-btn v3h-btn--ghost">
               <MessageCircle className="w-4 h-4" /> Написать Сергею

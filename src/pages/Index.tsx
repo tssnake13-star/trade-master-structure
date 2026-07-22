@@ -43,6 +43,10 @@ const Index = () => {
         {/* Внимание */}
         <HeroSectionV3 />
         <InstrumentTicker />
+
+        {/* Второй экран: первое действие — личный разбор сделок (лид-магнит + фильтр) */}
+        <AdmissionCheckSection />
+
         <StatsCounter />
 
         {/* Боль */}
@@ -79,9 +83,6 @@ const Index = () => {
 
         {/* Мысль-делитель */}
         <WordmarkKinetic text="Допуск, " emphasis="не сигнал" />
-
-        {/* Интерактив: проверь сетап через допуск */}
-        <AdmissionCheckSection />
 
         {/* Оффер и действие */}
         <LevelsSection />

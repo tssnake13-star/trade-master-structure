@@ -13,7 +13,6 @@ const sections = [
   { id: 'trading-system', num: '09', label: 'Архитектура' },
   { id: 'protection', num: '10', label: 'Защита' },
   { id: 'stages', num: '11', label: 'Путь' },
-  { id: 'admission-check', num: '12', label: 'Допуск' },
   { id: 'formats', num: '13', label: 'Сотрудничество' },
   { id: 'author', num: '14', label: 'Автор' },
   { id: 'faq', num: '15', label: 'Вопросы' },
