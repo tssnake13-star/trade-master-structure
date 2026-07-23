@@ -15,6 +15,15 @@ type Pkg = {
   points: string[];         // что входит
   notIncluded?: string[];   // чего здесь нет (честно) — только у младшего тарифа
   upsell?: string;          // «переход выше»: зачёт цены в старший тариф
+  addon?: {                 // платное дополнение к тарифу (архив эфиров) — только вместе с тарифом
+    label: string;
+    title: string;
+    price: string;
+    desc: string;
+    honesty: string;
+    note: string;
+  };
+  pricePairing?: string;    // связка конфигураций рядом с ценой («$249 тариф · $348 с архивом»)
   outcome: string;
   oldPrice?: string;
   price: string;
@@ -43,6 +52,15 @@ const PACKAGES: Pkg[] = [
       'Личного чата со мной',
     ],
     upsell: 'Если в течение 30 дней после покупки вы решите перейти на годовой тариф TRADE OS с сопровождением, все $249 зачтутся в его стоимость.',
+    addon: {
+      label: 'Дополнение по желанию',
+      title: 'Архив эфиров мастер-группы за 2025 год',
+      price: '$99',
+      desc: '12 месяцев записей: я разбираю тренировки учеников и параллельно анализирую рынок в реальном времени.',
+      honesty: 'Честно: это записи, прямой вопрос мне здесь не задать. Но весь год я отвечаю на вопросы учеников, и проходя курс самостоятельно, ответы на свои вы, скорее всего, найдёте именно там.',
+      note: 'Только вместе с тарифом · Вместе: $348',
+    },
+    pricePairing: '$249 тариф · $348 тариф с архивом',
     outcome: 'Для тех, кто уже торговал, умеет работать самостоятельно и ищет систему, а не мотивацию со стороны.',
     price: '$249',
     period: '365 дней',
@@ -142,6 +160,20 @@ export default function PackageCards({
               </div>
             )}
 
+            {/* дополнение по желанию — платный архив эфиров к тарифу */}
+            {p.addon && (
+              <div className="mt-5 p-4" style={{ border: '1px solid hsl(var(--accent) / 0.22)', background: 'hsl(var(--accent) / 0.035)' }}>
+                <div className="text-mono" style={{ ...MONO, color: GOLD }}>{p.addon.label}</div>
+                <div className="mt-2.5 flex items-baseline justify-between gap-3">
+                  <span className="text-sm text-foreground/90 leading-snug">+ {p.addon.title}</span>
+                  <span style={{ ...SERIF, fontSize: 22, lineHeight: 1, color: GOLD, flexShrink: 0 }}>{p.addon.price}</span>
+                </div>
+                <p className="mt-2.5 text-xs text-muted-foreground leading-relaxed">{p.addon.desc}</p>
+                <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{p.addon.honesty}</p>
+                <div className="text-mono mt-3" style={{ ...MONO, letterSpacing: '0.12em', color: 'hsl(var(--muted-foreground))' }}>{p.addon.note}</div>
+              </div>
+            )}
+
             {/* переход выше — зачёт цены в старший тариф */}
             {p.upsell && (
               <div className="mt-5 p-3.5 text-xs leading-relaxed" style={{ border: '1px solid hsl(var(--accent) / 0.3)', background: 'hsl(var(--accent) / 0.05)', color: 'hsl(var(--foreground) / 0.85)' }}>
@@ -161,6 +193,9 @@ export default function PackageCards({
                   {p.oldPrice && <span className="text-sm line-through" style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }}>{p.oldPrice}</span>}
                 </div>
                 <div className="text-mono mt-1" style={{ ...MONO, letterSpacing: '0.14em', color: 'hsl(var(--muted-foreground))' }}>{p.period}</div>
+                {p.pricePairing && (
+                  <div className="text-mono mt-2" style={{ ...MONO, letterSpacing: '0.12em', color: 'hsl(var(--muted-foreground) / 0.85)' }}>{p.pricePairing}</div>
+                )}
               </>
             ) : (
               <div
