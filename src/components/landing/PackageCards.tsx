@@ -1,4 +1,4 @@
-import { ArrowRight, Check } from 'lucide-react';
+import { ArrowRight, Check, X } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 
 /**
@@ -10,12 +10,16 @@ import { TELEGRAM_LINKS } from '@/lib/constants';
 type Pkg = {
   tag: string;
   name: string;
+  subtitle?: string;        // короткая строка под названием (напр. «Полностью самостоятельный»)
   forWhom: string;
-  points: string[];
+  points: string[];         // что входит
+  notIncluded?: string[];   // чего здесь нет (честно) — только у младшего тарифа
+  upsell?: string;          // «переход выше»: зачёт цены в старший тариф
   outcome: string;
-  oldPrice: string;
+  oldPrice?: string;
   price: string;
   period: string;
+  ctaText?: string;
   featured?: boolean;
 };
 
@@ -23,17 +27,24 @@ const PACKAGES: Pkg[] = [
   {
     tag: '01 · Старт',
     name: 'Trade System',
-    forWhom: 'Вы разочаровались в сигналах и хотите перестроить мышление.',
+    subtitle: 'Полностью самостоятельный',
+    forWhom: 'Основной курс по стратегии школы в формате самостоятельного изучения. Весь путь вы проходите сами, в своём темпе, без моего участия.',
     points: [
-      'Алгоритм принятия решений по шагам',
-      'Чек-листы для входа в сделку',
-      'Записи всех эфиров за прошлый год',
-      'Самостоятельное изучение',
+      'Курс TRADE SYSTEM 2.0: 10 глав в личном кабинете',
+      'PDF-протокол «Система допуска»',
+      'Финальный зачёт и статус выпускника школы',
+      'После зачёта — право подключить экосистему (Echo Gate, Hunter Bot, Risk Sentinel)',
     ],
-    outcome: 'Вы видите, что стоит за движением цены.',
-    oldPrice: '$800',
-    price: '$599',
-    period: '90 дней',
+    notIncluded: [
+      'Моего сопровождения и разборов ваших сделок',
+      'Обратной связи по домашним заданиям',
+      'Личного чата со мной',
+    ],
+    upsell: 'Если в течение 30 дней после покупки вы решите перейти на годовой тариф TRADE OS с сопровождением, все $249 зачтутся в его стоимость.',
+    outcome: 'Для тех, кто уже торговал, умеет работать самостоятельно и ищет систему, а не мотивацию со стороны.',
+    price: '$249',
+    period: '365 дней',
+    ctaText: 'Начать самостоятельно',
   },
   {
     tag: '02 · Популярный',
@@ -83,7 +94,7 @@ export default function PackageCards({
   return (
     <>
       {/* three levels */}
-      <div className="grid md:grid-cols-3 gap-3">
+      <div className="grid md:grid-cols-3 gap-3 items-start">
         {PACKAGES.map((p) => (
           <div
             key={p.name}
@@ -97,9 +108,13 @@ export default function PackageCards({
           >
             <div className="text-mono" style={{ ...MONO, color: GOLD }}>{p.tag}</div>
             <h3 className="mt-2 text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>{p.name}</h3>
+            {p.subtitle && (
+              <div className="text-mono mt-1.5" style={{ ...MONO, letterSpacing: '0.16em', color: 'hsl(var(--muted-foreground))' }}>{p.subtitle}</div>
+            )}
             <p className="mt-3 text-sm text-muted-foreground leading-relaxed" style={{ minHeight: 44 }}>{p.forWhom}</p>
 
-            <ul className="mt-5 space-y-2.5 flex-1">
+            {/* что входит */}
+            <ul className="mt-5 space-y-2.5">
               {p.points.map((pt, i) => (
                 <li key={i} className="flex items-start gap-2.5 text-sm text-foreground/90">
                   <Check size={15} style={{ color: GOLD, marginTop: 2, flexShrink: 0 }} />
@@ -107,6 +122,29 @@ export default function PackageCards({
                 </li>
               ))}
             </ul>
+
+            {/* чего здесь нет — честно */}
+            {p.notIncluded && (
+              <div className="mt-5">
+                <div className="text-mono mb-2.5" style={{ ...MONO, color: 'hsl(var(--muted-foreground) / 0.7)' }}>Чего здесь нет</div>
+                <ul className="space-y-2.5">
+                  {p.notIncluded.map((nt, i) => (
+                    <li key={i} className="flex items-start gap-2.5 text-sm text-muted-foreground/70">
+                      <X size={15} style={{ marginTop: 2, flexShrink: 0, opacity: 0.5 }} />
+                      <span>{nt}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* переход выше — зачёт цены в старший тариф */}
+            {p.upsell && (
+              <div className="mt-5 p-3.5 text-xs leading-relaxed" style={{ border: '1px solid hsl(var(--accent) / 0.3)', background: 'hsl(var(--accent) / 0.05)', color: 'hsl(var(--foreground) / 0.85)' }}>
+                <span className="text-mono" style={{ ...MONO, color: GOLD, display: 'block', marginBottom: 6 }}>Переход выше</span>
+                {p.upsell}
+              </div>
+            )}
 
             <div className="mt-5 pt-4 text-sm italic" style={{ borderTop: '1px solid hsl(var(--rule-soft))', color: 'hsl(var(--accent-dim))' }}>
               {p.outcome}
@@ -116,7 +154,7 @@ export default function PackageCards({
               <>
                 <div className="mt-5 flex items-baseline gap-3">
                   <span style={{ ...SERIF, fontSize: 38, lineHeight: 1, color: 'hsl(var(--foreground))' }}>{p.price}</span>
-                  <span className="text-sm line-through" style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }}>{p.oldPrice}</span>
+                  {p.oldPrice && <span className="text-sm line-through" style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }}>{p.oldPrice}</span>}
                 </div>
                 <div className="text-mono mt-1" style={{ ...MONO, letterSpacing: '0.14em', color: 'hsl(var(--muted-foreground))' }}>{p.period}</div>
               </>
@@ -137,7 +175,7 @@ export default function PackageCards({
                 p.featured ? 'btn-primary' : 'btn-secondary'
               }`}
             >
-              {p.featured ? 'Получить доступ' : 'Выбрать'}
+              {p.ctaText ?? (p.featured ? 'Получить доступ' : 'Выбрать')}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>
