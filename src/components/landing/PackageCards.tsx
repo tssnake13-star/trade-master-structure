@@ -20,6 +20,8 @@ type Pkg = {
   price: string;
   period: string;
   ctaText?: string;
+  ctaHref?: string;           // персональная ссылка кнопки (переопределяет общую)
+  showPriceAlways?: boolean;  // показывать цену даже когда showPrices=false (публичный вход)
   featured?: boolean;
 };
 
@@ -45,6 +47,8 @@ const PACKAGES: Pkg[] = [
     price: '$249',
     period: '365 дней',
     ctaText: 'Начать самостоятельно',
+    ctaHref: TELEGRAM_LINKS.dm,
+    showPriceAlways: true,
   },
   {
     tag: '02 · Популярный',
@@ -150,7 +154,7 @@ export default function PackageCards({
               {p.outcome}
             </div>
 
-            {showPrices ? (
+            {(showPrices || p.showPriceAlways) ? (
               <>
                 <div className="mt-5 flex items-baseline gap-3">
                   <span style={{ ...SERIF, fontSize: 38, lineHeight: 1, color: 'hsl(var(--foreground))' }}>{p.price}</span>
@@ -168,7 +172,7 @@ export default function PackageCards({
             )}
 
             <a
-              href={ctaHref}
+              href={p.ctaHref ?? ctaHref}
               target="_blank"
               rel="noopener noreferrer"
               className={`mt-6 inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium transition-all duration-300 group ${
