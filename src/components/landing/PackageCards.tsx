@@ -3,19 +3,22 @@ import { TELEGRAM_LINKS } from '@/lib/constants';
 
 /**
  * PackageCards — shared package/pricing cards used on the homepage (without
- * prices) and on the hidden /access page (with prices). One design, prices
- * toggled via `showPrices`. All CTAs route to the Telegram bot (the funnel that
- * hands out the /access link to qualified leads).
+ * prices) and on the hidden /access page (with prices).
+ *
+ * Layout: Trade System is content-heavy (что входит + чего нет + архив + переход),
+ * so it renders as ONE full-width card with a 2-column inner body — that keeps it
+ * short instead of a tall narrow column. Trade OS + Trade OS Plus sit below it as
+ * two equal half-width cards. On mobile everything stacks to one column.
  */
 type Pkg = {
   tag: string;
   name: string;
-  subtitle?: string;        // короткая строка под названием (напр. «Полностью самостоятельный»)
+  subtitle?: string;
   forWhom: string;
-  points: string[];         // что входит
-  notIncluded?: string[];   // чего здесь нет (честно) — только у младшего тарифа
-  upsell?: string;          // «переход выше»: зачёт цены в старший тариф
-  addon?: {                 // платное дополнение к тарифу (архив эфиров) — только вместе с тарифом
+  points: string[];
+  notIncluded?: string[];
+  upsell?: string;
+  addon?: {
     label: string;
     title: string;
     price: string;
@@ -23,14 +26,14 @@ type Pkg = {
     honesty: string;
     note: string;
   };
-  pricePairing?: string;    // связка конфигураций рядом с ценой («$249 тариф · $348 с архивом»)
+  pricePairing?: string;
   outcome: string;
   oldPrice?: string;
   price: string;
   period: string;
   ctaText?: string;
-  ctaHref?: string;           // персональная ссылка кнопки (переопределяет общую)
-  showPriceAlways?: boolean;  // показывать цену даже когда showPrices=false (публичный вход)
+  ctaHref?: string;
+  showPriceAlways?: boolean;
   featured?: boolean;
 };
 
@@ -113,112 +116,156 @@ export default function PackageCards({
   showPrices,
   ctaHref = TELEGRAM_LINKS.bot,
 }: { showPrices: boolean; ctaHref?: string }) {
+  const ts = PACKAGES[0];
+
+  // строка «что входит»
+  const includedList = (points: string[]) => (
+    <ul className="space-y-2.5">
+      {points.map((pt, i) => (
+        <li key={i} className="flex items-start gap-2.5 text-sm text-foreground/90">
+          <Check size={15} style={{ color: GOLD, marginTop: 2, flexShrink: 0 }} />
+          <span>{pt}</span>
+        </li>
+      ))}
+    </ul>
+  );
+
+  // стандартная вертикальная карточка — Trade OS / Trade OS Plus
+  const stdCard = (p: Pkg) => (
+    <div
+      key={p.name}
+      className="relative flex flex-col p-6 md:p-7"
+      style={{
+        background: p.featured
+          ? 'radial-gradient(120% 80% at 50% 0%, hsl(var(--accent) / 0.08), hsl(var(--card)) 60%)'
+          : 'hsl(var(--card))',
+        border: `1px solid ${p.featured ? 'hsl(var(--accent) / 0.45)' : 'hsl(var(--border))'}`,
+      }}
+    >
+      <div className="text-mono" style={{ ...MONO, color: GOLD }}>{p.tag}</div>
+      <h3 className="mt-2 text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>{p.name}</h3>
+      <p className="mt-3 text-sm text-muted-foreground leading-relaxed" style={{ minHeight: 44 }}>{p.forWhom}</p>
+
+      <div className="mt-5">{includedList(p.points)}</div>
+
+      <div className="mt-5 pt-4 text-sm italic" style={{ borderTop: '1px solid hsl(var(--rule-soft))', color: 'hsl(var(--accent-dim))' }}>
+        {p.outcome}
+      </div>
+
+      {(showPrices || p.showPriceAlways) ? (
+        <>
+          <div className="mt-5 flex items-baseline gap-3">
+            <span style={{ ...SERIF, fontSize: 38, lineHeight: 1, color: 'hsl(var(--foreground))' }}>{p.price}</span>
+            {p.oldPrice && <span className="text-sm line-through" style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }}>{p.oldPrice}</span>}
+          </div>
+          <div className="text-mono mt-1" style={{ ...MONO, letterSpacing: '0.14em', color: 'hsl(var(--muted-foreground))' }}>{p.period}</div>
+        </>
+      ) : (
+        <div
+          className="text-mono mt-5 inline-flex items-center self-start px-3 py-1.5"
+          style={{ ...MONO, letterSpacing: '0.14em', color: GOLD, border: '1px solid hsl(var(--accent) / 0.3)', background: 'hsl(var(--accent) / 0.05)' }}
+        >
+          {p.period}
+        </div>
+      )}
+
+      <a
+        href={p.ctaHref ?? ctaHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`mt-6 inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium transition-all duration-300 group ${
+          p.featured ? 'btn-primary' : 'btn-secondary'
+        }`}
+      >
+        {p.ctaText ?? (p.featured ? 'Получить доступ' : 'Выбрать')}
+        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+      </a>
+    </div>
+  );
+
   return (
     <>
-      {/* three levels */}
-      <div className="grid md:grid-cols-3 gap-3 items-start">
-        {PACKAGES.map((p) => (
-          <div
-            key={p.name}
-            className="relative flex flex-col p-6 md:p-7"
-            style={{
-              background: p.featured
-                ? 'radial-gradient(120% 80% at 50% 0%, hsl(var(--accent) / 0.08), hsl(var(--card)) 60%)'
-                : 'hsl(var(--card))',
-              border: `1px solid ${p.featured ? 'hsl(var(--accent) / 0.45)' : 'hsl(var(--border))'}`,
-            }}
-          >
-            <div className="text-mono" style={{ ...MONO, color: GOLD }}>{p.tag}</div>
-            <h3 className="mt-2 text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>{p.name}</h3>
-            {p.subtitle && (
-              <div className="text-mono mt-1.5" style={{ ...MONO, letterSpacing: '0.16em', color: 'hsl(var(--muted-foreground))' }}>{p.subtitle}</div>
+      <div className="grid gap-3">
+        {/* Trade System — во всю ширину, содержимое в 2 колонки (низкая широкая карточка) */}
+        <div className="relative p-6 md:p-7" style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
+          <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1.5">
+            <span className="text-mono" style={{ ...MONO, color: GOLD }}>{ts.tag}</span>
+            <h3 className="text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>{ts.name}</h3>
+            {ts.subtitle && (
+              <span className="text-mono" style={{ ...MONO, letterSpacing: '0.16em', color: 'hsl(var(--muted-foreground))' }}>{ts.subtitle}</span>
             )}
-            <p className="mt-3 text-sm text-muted-foreground leading-relaxed" style={{ minHeight: 44 }}>{p.forWhom}</p>
+          </div>
+          <p className="mt-3 text-sm text-muted-foreground leading-relaxed" style={{ maxWidth: '76ch' }}>{ts.forWhom}</p>
 
-            {/* что входит */}
-            <ul className="mt-5 space-y-2.5">
-              {p.points.map((pt, i) => (
-                <li key={i} className="flex items-start gap-2.5 text-sm text-foreground/90">
-                  <Check size={15} style={{ color: GOLD, marginTop: 2, flexShrink: 0 }} />
-                  <span>{pt}</span>
-                </li>
-              ))}
-            </ul>
-
-            {/* чего здесь нет — честно */}
-            {p.notIncluded && (
-              <div className="mt-5">
-                <div className="text-mono mb-2.5" style={{ ...MONO, color: 'hsl(var(--muted-foreground) / 0.7)' }}>Чего здесь нет</div>
-                <ul className="space-y-2.5">
-                  {p.notIncluded.map((nt, i) => (
-                    <li key={i} className="flex items-start gap-2.5 text-sm text-muted-foreground/70">
-                      <X size={15} style={{ marginTop: 2, flexShrink: 0, opacity: 0.5 }} />
-                      <span>{nt}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* дополнение по желанию — платный архив эфиров к тарифу */}
-            {p.addon && (
-              <div className="mt-5 p-4" style={{ border: '1px solid hsl(var(--accent) / 0.22)', background: 'hsl(var(--accent) / 0.035)' }}>
-                <div className="text-mono" style={{ ...MONO, color: GOLD }}>{p.addon.label}</div>
-                <div className="mt-2.5 flex items-baseline justify-between gap-3">
-                  <span className="text-sm text-foreground/90 leading-snug">+ {p.addon.title}</span>
-                  <span style={{ ...SERIF, fontSize: 22, lineHeight: 1, color: GOLD, flexShrink: 0 }}>{p.addon.price}</span>
+          {/* тело: слева — что входит / чего нет, справа — архив / переход */}
+          <div className="mt-6 grid md:grid-cols-2 gap-x-10 gap-y-6">
+            <div>
+              {includedList(ts.points)}
+              {ts.notIncluded && (
+                <div className="mt-5">
+                  <div className="text-mono mb-2.5" style={{ ...MONO, color: 'hsl(var(--muted-foreground) / 0.7)' }}>Чего здесь нет</div>
+                  <ul className="space-y-2.5">
+                    {ts.notIncluded.map((nt, i) => (
+                      <li key={i} className="flex items-start gap-2.5 text-sm text-muted-foreground/70">
+                        <X size={15} style={{ marginTop: 2, flexShrink: 0, opacity: 0.5 }} />
+                        <span>{nt}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-                <p className="mt-2.5 text-xs text-muted-foreground leading-relaxed">{p.addon.desc}</p>
-                <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{p.addon.honesty}</p>
-                <div className="text-mono mt-3" style={{ ...MONO, letterSpacing: '0.12em', color: 'hsl(var(--muted-foreground))' }}>{p.addon.note}</div>
-              </div>
-            )}
-
-            {/* переход выше — зачёт цены в старший тариф */}
-            {p.upsell && (
-              <div className="mt-5 p-3.5 text-xs leading-relaxed" style={{ border: '1px solid hsl(var(--accent) / 0.3)', background: 'hsl(var(--accent) / 0.05)', color: 'hsl(var(--foreground) / 0.85)' }}>
-                <span className="text-mono" style={{ ...MONO, color: GOLD, display: 'block', marginBottom: 6 }}>Переход выше</span>
-                {p.upsell}
-              </div>
-            )}
-
-            <div className="mt-5 pt-4 text-sm italic" style={{ borderTop: '1px solid hsl(var(--rule-soft))', color: 'hsl(var(--accent-dim))' }}>
-              {p.outcome}
+              )}
             </div>
 
-            {(showPrices || p.showPriceAlways) ? (
-              <>
-                <div className="mt-5 flex items-baseline gap-3">
-                  <span style={{ ...SERIF, fontSize: 38, lineHeight: 1, color: 'hsl(var(--foreground))' }}>{p.price}</span>
-                  {p.oldPrice && <span className="text-sm line-through" style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }}>{p.oldPrice}</span>}
+            <div className="space-y-4">
+              {ts.addon && (
+                <div className="p-4" style={{ border: '1px solid hsl(var(--accent) / 0.22)', background: 'hsl(var(--accent) / 0.035)' }}>
+                  <div className="text-mono" style={{ ...MONO, color: GOLD }}>{ts.addon.label}</div>
+                  <div className="mt-2.5 flex items-baseline justify-between gap-3">
+                    <span className="text-sm text-foreground/90 leading-snug">+ {ts.addon.title}</span>
+                    <span style={{ ...SERIF, fontSize: 22, lineHeight: 1, color: GOLD, flexShrink: 0 }}>{ts.addon.price}</span>
+                  </div>
+                  <p className="mt-2.5 text-xs text-muted-foreground leading-relaxed">{ts.addon.desc}</p>
+                  <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{ts.addon.honesty}</p>
+                  <div className="text-mono mt-3" style={{ ...MONO, letterSpacing: '0.12em', color: 'hsl(var(--muted-foreground))' }}>{ts.addon.note}</div>
                 </div>
-                <div className="text-mono mt-1" style={{ ...MONO, letterSpacing: '0.14em', color: 'hsl(var(--muted-foreground))' }}>{p.period}</div>
-                {p.pricePairing && (
-                  <div className="text-mono mt-2" style={{ ...MONO, letterSpacing: '0.12em', color: 'hsl(var(--muted-foreground) / 0.85)' }}>{p.pricePairing}</div>
-                )}
-              </>
-            ) : (
-              <div
-                className="text-mono mt-5 inline-flex items-center self-start px-3 py-1.5"
-                style={{ ...MONO, letterSpacing: '0.14em', color: GOLD, border: '1px solid hsl(var(--accent) / 0.3)', background: 'hsl(var(--accent) / 0.05)' }}
-              >
-                {p.period}
-              </div>
-            )}
+              )}
+              {ts.upsell && (
+                <div className="p-3.5 text-xs leading-relaxed" style={{ border: '1px solid hsl(var(--accent) / 0.3)', background: 'hsl(var(--accent) / 0.05)', color: 'hsl(var(--foreground) / 0.85)' }}>
+                  <span className="text-mono" style={{ ...MONO, color: GOLD, display: 'block', marginBottom: 6 }}>Переход выше</span>
+                  {ts.upsell}
+                </div>
+              )}
+            </div>
+          </div>
 
+          {/* низ: слева — для кого + цена, справа — кнопка */}
+          <div className="mt-6 pt-5 flex flex-col md:flex-row md:items-end md:justify-between gap-5" style={{ borderTop: '1px solid hsl(var(--rule-soft))' }}>
+            <div className="md:max-w-[62%]">
+              <p className="text-sm italic" style={{ color: 'hsl(var(--accent-dim))' }}>{ts.outcome}</p>
+              <div className="mt-4 flex items-baseline gap-3">
+                <span style={{ ...SERIF, fontSize: 38, lineHeight: 1, color: 'hsl(var(--foreground))' }}>{ts.price}</span>
+                <span className="text-mono" style={{ ...MONO, letterSpacing: '0.14em', color: 'hsl(var(--muted-foreground))' }}>{ts.period}</span>
+              </div>
+              {ts.pricePairing && (
+                <div className="text-mono mt-1.5" style={{ ...MONO, letterSpacing: '0.12em', color: 'hsl(var(--muted-foreground) / 0.85)' }}>{ts.pricePairing}</div>
+              )}
+            </div>
             <a
-              href={p.ctaHref ?? ctaHref}
+              href={ts.ctaHref ?? ctaHref}
               target="_blank"
               rel="noopener noreferrer"
-              className={`mt-6 inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium transition-all duration-300 group ${
-                p.featured ? 'btn-primary' : 'btn-secondary'
-              }`}
+              className="btn-secondary inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium group flex-shrink-0"
             >
-              {p.ctaText ?? (p.featured ? 'Получить доступ' : 'Выбрать')}
+              {ts.ctaText ?? 'Выбрать'}
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>
-        ))}
+        </div>
+
+        {/* Trade OS + Trade OS Plus — две равные карточки под Trade System */}
+        <div className="grid md:grid-cols-2 gap-3 items-start">
+          {PACKAGES.slice(1).map(stdCard)}
+        </div>
       </div>
 
       {/* ecosystem subscription — graduates only */}
