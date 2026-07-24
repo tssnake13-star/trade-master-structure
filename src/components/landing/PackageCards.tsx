@@ -105,7 +105,8 @@ const PACKAGES: Pkg[] = [
 
 const ECOSYSTEM: { price: string; period: string; desc: string; gift?: string; featured: boolean }[] = [
   { price: '$447', period: '3 месяца', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду. Попробовать инфраструктуру.', featured: false },
-  { price: '$1490', period: '365 дней', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду на год', gift: '+ 2 месяца в подарок', featured: true },
+  { price: '$840', period: '6 месяцев', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду на полгода.', featured: false },
+  { price: '$1490', period: '12 месяцев', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду на год', gift: '+ 2 месяца в подарок', featured: true },
 ];
 
 const GOLD = 'hsl(var(--accent))';
@@ -274,7 +275,7 @@ export default function PackageCards({
         <p className="mt-3 text-sm md:text-base text-muted-foreground" style={{ maxWidth: '70ch' }}>
           Доступ к инфраструктуре исполнения для выпускников: <b className="text-foreground/90">Echo Gate</b> — сигнальный бот, <b className="text-foreground/90">Hunter Bot</b> — автоисполнение и сопровождение, <b className="text-foreground/90">Risk Sentinel</b> — защита капитала. Подписка — аренда на срок; решение всегда за вами.
         </p>
-        <div className="mt-5 grid sm:grid-cols-2 gap-3">
+        <div className="mt-5 grid sm:grid-cols-3 gap-3">
           {ECOSYSTEM.map((e) => (
             <div key={e.period} className="p-4" style={{ border: `1px solid ${e.featured ? 'hsl(var(--accent) / 0.3)' : 'hsl(var(--rule-soft))'}` }}>
               <div className="flex items-baseline gap-2">
