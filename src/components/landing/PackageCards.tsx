@@ -104,9 +104,9 @@ const PACKAGES: Pkg[] = [
 ];
 
 const ECOSYSTEM: { price: string; period: string; desc: string; gift?: string; featured: boolean }[] = [
-  { price: '$447', period: '3 месяца', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду. Попробовать инфраструктуру.', featured: false },
-  { price: '$840', period: '6 месяцев', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду на полгода.', featured: false },
-  { price: '$1490', period: '12 месяцев', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду на год', gift: '+ 2 месяца в подарок', featured: true },
+  { price: '$447', period: '3 месяца', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду. Попробовать инфраструктуру.', gift: '+ 1 месяц в подарок', featured: false },
+  { price: '$840', period: '6 месяцев', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду на полгода.', gift: '+ 2 месяца в подарок', featured: false },
+  { price: '$1490', period: '12 месяцев', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду на год', gift: '+ 3 месяца в подарок', featured: true },
 ];
 
 const GOLD = 'hsl(var(--accent))';
