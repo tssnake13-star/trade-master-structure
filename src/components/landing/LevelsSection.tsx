@@ -8,7 +8,7 @@ const LevelsSection = () => {
         <div className="max-w-3xl">
           <span className="section-label">13 · Сотрудничество</span>
           <h2 className="text-foreground">
-            Выберите <em>формат</em> работы
+            Выберите <em>глубину</em> погружения
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '56ch' }}>
             Не курс ради курса, а система, которая остаётся с вами. От алгоритма принятия решений —

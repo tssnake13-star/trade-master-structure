@@ -53,7 +53,7 @@ const StagesSection = () => {
         <div className="max-w-4xl">
           <span className="section-label">11 · Путь</span>
           <h2 className="text-foreground">
-            Как <em>выстраивается</em> <span className="mute">система</span>
+            Пять шагов от <span className="mute">догадок</span> до <em>стабильности</em>
           </h2>
           <p className="mt-3 text-sm text-muted-foreground">
             Этап за этапом — от понимания к стабильной работе.

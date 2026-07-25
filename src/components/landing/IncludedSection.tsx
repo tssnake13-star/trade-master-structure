@@ -23,7 +23,7 @@ const IncludedSection = () => {
         <div className="max-w-3xl">
           <span className="section-label">08 · Что входит</span>
           <h2 className="text-foreground">
-            Три компонента <em>одной системы</em>
+            Стратегия, анализ, исполнение — <em>одна система</em>
           </h2>
         </div>
 
