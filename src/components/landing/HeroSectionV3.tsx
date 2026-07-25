@@ -88,7 +88,7 @@ export default function HeroSectionV3() {
               Получить систему допуска <ArrowRight className="arr w-4 h-4" />
             </a>
             <a href="#verdict" className="v3h-btn v3h-btn--ghost">
-              <ArrowDown className="w-4 h-4" /> Разбор моих сделок
+              <ArrowDown className="w-4 h-4" /> Разбор ваших сделок
             </a>
             <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" className="v3h-btn v3h-btn--ghost">
               <MessageCircle className="w-4 h-4" /> Написать Сергею
