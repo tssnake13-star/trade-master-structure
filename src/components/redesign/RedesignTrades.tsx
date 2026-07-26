@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import xagUsdImg from '@/assets/trades/xag-usd-08-01.jpg';
-import xauUsdImg from '@/assets/trades/xau-usd-08-01.jpg';
-import usdCadImg from '@/assets/trades/usd-cad-10-12-v2.jpg';
-import gbpJpyImg from '@/assets/trades/gbp-jpy-16-12-v3.jpg';
-import audUsdImg from '@/assets/trades/aud-usd-18-12.jpg';
-import btcUsdtImg from '@/assets/trades/btc-usdt-28-01.jpg';
+import xagUsdImg from '@/assets/trades/xag-usd-01-06-2026.jpg';
+import gbpUsdImg from '@/assets/trades/gbp-usd-10-06-2026.jpg';
+import usdCadImg from '@/assets/trades/usd-cad-10-06-2026.jpg';
+import usdChfImg from '@/assets/trades/usd-chf-15-06-2026.jpg';
+import xauUsdImg from '@/assets/trades/xau-usd-16-06-2026.jpg';
+import btcUsdImg from '@/assets/trades/btc-usd-21-06-2026.jpg';
 
 /**
  * RedesignTrades — full-bleed editorial grid of trades.
@@ -15,12 +15,12 @@ import btcUsdtImg from '@/assets/trades/btc-usdt-28-01.jpg';
  */
 
 const trades = [
-  { instrument: 'XAG/USD', date: '08.01.2026', tf: 'H4', dir: 'BUY' as const, description: 'Системный сигнал получен и отфильтрован вручную.\nКонтекст и подтверждение совпали по алгоритму.\nВход WORK-BUY, сопровождение через HunterBot.', image: xagUsdImg },
-  { instrument: 'XAU/USD', date: '08.01.2026', tf: 'H4', dir: 'BUY' as const, description: 'Сделка разрешена системой после фильтрации сигнала.\nКонтекст → подтверждение → точка входа.\nИсполнение по алгоритму, без угадываний.', image: xauUsdImg },
-  { instrument: 'USD/CAD', date: '10.12.2025', tf: 'H4', dir: 'SELL' as const, description: 'Чёткий сценарий после ручной фильтрации сигнала.\nКонтекст и подтверждение совпали.\nВход WORK-SELL, сопровождение по системе.', image: usdCadImg },
-  { instrument: 'GBP/JPY', date: '16.12.2025', tf: 'H4', dir: 'BUY' as const, description: 'Фаза рынка определена, сигнал отфильтрован.\nПодтверждение получено по алгоритму.\nВход WORK-BUY, дальше работа по плану.', image: gbpJpyImg },
-  { instrument: 'AUD/USD', date: '18.12.2025', tf: 'H4', dir: 'BUY' as const, description: 'Системный сигнал → ручная фильтрация.\nКонтекст и подтверждение совпали.\nВход WORK-BUY и сопровождение по правилам.', image: audUsdImg },
-  { instrument: 'BTC/USDt', date: '28.01.2026', tf: 'H4', dir: 'SELL' as const, description: 'Сделка разрешена системой после фильтрации.\nКонтекст → подтверждение → точка входа.\nВход WORK-SELL, точное исполнение по системе.', image: btcUsdtImg },
+  { instrument: 'XAG/USD', date: '01.06.2026', tf: 'H4', dir: 'SELL' as const, description: 'Оригинал из дневника сделок · WORK-SELL · +20R', image: xagUsdImg },
+  { instrument: 'GBP/USD', date: '10.06.2026', tf: 'H4', dir: 'SELL' as const, description: 'Оригинал из дневника сделок · WORK-SELL · +18R', image: gbpUsdImg },
+  { instrument: 'USD/CAD', date: '10.06.2026', tf: 'H4', dir: 'BUY' as const, description: 'Оригинал из дневника сделок · WORK-BUY · +24R', image: usdCadImg },
+  { instrument: 'USD/CHF', date: '15.06.2026', tf: 'H4', dir: 'BUY' as const, description: 'Оригинал из дневника сделок · WORK-BUY · +20R', image: usdChfImg },
+  { instrument: 'XAU/USD', date: '16.06.2026', tf: 'H4', dir: 'SELL' as const, description: 'Оригинал из дневника сделок · WORK-SELL · +16R', image: xauUsdImg },
+  { instrument: 'BTC/USD', date: '21.06.2026', tf: 'H4', dir: 'SELL' as const, description: 'Оригинал из дневника сделок · WORK-SELL · +22R', image: btcUsdImg },
 ];
 
 const monoStyle: React.CSSProperties = {
