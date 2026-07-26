@@ -1,9 +1,10 @@
 /**
- * TradingSystemSection — «03 · Архитектура». v3 editorial-terminal вариант.
- * Группировка: триггер (Trend Hunter) сверху → две стратегии-фильтра в ряд
- * (Echo Gate · Trade Master | Resonance Scanner · Nexus Gravity) → трейдер →
- * золотой узел-слияние → единая ось исполнения (Hunter Bot → Risk Sentinel).
- * Острые карточки, тонкие линии, без скруглений/теней. Тексты прежние.
+ * TradingSystemSection — «09 · Архитектура». v3 editorial-terminal вариант.
+ * Линейная цепочка: триггер (Trend Hunter) → фильтр допуска (Echo Gate) →
+ * трейдер принимает решение → золотой узел-слияние → ось исполнения
+ * (Hunter Bot → Risk Sentinel). Nexus Gravity убран: стратегия проверена
+ * только бэктестом и заморожена — на витрине её нет.
+ * Острые карточки, тонкие линии, без скруглений/теней.
  */
 
 const GOLD = 'hsl(var(--accent))';
@@ -24,13 +25,6 @@ const filters: FlowNode[] = [
     name: 'Echo Gate',
     desc: 'Фильтрует триггер по архиву сделок, геометрии и контексту W1 / D1. Результат: допуск или отказ.',
   },
-  {
-    n: '02',
-    tag: 'Nexus Gravity · M15',
-    name: 'Resonance Scanner',
-    desc: 'Сканирует инструменты, отправляет сигналы по резонансу.',
-    badge: '1.23x — 1.49x импульс',
-  },
 ];
 
 const spine: FlowNode[] = [
@@ -40,8 +34,8 @@ const spine: FlowNode[] = [
 
 const stats = [
   { value: '10:1', label: 'Среднее соотношение в сделках', sub: 'Торговля с 2012 года' },
-  { value: 'H4', label: 'Таймфрейм триггера', sub: 'Trade Master' },
-  { value: 'M15', label: 'Таймфрейм триггера', sub: 'Nexus Gravity' },
+  { value: 'H4', label: 'Таймфрейм триггера', sub: 'Trend Hunter' },
+  { value: 'W1 / D1', label: 'Контекст допуска', sub: 'Echo Gate' },
 ];
 
 const Node = ({ node, accent = false }: { node: FlowNode; accent?: boolean }) => (
@@ -86,7 +80,7 @@ const TradingSystemSection = () => {
             Как работает <em>система</em> <span className="mute">изнутри</span>
           </h2>
           <div className="text-mono" style={{ fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: 'hsl(var(--muted-foreground))' }}>
-            Две стратегии · одна экосистема · единый риск-менеджмент
+            Триггер · допуск · исполнение · защита капитала
           </div>
 
           {/* trigger — Trend Hunter on top */}
@@ -96,8 +90,8 @@ const TradingSystemSection = () => {
 
           <Conn />
 
-          {/* two strategy filters side by side */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 items-stretch">
+          {/* admission filter */}
+          <div className="mx-auto" style={{ maxWidth: 480 }}>
             {filters.map((f) => (
               <Node key={f.name} node={f} />
             ))}

@@ -90,7 +90,7 @@ const ComparisonSection = () => {
         </div>
 
         <p className="mt-6 text-base md:text-lg text-foreground font-medium" style={{ maxWidth: '64ch' }}>
-          Поэтому здесь безопаснее: риск фиксирован — 0.25% на сделку, максимальная просадка
+          Поэтому здесь безопаснее: риск ограничен — 0.25–0.3% на сделку, максимальная просадка
           за 18 месяцев — <span style={{ color: ACCENT }}>2.23%</span>.
         </p>
       </div>

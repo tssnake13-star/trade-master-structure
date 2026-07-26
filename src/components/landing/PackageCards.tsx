@@ -274,7 +274,7 @@ export default function PackageCards({
         <h3 className="text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>Подписка на экосистему</h3>
         <div className="text-mono mt-1.5" style={{ ...MONO, letterSpacing: '0.16em', color: 'hsl(var(--cool))' }}>только выпускникам</div>
         <p className="mt-3 text-sm md:text-base text-muted-foreground" style={{ maxWidth: '70ch' }}>
-          Доступ к инфраструктуре исполнения для выпускников: <b className="text-foreground/90">Echo Gate</b> — сигнальный бот, <b className="text-foreground/90">Hunter Bot</b> — автоисполнение и сопровождение, <b className="text-foreground/90">Risk Sentinel</b> — защита капитала. Подписка — аренда на срок; решение всегда за вами.
+          Доступ к инфраструктуре исполнения для выпускников: <b className="text-foreground/90">Echo Gate</b> — допуск: присылает разрешённые входы, <b className="text-foreground/90">Hunter Bot</b> — автоисполнение и сопровождение, <b className="text-foreground/90">Risk Sentinel</b> — защита капитала. Подписка — аренда на срок; решение всегда за вами.
         </p>
         <div className="mt-5 grid sm:grid-cols-3 gap-3">
           {ECOSYSTEM.map((e) => (

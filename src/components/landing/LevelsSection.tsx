@@ -25,7 +25,7 @@ const LevelsSection = () => {
         </div>
 
         <p className="mt-6 text-center text-sm text-muted-foreground">
-          Места ограничены · набор закрывается в ближайшее воскресенье ·{' '}
+          Каждую заявку разбираю лично, поэтому беру не всех ·{' '}
           <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground transition-colors">
             задать вопрос Сергею
           </a>

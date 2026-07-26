@@ -7,43 +7,20 @@ import gbpJpyImg from '@/assets/trades/gbp-jpy-16-12-v3.jpg';
 import audUsdImg from '@/assets/trades/aud-usd-18-12.jpg';
 import btcUsdtImg from '@/assets/trades/btc-usdt-28-01.jpg';
 
+/**
+ * Скрины из личного дневника сделок. Подписи намеренно короткие: инструмент,
+ * дата, направление. Раньше под каждой карточкой стоял абзац-шаблон («сигнал
+ * получен и отфильтрован…»), одинаковый на все шесть — он читался как вода и
+ * ослаблял самый сильный блок. Смысл несут подводка сверху и сам скрин.
+ * `side` заполняется только там, где направление известно точно.
+ */
 const trades = [
-  {
-    instrument: 'XAG/USD',
-    date: '08.01.2026',
-    description: 'Системный сигнал получен и отфильтрован вручную.\nКонтекст и подтверждение совпали по алгоритму.\nВход WORK-BUY, сопровождение через Hunter Bot.',
-    image: xagUsdImg,
-  },
-  {
-    instrument: 'XAU/USD',
-    date: '08.01.2026',
-    description: 'Сделка разрешена системой после фильтрации сигнала.\nКонтекст → подтверждение → точка входа.\nИсполнение по алгоритму, без угадываний.',
-    image: xauUsdImg,
-  },
-  {
-    instrument: 'USD/CAD',
-    date: '10.12.2025',
-    description: 'Чёткий сценарий после ручной фильтрации сигнала.\nКонтекст и подтверждение совпали.\nВход WORK-SELL, сопровождение по системе.',
-    image: usdCadImg,
-  },
-  {
-    instrument: 'GBP/JPY',
-    date: '16.12.2025',
-    description: 'Фаза рынка определена, сигнал отфильтрован.\nПодтверждение получено по алгоритму.\nВход WORK-BUY, дальше работа по плану.',
-    image: gbpJpyImg,
-  },
-  {
-    instrument: 'AUD/USD',
-    date: '18.12.2025',
-    description: 'Системный сигнал → ручная фильтрация.\nКонтекст и подтверждение совпали.\nВход WORK-BUY и сопровождение по правилам.',
-    image: audUsdImg,
-  },
-  {
-    instrument: 'BTC/USDt',
-    date: '28.01.2026',
-    description: 'Сделка разрешена системой после фильтрации.\nКонтекст → подтверждение → точка входа.\nВход WORK-SELL, точное исполнение по системе.',
-    image: btcUsdtImg,
-  },
+  { instrument: 'XAG/USD', date: '08.01.2026', side: 'WORK-BUY', image: xagUsdImg },
+  { instrument: 'XAU/USD', date: '08.01.2026', side: '', image: xauUsdImg },
+  { instrument: 'USD/CAD', date: '10.12.2025', side: 'WORK-SELL', image: usdCadImg },
+  { instrument: 'GBP/JPY', date: '16.12.2025', side: 'WORK-BUY', image: gbpJpyImg },
+  { instrument: 'AUD/USD', date: '18.12.2025', side: 'WORK-BUY', image: audUsdImg },
+  { instrument: 'BTC/USDt', date: '28.01.2026', side: 'WORK-SELL', image: btcUsdtImg },
 ];
 
 const TradesSection = () => {
@@ -103,9 +80,14 @@ const TradesSection = () => {
                     <span className="font-medium text-foreground text-sm">{trade.instrument}</span>
                     <span className="text-xs text-muted-foreground">{trade.date}</span>
                   </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line">
-                    {trade.description}
-                  </p>
+                  {trade.side && (
+                    <span
+                      className="text-mono inline-flex px-2 py-1"
+                      style={{ fontSize: 9, letterSpacing: '0.16em', color: 'hsl(var(--accent))', border: '1px solid hsl(var(--accent) / 0.3)' }}
+                    >
+                      {trade.side}
+                    </span>
+                  )}
                   <span className="text-xs text-muted-foreground/60 mt-3 block group-hover:text-muted-foreground">
                     Открыть разбор ↗
                   </span>
@@ -147,9 +129,14 @@ const TradesSection = () => {
                     <span className="font-medium text-foreground text-sm">{trade.instrument}</span>
                     <span className="text-xs text-muted-foreground">{trade.date}</span>
                   </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed whitespace-pre-line">
-                    {trade.description}
-                  </p>
+                  {trade.side && (
+                    <span
+                      className="text-mono inline-flex px-2 py-1"
+                      style={{ fontSize: 9, letterSpacing: '0.16em', color: 'hsl(var(--accent))', border: '1px solid hsl(var(--accent) / 0.3)' }}
+                    >
+                      {trade.side}
+                    </span>
+                  )}
                   <span className="text-xs text-muted-foreground/60 mt-3 block group-hover:text-muted-foreground">
                     Открыть разбор ↗
                   </span>
@@ -182,8 +169,8 @@ const TradesSection = () => {
                     />
                   </div>
                   <div className="p-4 border-t border-border">
-                    <p className="text-sm text-muted-foreground whitespace-pre-line">
-                      {selectedTrade.description}
+                    <p className="text-sm text-muted-foreground">
+                      Оригинал из дневника сделок{selectedTrade.side ? ` · ${selectedTrade.side}` : ''}
                     </p>
                   </div>
                 </div>

@@ -42,9 +42,6 @@ const AuthorSection = () => {
                   которая принимает решение
                 </p>
                 <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                  Это другой уровень работы
-                </p>
-                <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
                   Где вы перестаёте действовать на ощущениях
                 </p>
               </div>

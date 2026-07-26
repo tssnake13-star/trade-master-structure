@@ -59,7 +59,7 @@ export default function Access() {
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
             <p className="text-sm text-muted-foreground">
-              Места ограничены · набор закрывается в ближайшее воскресенье ·{' '}
+              Каждую заявку разбираю лично, поэтому беру не всех ·{' '}
               <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground transition-colors">
                 задать вопрос Сергею
               </a>

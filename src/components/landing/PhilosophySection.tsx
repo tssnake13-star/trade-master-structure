@@ -4,17 +4,14 @@ const PhilosophySection = () => {
       <div className="container-landing">
         <div className="max-w-3xl">
           <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-            Десять лет назад я сделал выбор в пользу{' '}
-            <span className="font-semibold text-foreground">независимости</span>,
-            отказавшись от работы в рамках массовых образовательных проектов
-            ради создания собственного торгового протокола. Для меня было важнее
-            сохранить право на честную, сухую методологию, чем следовать рыночным
-            шаблонам. Это время стало фильтром качества: я отсек информационный шум,
-            создав{' '}
-            <span className="font-semibold text-foreground">Trade OS</span> —
-            систему, основанную на жёсткой{' '}
-            <span className="font-semibold text-foreground">архитектуре</span>{' '}
-            принятия решений, проверенной годами личной практики.
+            Десять лет назад я ушёл из массового обучения. Там нужно было обещать
+            быстрый результат, а я так не умею. Мне было важнее довести свою систему
+            до состояния, когда она работает без вдохновения и настроения, и говорить
+            ученикам правду:{' '}
+            <span className="font-semibold text-foreground">рынок не угадывают, входы фильтруют</span>.
+            Из этого выросла{' '}
+            <span className="font-semibold text-foreground">Trade OS</span> — не набор
+            приёмов, а порядок принятия решений, по которому я торгую сам каждый день.
           </p>
         </div>
       </div>
