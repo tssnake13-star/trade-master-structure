@@ -1,6 +1,8 @@
+import { useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import '@/styles/v3-skin.css';
 import { TELEGRAM_LINKS } from '@/lib/constants';
+import { trackPageview, trackClick } from '@/lib/analytics';
 import StructureField from '@/components/landing/StructureField';
 import PackageCards from '@/components/landing/PackageCards';
 
@@ -10,6 +12,10 @@ import PackageCards from '@/components/landing/PackageCards';
  * bot / video descriptions). Same v3 visual language as the landing.
  */
 export default function Access() {
+  // страница цен — считаем отдельно от лендинга: сюда приходят из бота, и важно
+  // видеть, сколько дошло до цен и кто нажал «оформить»
+  useEffect(() => { trackPageview('/access'); }, []);
+
   return (
     <div className="landing-skin v3-skin min-h-screen relative" style={{ background: 'var(--v3-bg, hsl(var(--background)))', color: 'hsl(var(--foreground))' }}>
       <StructureField position="fixed" opacity={0.45} zIndex={0} mask="radial-gradient(150% 120% at 50% 32%, #000 45%, transparent 92%)" />
@@ -32,6 +38,7 @@ export default function Access() {
             href={TELEGRAM_LINKS.razbor}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackClick('access_razbor')}
             className="mt-8 flex items-start justify-between gap-4 max-w-2xl border border-border rounded-xl bg-card/60 p-5 hover:border-muted-foreground/50 transition-colors group"
           >
             <div>
@@ -53,6 +60,7 @@ export default function Access() {
               href={TELEGRAM_LINKS.dm}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackClick('access_apply')}
               className="btn-primary group text-base md:text-lg"
             >
               Оставить заявку на обучение

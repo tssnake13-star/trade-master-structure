@@ -61,6 +61,8 @@ const CLICK_NAMES: Record<string, string> = {
   package_trade_system: 'Тариф Trade System',
   package_trade_os: 'Тариф Trade OS',
   package_trade_os_plus: 'Тариф Trade OS Plus',
+  access_razbor: 'Страница цен → разбор сделок',
+  access_apply: 'Страница цен → заявка на обучение',
 };
 
 const SOURCE_NAMES: Record<string, string> = {
