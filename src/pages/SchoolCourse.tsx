@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, Lock } from 'lucide-react';
 import ConstellationBg from '@/components/ConstellationBg';
+import { useDashboardTexts } from '@/lib/dashboardTexts';
 
 interface Lesson {
   id: string;
@@ -24,6 +25,7 @@ export default function SchoolCourse() {
   const { id } = useParams<{ id: string }>();
   const { session, user, role, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const { t } = useDashboardTexts();
   const [courseTitle, setCourseTitle] = useState('');
   const [courseSubtitle, setCourseSubtitle] = useState<string | null>(null);
   const [isFree, setIsFree] = useState(false);
@@ -169,17 +171,27 @@ export default function SchoolCourse() {
                   >
                     {l.title}
                   </div>
+                  {/* краткое описание блока: данные грузились, но не выводились */}
+                  {l.description && status !== 'locked' && (
+                    <p
+                      className="mt-1"
+                      style={{ fontFamily: SANS, fontSize: 12.5, lineHeight: 1.45, color: '#8a8378', maxWidth: '64ch' }}
+                    >
+                      {l.description}
+                    </p>
+                  )}
                 </div>
 
                 {status === 'locked' ? (
                   <span
-                    className="flex-shrink-0 pt-1"
+                    className="flex-shrink-0 pt-1 text-right"
                     style={{
-                      fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase',
-                      color: '#666',
+                      fontFamily: MONO, fontSize: 9, letterSpacing: '0.14em', textTransform: 'uppercase',
+                      color: '#666', maxWidth: 132, lineHeight: 1.4,
                     }}
                   >
-                    Закрыто
+                    {/* раньше было просто «Закрыто» — ученик не понимал, что делать */}
+                    {isFree ? t('course_lesson_locked_prev') : t('course_lesson_locked_mentor')}
                   </span>
                 ) : status === 'done' ? (
                   <button

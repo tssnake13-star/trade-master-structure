@@ -433,6 +433,16 @@ export default function SchoolLesson() {
             Следующее <ArrowRight size={14} />
           </button>
         </div>
+
+        {/* Блок завершён, а следующий ещё закрыт: объясняем, почему кнопка не нажимается */}
+        {isCompleted && nextLessonId && !isNextUnlocked && (
+          <p
+            className="mt-3 text-center"
+            style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.06em', color: '#8a7048', lineHeight: 1.5 }}
+          >
+            Следующий блок откроет наставник
+          </p>
+        )}
       </main>
     </div>
   );

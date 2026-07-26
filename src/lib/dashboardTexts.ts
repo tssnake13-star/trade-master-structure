@@ -31,6 +31,9 @@ export const DASHBOARD_TEXT_DEFAULTS = {
   course_lesson_locked: 'Закрыто',
   course_lesson_repeat: 'Повторить →',
   course_lesson_open: 'Открыть',
+  // Причина, по которой занятие ещё закрыто (раньше было просто «Закрыто»)
+  course_lesson_locked_mentor: 'Откроет наставник',
+  course_lesson_locked_prev: 'Пройдите предыдущий блок',
 
   // ===== Paid home — hero =====
   paid_hero_eyebrow: 'С возвращением',
@@ -110,6 +113,17 @@ export const DASHBOARD_TEXT_DEFAULTS = {
   // ===== Loading =====
   loading_label: 'Загрузка',
   locked_program_message: 'Программа закрыта',
+
+  // ===== Закрытая программа: две разные ситуации =====
+  // 1) доступа никогда не было → нужно оформить
+  // 2) доступ был и закончился → нужно продлить (прогресс сохранён)
+  sidebar_locked_expired: 'Доступ истёк',
+  locked_unpaid_title: 'Программа ещё не открыта',
+  locked_unpaid_text: 'Эта программа доступна после оформления обучения. Напишите — подскажу, какой уровень подойдёт.',
+  locked_unpaid_cta: 'Оформить доступ',
+  locked_expired_title: 'Срок доступа закончился',
+  locked_expired_text: 'Обучение по этой программе завершено {date}. Ваш прогресс сохранён — после продления вы продолжите с того же места.',
+  locked_expired_cta: 'Продлить доступ',
 } as const;
 
 export type DashboardTextKey = keyof typeof DASHBOARD_TEXT_DEFAULTS;
@@ -122,6 +136,7 @@ export const DASHBOARD_TEXT_GROUPS: { title: string; keys: DashboardTextKey[] }[
     title: 'Боковое меню',
     keys: [
       'sidebar_brand', 'sidebar_home', 'sidebar_programs_label', 'sidebar_locked',
+      'sidebar_locked_expired',
       'sidebar_status_intro', 'sidebar_status_active', 'sidebar_default_name', 'sidebar_signout',
     ],
   },
@@ -195,7 +210,15 @@ export const DASHBOARD_TEXT_GROUPS: { title: string; keys: DashboardTextKey[] }[
     title: 'Карточки блоков и состояния',
     keys: [
       'course_eyebrow', 'course_lesson_locked', 'course_lesson_repeat', 'course_lesson_open',
+      'course_lesson_locked_mentor', 'course_lesson_locked_prev',
       'loading_label', 'locked_program_message',
+    ],
+  },
+  {
+    title: 'Закрытая программа (не оплачено / истёк срок)',
+    keys: [
+      'locked_unpaid_title', 'locked_unpaid_text', 'locked_unpaid_cta',
+      'locked_expired_title', 'locked_expired_text', 'locked_expired_cta',
     ],
   },
 ];

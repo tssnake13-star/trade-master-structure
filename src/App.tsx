@@ -13,6 +13,7 @@ import SchoolLesson from "./pages/SchoolLesson";
 import SchoolAdmin from "./pages/SchoolAdmin";
 import SchoolStudentDetail from "./pages/SchoolStudentDetail";
 import SchoolResetPassword from "./pages/SchoolResetPassword";
+import SchoolProfile from "./pages/SchoolProfile";
 import PreviewRedesign from "./pages/PreviewRedesign";
 import PreviewNext from "./pages/PreviewNext";
 import PreviewCandles from "./pages/PreviewCandles";
@@ -48,6 +49,7 @@ const App = () => (
             <Route path="/school/admin" element={<SchoolAdmin />} />
             <Route path="/school/admin/students/:id" element={<SchoolStudentDetail />} />
             <Route path="/school/reset-password" element={<SchoolResetPassword />} />
+            <Route path="/school/profile" element={<SchoolProfile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

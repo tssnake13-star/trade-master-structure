@@ -215,6 +215,10 @@ export default function SchoolDashboard() {
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [accessMap, setAccessMap] = useState<Map<string, { courseId: string; unlocked: number[]; granted_at?: string | null; expires_at?: string | null }>>(new Map());
+  // Курсы, доступ к которым БЫЛ и закончился: courseId → дата окончания.
+  // Нужно, чтобы отличить «ещё не оформлял обучение» от «срок вышел»: в первом
+  // случае предлагаем оформить доступ, во втором — продлить (прогресс сохранён).
+  const [expiredAccess, setExpiredAccess] = useState<Map<string, Date>>(new Map());
   const [progress, setProgress] = useState<ProgressMap>({});
   const [allLessons, setAllLessons] = useState<Lesson[]>([]);
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
@@ -314,12 +318,20 @@ export default function SchoolDashboard() {
       // либо granted_at + 90 дней (то же правило, что и в обратном отсчёте).
       // Прогресс (lesson_progress) хранится отдельно и здесь не затрагивается.
       const nowMs = Date.now();
+      const endOf = (a: { granted_at: string; expires_at: string | null }) => a.expires_at
+        ? new Date(a.expires_at).getTime()
+        : (a.granted_at ? new Date(a.granted_at).getTime() + 90 * 86400000 : null);
       const accessData = allAccessData.filter(a => {
-        const endMs = a.expires_at
-          ? new Date(a.expires_at).getTime()
-          : (a.granted_at ? new Date(a.granted_at).getTime() + 90 * 86400000 : null);
+        const endMs = endOf(a);
         return endMs === null || endMs > nowMs;
       });
+      // просроченные запоминаем отдельно — с датой окончания для текста «истёк»
+      const expMap = new Map<string, Date>();
+      for (const a of allAccessData) {
+        const endMs = endOf(a);
+        if (endMs !== null && endMs <= nowMs) expMap.set(a.course_id, new Date(endMs));
+      }
+      setExpiredAccess(expMap);
       const accessSet = new Set(accessData.map(a => a.course_id));
       const aMap = new Map(accessData.map(a => [a.course_id, { courseId: a.course_id, unlocked: a.unlocked_lessons || [1], granted_at: a.granted_at, expires_at: a.expires_at }]));
       const lessons = (lessonsRes.data || []) as Lesson[];
@@ -542,7 +554,9 @@ export default function SchoolDashboard() {
                   </div>
                 )}
                 {!accessible && (
-                  <div style={{ fontFamily: MONO, fontSize: 9, color: '#444', marginTop: 4 }}>{t('sidebar_locked')}</div>
+                  <div style={{ fontFamily: MONO, fontSize: 9, color: expiredAccess.has(c.id) ? '#8a7048' : '#444', marginTop: 4 }}>
+                    {expiredAccess.has(c.id) ? t('sidebar_locked_expired') : t('sidebar_locked')}
+                  </div>
                 )}
               </button>
             );
@@ -551,7 +565,15 @@ export default function SchoolDashboard() {
 
         {/* Profile */}
         <div className="border-t p-3 space-y-2" style={{ borderColor: BORDER }}>
-          <div className="flex items-center gap-3 px-2 py-2">
+          {/* карточка профиля — теперь ведёт на страницу смены имени/пароля */}
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => { setMobileSidebarOpen(false); navigate('/school/profile'); }}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setMobileSidebarOpen(false); navigate('/school/profile'); } }}
+            className="flex items-center gap-3 px-2 py-2 rounded hover:bg-white/5 transition cursor-pointer"
+            title="Профиль и пароль"
+          >
             <div
               className="flex items-center justify-center flex-shrink-0"
               style={{
@@ -571,7 +593,11 @@ export default function SchoolDashboard() {
               </div>
             </div>
             {role === 'admin' && (
-              <button onClick={() => navigate('/school/admin')} className="p-1.5 hover:bg-white/5 rounded transition" title="Админ">
+              <button
+                onClick={(e) => { e.stopPropagation(); navigate('/school/admin'); }}
+                className="p-1.5 hover:bg-white/5 rounded transition"
+                title="Админ"
+              >
                 <Settings size={22} style={{ color: '#666' }} />
               </button>
             )}
@@ -647,12 +673,39 @@ export default function SchoolDashboard() {
             />
           )}
 
-          {selectedCourseData && !selectedAccessible && (
-            <div className="flex flex-col items-center justify-center py-24">
-              <Lock size={28} style={{ color: '#333' }} className="mb-4" />
-              <p style={{ fontFamily: MONO, fontSize: 12, color: '#555' }}>{t('locked_program_message')}</p>
-            </div>
-          )}
+          {selectedCourseData && !selectedAccessible && (() => {
+            // две разные ситуации: доступ закончился vs его никогда не оформляли
+            const expiredAt = expiredAccess.get(selectedCourseData.id);
+            const isExpired = !!expiredAt;
+            const dateStr = expiredAt ? expiredAt.toLocaleDateString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
+            return (
+              <div className="flex flex-col items-center justify-center py-20 sm:py-24 px-4 text-center">
+                <Lock size={26} style={{ color: isExpired ? ACCENT : '#333' }} className="mb-5" />
+                <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.28em', textTransform: 'uppercase', color: '#666', marginBottom: 12 }}>
+                  {selectedCourseData.title}
+                </div>
+                <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(24px, 3.4vw, 34px)', lineHeight: 1.1, letterSpacing: '-0.02em', color: FG }}>
+                  {isExpired ? t('locked_expired_title') : t('locked_unpaid_title')}
+                </h2>
+                <p className="mt-4" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '46ch' }}>
+                  {isExpired ? t('locked_expired_text', { date: dateStr }) : t('locked_unpaid_text')}
+                </p>
+                <a
+                  href="http://t.me/tradeliketyo"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-7 inline-flex items-center gap-2 transition hover:brightness-110"
+                  style={{
+                    backgroundColor: ACCENT, color: '#0a0a0a', borderRadius: 8, padding: '13px 26px',
+                    fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
+                  }}
+                >
+                  <MessageCircle size={14} />
+                  {isExpired ? t('locked_expired_cta') : t('locked_unpaid_cta')}
+                </a>
+              </div>
+            );
+          })()}
 
           {/* ----- Home view ----- */}
           {!selectedCourse && !isFreeUser && (
@@ -777,6 +830,7 @@ export function SelectedCourseView({
         showBridge={!course.is_free && lessons.length > 0 && lessons.every((_, i) => unlockedSortOrders.includes(i + 1))}
         bridgeToTelegram={course.id === ECOSYSTEM_COURSE_ID}
         onOpenEcosystem={() => onOpenCourse(ECOSYSTEM_COURSE_ID)}
+        isFree={course.is_free}
         t={t}
       />
     </>
@@ -1275,8 +1329,9 @@ export function FreeHome({
 //   Rendered inside SelectedCourseView (the per-course detail page).
 // ====================================================================
 function CourseLadder({
-  lessons, completedIds, unlockedSortOrders, onOpen, showBridge = false, bridgeToTelegram = false, onOpenEcosystem, t,
+  lessons, completedIds, unlockedSortOrders, onOpen, showBridge = false, bridgeToTelegram = false, onOpenEcosystem, isFree = false, t,
 }: {
+  isFree?: boolean;
   lessons: Lesson[];
   completedIds: Set<string>;
   unlockedSortOrders: number[];
@@ -1367,7 +1422,8 @@ function CourseLadder({
               >
                 <div className="min-w-0">
                   <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: done ? '#888' : openable ? ACCENT : '#55504a', marginBottom: 3 }}>
-                    Этап {pad(num)}{done ? ' · пройден' : openable ? '' : ' · закрыто'}
+                    {/* вместо голого «закрыто» — что нужно, чтобы блок открылся */}
+                    Этап {pad(num)}{done ? ' · пройден' : openable ? '' : ` · ${isFree ? t('course_lesson_locked_prev') : t('course_lesson_locked_mentor')}`}
                   </div>
                   <h3 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 24, lineHeight: 1.1, color: done ? '#cfc7b8' : openable ? FG : '#55504a', overflowWrap: 'anywhere' }}>{l.title}</h3>
                 </div>
