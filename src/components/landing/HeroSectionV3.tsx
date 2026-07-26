@@ -77,13 +77,13 @@ export default function HeroSectionV3() {
             ))}
           </h1>
 
-          <p className="v3h-offer mt-8">
+          <p className="v3h-offer mt-9">
             {OFFER.map((s, i) => (
               <span key={i} className={s.cls}>{s.t}</span>
             ))}
           </p>
 
-          <div className="mt-10 flex flex-wrap items-center gap-4">
+          <div className="mt-12 flex flex-wrap items-center gap-4">
             <a href={TELEGRAM_LINKS.bot} target="_blank" rel="noopener noreferrer" className="v3h-btn v3h-btn--solid">
               Получить систему допуска <ArrowRight className="arr w-4 h-4" />
             </a>
@@ -96,7 +96,7 @@ export default function HeroSectionV3() {
           </div>
 
           {/* усилитель под кнопками: снимает страх звонка + говорит, что будет после клика */}
-          <p className="v3h-mono mt-5" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.55 }}>
+          <p className="v3h-mono mt-7" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.55 }}>
             Без звонков · бот за 2 минуты покажет, как работает допуск
           </p>
 

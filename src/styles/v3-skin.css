@@ -112,6 +112,15 @@
   padding-bottom: 1px;
 }
 
+/* Short laptop screens (1366×768, 1440×900 и т.п.): сжимаем ритм hero, чтобы
+   кнопки оставались НАД фолдом. Телефоны (<1024w) и высокие мониторы не трогаем. */
+@media (min-width: 1024px) and (max-height: 950px) {
+  .v3h { padding-top: 56px !important; }
+  .v3h-h1 { font-size: clamp(48px, 6.2vw, 96px) !important; }
+  .v3h-offer { font-size: clamp(18px, 1.8vw, 22px); margin-top: 1.75rem !important; }
+  .v3h .mt-12 { margin-top: 2.5rem !important; }
+}
+
 .v3h-btn {
   display: inline-flex; align-items: center; gap: 12px;
   font-family: var(--font-ui);
