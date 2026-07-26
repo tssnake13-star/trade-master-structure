@@ -6,6 +6,7 @@ import { Lock, Settings, LogOut, ArrowRight, Menu, Ticket, Home as HomeIcon, Mes
 import logoVideoFallback from '@/assets/logo-header.mp4';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 import { useDashboardTexts, type DashboardTextKey } from '@/lib/dashboardTexts';
+import { setOwnVisitFlag } from '@/lib/analytics';
 import StructureField from '@/components/landing/StructureField';
 
 // v3 structure background for the cabinet — full-screen, faint, centred.
@@ -232,6 +233,12 @@ export default function SchoolDashboard() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const logoVideo = useSiteAsset(SITE_ASSET_KEYS.schoolDashboardLogo, logoVideoFallback);
   const now = useNow(1000);
+
+  // Помечаем браузер администратора, чтобы его заходы на лендинг не попадали
+  // в статистику (иначе своя же аналитика показывает не учеников, а нас).
+  useEffect(() => {
+    if (role === 'admin') setOwnVisitFlag(true);
+  }, [role]);
 
   // hasAccess needs role/accessMap — compute inline below as well
   const _hasAccessEarly = (c: Course) => role === 'admin' || c.is_free || accessMap.has(c.id);

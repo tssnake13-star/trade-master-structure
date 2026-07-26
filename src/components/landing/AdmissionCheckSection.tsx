@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
+import { trackClick } from '@/lib/analytics';
 
 /**
  * AdmissionCheckSection → блок «Разбор сделок» (личный вердикт).
@@ -52,6 +53,7 @@ export default function AdmissionCheckSection() {
             href={TELEGRAM_LINKS.razbor}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={() => trackClick('verdict_razbor')}
             className="btn-primary inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm md:text-base font-medium group"
           >
             Получить вердикт по моим сделкам

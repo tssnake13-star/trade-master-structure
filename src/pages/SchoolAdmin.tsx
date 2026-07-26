@@ -96,6 +96,8 @@ export default function SchoolAdmin() {
         <button style={tabStyle(tab === 'invites')} onClick={() => setTab('invites')}>Инвайт-коды</button>
         <button style={tabStyle(tab === 'access')} onClick={() => setTab('access')}>Доступы</button>
         <button style={tabStyle(tab === 'settings')} onClick={() => setTab('settings')}>Настройки</button>
+        {/* Аналитика — отдельная страница, а не таб: там свои запросы и графики */}
+        <button style={tabStyle(false)} onClick={() => navigate('/school/admin/analytics')}>Аналитика ↗</button>
       </div>
 
       <main className="max-w-5xl mx-auto p-4 sm:p-6">

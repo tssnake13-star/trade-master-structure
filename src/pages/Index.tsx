@@ -1,5 +1,7 @@
 import '@/styles/v3-skin.css';
+import { useEffect } from 'react';
 import useScrollAnimate from '@/hooks/useScrollAnimate';
+import { trackPageview, observeSections } from '@/lib/analytics';
 import Header from '@/components/landing/Header';
 import StickyHeader from '@/components/landing/StickyHeader';
 import SideNav from '@/components/landing/SideNav';
@@ -29,8 +31,26 @@ import LogoSection from '@/components/landing/LogoSection';
 import Footer from '@/components/landing/Footer';
 import WordmarkKinetic from '@/components/preview-next/WordmarkKinetic';
 
+/** Блоки, по которым считаем, до чего люди доскролливают (воронка внимания). */
+const TRACKED_SECTIONS = [
+  'hero', 'problem', 'verdict', 'transformation', 'proof', 'stats',
+  'trades', 'filter', 'difference', 'included', 'trading-system',
+  'protection', 'stages', 'formats', 'author', 'faq',
+];
+
 const Index = () => {
   useScrollAnimate();
+
+  useEffect(() => {
+    trackPageview('/');
+    // секции появляются после первого рендера — подписываемся с небольшой задержкой
+    let disconnect: (() => void) | null = null;
+    const timer = window.setTimeout(() => { disconnect = observeSections(TRACKED_SECTIONS); }, 400);
+    return () => {
+      window.clearTimeout(timer);
+      disconnect?.();
+    };
+  }, []);
 
   return (
     <div className="min-h-screen bg-background landing-skin v3-skin relative isolate">

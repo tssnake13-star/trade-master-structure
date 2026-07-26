@@ -1,5 +1,6 @@
 import { ArrowRight, MessageCircle } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
+import { trackClick } from '@/lib/analytics';
 
 const DualCTASection = () => {
   return (
@@ -22,6 +23,7 @@ const DualCTASection = () => {
               href={TELEGRAM_LINKS.bot}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackClick('final_bot')}
               className="btn-primary group w-full justify-center"
             >
               Перейти в Telegram-бот

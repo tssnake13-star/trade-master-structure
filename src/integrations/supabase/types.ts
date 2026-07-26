@@ -297,6 +297,19 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      analytics_summary: { Args: { _days?: number }; Returns: Json }
+      track_event: {
+        Args: {
+          _session_id: string
+          _event_type: string
+          _path: string
+          _target?: string | null
+          _referrer?: string | null
+          _source?: string | null
+          _device?: string | null
+        }
+        Returns: undefined
+      }
       delete_student: { Args: { _user_id: string }; Returns: undefined }
       has_role: {
         Args: {

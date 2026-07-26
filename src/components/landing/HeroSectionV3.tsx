@@ -1,5 +1,6 @@
 import { ArrowRight, ArrowDown, MessageCircle } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
+import { trackClick } from '@/lib/analytics';
 import heroAuthorFallback from '@/assets/hero-author.jpg';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 import StructureField from '@/components/landing/StructureField';
@@ -84,13 +85,13 @@ export default function HeroSectionV3() {
           </p>
 
           <div className="mt-12 flex flex-wrap items-center gap-4">
-            <a href={TELEGRAM_LINKS.bot} target="_blank" rel="noopener noreferrer" className="v3h-btn v3h-btn--solid">
+            <a href={TELEGRAM_LINKS.bot} target="_blank" rel="noopener noreferrer" className="v3h-btn v3h-btn--solid" onClick={() => trackClick('hero_bot')}>
               Получить систему допуска <ArrowRight className="arr w-4 h-4" />
             </a>
-            <a href="#verdict" className="v3h-btn v3h-btn--ghost">
+            <a href="#verdict" className="v3h-btn v3h-btn--ghost" onClick={() => trackClick('hero_scroll_verdict')}>
               <ArrowDown className="w-4 h-4" /> Разбор ваших сделок
             </a>
-            <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" className="v3h-btn v3h-btn--ghost">
+            <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" className="v3h-btn v3h-btn--ghost" onClick={() => trackClick('hero_dm')}>
               <MessageCircle className="w-4 h-4" /> Написать Сергею
             </a>
           </div>

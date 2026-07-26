@@ -1,5 +1,6 @@
 import { ArrowRight, Check, X } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
+import { trackClick } from '@/lib/analytics';
 
 /**
  * PackageCards — shared package/pricing cards used on the homepage (without
@@ -174,6 +175,7 @@ export default function PackageCards({
         href={p.ctaHref ?? ctaHref}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => trackClick(`package_${p.name.toLowerCase().replace(/\s+/g, '_')}`)}
         className={`mt-6 inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium transition-all duration-300 group ${
           p.featured ? 'btn-primary' : 'btn-secondary'
         }`}
@@ -255,6 +257,7 @@ export default function PackageCards({
               href={ts.ctaHref ?? ctaHref}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => trackClick('package_trade_system')}
               className="btn-secondary inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium group flex-shrink-0"
             >
               {ts.ctaText ?? 'Выбрать'}
