@@ -25,6 +25,8 @@ type Summary = {
   visits: number;
   pageviews: number;
   clicks: number;
+  /** визиты владельца — считаются отдельно, в основные цифры не входят */
+  owner?: { visits: number; pageviews: number; clicks: number; last_at: string | null };
   by_day: { day: string; visits: number; views: number }[];
   by_source: { source: string; visits: number }[];
   by_device: { device: string; visits: number }[];
@@ -324,8 +326,26 @@ export default function SchoolAnalytics() {
               />
             </div>
 
+            {/* Свои визиты — отдельной строкой, в цифры выше не входят */}
+            <div className="mt-3 p-5 flex flex-wrap items-center gap-x-8 gap-y-3" style={{ border: `1px dashed ${BORDER}`, borderRadius: 10, backgroundColor: 'transparent' }}>
+              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#777' }}>
+                Ваши визиты · отдельно
+              </div>
+              <div className="flex flex-wrap gap-x-7 gap-y-2" style={{ fontFamily: MONO, fontSize: 12, color: '#8a8378' }}>
+                <span>Заходов: <b style={{ color: FG }}>{data.owner?.visits ?? 0}</b></span>
+                <span>Просмотров: <b style={{ color: FG }}>{data.owner?.pageviews ?? 0}</b></span>
+                <span>Кликов: <b style={{ color: FG }}>{data.owner?.clicks ?? 0}</b></span>
+                {data.owner?.last_at && (
+                  <span>Последний: <b style={{ color: FG }}>{new Date(data.owner.last_at).toLocaleString('ru-RU', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}</b></span>
+                )}
+              </div>
+            </div>
+
             <p className="mt-6" style={{ fontFamily: SANS, fontSize: 12.5, lineHeight: 1.6, color: '#8a8378', maxWidth: '70ch' }}>
-              Считаются только заходы посетителей: ваши собственные визиты и открытия с localhost исключены.
+              Цифры выше — только посетители: ваши заходы вынесены в отдельную строку, локальная разработка не считается.
+              Браузер помечается как ваш при входе в кабинет; на телефоне откройте сайт с адресом
+              {' '}<code style={{ fontFamily: MONO, fontSize: 11, color: ACCENT }}>?owner=1</code> — снять пометку можно через
+              {' '}<code style={{ fontFamily: MONO, fontSize: 11, color: ACCENT }}>?owner=0</code>.
               IP-адреса и cookie не собираются — сессия анонимна и живёт до закрытия вкладки.
             </p>
           </>

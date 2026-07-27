@@ -307,6 +307,7 @@ export type Database = {
           _referrer?: string | null
           _source?: string | null
           _device?: string | null
+          _is_owner?: boolean
         }
         Returns: undefined
       }

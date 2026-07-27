@@ -68,20 +68,35 @@ function device(): 'mobile' | 'desktop' {
   return window.innerWidth < 900 ? 'mobile' : 'desktop';
 }
 
-/** Свои визиты в статистику не пишем — иначе она врёт. */
-function isOwnVisit(): boolean {
+/**
+ * Визит владельца. Такие заходы НЕ выбрасываем, а помечаем: в основную
+ * статистику они не попадают, но видны отдельным блоком в дашборде.
+ *
+ * Браузер помечается двумя способами:
+ *   1) автоматически — при входе в кабинет под админом;
+ *   2) вручную — открыть сайт с ?owner=1 (удобно для телефона, где в кабинет
+ *      не заходили). Снять пометку: ?owner=0.
+ */
+function isOwnerVisit(): boolean {
   if (!isBrowser) return false;
   try {
-    // админ помечается при входе в кабинет (см. AdminVisitFlag ниже)
-    if (localStorage.getItem('tlt_is_admin') === '1') return true;
-    return /localhost|127\.0\.0\.1/.test(window.location.hostname);
+    const flag = new URLSearchParams(window.location.search).get('owner');
+    if (flag === '1') localStorage.setItem('tlt_is_admin', '1');
+    if (flag === '0') localStorage.removeItem('tlt_is_admin');
+    return localStorage.getItem('tlt_is_admin') === '1';
   } catch {
     return false;
   }
 }
 
+/** Локальная разработка в статистику не идёт вообще. */
+function isLocalDev(): boolean {
+  if (!isBrowser) return false;
+  return /localhost|127\.0\.0\.1/.test(window.location.hostname);
+}
+
 async function send(event_type: 'pageview' | 'scroll' | 'click', path: string, target?: string) {
-  if (!isBrowser || isOwnVisit()) return;
+  if (!isBrowser || isLocalDev()) return;
   try {
     await supabase.rpc('track_event', {
       _session_id: sessionId(),
@@ -91,6 +106,7 @@ async function send(event_type: 'pageview' | 'scroll' | 'click', path: string, t
       _referrer: document.referrer ? new URL(document.referrer).hostname.slice(0, 255) : null,
       _source: detectSource(),
       _device: device(),
+      _is_owner: isOwnerVisit(),
     });
   } catch {
     /* аналитика никогда не должна ломать страницу */
@@ -120,7 +136,7 @@ export function trackSection(sectionId: string) {
  * Возвращает функцию отписки.
  */
 export function observeSections(sectionIds: string[]): () => void {
-  if (!isBrowser || isOwnVisit() || typeof IntersectionObserver === 'undefined') return () => {};
+  if (!isBrowser || isLocalDev() || typeof IntersectionObserver === 'undefined') return () => {};
   const io = new IntersectionObserver(
     entries => {
       for (const e of entries) {
