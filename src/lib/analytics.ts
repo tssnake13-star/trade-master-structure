@@ -137,22 +137,38 @@ export function trackSection(sectionId: string) {
  */
 export function observeSections(sectionIds: string[]): () => void {
   if (!isBrowser || isLocalDev() || typeof IntersectionObserver === 'undefined') return () => {};
-  const io = new IntersectionObserver(
-    entries => {
-      for (const e of entries) {
-        if (e.isIntersecting && e.target.id) {
-          trackSection(e.target.id);
-          io.unobserve(e.target);
-        }
-      }
-    },
-    { threshold: 0.4 },
-  );
+
+  const observers: IntersectionObserver[] = [];
+  const vh = window.innerHeight || 800;
+
   for (const id of sectionIds) {
     const el = document.getElementById(id);
-    if (el) io.observe(el);
+    if (!el) continue;
+
+    // Порог считаем от высоты блока, а не фиксированные 40%. Иначе длинные блоки
+    // на телефоне не засчитываются НИКОГДА: например, «Тарифы» высотой 3444px в
+    // экран 812px влезают максимум на 24% — условие 40% недостижимо физически.
+    // Теперь блок считается просмотренным, когда он занял половину экрана
+    // (для коротких блоков это не больше 50% их площади).
+    const h = el.getBoundingClientRect().height || 1;
+    const threshold = Math.max(0.05, Math.min(0.5, (vh * 0.5) / h));
+
+    const io = new IntersectionObserver(
+      entries => {
+        for (const e of entries) {
+          if (e.isIntersecting && e.target.id) {
+            trackSection(e.target.id);
+            io.unobserve(e.target);
+          }
+        }
+      },
+      { threshold },
+    );
+    io.observe(el);
+    observers.push(io);
   }
-  return () => io.disconnect();
+
+  return () => observers.forEach(io => io.disconnect());
 }
 
 /** Помечает браузер администратора, чтобы его визиты не попадали в статистику. */
