@@ -25,9 +25,12 @@ type Summary = {
   visits: number;
   pageviews: number;
   clicks: number;
+  /** сколько ЧЕЛОВЕК нажали хотя бы одну кнопку (для честной конверсии) */
+  clickers?: number;
   /** визиты владельца — считаются отдельно, в основные цифры не входят */
   owner?: { visits: number; pageviews: number; clicks: number; last_at: string | null };
-  by_day: { day: string; visits: number; views: number }[];
+  by_page?: { path: string; views: number; visits: number }[];
+  by_day: { day: string; visits: number; views?: number }[];
   by_source: { source: string; visits: number }[];
   by_device: { device: string; visits: number }[];
   by_section: { section: string; visits: number }[];
@@ -241,11 +244,13 @@ export default function SchoolAnalytics() {
             <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-3">
               <Kpi value={data.visits} label="Посетителей" hint="уникальные сессии" color={ACCENT} />
               <Kpi value={data.pageviews} label="Просмотров страниц" />
-              <Kpi value={data.clicks} label="Клики по кнопкам" color={COOL} />
+              <Kpi value={data.clicks} label="Клики по кнопкам" hint={`нажимали ${data.clickers ?? 0} чел.`} color={COOL} />
               <Kpi
-                value={`${funnelBase > 0 ? Math.round((data.clicks / funnelBase) * 100) : 0}%`}
+                // считаем по ЛЮДЯМ, а не по кликам: иначе один посетитель,
+                // нажавший три кнопки, давал бы 300%
+                value={`${totalVisits > 0 ? Math.round(((data.clickers ?? 0) / totalVisits) * 100) : 0}%`}
                 label="Дошли до действия"
-                hint="клики / посетители"
+                hint="нажали кнопку / все посетители"
                 color={COOL}
               />
             </div>
@@ -296,6 +301,22 @@ export default function SchoolAnalytics() {
                 empty="Пока нет данных."
               />
             </div>
+
+            {/* Страницы */}
+            {data.by_page && data.by_page.length > 0 && (
+              <div className="mt-3">
+                <Bars
+                  title="Страницы"
+                  rows={data.by_page.map(p => ({
+                    name: p.path === '/' ? 'Лендинг' : p.path === '/access' ? 'Страница цен' : p.path,
+                    value: p.visits,
+                    extra: `${p.views} просмотров`,
+                  }))}
+                  max={Math.max(1, ...data.by_page.map(p => p.visits))}
+                  empty="Пока нет данных."
+                />
+              </div>
+            )}
 
             {/* Воронка внимания */}
             <div className="mt-3">
