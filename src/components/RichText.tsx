@@ -12,9 +12,23 @@ import { Fragment } from 'react';
  * поэтому разметку или скрипт через описание протащить нельзя.
  */
 
-// Ловим широко, «хвостовую» пунктуацию отрезаем ниже — иначе точка в конце
-// предложения приклеилась бы к адресу.
-const URL_RE = /((?:https?:\/\/|www\.|t\.me\/)[^\s<>«»]+)/gi;
+// Домены, которые считаем ссылкой, когда адрес написан без https:// и без www —
+// именно так их обычно и пишут в описании: tradeliketyo.com/kurs, t.me/канал.
+// Список нужен, чтобы не превращать в ссылки обычные слова с точкой («Node.js»,
+// «файл.pdf»); кириллица сюда не попадает, поэтому «и т.д.» тоже безопасно.
+const TLD =
+  'com|ru|org|net|io|me|dev|app|pro|info|biz|tv|online|site|store|club|life|team|space|tech|digital|studio|agency|trade|money|capital|xyz|top|su|ua|kz|by|uk|de|fr|es|it|pl|cz|tr|ge|am|md|lv|lt|ee|fi|se|no|nl|ch|at|be|pt|gr|jp|cn|kr|in|br|mx|ar|au|ca|us|co|ai|cc|to|ly';
+
+// Порядок важен: сначала почта (иначе домен внутри адреса стал бы отдельной
+// ссылкой), затем адреса с протоколом, затем «голые» домены.
+const URL_RE = new RegExp(
+  '(' +
+    '[\\w.+-]+@[a-z0-9-]+(?:\\.[a-z0-9-]+)*\\.[a-z]{2,}' +
+    '|(?:https?:\\/\\/|www\\.)[^\\s<>«»]+' +
+    '|[a-z0-9][a-z0-9-]*(?:\\.[a-z0-9-]+)*\\.(?:' + TLD + ')(?:\\/[^\\s<>«»]*)?' +
+  ')',
+  'gi',
+);
 const TRAILING = /[.,;:!?)»"'\]]+$/;
 
 function linkify(text: string, linkColor: string) {
@@ -25,7 +39,12 @@ function linkify(text: string, linkColor: string) {
     if (i % 2 === 1) {
       const trailing = (part.match(TRAILING) || [''])[0];
       const url = trailing ? part.slice(0, -trailing.length) : part;
-      const href = /^https?:\/\//i.test(url) ? url : `https://${url}`;
+      const isEmail = /^[^\s@]+@[^\s@]+$/.test(url);
+      const href = isEmail
+        ? `mailto:${url}`
+        : /^https?:\/\//i.test(url)
+          ? url
+          : `https://${url}`;
       return (
         <Fragment key={i}>
           <a
