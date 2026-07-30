@@ -7,6 +7,7 @@ import logoVideoFallback from '@/assets/logo-header.mp4';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 import { useDashboardTexts, type DashboardTextKey } from '@/lib/dashboardTexts';
 import { setOwnVisitFlag } from '@/lib/analytics';
+import RichText from '@/components/RichText';
 import StructureField from '@/components/landing/StructureField';
 
 // v3 structure background for the cabinet — full-screen, faint, centred.
@@ -1405,7 +1406,13 @@ function CourseLadder({
                 </div>
                 <h3 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 25, lineHeight: 1.15, color: FG, marginBottom: l.description ? 10 : 14 }}>{l.title}</h3>
                 {l.description && (
-                  <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.55, color: '#a8a090', maxWidth: '54ch', marginBottom: 16 }}>{l.description}</p>
+                  <div style={{ marginBottom: 16 }}>
+                    <RichText
+                      text={l.description}
+                      style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.55, color: '#a8a090', maxWidth: '54ch' }}
+                      gap="0.6em"
+                    />
+                  </div>
                 )}
                 <div className="flex items-center justify-between flex-wrap gap-3">
                   <span style={{ fontFamily: MONO, fontSize: 11, color: '#666' }}>{t('continue_meta_video')} · {t('continue_meta_pdf')}</span>

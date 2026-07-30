@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, MessageCircle, CheckCircle, Download } from 'luc
 import YouTubePlayer from '@/components/school/YouTubePlayer';
 import FloatingWatermark from '@/components/school/FloatingWatermark';
 import ConstellationBg from '@/components/ConstellationBg';
+import RichText from '@/components/RichText';
 
 interface LessonData {
   id: string;
@@ -209,9 +210,14 @@ export default function SchoolLesson() {
           {lesson.title}
         </h1>
         {lesson.description && (
-          <p className="mt-4" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '60ch' }}>
-            {lesson.description}
-          </p>
+          <div className="mt-4">
+            {/* абзацы из админки сохраняются: пустая строка = новый абзац */}
+            <RichText
+              text={lesson.description}
+              style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '60ch' }}
+              gap="0.85em"
+            />
+          </div>
         )}
 
         {/* Course progress bar */}

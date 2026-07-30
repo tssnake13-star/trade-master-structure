@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, Lock } from 'lucide-react';
 import ConstellationBg from '@/components/ConstellationBg';
 import { useDashboardTexts } from '@/lib/dashboardTexts';
+import RichText from '@/components/RichText';
 
 interface Lesson {
   id: string;
@@ -173,12 +174,13 @@ export default function SchoolCourse() {
                   </div>
                   {/* краткое описание блока: данные грузились, но не выводились */}
                   {l.description && status !== 'locked' && (
-                    <p
-                      className="mt-1"
-                      style={{ fontFamily: SANS, fontSize: 12.5, lineHeight: 1.45, color: '#8a8378', maxWidth: '64ch' }}
-                    >
-                      {l.description}
-                    </p>
+                    <div className="mt-1">
+                      <RichText
+                        text={l.description}
+                        style={{ fontFamily: SANS, fontSize: 12.5, lineHeight: 1.45, color: '#8a8378', maxWidth: '64ch' }}
+                        gap="0.6em"
+                      />
+                    </div>
                   )}
                 </div>
 
