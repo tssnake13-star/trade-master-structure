@@ -74,7 +74,9 @@ export default function SchoolLesson() {
   const [showTaskMessage, setShowTaskMessage] = useState(false);
   const [prevLessonId, setPrevLessonId] = useState<string | null>(null);
   const [nextLessonId, setNextLessonId] = useState<string | null>(null);
-  const [isNextUnlocked, setIsNextUnlocked] = useState(false);
+  // Разрешил ли администратор следующий блок (или курс бесплатный). Сам доступ
+  // к нему считается ниже: нужно ещё, чтобы текущий блок был завершён.
+  const [nextGranted, setNextGranted] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
   const [totalLessons, setTotalLessons] = useState(0);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -130,7 +132,7 @@ export default function SchoolLesson() {
         setIsCompleted((progressRes.data || []).length > 0 || fullyUnlocked);
         setPrevLessonId(prev?.id || null);
         setNextLessonId(next?.id || null);
-        setIsNextUnlocked(next ? (isAdmin || unlocked.includes(currentIdx + 2) || isFree) : false);
+        setNextGranted(next ? (isFree || unlocked.includes(currentIdx + 2)) : false);
         setVideos((videosRes.data || []) as VideoData[]);
 
         const courseLessonIds = new Set(allSorted.map(x => x.id));
@@ -165,6 +167,11 @@ export default function SchoolLesson() {
   }
 
   const pct = totalLessons > 0 ? Math.round((completedCount / totalLessons) * 100) : 0;
+
+  // Следующий блок открыт, только если текущий завершён. Считаем на лету (а не
+  // храним в state), чтобы кнопка «Следующее» оживала сразу после нажатия
+  // «Завершить блок», без перезагрузки страницы.
+  const isNextUnlocked = !!nextLessonId && (role === 'admin' || (isCompleted && nextGranted));
 
   const watermark = profileData.email ? <FloatingWatermark email={profileData.email} fullName={profileData.full_name} /> : null;
   const playableVideos = videos.filter(v => v.video_url);

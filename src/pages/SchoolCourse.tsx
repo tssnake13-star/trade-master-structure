@@ -71,11 +71,15 @@ export default function SchoolCourse() {
     const lesson = lessons[index];
     if (!lesson) return false;
     if (role === 'admin') return true;
-    // Бесплатный курс — поэтапно по прохождению: 1-й урок и каждый следующий
-    // после завершения предыдущего (а уже пройденный остаётся открытым).
-    if (isFree) return index === 0 || completedIds.has(lesson.id) || (lessons[index - 1] && completedIds.has(lessons[index - 1].id));
-    // Платный курс — строго по списку открытых уроков (как на дашборде).
-    return unlockedSortOrders.includes(index + 1);
+    // Блоки открываются поэтапно: первый доступен сразу, следующий — только
+    // после нажатия «Завершить блок» на предыдущем (уже пройденный остаётся открытым).
+    const prevDone = !!lessons[index - 1] && completedIds.has(lessons[index - 1].id);
+    if (isFree) return index === 0 || completedIds.has(lesson.id) || prevDone;
+    // Платный курс: админ задаёт границу доступа, внутри неё — та же
+    // последовательность. Первый выданный блок открыт всегда (обычно это первый).
+    if (!unlockedSortOrders.includes(index + 1)) return false;
+    const firstGranted = Math.min(...unlockedSortOrders);
+    return index + 1 === firstGranted || completedIds.has(lesson.id) || prevDone;
   };
 
   const completed = lessons.filter(l => completedIds.has(l.id)).length;

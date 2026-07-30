@@ -428,7 +428,27 @@ export default function SchoolDashboard() {
       }
       return unlocked;
     }
-    return accessMap.get(course.id)?.unlocked || [1];
+    // Платный курс: админ задаёт ГРАНИЦУ доступа, а внутри неё блоки открываются
+    // последовательно — следующий только после «Завершить блок». Иначе кнопка
+    // ничего не значит и человек перескакивает через материал.
+    const granted = accessMap.get(course.id)?.unlocked || [1];
+    const unlocked: number[] = [];
+    let started = false; // первый ВЫДАННЫЙ блок открыт всегда, дальше — по прохождению
+    for (let i = 0; i < courseLessons.length; i++) {
+      const num = i + 1;
+      if (!granted.includes(num)) {
+        if (started) break;
+        continue;
+      }
+      if (!started) {
+        unlocked.push(num);
+        started = true;
+        continue;
+      }
+      if (completedIds.has(courseLessons[i - 1].id)) unlocked.push(num);
+      else break;
+    }
+    return unlocked.length ? unlocked : granted;
   };
 
   const getUnlockedLessons = (course: Course, courseLessons: Lesson[]) => {
