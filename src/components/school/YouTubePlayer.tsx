@@ -72,6 +72,9 @@ export default function YouTubePlayer({ url, watermark }: Props) {
   const [showVolume, setShowVolume] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [fakeFullscreen, setFakeFullscreen] = useState(false);
+  // субтитры по умолчанию выключены; родной интерфейс YouTube у нас скрыт,
+  // поэтому управление — только через свою кнопку CC
+  const [captionsOn, setCaptionsOn] = useState(false);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const videoId = extractVideoId(url);
 
@@ -179,6 +182,7 @@ export default function YouTubePlayer({ url, watermark }: Props) {
           showinfo: 0,
           fs: 0,
           playsinline: 1,
+          cc_load_policy: 0, // не показывать субтитры при старте
         },
         events: {
           onReady: () => {
@@ -200,6 +204,13 @@ export default function YouTubePlayer({ url, watermark }: Props) {
               const v = player.getVolume?.();
               if (typeof v === 'number') setVolume(v);
               setMuted(!!player.isMuted?.());
+            } catch {}
+            // Гасим субтитры принудительно: одного cc_load_policy мало, если у
+            // зрителя в аккаунте YouTube стоит «всегда показывать субтитры».
+            try {
+              player.unloadModule?.('captions'); // старый плеер
+              player.unloadModule?.('cc');       // html5
+              player.setOption?.('captions', 'track', {});
             } catch {}
             if (savedPositionRef.current > 1) {
               player.seekTo(savedPositionRef.current, true);
@@ -276,6 +287,34 @@ export default function YouTubePlayer({ url, watermark }: Props) {
     }
     scheduleHide();
   }, [muted, scheduleHide]);
+
+  const toggleCaptions = useCallback(() => {
+    const p = playerRef.current;
+    if (!p) return;
+    if (captionsOn) {
+      try {
+        p.setOption?.('captions', 'track', {});
+        p.unloadModule?.('captions');
+        p.unloadModule?.('cc');
+      } catch {}
+      setCaptionsOn(false);
+    } else {
+      try {
+        p.loadModule?.('captions');
+        p.loadModule?.('cc');
+      } catch {}
+      // модулю нужно мгновение на загрузку списка дорожек; предпочитаем русскую
+      setTimeout(() => {
+        try {
+          const list = p.getOption?.('captions', 'tracklist') || [];
+          const track = list.find((t: any) => t.languageCode === 'ru') || list[0];
+          if (track) p.setOption?.('captions', 'track', { languageCode: track.languageCode });
+        } catch {}
+      }, 350);
+      setCaptionsOn(true);
+    }
+    scheduleHide();
+  }, [captionsOn, scheduleHide]);
 
   const toggleFullscreen = useCallback(() => {
     const el = containerRef.current;
@@ -462,6 +501,24 @@ export default function YouTubePlayer({ url, watermark }: Props) {
                 />
               </div>
             </div>
+
+            {/* Субтитры (по умолчанию выключены) */}
+            <button
+              onClick={toggleCaptions}
+              title={captionsOn ? 'Выключить субтитры' : 'Включить субтитры'}
+              aria-label={captionsOn ? 'Выключить субтитры' : 'Включить субтитры'}
+              aria-pressed={captionsOn}
+              style={{
+                background: captionsOn ? '#fff' : 'none',
+                border: `1px solid ${captionsOn ? '#fff' : 'rgba(255,255,255,0.3)'}`,
+                borderRadius: '4px',
+                color: captionsOn ? '#000' : '#fff',
+                fontSize: '11px', padding: '2px 6px', cursor: 'pointer',
+                fontFamily: "'Martian Mono', monospace", lineHeight: 1.4,
+              }}
+            >
+              CC
+            </button>
 
             {/* Speed */}
             <div style={{ position: 'relative' }}>
