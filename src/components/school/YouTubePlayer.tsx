@@ -72,10 +72,10 @@ export default function YouTubePlayer({ url, watermark }: Props) {
   const [showVolume, setShowVolume] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [fakeFullscreen, setFakeFullscreen] = useState(false);
-  // субтитры по умолчанию выключены; родной интерфейс YouTube у нас скрыт,
-  // поэтому управление — только через свою кнопку CC
-  const [captionsOn, setCaptionsOn] = useState(false);
-  // гасим субтитры один раз после реального старта воспроизведения
+  // Субтитры всегда выключены. Кнопку включения убрали: YouTube не отдаёт
+  // управление дорожками, когда плеер стартовал с отключёнными субтитрами
+  // (loadModule для html5-плеера не срабатывает), а нерабочая кнопка хуже, чем
+  // её отсутствие. Гасим один раз после реального старта воспроизведения.
   const captionsInitRef = useRef(false);
   const hideTimerRef = useRef<ReturnType<typeof setTimeout>>();
   const videoId = extractVideoId(url);
@@ -236,7 +236,6 @@ export default function YouTubePlayer({ url, watermark }: Props) {
                   }
                 };
                 [200, 900, 2000].forEach(ms => setTimeout(kill, ms));
-                setCaptionsOn(false);
               }
               rafRef.current = requestAnimationFrame(updateProgress);
               scheduleHide();
@@ -259,9 +258,8 @@ export default function YouTubePlayer({ url, watermark }: Props) {
       setStarted(false);
       setCurrentTime(0);
       setDuration(0);
-      // при смене видео субтитры снова гасим и кнопку возвращаем в «выключено»
+      // при смене видео субтитры гасим заново
       captionsInitRef.current = false;
-      setCaptionsOn(false);
     };
   }, [videoId, updateProgress, scheduleHide]);
 
@@ -307,58 +305,6 @@ export default function YouTubePlayer({ url, watermark }: Props) {
     }
     scheduleHide();
   }, [muted, scheduleHide]);
-
-  /** Реально ли сейчас показываются субтитры (а не что мы думаем). */
-  const readCaptionsState = useCallback((): boolean => {
-    const p = playerRef.current;
-    if (!p?.getOption) return false;
-    for (const mod of ['captions', 'cc']) {
-      try {
-        const track = p.getOption(mod, 'track');
-        if (track && track.languageCode) return true;
-      } catch {}
-    }
-    return false;
-  }, []);
-
-  /** Включить/выключить субтитры. Оба модуля — старый плеер и html5. */
-  const applyCaptions = useCallback((on: boolean) => {
-    const p = playerRef.current;
-    if (!p) return;
-    if (on) {
-      for (const mod of ['captions', 'cc']) {
-        try { p.loadModule?.(mod); } catch {}
-      }
-      // список дорожек появляется не мгновенно — выбираем русскую, иначе первую
-      setTimeout(() => {
-        for (const mod of ['captions', 'cc']) {
-          try {
-            const list = p.getOption?.(mod, 'tracklist');
-            if (Array.isArray(list) && list.length) {
-              const track = list.find((t: any) => t.languageCode === 'ru') || list[0];
-              p.setOption?.(mod, 'track', { languageCode: track.languageCode });
-            }
-          } catch {}
-        }
-        setCaptionsOn(readCaptionsState());
-      }, 300);
-    } else {
-      for (const mod of ['captions', 'cc']) {
-        try { p.setOption?.(mod, 'track', {}); } catch {}
-        try { p.unloadModule?.(mod); } catch {}
-      }
-      setCaptionsOn(false);
-    }
-  }, [readCaptionsState]);
-
-  const toggleCaptions = useCallback(() => {
-    // отталкиваемся от РЕАЛЬНОГО состояния плеера, а не от того, что показывает
-    // кнопка: иначе после автовключения субтитров из настроек аккаунта первое
-    // нажатие уходило впустую и приходилось жать дважды
-    const actuallyOn = readCaptionsState() || captionsOn;
-    applyCaptions(!actuallyOn);
-    scheduleHide();
-  }, [captionsOn, readCaptionsState, applyCaptions, scheduleHide]);
 
   const toggleFullscreen = useCallback(() => {
     const el = containerRef.current;
@@ -545,24 +491,6 @@ export default function YouTubePlayer({ url, watermark }: Props) {
                 />
               </div>
             </div>
-
-            {/* Субтитры (по умолчанию выключены) */}
-            <button
-              onClick={toggleCaptions}
-              title={captionsOn ? 'Выключить субтитры' : 'Включить субтитры'}
-              aria-label={captionsOn ? 'Выключить субтитры' : 'Включить субтитры'}
-              aria-pressed={captionsOn}
-              style={{
-                background: captionsOn ? '#fff' : 'none',
-                border: `1px solid ${captionsOn ? '#fff' : 'rgba(255,255,255,0.3)'}`,
-                borderRadius: '4px',
-                color: captionsOn ? '#000' : '#fff',
-                fontSize: '11px', padding: '2px 6px', cursor: 'pointer',
-                fontFamily: "'Martian Mono', monospace", lineHeight: 1.4,
-              }}
-            >
-              CC
-            </button>
 
             {/* Speed */}
             <div style={{ position: 'relative' }}>
