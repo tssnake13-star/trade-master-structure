@@ -89,6 +89,29 @@ const PERIODS = [
   { days: 90, label: '90 дней' },
 ];
 
+/**
+ * База возвращает только дни, когда были заходы. Для графика достраиваем весь
+ * период: 7 дней — 7 столбиков, 90 — 90, дни без посетителей показываем нулём.
+ * Иначе по графику не видно провалов и он врёт о равномерности.
+ */
+function fillMissingDays(byDay: { day: string; visits: number }[], days: number) {
+  const map = new Map(byDay.map(d => [d.day, d.visits]));
+  const out: { day: string; visits: number; label: string }[] = [];
+  const today = new Date();
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    // ключ в том же формате, что и в БД (YYYY-MM-DD)
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    out.push({
+      day: key,
+      visits: map.get(key) ?? 0,
+      label: `${String(d.getDate()).padStart(2, '0')}.${String(d.getMonth() + 1).padStart(2, '0')}`,
+    });
+  }
+  return out;
+}
+
 function Kpi({ value, label, hint, color = FG }: { value: string | number; label: string; hint?: string; color?: string }) {
   return (
     <div className="p-5" style={{ border: `1px solid ${BORDER}`, borderRadius: 10, backgroundColor: CARD }}>
@@ -170,6 +193,8 @@ export default function SchoolAnalytics() {
   const totalVisits = data?.visits ?? 0;
   const heroVisits = data?.by_section.find(s => s.section === 'hero')?.visits ?? 0;
   const funnelBase = heroVisits || totalVisits;
+  // весь период по дням, включая дни без посетителей
+  const chartDays = fillMissingDays(data?.by_day ?? [], days);
 
   return (
     <div data-school-skin className="min-h-screen" style={{ backgroundColor: BG, color: FG }}>
@@ -265,16 +290,28 @@ export default function SchoolAnalytics() {
               ) : (
                 <div style={{ width: '100%', height: 220 }}>
                   <ResponsiveContainer>
-                    <BarChart data={data.by_day.map(d => ({ ...d, label: d.day.slice(5) }))}>
+                    {/* столбиков ровно столько, сколько дней в периоде; ширину
+                        recharts подбирает сам, зазор уменьшаем на длинных периодах */}
+                    <BarChart data={chartDays} barCategoryGap={days > 30 ? '8%' : days > 7 ? '15%' : '25%'}>
                       <CartesianGrid stroke="#221e1a" vertical={false} />
-                      <XAxis dataKey="label" tick={{ fill: '#666', fontSize: 10, fontFamily: MONO }} stroke="#2a2620" />
-                      <YAxis tick={{ fill: '#666', fontSize: 10, fontFamily: MONO }} stroke="#2a2620" allowDecimals={false} />
+                      <XAxis
+                        dataKey="label"
+                        tick={{ fill: '#666', fontSize: days > 30 ? 8 : 10, fontFamily: MONO }}
+                        stroke="#2a2620"
+                        /* на 30 и 90 днях подписи не влезут — показываем каждую N-ю */
+                        interval={days > 30 ? 8 : days > 7 ? 2 : 0}
+                        tickMargin={6}
+                        minTickGap={2}
+                      />
+                      <YAxis tick={{ fill: '#666', fontSize: 10, fontFamily: MONO }} stroke="#2a2620" allowDecimals={false} width={28} />
                       <Tooltip
+                        cursor={{ fill: 'rgba(255,255,255,0.04)' }}
                         contentStyle={{ backgroundColor: '#0d0b09', border: `1px solid ${BORDER}`, borderRadius: 8, fontFamily: SANS, fontSize: 12 }}
                         labelStyle={{ color: FG }}
-                        formatter={(v: number, name: string) => [v, name === 'visits' ? 'посетители' : 'просмотры']}
+                        formatter={(v: number) => [v, 'посетители']}
+                        labelFormatter={(l: string) => `Дата: ${l}`}
                       />
-                      <Bar dataKey="visits" fill={ACCENT} radius={[3, 3, 0, 0]} />
+                      <Bar dataKey="visits" fill={ACCENT} radius={[2, 2, 0, 0]} />
                     </BarChart>
                   </ResponsiveContainer>
                 </div>
