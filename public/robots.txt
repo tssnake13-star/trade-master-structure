@@ -13,4 +13,12 @@ Allow: /
 User-agent: *
 Allow: /
 
+# Служебные разделы — не для поиска:
+# /school — вход в кабинет (форма логина, полезного контента нет)
+# /access — приватная страница с ценами, ссылку выдаёт бот
+# /preview-* — черновики дизайна
+Disallow: /school
+Disallow: /access
+Disallow: /preview-
+
 Sitemap: https://www.tradeliketyo.com/sitemap.xml
