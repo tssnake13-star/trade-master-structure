@@ -49,6 +49,36 @@ export type Database = {
           },
         ]
       }
+      course_access_expired: {
+        Row: {
+          archived_at: string
+          course_id: string
+          expires_at: string
+          granted_at: string
+          id: string
+          unlocked_lessons: number[]
+          user_id: string
+        }
+        Insert: {
+          archived_at?: string
+          course_id: string
+          expires_at: string
+          granted_at: string
+          id?: string
+          unlocked_lessons?: number[]
+          user_id: string
+        }
+        Update: {
+          archived_at?: string
+          course_id?: string
+          expires_at?: string
+          granted_at?: string
+          id?: string
+          unlocked_lessons?: number[]
+          user_id?: string
+        }
+        Relationships: []
+      }
       courses: {
         Row: {
           created_at: string
@@ -312,6 +342,7 @@ export type Database = {
         Returns: undefined
       }
       delete_student: { Args: { _user_id: string }; Returns: undefined }
+      expire_course_access: { Args: Record<string, never>; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
