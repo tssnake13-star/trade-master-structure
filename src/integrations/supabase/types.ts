@@ -49,36 +49,6 @@ export type Database = {
           },
         ]
       }
-      course_access_expired: {
-        Row: {
-          archived_at: string
-          course_id: string
-          expires_at: string
-          granted_at: string
-          id: string
-          unlocked_lessons: number[]
-          user_id: string
-        }
-        Insert: {
-          archived_at?: string
-          course_id: string
-          expires_at: string
-          granted_at: string
-          id?: string
-          unlocked_lessons?: number[]
-          user_id: string
-        }
-        Update: {
-          archived_at?: string
-          course_id?: string
-          expires_at?: string
-          granted_at?: string
-          id?: string
-          unlocked_lessons?: number[]
-          user_id?: string
-        }
-        Relationships: []
-      }
       courses: {
         Row: {
           created_at: string

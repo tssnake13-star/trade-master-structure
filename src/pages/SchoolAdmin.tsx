@@ -51,9 +51,6 @@ interface LessonVideo { id?: string; title: string; video_url: string; video_url
 interface Profile { user_id: string; email: string; full_name: string | null; created_at: string; is_blocked: boolean; }
 interface UserRole { user_id: string; role: string; }
 interface Access { id: string; user_id: string; course_id: string; granted_at: string; expires_at: string | null; unlocked_lessons: number[]; }
-// Доступ, у которого вышел срок: строка ушла из course_access в архив, чтобы
-// в списке доступов не висело то, чего у человека уже нет.
-interface ExpiredAccess { id: string; user_id: string; course_id: string; granted_at: string; expires_at: string; unlocked_lessons: number[]; archived_at: string; }
 
 export default function SchoolAdmin() {
   const { session, role, loading: authLoading, signOut } = useAuth();
@@ -1013,25 +1010,22 @@ function StudentsTab() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [roles, setRoles] = useState<UserRole[]>([]);
   const [accesses, setAccesses] = useState<Access[]>([]);
-  const [expired, setExpired] = useState<ExpiredAccess[]>([]);
   const [courses, setCourses] = useState<{ id: string; is_free: boolean }[]>([]);
 
   const load = async () => {
-    // Сначала гасим всё, у чего вышел срок, — планировщик делает то же самое каждые
+    // Сначала удаляем всё, у чего вышел срок, — планировщик делает то же самое каждые
     // 10 минут, но админ не должен видеть доступ, которого уже нет.
     await supabase.rpc('expire_course_access');
-    const [p, r, a, c, e] = await Promise.all([
+    const [p, r, a, c] = await Promise.all([
       supabase.from('profiles').select('*').order('created_at', { ascending: false }),
       supabase.from('user_roles').select('*'),
       supabase.from('course_access').select('*'),
       supabase.from('courses').select('id, is_free'),
-      supabase.from('course_access_expired').select('*'),
     ]);
     setProfiles(p.data || []);
     setRoles(r.data || []);
     setAccesses((a.data as Access[]) || []);
     setCourses((c.data as { id: string; is_free: boolean }[]) || []);
-    setExpired((e.data as ExpiredAccess[]) || []);
   };
 
   useEffect(() => { load(); }, []);
@@ -1044,22 +1038,15 @@ function StudentsTab() {
     return rs.includes('admin') ? 'admin' : (rs[0] || 'student');
   };
 
-  const getAccessDaysLeft = (uid: string): { days: number | null; hasAccess: boolean; expiredAt: string | null } => {
+  const getAccessDaysLeft = (uid: string): { days: number | null; hasAccess: boolean } => {
     const userAccesses = accesses.filter(a => a.user_id === uid);
-    if (userAccesses.length === 0) {
-      // Активных доступов нет. Если человек их когда-то покупал — показываем дату
-      // окончания: это те, кому пора предлагать продление.
-      const gone = expired.filter(e => e.user_id === uid);
-      if (gone.length === 0) return { days: null, hasAccess: false, expiredAt: null };
-      const last = gone.reduce((m, e) => (new Date(e.expires_at) > new Date(m.expires_at) ? e : m));
-      return { days: null, hasAccess: false, expiredAt: last.expires_at };
-    }
+    if (userAccesses.length === 0) return { days: null, hasAccess: false };
     const withExpiry = userAccesses.filter(a => a.expires_at);
-    if (withExpiry.length === 0) return { days: null, hasAccess: true, expiredAt: null };
+    if (withExpiry.length === 0) return { days: null, hasAccess: true };
     const minDays = Math.min(
       ...withExpiry.map(a => Math.ceil((new Date(a.expires_at!).getTime() - Date.now()) / 86400000))
     );
-    return { days: minDays, hasAccess: true, expiredAt: null };
+    return { days: minDays, hasAccess: true };
   };
 
   // Порядок ярусов: админы → платники → бесплатники. Внутри платников — новые
@@ -1118,11 +1105,6 @@ function StudentsTab() {
                       </span>
                     )
                   )}
-                  {!access.hasAccess && access.expiredAt && (
-                    <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ backgroundColor: '#8a4a4a22', color: '#c45050', fontFamily: font.mono }}>
-                      истёк {new Date(access.expiredAt).toLocaleDateString('ru')}
-                    </span>
-                  )}
                 </span>
                 {p.full_name && (
                   <span className="text-[11px] block" style={{ fontFamily: font.mono, color: '#555' }}>{p.email}</span>
@@ -1143,24 +1125,21 @@ function StudentsTab() {
 /* ========= ACCESS TAB ========= */
 function AccessTab() {
   const [accesses, setAccesses] = useState<Access[]>([]);
-  const [expired, setExpired] = useState<ExpiredAccess[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
 
   useEffect(() => {
     const load = async () => {
-      // Просроченные уносим в архив до чтения — в таблице остаются только живые доступы.
+      // Просроченные удаляем до чтения — в таблице остаются только живые доступы.
       await supabase.rpc('expire_course_access');
-      const [a, p, c, e] = await Promise.all([
+      const [a, p, c] = await Promise.all([
         supabase.from('course_access').select('*').order('granted_at', { ascending: false }),
         supabase.from('profiles').select('*'),
         supabase.from('courses').select('*'),
-        supabase.from('course_access_expired').select('*').order('expires_at', { ascending: false }),
       ]);
       setAccesses(a.data || []);
       setProfiles(p.data || []);
       setCourses(c.data || []);
-      setExpired((e.data as ExpiredAccess[]) || []);
     };
     load();
   }, []);
@@ -1219,36 +1198,6 @@ function AccessTab() {
         </table>
       </div>
 
-      {expired.length > 0 && (
-        <div className="mt-10">
-          <h3 className="text-sm mb-1" style={{ fontFamily: font.heading, color: '#a8a090' }}>Срок вышел</h3>
-          <p className="text-[11px] mb-3" style={{ fontFamily: font.mono, color: '#555' }}>
-            Доступ закрылся сам. Кому продлить — открыть карточку ученика и выдать заново.
-          </p>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs" style={{ fontFamily: font.mono }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #1a1a1a' }}>
-                  <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Ученик</th>
-                  <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Программа</th>
-                  <th className="text-left py-2 pr-4" style={{ color: '#666' }}>Был выдан</th>
-                  <th className="text-left py-2" style={{ color: '#666' }}>Закончился</th>
-                </tr>
-              </thead>
-              <tbody>
-                {expired.map(e => (
-                  <tr key={e.id} style={{ borderBottom: '1px solid #111' }}>
-                    <td className="py-2.5 pr-4" style={{ color: '#8a8478' }}>{getEmail(e.user_id)}</td>
-                    <td className="py-2.5 pr-4" style={{ color: '#8a8478' }}>{getCourse(e.course_id)}</td>
-                    <td className="py-2.5 pr-4" style={{ color: '#555' }}>{new Date(e.granted_at).toLocaleDateString('ru')}</td>
-                    <td className="py-2.5" style={{ color: '#c45050' }}>{new Date(e.expires_at).toLocaleDateString('ru')}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

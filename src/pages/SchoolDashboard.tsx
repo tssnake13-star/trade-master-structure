@@ -301,7 +301,7 @@ export default function SchoolDashboard() {
     if (authLoading) return;
     if (!user) return;
     const load = async () => {
-      const [coursesRes, accessRes, lessonsRes, progressRes, profileRes, titleRes, mainRes, expiredRes] = await Promise.all([
+      const [coursesRes, accessRes, lessonsRes, progressRes, profileRes, titleRes, mainRes] = await Promise.all([
         supabase.from('courses').select('*').order('sort_order'),
         supabase.from('course_access').select('course_id, unlocked_lessons, granted_at, expires_at').eq('user_id', user.id),
         supabase.from('lessons').select('id, course_id, title, description, sort_order').order('sort_order'),
@@ -309,7 +309,6 @@ export default function SchoolDashboard() {
         supabase.from('profiles').select('full_name, email').eq('user_id', user.id).single(),
         supabase.from('site_settings').select('value').eq('key', 'dashboard_welcome_title').single(),
         supabase.from('site_settings').select('value').eq('key', 'dashboard_main_course_id').maybeSingle(),
-        supabase.from('course_access_expired').select('course_id, expires_at').eq('user_id', user.id),
       ]);
 
       if (titleRes.data?.value) setWelcomeTitle(titleRes.data.value);
@@ -340,14 +339,8 @@ export default function SchoolDashboard() {
         const endMs = endOf(a);
         if (endMs !== null && endMs <= nowMs) expMap.set(a.course_id, new Date(endMs));
       }
-      // Строку course_access через несколько минут после истечения уносит в архив
-      // (expire_course_access), и она перестаёт приходить в accessRes. Без архива
-      // ученик увидел бы «курс не оплачен» вместо «доступ был до такого-то числа».
-      const accessSet = new Set(accessData.map(a => a.course_id));
-      for (const e of (expiredRes.data || []) as { course_id: string; expires_at: string }[]) {
-        if (!accessSet.has(e.course_id)) expMap.set(e.course_id, new Date(e.expires_at));
-      }
       setExpiredAccess(expMap);
+      const accessSet = new Set(accessData.map(a => a.course_id));
       const aMap = new Map(accessData.map(a => [a.course_id, { courseId: a.course_id, unlocked: a.unlocked_lessons || [1], granted_at: a.granted_at, expires_at: a.expires_at }]));
       const lessons = (lessonsRes.data || []) as Lesson[];
       const completionList = (progressRes.data || []) as CompletionRecord[];

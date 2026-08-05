@@ -14,8 +14,6 @@ interface Profile { user_id: string; email: string; full_name: string | null; cr
 interface Course { id: string; title: string; subtitle: string | null; is_free: boolean; sort_order: number; }
 interface Lesson { id: string; course_id: string; title: string; sort_order: number; }
 interface Access { id: string; user_id: string; course_id: string; granted_at: string; expires_at: string | null; unlocked_lessons: number[]; }
-// Доступ с вышедшим сроком: строка уехала из course_access в архив автоматически.
-interface ExpiredAccess { id: string; course_id: string; granted_at: string; expires_at: string; }
 interface InviteCode { id: string; code: string; course_id: string | null; used_by: string | null; }
 interface AuthMeta { created_at: string | null; last_sign_in_at: string | null; last_ip: string | null; signup_ip: string | null; }
 
@@ -29,7 +27,6 @@ export default function SchoolStudentDetail() {
   const [courses, setCourses] = useState<Course[]>([]);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [accesses, setAccesses] = useState<Access[]>([]);
-  const [expired, setExpired] = useState<ExpiredAccess[]>([]);
   const [progressIds, setProgressIds] = useState<Set<string>>(new Set());
   const [inviteCode, setInviteCode] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -56,10 +53,10 @@ export default function SchoolStudentDetail() {
 
   const load = async () => {
     if (!studentId) return;
-    // Гасим просроченное перед чтением, иначе в карточке будет висеть доступ,
+    // Удаляем просроченное перед чтением, иначе в карточке будет висеть доступ,
     // которого у человека уже нет (планировщик дойдёт до него в течение 10 минут).
     await supabase.rpc('expire_course_access');
-    const [pRes, rRes, cRes, lRes, aRes, prRes, icRes, exRes] = await Promise.all([
+    const [pRes, rRes, cRes, lRes, aRes, prRes, icRes] = await Promise.all([
       supabase.from('profiles').select('*').eq('user_id', studentId).single(),
       supabase.from('user_roles').select('role').eq('user_id', studentId), // may hold several roles — no .single()
       supabase.from('courses').select('*').order('sort_order'),
@@ -67,7 +64,6 @@ export default function SchoolStudentDetail() {
       supabase.from('course_access').select('*').eq('user_id', studentId),
       supabase.from('lesson_progress').select('lesson_id').eq('user_id', studentId),
       supabase.from('invite_codes').select('code').eq('used_by', studentId).limit(1),
-      supabase.from('course_access_expired').select('id, course_id, granted_at, expires_at').eq('user_id', studentId).order('expires_at', { ascending: false }),
     ]);
     setProfile(pRes.data as Profile | null);
     const roleRows = (rRes.data ?? []) as { role: string }[];
@@ -75,7 +71,6 @@ export default function SchoolStudentDetail() {
     setCourses(cRes.data || []);
     setLessons(lRes.data || []);
     setAccesses((aRes.data || []) as Access[]);
-    setExpired((exRes.data || []) as ExpiredAccess[]);
     setProgressIds(new Set((prRes.data || []).map((p: any) => p.lesson_id)));
     setInviteCode(icRes.data?.[0]?.code || null);
     setLoading(false);
@@ -116,9 +111,6 @@ export default function SchoolStudentDetail() {
       expires_at: expiresAt.toISOString(),
       unlocked_lessons: [1],
     });
-    // Доступ выдан заново — старая запись об истечении больше не нужна,
-    // иначе ученик увидит «срок истёк» рядом с открытым курсом.
-    await supabase.from('course_access_expired').delete().eq('user_id', studentId).eq('course_id', grantCourseId);
     setGrantModal(false);
     setGrantCourseId('');
     load();
@@ -323,9 +315,9 @@ export default function SchoolStudentDetail() {
             </button>
           </div>
 
-          {accesses.length === 0 && expired.length === 0 ? (
+          {accesses.length === 0 ? (
             <p className="text-[11px]" style={{ color: '#444', fontFamily: font.mono }}>Нет доступов к программам</p>
-          ) : accesses.length === 0 ? null : (
+          ) : (
             <div className="space-y-2">
               {accesses.map(acc => {
                 const course = courses.find(c => c.id === acc.course_id);
@@ -391,35 +383,6 @@ export default function SchoolStudentDetail() {
                   </div>
                 );
               })}
-            </div>
-          )}
-
-          {expired.length > 0 && (
-            <div className={accesses.length > 0 ? 'mt-5 pt-4' : ''} style={accesses.length > 0 ? { borderTop: '1px solid #1a1a1a' } : undefined}>
-              <p className="text-[11px] mb-2" style={{ fontFamily: font.mono, color: '#666' }}>Срок вышел</p>
-              <div className="space-y-2">
-                {expired.map(e => {
-                  const course = courses.find(c => c.id === e.course_id);
-                  if (!course) return null;
-                  return (
-                    <div key={e.id} className="rounded border px-4 py-3 flex flex-wrap items-center justify-between gap-2" style={{ borderColor: '#1a1a1a', backgroundColor: '#0f0f0f' }}>
-                      <div className="min-w-0">
-                        <span className="text-xs block" style={{ fontFamily: font.mono, color: '#8a8478' }}>{course.title}</span>
-                        <span className="text-[11px]" style={{ fontFamily: font.mono, color: '#555' }}>
-                          {new Date(e.granted_at).toLocaleDateString('ru')} — {new Date(e.expires_at).toLocaleDateString('ru')}
-                        </span>
-                      </div>
-                      <button
-                        onClick={() => { setGrantModal(true); setGrantCourseId(e.course_id); }}
-                        className="text-[11px] px-2.5 py-1 rounded flex items-center gap-1 flex-shrink-0"
-                        style={{ color: '#4a8a4a', border: '1px solid #1a1a1a', fontFamily: font.mono }}
-                      >
-                        <Plus size={11} /> Выдать снова
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
             </div>
           )}
         </section>
