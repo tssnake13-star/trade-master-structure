@@ -43,10 +43,19 @@ function extractVideoId(raw: string): string | null {
   return null;
 }
 
-function formatTime(s: number): string {
-  const m = Math.floor(s / 60);
-  const sec = Math.floor(s % 60);
-  return `${m}:${sec.toString().padStart(2, '0')}`;
+/**
+ * Время в плеере. Раньше часы не выделялись, и полуторачасовой урок показывался
+ * как «90:23» вместо «1:30:23». Если видео длиннее часа, часы показываем у ОБОИХ
+ * значений (`withHours`), иначе «5:30 / 1:30:00» читалось бы вразнобой.
+ */
+function formatTime(s: number, withHours = false): string {
+  const total = Math.max(0, Math.floor(Number.isFinite(s) ? s : 0));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const sec = total % 60;
+  const ss = String(sec).padStart(2, '0');
+  if (h > 0 || withHours) return `${h}:${String(m).padStart(2, '0')}:${ss}`;
+  return `${m}:${ss}`;
 }
 
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
@@ -432,7 +441,7 @@ export default function YouTubePlayer({ url, watermark }: Props) {
 
             {/* Time */}
             <span style={{ fontSize: '12px', color: '#fff', fontFamily: "'Martian Mono', monospace", whiteSpace: 'nowrap' }}>
-              {formatTime(currentTime)} / {formatTime(duration)}
+              {formatTime(currentTime, duration >= 3600)} / {formatTime(duration, duration >= 3600)}
             </span>
 
             <div style={{ flex: 1 }} />
