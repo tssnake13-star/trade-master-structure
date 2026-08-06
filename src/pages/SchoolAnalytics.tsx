@@ -27,6 +27,8 @@ type Summary = {
   clicks: number;
   /** сколько ЧЕЛОВЕК нажали хотя бы одну кнопку (для честной конверсии) */
   clickers?: number;
+  /** заходы, отсеянные как автоматические: открыл и мгновенно ушёл, ничего не листал */
+  skipped?: number;
   /** визиты владельца — считаются отдельно, в основные цифры не входят */
   owner?: { visits: number; pageviews: number; clicks: number; last_at: string | null };
   by_page?: { path: string; views: number; visits: number }[];
@@ -267,7 +269,7 @@ export default function SchoolAnalytics() {
           <>
             {/* KPI */}
             <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-3">
-              <Kpi value={data.visits} label="Посетителей" hint="уникальные сессии" color={ACCENT} />
+              <Kpi value={data.visits} label="Посетителей" hint="живые люди, без ботов" color={ACCENT} />
               <Kpi value={data.pageviews} label="Просмотров страниц" />
               <Kpi value={data.clicks} label="Клики по кнопкам" hint={`нажимали ${data.clickers ?? 0} чел.`} color={COOL} />
               <Kpi
@@ -279,6 +281,13 @@ export default function SchoolAnalytics() {
                 color={COOL}
               />
             </div>
+
+            {(data.skipped ?? 0) > 0 && (
+              <p className="mt-3" style={{ fontFamily: MONO, fontSize: 11, color: '#666' }}>
+                Отсеяно автоматических заходов: {data.skipped}. Это боты и сканеры — открыли
+                страницу и ушли, не задержавшись ни на секунду. В цифры выше они не входят.
+              </p>
+            )}
 
             {/* Посещения по дням */}
             <div className="mt-3 p-5" style={{ border: `1px solid ${BORDER}`, borderRadius: 10, backgroundColor: CARD }}>

@@ -95,7 +95,7 @@ function isLocalDev(): boolean {
   return /localhost|127\.0\.0\.1/.test(window.location.hostname);
 }
 
-async function send(event_type: 'pageview' | 'scroll' | 'click', path: string, target?: string) {
+async function send(event_type: 'pageview' | 'scroll' | 'click' | 'alive', path: string, target?: string) {
   if (!isBrowser || isLocalDev()) return;
   try {
     await supabase.rpc('track_event', {
@@ -113,9 +113,21 @@ async function send(event_type: 'pageview' | 'scroll' | 'click', path: string, t
   }
 }
 
-/** Заход на страницу. */
+/**
+ * Заход на страницу. Через пять секунд отмечаем, что человек ещё здесь.
+ *
+ * Метка нужна, чтобы отличить читателя от бота: сканеры дёргают страницу и
+ * уходят мгновенно, а у того, кто читает первый экран не прокручивая, других
+ * событий не будет вовсе — по данным он неотличим от бота. Вкладку в фоне
+ * (превью, открытие в новой вкладке) за живой визит не считаем.
+ */
 export function trackPageview(path = isBrowser ? window.location.pathname : '/') {
   void send('pageview', path);
+  if (!isBrowser) return;
+  window.setTimeout(() => {
+    if (document.visibilityState === 'hidden') return;
+    void send('alive', path);
+  }, 5000);
 }
 
 /** Клик по кнопке. `target` — короткое понятное имя, например 'hero_bot'. */
