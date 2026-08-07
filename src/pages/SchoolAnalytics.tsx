@@ -76,10 +76,6 @@ const SOURCE_NAMES: Record<string, string> = {
   direct: 'Прямые заходы',
   internal: 'Внутренние переходы',
   instagram: 'Instagram',
-  // короткие адреса-метки: /ig-bio, /ig-reels, /ig-stories
-  ig_bio: 'Instagram · шапка профиля',
-  ig_reels: 'Instagram · рилсы',
-  ig_stories: 'Instagram · сторис',
   telegram: 'Telegram',
   youtube: 'YouTube',
   google: 'Google',
@@ -88,6 +84,40 @@ const SOURCE_NAMES: Record<string, string> = {
   facebook: 'Facebook',
   tiktok: 'TikTok',
 };
+
+/**
+ * Instagram приходит несколькими метками сразу — их ставят в разные места
+ * (/ig, /ig-bio, /ig-reels, /ig-stories). В отчёте это одна площадка: раздробленная
+ * на четыре строки, она выглядит вчетверо меньше, чем есть. Поэтому складываем
+ * в одну строку, а места показываем расшифровкой рядом.
+ */
+const IG_PLACES: Record<string, string> = {
+  ig_bio: 'шапка',
+  ig_reels: 'рилсы',
+  ig_stories: 'сторис',
+};
+const isInstagram = (s: string) => s === 'instagram' || s === 'ig' || s in IG_PLACES;
+
+function groupSources(rows: { source: string; visits: number }[]) {
+  const ig = rows.filter(r => isInstagram(r.source));
+  const out = rows
+    .filter(r => !isInstagram(r.source))
+    .map(r => ({ name: SOURCE_NAMES[r.source] || r.source, value: r.visits, extra: undefined as string | undefined }));
+
+  if (ig.length > 0) {
+    const places = ig
+      .filter(r => IG_PLACES[r.source])
+      .sort((a, b) => b.visits - a.visits)
+      .map(r => `${IG_PLACES[r.source]} ${r.visits}`)
+      .join(' · ');
+    out.push({
+      name: 'Instagram',
+      value: ig.reduce((sum, r) => sum + r.visits, 0),
+      extra: places || undefined,
+    });
+  }
+  return out.sort((a, b) => b.value - a.value);
+}
 
 const PERIODS = [
   { days: 7, label: '7 дней' },
@@ -196,6 +226,7 @@ export default function SchoolAnalytics() {
     if (role === 'admin') void load(days);
   }, [role, days]);
 
+  const sources = data ? groupSources(data.by_source) : [];
   const totalVisits = data?.visits ?? 0;
   const heroVisits = data?.by_section.find(s => s.section === 'hero')?.visits ?? 0;
   const funnelBase = heroVisits || totalVisits;
@@ -335,8 +366,8 @@ export default function SchoolAnalytics() {
             <div className="mt-3 grid grid-cols-1 lg:grid-cols-2 gap-3">
               <Bars
                 title="Откуда пришли"
-                rows={data.by_source.map(s => ({ name: SOURCE_NAMES[s.source] || s.source, value: s.visits }))}
-                max={Math.max(1, ...data.by_source.map(s => s.visits))}
+                rows={sources}
+                max={Math.max(1, ...sources.map(s => s.value))}
                 empty="Пока нет данных."
               />
               <Bars
