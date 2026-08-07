@@ -76,6 +76,10 @@ const SOURCE_NAMES: Record<string, string> = {
   direct: 'Прямые заходы',
   internal: 'Внутренние переходы',
   instagram: 'Instagram',
+  // короткие адреса-метки: /ig-bio, /ig-reels, /ig-stories
+  ig_bio: 'Instagram · шапка профиля',
+  ig_reels: 'Instagram · рилсы',
+  ig_stories: 'Instagram · сторис',
   telegram: 'Telegram',
   youtube: 'YouTube',
   google: 'Google',

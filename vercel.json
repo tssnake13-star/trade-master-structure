@@ -16,7 +16,12 @@
     { "source": "/start", "destination": "https://t.me/New_TradeLikeTYO_bot", "permanent": false },
     { "source": "/viktor", "destination": "https://t.me/New_TradeLikeTYO_bot?start=viktor", "permanent": false },
     { "source": "/vk", "destination": "https://t.me/New_TradeLikeTYO_bot?start=vk", "permanent": false },
-    { "source": "/([Ff][Aa][Cc][Ee][Bb][Oo][Oo][Kk])", "destination": "https://t.me/New_TradeLikeTYO_bot?start=facebook", "permanent": false }
+    { "source": "/([Ff][Aa][Cc][Ee][Bb][Oo][Oo][Kk])", "destination": "https://t.me/New_TradeLikeTYO_bot?start=facebook", "permanent": false },
+
+    { "source": "/([Ii][Gg])", "destination": "/?utm_source=instagram", "permanent": false },
+    { "source": "/([Ii][Gg])-([Bb][Ii][Oo])", "destination": "/?utm_source=ig_bio", "permanent": false },
+    { "source": "/([Ii][Gg])-([Rr][Ee][Ee][Ll][Ss])", "destination": "/?utm_source=ig_reels", "permanent": false },
+    { "source": "/([Ii][Gg])-([Ss][Tt][Oo][Rr][Ii][Ee][Ss])", "destination": "/?utm_source=ig_stories", "permanent": false }
   ],
   "headers": [
     {
