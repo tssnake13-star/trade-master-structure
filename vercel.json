@@ -7,6 +7,7 @@
     { "source": "/kurs", "destination": "https://t.me/New_TradeLikeTYO_bot?start=kurs", "permanent": false },
     { "source": "/([Yy][Oo][Uu][Tt][Uu][Bb][Ee])", "destination": "https://t.me/New_TradeLikeTYO_bot?start=youtube", "permanent": false },
     { "source": "/shorts", "destination": "https://t.me/New_TradeLikeTYO_bot?start=shorts", "permanent": false },
+    { "source": "/([Ss][Tt][Oo][Rr][Ii][Ee][Ss])", "destination": "https://t.me/New_TradeLikeTYO_bot?start=stories", "permanent": false },
     { "source": "/tiktok", "destination": "https://t.me/New_TradeLikeTYO_bot?start=tiktok", "permanent": false },
     { "source": "/site", "destination": "https://t.me/New_TradeLikeTYO_bot?start=site", "permanent": false },
     { "source": "/bio", "destination": "https://t.me/New_TradeLikeTYO_bot?start=bio", "permanent": false },
