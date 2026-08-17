@@ -51,7 +51,7 @@ const StagesSection = () => {
     <section id="stages" className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-4xl">
-          <span className="section-label">11 · Путь</span>
+          <span className="section-label">12 · Путь</span>
           <h2 className="text-foreground">
             Пять шагов от <span className="mute">догадок</span> до <em>стабильности</em>
           </h2>

@@ -12,6 +12,8 @@ import StatsCounter from '@/components/landing/StatsCounter';
 import TwoStagesSection from '@/components/landing/TwoStagesSection';
 import CoreProblemSection from '@/components/landing/CoreProblemSection';
 import IncludedSection from '@/components/landing/IncludedSection';
+import FourQuestionsSection from '@/components/landing/FourQuestionsSection';
+import WhatYouLearnSection from '@/components/landing/WhatYouLearnSection';
 import TradingSystemSection from '@/components/landing/TradingSystemSection';
 import CapitalProtectionSection from '@/components/landing/CapitalProtectionSection';
 import SystemStatsSection from '@/components/landing/SystemStatsSection';
@@ -34,8 +36,8 @@ import WordmarkKinetic from '@/components/preview-next/WordmarkKinetic';
 /** Блоки, по которым считаем, до чего люди доскролливают (воронка внимания). */
 const TRACKED_SECTIONS = [
   'hero', 'problem', 'verdict', 'transformation', 'proof', 'stats',
-  'trades', 'filter', 'difference', 'included', 'trading-system',
-  'protection', 'stages', 'formats', 'author', 'faq',
+  'trades', 'filter', 'difference', 'included', 'questions', 'trading-system',
+  'protection', 'stages', 'learn', 'formats', 'author', 'faq',
 ];
 
 const Index = () => {
@@ -94,9 +96,18 @@ const Index = () => {
 
         {/* Механика системы */}
         <IncludedSection />
+
+        {/* Суть метода: четыре вопроса, на которые отвечает любая сделка.
+            Стоит после состава — сначала «из чего», сразу за ним «по какому правилу». */}
+        <FourQuestionsSection />
+
         <TradingSystemSection />
         <CapitalProtectionSection />
         <StagesSection />
+
+        {/* Снимает возражение «зачем мне чужая стратегия» — до того, как человек
+            увидит цену. */}
+        <WhatYouLearnSection />
 
         {/* Структура оффера */}
         <TwoStagesSection />

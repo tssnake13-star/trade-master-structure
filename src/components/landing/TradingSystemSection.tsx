@@ -1,5 +1,5 @@
 /**
- * TradingSystemSection — «09 · Архитектура». v3 editorial-terminal вариант.
+ * TradingSystemSection — «10 · Архитектура». v3 editorial-terminal вариант.
  * Линейная цепочка: триггер (Trend Hunter) → фильтр допуска (Echo Gate) →
  * трейдер принимает решение → золотой узел-слияние → ось исполнения
  * (Hunter Bot → Risk Sentinel). Nexus Gravity убран: стратегия проверена
@@ -75,7 +75,7 @@ const TradingSystemSection = () => {
     <section id="trading-system" className="py-16 md:py-24 section-animate">
       <div className="container-landing">
         <div className="max-w-4xl mx-auto">
-          <span className="section-label">09 · Архитектура</span>
+          <span className="section-label">10 · Архитектура</span>
           <h2 className="text-foreground mb-3">
             Как работает <em>система</em> <span className="mute">изнутри</span>
           </h2>

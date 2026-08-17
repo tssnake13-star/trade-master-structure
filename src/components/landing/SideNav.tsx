@@ -11,12 +11,14 @@ const sections = [
   { id: 'filter', num: '06', label: 'Фильтр' },
   { id: 'difference', num: '07', label: 'Отличие' },
   { id: 'included', num: '08', label: 'Что входит' },
-  { id: 'trading-system', num: '09', label: 'Архитектура' },
-  { id: 'protection', num: '10', label: 'Защита' },
-  { id: 'stages', num: '11', label: 'Путь' },
-  { id: 'formats', num: '13', label: 'Сотрудничество' },
-  { id: 'author', num: '14', label: 'Автор' },
-  { id: 'faq', num: '15', label: 'Вопросы' },
+  { id: 'questions', num: '09', label: 'Четыре вопроса' },
+  { id: 'trading-system', num: '10', label: 'Архитектура' },
+  { id: 'protection', num: '11', label: 'Защита' },
+  { id: 'stages', num: '12', label: 'Путь' },
+  { id: 'learn', num: '13', label: 'Чему вы учитесь' },
+  { id: 'formats', num: '14', label: 'Сотрудничество' },
+  { id: 'author', num: '15', label: 'Автор' },
+  { id: 'faq', num: '16', label: 'Вопросы' },
 ];
 
 const SideNav = () => {

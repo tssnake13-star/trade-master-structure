@@ -6,7 +6,7 @@ const LevelsSection = () => {
     <section id="formats" className="section-animate py-12 md:py-20 bg-card/40 border-y border-border">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <span className="section-label">13 · Сотрудничество</span>
+          <span className="section-label">14 · Сотрудничество</span>
           <h2 className="text-foreground">
             Выберите <em>глубину</em> погружения
           </h2>
