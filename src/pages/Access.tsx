@@ -44,7 +44,7 @@ export default function Access() {
             <div>
               <div className="text-foreground font-medium">Не готовы решать — начните с вердикта</div>
               <p className="mt-1 text-sm text-muted-foreground">
-                Пришлите 3 свои сделки — бесплатный личный видеоразбор через систему допуска.
+                Пришлите одну убыточную сделку — бесплатный личный видеоразбор через систему допуска.
               </p>
             </div>
             <ArrowRight className="w-4 h-4 flex-shrink-0 mt-1 group-hover:translate-x-1 transition-transform" style={{ color: 'hsl(var(--accent))' }} />
