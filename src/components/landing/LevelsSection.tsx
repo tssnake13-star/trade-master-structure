@@ -15,7 +15,7 @@ const LevelsSection = () => {
             до полной инфраструктуры с автоисполнением и защитой капитала.
           </p>
           <p className="mt-5 text-base md:text-lg text-foreground">
-            Стоимость: <span style={{ color: 'hsl(var(--accent))', fontWeight: 500 }}>от&nbsp;$249</span>, в зависимости от уровня.
+            Стоимость: <span style={{ color: 'hsl(var(--accent))', fontWeight: 500 }}>от&nbsp;$349</span>, в зависимости от уровня.
           </p>
         </div>
 

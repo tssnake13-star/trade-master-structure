@@ -25,12 +25,9 @@ type Pkg = {
   addon?: {
     label: string;
     title: string;
-    price: string;
     desc: string;
     honesty: string;
-    note: string;
   };
-  pricePairing?: string;
   /** условие входа: набор идёт потоками, участников отбирают лично */
   admission?: string;
   outcome: string;
@@ -62,16 +59,13 @@ const PACKAGES: Pkg[] = [
     ],
     upsell: 'В течение 30 дней после покупки оплаченное зачитывается полностью: в практикум — доплата $150, в Trade OS — доплата $1250.',
     addon: {
-      label: 'Дополнение по желанию',
+      label: 'Входит в тариф',
       title: 'Архив эфиров мастер-группы за 2025 год',
-      price: '$100',
       desc: '12 месяцев записей: я разбираю тренировки учеников и параллельно анализирую рынок в реальном времени.',
       honesty: 'Честно: это записи, прямой вопрос мне здесь не задать. Но весь год я отвечаю на вопросы учеников, и проходя курс самостоятельно, ответы на свои вы, скорее всего, найдёте именно там.',
-      note: 'Только вместе с тарифом · Вместе: $349',
     },
-    pricePairing: '$249 тариф · $349 тариф с архивом',
     outcome: 'Для тех, кто уже торговал, умеет работать самостоятельно и ищет систему, а не мотивацию со стороны.',
-    price: '$249',
+    price: '$349',
     period: '365 дней',
     ctaText: 'Начать самостоятельно',
     ctaHref: TELEGRAM_LINKS.dm,
@@ -268,13 +262,11 @@ export default function PackageCards({
               {ts.addon && (
                 <div className="p-4" style={{ border: '1px solid hsl(var(--accent) / 0.22)', background: 'hsl(var(--accent) / 0.035)' }}>
                   <div className="text-mono" style={{ ...MONO, color: GOLD }}>{ts.addon.label}</div>
-                  <div className="mt-2.5 flex items-baseline justify-between gap-3">
+                  <div className="mt-2.5">
                     <span className="text-sm text-foreground/90 leading-snug">+ {ts.addon.title}</span>
-                    <span style={{ ...SERIF, fontSize: 22, lineHeight: 1, color: GOLD, flexShrink: 0 }}>{ts.addon.price}</span>
                   </div>
                   <p className="mt-2.5 text-xs text-muted-foreground leading-relaxed">{ts.addon.desc}</p>
                   <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{ts.addon.honesty}</p>
-                  <div className="text-mono mt-3" style={{ ...MONO, letterSpacing: '0.12em', color: 'hsl(var(--muted-foreground))' }}>{ts.addon.note}</div>
                 </div>
               )}
               {ts.upsell && (
@@ -294,9 +286,6 @@ export default function PackageCards({
                 <span style={{ ...SERIF, fontSize: 38, lineHeight: 1, color: 'hsl(var(--foreground))' }}>{ts.price}</span>
                 <span className="text-mono" style={{ ...MONO, letterSpacing: '0.14em', color: 'hsl(var(--muted-foreground))' }}>{ts.period}</span>
               </div>
-              {ts.pricePairing && (
-                <div className="text-mono mt-1.5" style={{ ...MONO, letterSpacing: '0.12em', color: 'hsl(var(--muted-foreground) / 0.85)' }}>{ts.pricePairing}</div>
-              )}
             </div>
             <a
               href={ts.ctaHref ?? ctaHref}
