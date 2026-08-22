@@ -8,7 +8,7 @@ import { trackClick } from '@/lib/analytics';
  *
  * Layout: Trade System is content-heavy (что входит + чего нет + архив + переход),
  * so it renders as ONE full-width card with a 2-column inner body — that keeps it
- * short instead of a tall narrow column. Practicum + Trade OS + Trade OS Plus sit
+ * short instead of a tall narrow column. Practicum + Trade OS Plus + VIP sit
  * below it as a three-step ladder. On mobile everything stacks to one column.
  *
  * Ни у одного тарифа больше нет пометки «популярный»: пока непонятно, что
@@ -34,6 +34,12 @@ type Pkg = {
   oldPrice?: string;
   price: string;
   period: string;
+  /**
+   * Метка клика для аналитики. Закреплена за продуктом, а не за витринным
+   * именем: тариф за $1599 остаётся `trade_os`, хотя теперь называется
+   * Trade OS Plus. Иначе переименование смешало бы историю кликов.
+   */
+  clickId: string;
   ctaText?: string;
   ctaHref?: string;
   showPriceAlways?: boolean;
@@ -44,6 +50,7 @@ const PACKAGES: Pkg[] = [
   {
     tag: '01 · Старт',
     name: 'Trade System',
+    clickId: 'trade_system',
     subtitle: 'Полностью самостоятельный',
     forWhom: 'Основной курс по стратегии школы в формате самостоятельного изучения. Весь путь вы проходите сами, в своём темпе, без моего участия.',
     points: [
@@ -57,9 +64,9 @@ const PACKAGES: Pkg[] = [
       'Обратной связи по домашним заданиям',
       'Личного чата со мной',
     ],
-    upsell: 'В течение 30 дней после покупки оплаченное зачитывается полностью: в практикум — доплата $150, в Trade OS — доплата $1250.',
+    upsell: 'В течение 30 дней после покупки оплаченное зачитывается полностью: в практикум — доплата $150, в Trade OS Plus — доплата $1250.',
     addon: {
-      label: 'Входит в тариф',
+      label: 'Дополнительно',
       title: 'Архив эфиров мастер-группы за 2025 год',
       desc: '12 месяцев записей: я разбираю тренировки учеников и параллельно анализирую рынок в реальном времени.',
       honesty: 'Честно: это записи, прямой вопрос мне здесь не задать. Но весь год я отвечаю на вопросы учеников, и проходя курс самостоятельно, ответы на свои вы, скорее всего, найдёте именно там.',
@@ -74,6 +81,7 @@ const PACKAGES: Pkg[] = [
   {
     tag: '02 · Практикум',
     name: 'Trade System Practicum',
+    clickId: 'practicum',
     subtitle: '60 дней работы со мной',
     forWhom: 'Для тех, кому мало самостоятельного формата и нужен человек, у которого можно спросить.',
     points: [
@@ -86,7 +94,7 @@ const PACKAGES: Pkg[] = [
     // Набор идёт потоками, мест немного. Дат и счётчиков на странице нет
     // намеренно: они устаревают, а страница должна работать круглый год.
     admission: 'Беру не всех и не в любой момент. Напишите, скажу, когда ближайший поток и подходит ли вам этот формат.',
-    upsell: 'В течение 67 дней (60 дней потока плюс неделя после) оплаченные $499 зачитываются в Trade OS полностью. Доплата $1100.',
+    upsell: 'В течение 67 дней (60 дней потока плюс неделя после) оплаченные $499 зачитываются в Trade OS Plus полностью. Доплата $1100.',
     outcome: 'К концу 60 дней вы проходите алгоритм от направления до выхода сами.',
     price: '$499',
     period: '60 дней',
@@ -95,7 +103,8 @@ const PACKAGES: Pkg[] = [
   },
   {
     tag: '03 · Сопровождение',
-    name: 'Trade OS',
+    name: 'Trade OS Plus',
+    clickId: 'trade_os',
     forWhom: 'Вы торгуете больше полугода и устали от хаоса.',
     points: [
       'Полная настройка вашей торговли',
@@ -110,10 +119,11 @@ const PACKAGES: Pkg[] = [
   },
   {
     tag: '04 · Всё включено',
-    name: 'Trade OS Plus',
+    name: 'VIP',
+    clickId: 'trade_os_plus',
     forWhom: 'Вам нужен полный доступ ко всей системе и базе.',
     points: [
-      'Всё из Trade OS',
+      'Всё из Trade OS Plus',
       'Индикаторы, скрипты и таблицы системы',
       'Hunter Bot и Risk Sentinel — навсегда, остаются у вас',
     ],
@@ -152,7 +162,7 @@ export default function PackageCards({
     </ul>
   );
 
-  // стандартная вертикальная карточка — Trade OS / Trade OS Plus
+  // стандартная вертикальная карточка — практикум / Trade OS Plus / VIP
   const stdCard = (p: Pkg) => (
     <div
       key={p.name}
@@ -214,7 +224,7 @@ export default function PackageCards({
         href={p.ctaHref ?? ctaHref}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={() => trackClick(`package_${p.name.toLowerCase().replace(/\s+/g, '_')}`)}
+        onClick={() => trackClick(`package_${p.clickId}`)}
         className={`mt-6 inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium transition-all duration-300 group ${
           p.featured ? 'btn-primary' : 'btn-secondary'
         }`}
@@ -300,7 +310,7 @@ export default function PackageCards({
           </div>
         </div>
 
-        {/* Практикум + Trade OS + Trade OS Plus — лестница под Trade System.
+        {/* Практикум + Trade OS Plus + VIP — лестница под Trade System.
             На планшете по две в ряд, на телефоне в одну колонку. */}
         <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {PACKAGES.slice(1).map(stdCard)}

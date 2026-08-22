@@ -68,8 +68,11 @@ const CLICK_NAMES: Record<string, string> = {
   verdict_razbor: 'Разбор сделок → бот (/razbor)',
   final_bot: 'Финальный блок → бот',
   package_trade_system: 'Тариф Trade System',
-  package_trade_os: 'Тариф Trade OS',
-  package_trade_os_plus: 'Тариф Trade OS Plus',
+  // метки закреплены за продуктом, имена на витрине менялись:
+  // trade_os — тариф за $1599 (сейчас Trade OS Plus), trade_os_plus — за $2990 (сейчас VIP)
+  package_practicum: 'Тариф Практикум',
+  package_trade_os: 'Тариф Trade OS Plus',
+  package_trade_os_plus: 'Тариф VIP',
   access_razbor: 'Страница цен → разбор сделок',
   access_apply: 'Страница цен → заявка на обучение',
 };
