@@ -8,8 +8,11 @@ import { trackClick } from '@/lib/analytics';
  *
  * Layout: Trade System is content-heavy (что входит + чего нет + архив + переход),
  * so it renders as ONE full-width card with a 2-column inner body — that keeps it
- * short instead of a tall narrow column. Trade OS + Trade OS Plus sit below it as
- * two equal half-width cards. On mobile everything stacks to one column.
+ * short instead of a tall narrow column. Practicum + Trade OS + Trade OS Plus sit
+ * below it as a three-step ladder. On mobile everything stacks to one column.
+ *
+ * Ни у одного тарифа больше нет пометки «популярный»: пока непонятно, что
+ * окажется популярным, а метка на витрине выбирает за человека.
  */
 type Pkg = {
   tag: string;
@@ -28,6 +31,8 @@ type Pkg = {
     note: string;
   };
   pricePairing?: string;
+  /** условие входа: набор идёт потоками, участников отбирают лично */
+  admission?: string;
   outcome: string;
   oldPrice?: string;
   price: string;
@@ -55,16 +60,16 @@ const PACKAGES: Pkg[] = [
       'Обратной связи по домашним заданиям',
       'Личного чата со мной',
     ],
-    upsell: 'Если в течение 30 дней после покупки вы решите перейти на годовой тариф TRADE OS с сопровождением, все $249 зачтутся в его стоимость.',
+    upsell: 'В течение 30 дней после покупки оплаченное зачитывается полностью: в практикум — доплата $150, в Trade OS — доплата $1250.',
     addon: {
       label: 'Дополнение по желанию',
       title: 'Архив эфиров мастер-группы за 2025 год',
-      price: '$99',
+      price: '$100',
       desc: '12 месяцев записей: я разбираю тренировки учеников и параллельно анализирую рынок в реальном времени.',
       honesty: 'Честно: это записи, прямой вопрос мне здесь не задать. Но весь год я отвечаю на вопросы учеников, и проходя курс самостоятельно, ответы на свои вы, скорее всего, найдёте именно там.',
-      note: 'Только вместе с тарифом · Вместе: $348',
+      note: 'Только вместе с тарифом · Вместе: $349',
     },
-    pricePairing: '$249 тариф · $348 тариф с архивом',
+    pricePairing: '$249 тариф · $349 тариф с архивом',
     outcome: 'Для тех, кто уже торговал, умеет работать самостоятельно и ищет систему, а не мотивацию со стороны.',
     price: '$249',
     period: '365 дней',
@@ -73,7 +78,29 @@ const PACKAGES: Pkg[] = [
     showPriceAlways: true,
   },
   {
-    tag: '02 · Популярный',
+    tag: '02 · Практикум',
+    name: 'Trade System Practicum',
+    subtitle: '60 дней работы со мной',
+    forWhom: 'Для тех, кому мало самостоятельного формата и нужен человек, у которого можно спросить.',
+    points: [
+      'Всё из Trade System',
+      'Живое занятие раз в неделю',
+      'Еженедельный разбор сделок группы в записи',
+      'Личный разбор ваших сделок',
+      'Закрытая группа',
+    ],
+    // Набор идёт потоками, мест немного. Дат и счётчиков на странице нет
+    // намеренно: они устаревают, а страница должна работать круглый год.
+    admission: 'Беру не всех и не в любой момент. Напишите, скажу, когда ближайший поток и подходит ли вам этот формат.',
+    upsell: 'В течение 67 дней (60 дней потока плюс неделя после) оплаченные $499 зачитываются в Trade OS полностью. Доплата $1100.',
+    outcome: 'К концу 60 дней вы проходите алгоритм от направления до выхода сами.',
+    price: '$499',
+    period: '60 дней',
+    ctaText: 'Узнать про ближайший поток',
+    ctaHref: TELEGRAM_LINKS.dm,
+  },
+  {
+    tag: '03 · Сопровождение',
     name: 'Trade OS',
     forWhom: 'Вы торгуете больше полугода и устали от хаоса.',
     points: [
@@ -86,10 +113,9 @@ const PACKAGES: Pkg[] = [
     oldPrice: '$1799',
     price: '$1599',
     period: '365 дней',
-    featured: true,
   },
   {
-    tag: '03 · Всё включено',
+    tag: '04 · Всё включено',
     name: 'Trade OS Plus',
     forWhom: 'Вам нужен полный доступ ко всей системе и базе.',
     points: [
@@ -146,6 +172,11 @@ export default function PackageCards({
     >
       <div className="text-mono" style={{ ...MONO, color: GOLD }}>{p.tag}</div>
       <h3 className="mt-2 text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>{p.name}</h3>
+      {p.subtitle && (
+        <div className="text-mono mt-1.5" style={{ ...MONO, letterSpacing: '0.16em', color: 'hsl(var(--muted-foreground))' }}>
+          {p.subtitle}
+        </div>
+      )}
       <p className="mt-3 text-sm text-muted-foreground leading-relaxed" style={{ minHeight: 44 }}>{p.forWhom}</p>
 
       <div className="mt-5">{includedList(p.points)}</div>
@@ -153,6 +184,20 @@ export default function PackageCards({
       <div className="mt-5 pt-4 text-sm italic" style={{ borderTop: '1px solid hsl(var(--rule-soft))', color: 'hsl(var(--accent-dim))' }}>
         {p.outcome}
       </div>
+
+      {p.admission && (
+        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">{p.admission}</p>
+      )}
+
+      {p.upsell && (
+        <div className="mt-4 p-3.5 text-xs leading-relaxed" style={{ border: '1px solid hsl(var(--accent) / 0.3)', background: 'hsl(var(--accent) / 0.05)', color: 'hsl(var(--foreground) / 0.85)' }}>
+          <span className="text-mono" style={{ ...MONO, color: GOLD, display: 'block', marginBottom: 6 }}>Переход выше</span>
+          {p.upsell}
+        </div>
+      )}
+
+      {/* распорка: цена и кнопка уезжают к низу, карточки в ряду выравниваются */}
+      <div className="flex-grow" />
 
       {(showPrices || p.showPriceAlways) ? (
         <>
@@ -266,8 +311,9 @@ export default function PackageCards({
           </div>
         </div>
 
-        {/* Trade OS + Trade OS Plus — две равные карточки под Trade System */}
-        <div className="grid md:grid-cols-2 gap-3 items-start">
+        {/* Практикум + Trade OS + Trade OS Plus — лестница под Trade System.
+            На планшете по две в ряд, на телефоне в одну колонку. */}
+        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
           {PACKAGES.slice(1).map(stdCard)}
         </div>
       </div>
