@@ -22,6 +22,11 @@ type Pkg = {
   points: string[];
   notIncluded?: string[];
   upsell?: string;
+  /**
+   * Тот же переход выше, но без сумм — для лендинга, где цены Trade OS Plus и VIP
+   * не раскрываются. По доплате они считаются в уме: $349 + $1250 = $1599.
+   */
+  upsellPublic?: string;
   addon?: {
     label: string;
     title: string;
@@ -65,6 +70,7 @@ const PACKAGES: Pkg[] = [
       'Личного чата со мной',
     ],
     upsell: 'В течение 30 дней после покупки оплаченное зачитывается полностью: в практикум — доплата $150, в Trade OS Plus — доплата $1250.',
+    upsellPublic: 'В течение 30 дней после покупки оплаченное зачитывается полностью в счёт практикума или Trade OS Plus.',
     addon: {
       label: 'Дополнительно',
       title: 'Архив эфиров мастер-группы за 2025 год',
@@ -95,11 +101,13 @@ const PACKAGES: Pkg[] = [
     // намеренно: они устаревают, а страница должна работать круглый год.
     admission: 'Беру не всех и не в любой момент. Напишите, скажу, когда ближайший поток и подходит ли вам этот формат.',
     upsell: 'В течение 67 дней (60 дней потока плюс неделя после) оплаченные $499 зачитываются в Trade OS Plus полностью. Доплата $1100.',
+    upsellPublic: 'В течение 67 дней (60 дней потока плюс неделя после) оплаченное зачитывается в Trade OS Plus полностью.',
     outcome: 'К концу 60 дней вы проходите алгоритм от направления до выхода сами.',
     price: '$499',
     period: '60 дней',
     ctaText: 'Узнать про ближайший поток',
     ctaHref: TELEGRAM_LINKS.dm,
+    showPriceAlways: true,
   },
   {
     tag: '03 · Сопровождение',
@@ -193,10 +201,10 @@ export default function PackageCards({
         <p className="mt-4 text-xs leading-relaxed text-muted-foreground">{p.admission}</p>
       )}
 
-      {p.upsell && (
+      {(showPrices ? p.upsell : p.upsellPublic ?? p.upsell) && (
         <div className="mt-4 p-3.5 text-xs leading-relaxed" style={{ border: '1px solid hsl(var(--accent) / 0.3)', background: 'hsl(var(--accent) / 0.05)', color: 'hsl(var(--foreground) / 0.85)' }}>
           <span className="text-mono" style={{ ...MONO, color: GOLD, display: 'block', marginBottom: 6 }}>Переход выше</span>
-          {p.upsell}
+          {showPrices ? p.upsell : p.upsellPublic ?? p.upsell}
         </div>
       )}
 
@@ -279,10 +287,10 @@ export default function PackageCards({
                   <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{ts.addon.honesty}</p>
                 </div>
               )}
-              {ts.upsell && (
+              {(showPrices ? ts.upsell : ts.upsellPublic ?? ts.upsell) && (
                 <div className="p-3.5 text-xs leading-relaxed" style={{ border: '1px solid hsl(var(--accent) / 0.3)', background: 'hsl(var(--accent) / 0.05)', color: 'hsl(var(--foreground) / 0.85)' }}>
                   <span className="text-mono" style={{ ...MONO, color: GOLD, display: 'block', marginBottom: 6 }}>Переход выше</span>
-                  {ts.upsell}
+                  {showPrices ? ts.upsell : ts.upsellPublic ?? ts.upsell}
                 </div>
               )}
             </div>
