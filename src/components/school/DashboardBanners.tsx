@@ -20,6 +20,7 @@ import { TELEGRAM_LINKS } from '@/lib/constants';
  */
 
 const ACCENT = '#e1a84d';
+const DISPLAY = "'Cormorant', Georgia, 'Times New Roman', serif";
 const MONO = "'Space Mono', ui-monospace, monospace";
 const SANS = "'Syne', system-ui, sans-serif";
 
@@ -46,6 +47,16 @@ function formatStartDate(iso: string): string {
   const d = new Date(`${iso}T00:00:00`);
   if (Number.isNaN(d.getTime())) return '';
   return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+}
+
+/** Разбивка остатка до даты: дни, часы, минуты, секунды. Как у счётчика эфира. */
+function splitCountdown(target: Date, now: Date) {
+  let diff = Math.max(0, target.getTime() - now.getTime());
+  const d = Math.floor(diff / 86400000); diff -= d * 86400000;
+  const h = Math.floor(diff / 3600000);  diff -= h * 3600000;
+  const m = Math.floor(diff / 60000);    diff -= m * 60000;
+  const s = Math.floor(diff / 1000);
+  return { d, h, m, s };
 }
 
 /** Начало текущего дня — чтобы отсчёт не прыгал внутри суток. */
@@ -90,6 +101,13 @@ export default function DashboardBanners({ accessMap }: {
   accessMap: Map<string, AccessInfo>;
 }) {
   const [s, setS] = useState<Settings | null>(null);
+  const [now, setNow] = useState(() => new Date());
+
+  // секунды идут только ради этого счётчика; интервал чистится при размонтировании
+  useEffect(() => {
+    const id = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(id);
+  }, []);
 
   useEffect(() => {
     supabase
@@ -131,6 +149,8 @@ export default function DashboardBanners({ accessMap }: {
   const left = Math.max(0, seats - taken);
   // «свободно 10 из 10» работает против нас — остаток показываем только с порога
   const showSeatsLeft = taken >= threshold && left > 0;
+
+  const streamCountdown = startValid ? splitCountdown(start!, now) : null;
 
   const showStream = on('banner_stream_enabled') && streamAhead && !alreadyBought;
 
@@ -186,6 +206,24 @@ export default function DashboardBanners({ accessMap }: {
             60 дней работы со мной: живое занятие раз в неделю, разбор ваших сделок лично,
             закрытая группа. {showSeatsLeft ? `Осталось ${left} ${plural(left, 'место', 'места', 'мест')} из ${seats}.` : `Беру ${seats} человек.`}
           </p>
+          {streamCountdown && (
+            <div className="flex gap-4 mt-4">
+              {[
+                { v: streamCountdown.d, l: 'дней' },
+                { v: streamCountdown.h, l: 'часов' },
+                { v: streamCountdown.m, l: 'минут' },
+                { v: streamCountdown.s, l: 'секунд' },
+              ].map((x, i) => (
+                <div key={i} style={{ textAlign: 'center' }}>
+                  <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 40, lineHeight: 1, color: '#e8e0d0', fontVariantNumeric: 'tabular-nums' }}>
+                    {String(x.v).padStart(2, '0')}
+                  </div>
+                  <div style={{ fontFamily: MONO, fontSize: 9, color: '#666', marginTop: 4 }}>{x.l}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
           <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" style={cta} className="transition hover:brightness-110">
             Узнать про поток
             <ArrowRight size={14} />
