@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type CSSProperties } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import DashboardBanners from '@/components/school/DashboardBanners';
 import { Lock, Settings, LogOut, ArrowRight, Menu, Ticket, Home as HomeIcon, MessageCircle } from 'lucide-react';
 import logoVideoFallback from '@/assets/logo-header.mp4';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
@@ -734,6 +735,10 @@ export default function SchoolDashboard() {
               </div>
             );
           })()}
+
+          {/* Баннеры набора и зачёта — только на главной кабинета и только
+              зарегистрированным. На публичные страницы они не выносятся. */}
+          {!selectedCourse && <DashboardBanners accessMap={accessMap} />}
 
           {/* ----- Home view ----- */}
           {!selectedCourse && !isFreeUser && (

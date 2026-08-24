@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import BannersSettings from '@/components/school/BannersSettings';
 import { ArrowLeft, Plus, Trash2, Pencil, GripVertical, Upload, X, Archive, ArchiveRestore } from 'lucide-react';
 import VideoBlockEditor from '@/components/school/VideoBlockEditor';
 import { SITE_ASSET_KEYS, notifySiteAssetChange } from '@/hooks/useSiteAsset';
@@ -254,6 +255,8 @@ function SettingsTab() {
           {saved && <span className="text-xs" style={{ color: '#4a8a4a', fontFamily: font.mono }}>Сохранено ✓</span>}
         </div>
       </div>
+
+      <BannersSettings courses={courses} />
 
       <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Логотипы и медиа сайта</h2>
       <div className="space-y-3">
