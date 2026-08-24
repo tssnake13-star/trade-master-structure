@@ -686,6 +686,10 @@ export default function SchoolDashboard() {
 
         {/* Body */}
         <div className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-8 py-8 sm:py-12">
+          {/* Баннеры видны и на странице курса, вверху: человек, который проходит
+              бесплатный курс, до главной кабинета может и не вернуться. */}
+          {selectedCourseData && selectedAccessible && <DashboardBanners accessMap={accessMap} />}
+
           {/* ----- Selected course detail view ----- */}
           {selectedCourseData && selectedAccessible && (
             <SelectedCourseView
