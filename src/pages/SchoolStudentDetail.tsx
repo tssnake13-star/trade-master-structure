@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import { TARIFFS, tariffColor } from '@/lib/tariffs';
 import { ArrowLeft, ShieldOff, ShieldCheck, Trash2, Plus, ChevronRight, Unlock, ShieldPlus, ShieldMinus, KeyRound, Eye, EyeOff, RefreshCw, Copy, Check } from 'lucide-react';
 
 const SUPER_ADMIN_EMAILS = ['tssnake13@gmail.com', 'tssnake@list.ru'];
@@ -10,7 +11,7 @@ const isSuperAdminEmail = (email?: string | null) =>
 
 const font = { heading: "'Hanken Grotesk', sans-serif", mono: "'Hanken Grotesk', sans-serif" };
 
-interface Profile { user_id: string; email: string; full_name: string | null; created_at: string; is_blocked: boolean; last_seen_at: string | null; }
+interface Profile { user_id: string; email: string; full_name: string | null; created_at: string; is_blocked: boolean; last_seen_at: string | null; tariff: string | null; }
 interface Course { id: string; title: string; subtitle: string | null; is_free: boolean; sort_order: number; }
 interface Lesson { id: string; course_id: string; title: string; sort_order: number; }
 interface Access { id: string; user_id: string; course_id: string; granted_at: string; expires_at: string | null; unlocked_lessons: number[]; }
@@ -37,6 +38,7 @@ export default function SchoolStudentDetail() {
   const [grantModal, setGrantModal] = useState(false);
   const [grantCourseId, setGrantCourseId] = useState('');
   const [grantDays, setGrantDays] = useState(30);
+  const [grantTariff, setGrantTariff] = useState('');
   const [removeAccessConfirm, setRemoveAccessConfirm] = useState<string | null>(null);
   const [pwModal, setPwModal] = useState(false);
   const [newPassword, setNewPassword] = useState('');
@@ -111,8 +113,20 @@ export default function SchoolStudentDetail() {
       expires_at: expiresAt.toISOString(),
       unlocked_lessons: [1],
     });
+    // Тариф — отдельная от доступа вещь: пишем его, только если админ выбрал.
+    // Молча затирать уже проставленный тариф выдачей ещё одного курса нельзя.
+    if (grantTariff) {
+      await supabase.from('profiles').update({ tariff: grantTariff }).eq('user_id', studentId);
+    }
     setGrantModal(false);
     setGrantCourseId('');
+    setGrantTariff('');
+    load();
+  };
+
+  const setTariff = async (value: string) => {
+    if (!studentId) return;
+    await supabase.from('profiles').update({ tariff: value || null }).eq('user_id', studentId);
     load();
   };
 
@@ -302,6 +316,25 @@ export default function SchoolStudentDetail() {
           </div>
         </section>
 
+        {/* ======== TARIFF ======== */}
+        <section className="rounded-lg border p-5" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
+          <h2 className="text-sm mb-3" style={{ fontFamily: font.heading, color: '#888' }}>Тариф</h2>
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={profile.tariff || ''}
+              onChange={e => setTariff(e.target.value)}
+              className="px-3 py-2 rounded border text-sm"
+              style={{ backgroundColor: '#111', borderColor: '#222', color: profile.tariff ? tariffColor(profile.tariff) : '#777', fontFamily: font.mono, minWidth: 200 }}
+            >
+              <option value="">Не проставлен</option>
+              {TARIFFS.map(t => <option key={t.key} value={t.key}>{t.label}</option>)}
+            </select>
+            <span className="text-[11px]" style={{ color: '#555', fontFamily: font.mono }}>
+              Виден в списке аккаунтов рядом с именем и задаёт порядок сортировки.
+            </span>
+          </div>
+        </section>
+
         {/* ======== ACCESS BLOCK ======== */}
         <section className="rounded-lg border p-5" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
           <div className="flex items-center justify-between mb-4">
@@ -472,6 +505,15 @@ export default function SchoolStudentDetail() {
             >
               <option value="">Выберите программу</option>
               {courses.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
+            </select>
+            <select
+              value={grantTariff}
+              onChange={e => setGrantTariff(e.target.value)}
+              className="w-full px-3 py-2 rounded border text-sm"
+              style={{ backgroundColor: '#111', borderColor: '#222', color: '#e8e0d0', fontFamily: font.mono }}
+            >
+              <option value="">Тариф не менять</option>
+              {TARIFFS.map(t => <option key={t.key} value={t.key}>{t.label}</option>)}
             </select>
             <input
               type="number"

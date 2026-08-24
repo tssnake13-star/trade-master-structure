@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import BannersSettings from '@/components/school/BannersSettings';
+import { tariffLabel, tariffColor, tariffWeight, lastSeenLabel } from '@/lib/tariffs';
 import { ArrowLeft, Plus, Trash2, Pencil, GripVertical, Upload, X, Archive, ArchiveRestore } from 'lucide-react';
 import VideoBlockEditor from '@/components/school/VideoBlockEditor';
 import { SITE_ASSET_KEYS, notifySiteAssetChange } from '@/hooks/useSiteAsset';
@@ -49,7 +50,7 @@ const tabStyle = (active: boolean) => ({
 interface Course { id: string; title: string; subtitle: string | null; is_free: boolean; sort_order: number; is_archived?: boolean; }
 interface Lesson { id: string; course_id: string; title: string; description: string | null; sort_order: number; }
 interface LessonVideo { id?: string; title: string; video_url: string; video_url_alt: string; sort_order: number; }
-interface Profile { user_id: string; email: string; full_name: string | null; created_at: string; is_blocked: boolean; }
+interface Profile { user_id: string; email: string; full_name: string | null; created_at: string; is_blocked: boolean; tariff: string | null; last_seen_at: string | null; }
 interface UserRole { user_id: string; role: string; }
 interface Access { id: string; user_id: string; course_id: string; granted_at: string; expires_at: string | null; unlocked_lessons: number[]; }
 
@@ -1066,7 +1067,12 @@ function StudentsTab() {
   const sortedProfiles = [...profiles].sort((x, y) => {
     const tx = tier(x.user_id), ty = tier(y.user_id);
     if (tx !== ty) return ty - tx;                                     // админы → платники → бесплатники
-    if (tx === 1) return paidFreshness(y.user_id) - paidFreshness(x.user_id); // новые платники — в самом верху
+    if (tx === 1) {
+      // внутри платников сначала старший тариф, при равном — кто купил позже
+      const wx = tariffWeight(x.tariff), wy = tariffWeight(y.tariff);
+      if (wx !== wy) return wy - wx;
+      return paidFreshness(y.user_id) - paidFreshness(x.user_id);
+    }
     return new Date(y.created_at).getTime() - new Date(x.created_at).getTime(); // новые регистрации выше
   });
 
@@ -1093,6 +1099,11 @@ function StudentsTab() {
                       заблокирован
                     </span>
                   )}
+                  {tariffLabel(p.tariff) && (
+                    <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ border: `1px solid ${tariffColor(p.tariff)}55`, color: tariffColor(p.tariff), fontFamily: font.mono }}>
+                      {tariffLabel(p.tariff)}
+                    </span>
+                  )}
                   {access.hasAccess && (
                     access.days === null ? (
                       <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ backgroundColor: '#4a8a4a22', color: '#4a8a4a', fontFamily: font.mono }}>
@@ -1112,6 +1123,9 @@ function StudentsTab() {
                 {p.full_name && (
                   <span className="text-[11px] block" style={{ fontFamily: font.mono, color: '#555' }}>{p.email}</span>
                 )}
+                <span className="text-[11px] block" style={{ fontFamily: font.mono, color: '#4a4a4a' }}>
+                  {lastSeenLabel(p.last_seen_at) ?? 'в кабинет не заходил'}
+                </span>
               </div>
               <span className="text-[11px] flex-shrink-0" style={{ fontFamily: font.mono, color: getRole(p.user_id) === 'admin' ? '#4a8a4a' : '#555' }}>
                 {getRole(p.user_id)}
