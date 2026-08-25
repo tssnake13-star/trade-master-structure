@@ -56,7 +56,7 @@ const MONO = "'Space Mono', ui-monospace, monospace";
 const SANS = "'Syne', system-ui, sans-serif";
 const DISPLAY = "'Cormorant', Georgia, 'Times New Roman', serif";
 
-// Курс-экосистема (ECOSYSTEM: ECHO-GATE & NEXUS GRAVITY). Мостик «Перейти в
+// Курс-экосистема. Мостик «Перейти в
 // экосистему» из ДРУГИХ курсов ведёт СЮДА (открывает этот курс в кабинете);
 // а уже внутри него кнопка «Хочу в экосистему» ведёт в Telegram к автору.
 const ECOSYSTEM_COURSE_ID = '7280015b-be5f-4569-b6ea-0bbb69fc06ee';
@@ -1513,7 +1513,7 @@ function CourseLadder({
                   Экосистема <span style={{ color: ACCENT }}>следит</span> за тем, чтобы вы их не нарушали.
                 </h3>
                 <p style={{ fontFamily: SANS, fontSize: 12, lineHeight: 1.55, color: '#8a857c', maxWidth: '52ch', marginBottom: 18 }}>
-                  Echo Gate · Trade Master · Nexus Gravity — инфраструктура исполнения на вашем счёте.
+                  Echo Gate · Hunter Bot · Risk Sentinel — инфраструктура исполнения на вашем счёте.
                 </p>
                 <a
                   href="/access"
