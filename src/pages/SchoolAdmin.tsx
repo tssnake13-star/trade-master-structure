@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import BannersSettings from '@/components/school/BannersSettings';
+import InactivePurgeSettings from '@/components/school/InactivePurgeSettings';
 import { tariffLabel, tariffColor, tariffWeight, lastSeenLabel } from '@/lib/tariffs';
 import { ArrowLeft, Plus, Trash2, Pencil, GripVertical, Upload, X, Archive, ArchiveRestore } from 'lucide-react';
 import VideoBlockEditor from '@/components/school/VideoBlockEditor';
@@ -258,6 +259,8 @@ function SettingsTab() {
       </div>
 
       <BannersSettings courses={courses} />
+
+      <InactivePurgeSettings />
 
       <h2 className="text-lg mb-4" style={{ fontFamily: font.heading }}>Логотипы и медиа сайта</h2>
       <div className="space-y-3">
