@@ -135,7 +135,10 @@ export default function DashboardBanners({ accessMap }: {
   const startValid = start && !Number.isNaN(start.getTime());
   // после старта баннер гаснет сам и не возвращается, пока в настройках
   // не появится дата следующего потока
-  const streamAhead = startValid && start!.getTime() >= startOfToday().getTime();
+  // до старта показываем дату и счётчик; когда дата наступила или прошла —
+  // мягкое «скоро», без даты и без счётчика на нулях. Автоматически новая дата
+  // НЕ подставляется: следующий поток ставится руками в настройках.
+  const beforeStart = startValid && start!.getTime() > now.getTime();
 
   const hideFor = (s.banner_stream_hide_courses || '')
     .split(',')
@@ -150,9 +153,9 @@ export default function DashboardBanners({ accessMap }: {
   // «свободно 10 из 10» работает против нас — остаток показываем только с порога
   const showSeatsLeft = taken >= threshold && left > 0;
 
-  const streamCountdown = startValid ? splitCountdown(start!, now) : null;
+  const streamCountdown = beforeStart ? splitCountdown(start!, now) : null;
 
-  const showStream = on('banner_stream_enabled') && streamAhead && !alreadyBought;
+  const showStream = on('banner_stream_enabled') && !alreadyBought;
 
   // ---------- Баннер 2: персональный отсчёт зачёта ----------
   const upgradeCourse = (s.banner_upgrade_course_id || '').trim();
@@ -200,11 +203,16 @@ export default function DashboardBanners({ accessMap }: {
         <div style={card}>
           <div style={label}>Набор в практикум</div>
           <h3 className="mt-2.5" style={{ fontFamily: SANS, fontSize: 19, lineHeight: 1.25, color: '#f0e8d8' }}>
-            Ближайший поток практикума стартует {formatStartDate(streamDate)}
+            {beforeStart
+              ? `Ближайший поток практикума стартует ${formatStartDate(streamDate)}`
+              : 'Следующий поток практикума уже скоро'}
           </h3>
           <p className="mt-2.5" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '62ch' }}>
             60 дней работы со мной: живое занятие раз в неделю, разбор ваших сделок лично,
-            закрытая группа. {showSeatsLeft ? `Осталось ${left} ${plural(left, 'место', 'места', 'мест')} из ${seats}.` : `Беру ${seats} человек.`}
+            закрытая группа.{' '}
+            {beforeStart
+              ? (showSeatsLeft ? `Осталось ${left} ${plural(left, 'место', 'места', 'мест')} из ${seats}.` : `Беру ${seats} человек.`)
+              : 'Напишите, скажу дату ближайшего набора.'}
           </p>
           {streamCountdown && (
             <div className="flex gap-4 mt-4">
