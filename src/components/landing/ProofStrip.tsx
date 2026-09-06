@@ -38,7 +38,7 @@ export default function ProofStrip() {
       <div className="mt-6 pt-5 grid md:grid-cols-2 gap-x-10 gap-y-3" style={{ borderTop: '1px solid hsl(var(--rule-soft))' }}>
         <p className="text-sm text-muted-foreground leading-relaxed">
           6,4% в месяц — это среднее за 20 месяцев, а не помесячная норма:
-          <b className="text-foreground/85"> 3 месяца из 20 закрылись в минус</b>, лучший дал 10,2%.
+          <b className="text-foreground/85"> 3 месяца из 20 закрылись в минус</b>, лучший дал 26,5%.
           Риск 0,25% на сделку, профит-фактор 2,86.
         </p>
         <p className="text-sm text-muted-foreground leading-relaxed">
