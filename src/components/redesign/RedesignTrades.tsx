@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import xagUsdImg from '@/assets/trades/xag-usd-01-06-2026.jpg';
-import gbpUsdImg from '@/assets/trades/gbp-usd-10-06-2026.jpg';
-import usdCadImg from '@/assets/trades/usd-cad-10-06-2026.jpg';
-import usdChfImg from '@/assets/trades/usd-chf-15-06-2026.jpg';
-import xauUsdImg from '@/assets/trades/xau-usd-16-06-2026.jpg';
-import btcUsdImg from '@/assets/trades/btc-usd-21-06-2026.jpg';
+import eurUsdImg from '@/assets/trades/eur-usd-11-08-2026.jpg';
+import gbpUsdImg from '@/assets/trades/gbp-usd-13-08-2026.jpg';
+import usdCadImg from '@/assets/trades/usd-cad-19-08-2026.jpg';
+import eurAudImg from '@/assets/trades/eur-aud-31-08-2026.jpg';
+import gbpAudImg from '@/assets/trades/gbp-aud-31-08-2026.jpg';
 
 /**
  * RedesignTrades — full-bleed editorial grid of trades.
@@ -15,12 +14,11 @@ import btcUsdImg from '@/assets/trades/btc-usd-21-06-2026.jpg';
  */
 
 const trades = [
-  { instrument: 'XAG/USD', date: '01.06.2026', tf: 'H4', dir: 'SELL' as const, description: 'Оригинал из дневника сделок · WORK-SELL · +20R', image: xagUsdImg },
-  { instrument: 'GBP/USD', date: '10.06.2026', tf: 'H4', dir: 'SELL' as const, description: 'Оригинал из дневника сделок · WORK-SELL · +18R', image: gbpUsdImg },
-  { instrument: 'USD/CAD', date: '10.06.2026', tf: 'H4', dir: 'BUY' as const, description: 'Оригинал из дневника сделок · WORK-BUY · +24R', image: usdCadImg },
-  { instrument: 'USD/CHF', date: '15.06.2026', tf: 'H4', dir: 'BUY' as const, description: 'Оригинал из дневника сделок · WORK-BUY · +20R', image: usdChfImg },
-  { instrument: 'XAU/USD', date: '16.06.2026', tf: 'H4', dir: 'SELL' as const, description: 'Оригинал из дневника сделок · WORK-SELL · +16R', image: xauUsdImg },
-  { instrument: 'BTC/USD', date: '21.06.2026', tf: 'H4', dir: 'SELL' as const, description: 'Оригинал из дневника сделок · WORK-SELL · +22R', image: btcUsdImg },
+  { instrument: 'EUR/USD', date: '11.08.2026', tf: 'H4', dir: 'BUY' as const, description: 'Оригинал из дневника сделок · WORK-BUY · +11R', image: eurUsdImg },
+  { instrument: 'GBP/USD', date: '13.08.2026', tf: 'H4', dir: 'BUY' as const, description: 'Оригинал из дневника сделок · WORK-BUY · +13,7R', image: gbpUsdImg },
+  { instrument: 'USD/CAD', date: '19.08.2026', tf: 'H4', dir: 'SELL' as const, description: 'Оригинал из дневника сделок · WORK-SELL · +14,8R', image: usdCadImg },
+  { instrument: 'GBP/AUD', date: '31.08.2026', tf: 'H4', dir: 'SELL' as const, description: 'Оригинал из дневника сделок · WORK-SELL · +10,9R', image: gbpAudImg },
+  { instrument: 'EUR/AUD', date: '31.08.2026', tf: 'H4', dir: 'SELL' as const, description: 'Оригинал из дневника сделок · WORK-SELL · +8,4R', image: eurAudImg },
 ];
 
 const monoStyle: React.CSSProperties = {

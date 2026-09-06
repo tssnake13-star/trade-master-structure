@@ -1,27 +1,31 @@
 import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import xagUsdImg from '@/assets/trades/xag-usd-01-06-2026.jpg';
-import gbpUsdImg from '@/assets/trades/gbp-usd-10-06-2026.jpg';
-import usdCadImg from '@/assets/trades/usd-cad-10-06-2026.jpg';
-import usdChfImg from '@/assets/trades/usd-chf-15-06-2026.jpg';
-import xauUsdImg from '@/assets/trades/xau-usd-16-06-2026.jpg';
-import btcUsdImg from '@/assets/trades/btc-usd-21-06-2026.jpg';
+import eurUsdImg from '@/assets/trades/eur-usd-11-08-2026.jpg';
+import gbpUsdImg from '@/assets/trades/gbp-usd-13-08-2026.jpg';
+import usdCadImg from '@/assets/trades/usd-cad-19-08-2026.jpg';
+import eurAudImg from '@/assets/trades/eur-aud-31-08-2026.jpg';
+import gbpAudImg from '@/assets/trades/gbp-aud-31-08-2026.jpg';
 
 /**
- * Скрины из личного дневника сделок за июнь 2026. Подписи намеренно короткие:
- * инструмент, дата, направление, результат в R. Раньше под каждой карточкой
- * стоял абзац-шаблон («сигнал получен и отфильтрован…»), одинаковый на все
- * шесть — он читался как вода. Результат даём в R, а не в пипсах: пипсы между
- * инструментами несопоставимы (у биткоина шестизначные, у фунта четырёхзначные)
- * и выглядят как накрутка, тогда как R стыкуется с «R:R 10:1» в счётчике.
+ * Скрины из личного дневника сделок за август 2026 (обновлены 06.09.2026).
+ * Подписи намеренно короткие: инструмент, дата, направление, результат в R.
+ * Раньше под каждой карточкой стоял абзац-шаблон («сигнал получен
+ * и отфильтрован…»), одинаковый на все — он читался как вода.
+ *
+ * Результат даём в R, а не в пипсах: пипсы между инструментами несопоставимы
+ * (у йеновых пар и у фунта разный масштаб) и выглядят как накрутка, тогда как
+ * R стыкуется с соотношением риск-прибыль в счётчике.
+ *
+ * ⚠️ Оговорка внизу блока обязательна: это витрина сильных сделок, а не
+ * средний результат. Win Rate там стоит только вместе с +9,40 R против
+ * −1,00 R — одно без другого читается как «система почти всегда ошибается».
  */
 const trades = [
-  { instrument: 'XAG/USD', date: '01.06.2026', side: 'WORK-SELL', result: '+20R', image: xagUsdImg },
-  { instrument: 'GBP/USD', date: '10.06.2026', side: 'WORK-SELL', result: '+18R', image: gbpUsdImg },
-  { instrument: 'USD/CAD', date: '10.06.2026', side: 'WORK-BUY', result: '+24R', image: usdCadImg },
-  { instrument: 'USD/CHF', date: '15.06.2026', side: 'WORK-BUY', result: '+20R', image: usdChfImg },
-  { instrument: 'XAU/USD', date: '16.06.2026', side: 'WORK-SELL', result: '+16R', image: xauUsdImg },
-  { instrument: 'BTC/USD', date: '21.06.2026', side: 'WORK-SELL', result: '+22R', image: btcUsdImg },
+  { instrument: 'EUR/USD', date: '11.08.2026', side: 'WORK-BUY', result: '+11R', image: eurUsdImg },
+  { instrument: 'GBP/USD', date: '13.08.2026', side: 'WORK-BUY', result: '+13,7R', image: gbpUsdImg },
+  { instrument: 'USD/CAD', date: '19.08.2026', side: 'WORK-SELL', result: '+14,8R', image: usdCadImg },
+  { instrument: 'GBP/AUD', date: '31.08.2026', side: 'WORK-SELL', result: '+10,9R', image: gbpAudImg },
+  { instrument: 'EUR/AUD', date: '31.08.2026', side: 'WORK-SELL', result: '+8,4R', image: eurAudImg },
 ];
 
 const TradesSection = () => {
@@ -51,7 +55,7 @@ const TradesSection = () => {
           </h2>
           
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            Июнь 2026. Ни одна из этих сделок не была обязательной.<br />
+            Август 2026. Ни одна из этих сделок не была обязательной.<br />
             Все они были разрешены системой.
           </p>
 
@@ -168,8 +172,9 @@ const TradesSection = () => {
           </p>
           {/* честная оговорка: витрина сильных сделок ≠ средний результат */}
           <p className="mt-3 text-xs leading-relaxed text-muted-foreground/70 text-center md:text-left" style={{ maxWidth: '62ch' }}>
-            Это удачные сделки месяца, а не средний результат. По системе Win Rate 23% при среднем
-            соотношении 10:1 — прибыль приносит не частота побед, а размер движения, когда допуск сработал.
+            Это удачные сделки месяца, а не средний результат. По системе побед 23,3%, и средняя
+            прибыльная сделка +9,40 R против −1,00 R в убыточной — прибыль приносит не частота побед,
+            а размер движения, когда допуск сработал. Прошлый результат не гарантирует будущий.
           </p>
 
           <Dialog open={!!selectedTrade} onOpenChange={() => setSelectedTrade(null)}>
