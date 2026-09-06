@@ -1,9 +1,10 @@
+// Срез таблицы «TLT_Statement_Tactic1» от 05.09.2026. Обновлять только отсюда.
 const stats = [
-  { n: '+112.1%', l: 'доходность · 18 мес' },
-  { n: '2.85', l: 'profit factor' },
-  { n: '−2.23%', l: 'макс. просадка' },
-  { n: '15/18', l: 'прибыльных месяцев' },
-  { n: '319', l: 'сделок за 18 мес' },
+  { n: '+128,5%', l: 'доходность · 20 мес' },
+  { n: '2,86', l: 'profit factor' },
+  { n: '−2,23%', l: 'макс. просадка' },
+  { n: '17/20', l: 'прибыльных месяцев' },
+  { n: '377', l: 'сделок за 20 мес' },
 ];
 
 const SystemStatsSection = () => {
@@ -16,7 +17,9 @@ const SystemStatsSection = () => {
             Цифры, которые <em>не зависят</em> от настроения
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            Статистика системы за 18 месяцев — 319 сделок. Риск 0.25% на сделку, без компаундинга.
+            Статистика системы за 20 месяцев — 377 сделок. Риск 0,25% на сделку, без компаундинга.
+            В среднем это 6,4% в месяц, при этом 3 месяца из 20 закрылись в минус.
+            Прошлый результат не гарантирует будущий.
           </p>
         </div>
 
@@ -38,8 +41,8 @@ const SystemStatsSection = () => {
             <p className="mt-2 text-sm text-muted-foreground">Точка безубытка ~11%. Большинство думает, что нужно 70%+ побед — это миф. Важно не как часто ты прав, а сколько берёшь, когда прав.</p>
           </div>
           <div className="border border-border rounded-xl bg-card p-5">
-            <div className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--accent))' }}>Profit Factor 2.85</div>
-            <p className="mt-2 text-sm text-muted-foreground">На каждый потерянный $1 система возвращает $2.85. Результат на фиксированном риске — не «разгон депозита», а устойчивая работа.</p>
+            <div className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--accent))' }}>Profit Factor 2,86</div>
+            <p className="mt-2 text-sm text-muted-foreground">На каждый потерянный $1 система возвращает $2,86. Результат на фиксированном риске — не «разгон депозита», а устойчивая работа.</p>
           </div>
         </div>
 

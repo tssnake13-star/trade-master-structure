@@ -91,7 +91,7 @@ const ComparisonSection = () => {
 
         <p className="mt-6 text-base md:text-lg text-foreground font-medium" style={{ maxWidth: '64ch' }}>
           Поэтому здесь безопаснее: риск ограничен — 0.25–0.3% на сделку, максимальная просадка
-          за 18 месяцев — <span style={{ color: ACCENT }}>2.23%</span>.
+          за 20 месяцев — <span style={{ color: ACCENT }}>2,23%</span>.
         </p>
       </div>
     </section>
