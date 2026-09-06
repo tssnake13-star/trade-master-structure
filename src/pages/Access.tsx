@@ -5,11 +5,19 @@ import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackPageview, trackClick } from '@/lib/analytics';
 import StructureField from '@/components/landing/StructureField';
 import PackageCards from '@/components/landing/PackageCards';
+import WhereYouAreNow from '@/components/landing/WhereYouAreNow';
+import ProofStrip from '@/components/landing/ProofStrip';
+import FiveStagesSection from '@/components/landing/FiveStagesSection';
+import PurchaseFAQ from '@/components/landing/PurchaseFAQ';
 
 /**
  * /access — private pricing page. NOT linked from anywhere on the site and not
  * in any navigation. Reachable only by direct URL (handed out via the Telegram
  * bot / video descriptions). Same v3 visual language as the landing.
+ *
+ * Порядок блоков задан Сергеем 06.09.2026: шапка → бесплатный вердикт →
+ * где вы сейчас → доказательства → пять этапов → карточки и экосистема →
+ * вопросы перед оплатой → заявка.
  */
 export default function Access() {
   // страница цен — считаем отдельно от лендинга: сюда приходят из бота, и важно
@@ -25,37 +33,63 @@ export default function Access() {
           <div className="max-w-3xl">
             <span className="section-label" style={{ color: 'hsl(var(--accent))' }}>TLT · Доступ · цены и условия</span>
             <h1 className="text-foreground" style={{ fontSize: 'clamp(44px, 7vw, 88px)', lineHeight: 0.98 }}>
-              Форматы <em>и цены</em>
+              4 уровня. <em>Один алгоритм.</em>
             </h1>
             <p className="mt-5 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '58ch' }}>
-              Алгоритм решает, какую сделку брать. Со мной вы её берёте. Выберите уровень:
-              от самостоятельного курса до полной инфраструктуры с автоисполнением и защитой капитала.
+              Алгоритм решает, какую сделку брать. Разница между уровнями в одном: сколько раз
+              я стою рядом, когда вы это решение принимаете.
             </p>
           </div>
 
-          {/* для сомневающихся: вход через бесплатный разбор — перед ценами */}
+          {/* бесплатный вход. Лимит настоящий: 5 разборов в неделю — столько
+              Сергей реально успевает. Число не завышаем никогда. */}
           <a
             href={TELEGRAM_LINKS.razbor}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackClick('access_razbor')}
-            className="mt-8 flex items-start justify-between gap-4 max-w-2xl border border-border rounded-xl bg-card/60 p-5 hover:border-muted-foreground/50 transition-colors group"
+            className="mt-8 flex items-start justify-between gap-4 max-w-2xl border rounded-xl p-5 transition-colors group"
+            style={{ borderColor: 'hsl(var(--accent) / 0.35)', background: 'hsl(var(--accent) / 0.05)' }}
           >
             <div>
-              <div className="text-foreground font-medium">Не готовы решать — начните с вердикта</div>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Пришлите одну свою сделку — ту, где вы всё сделали правильно и всё равно получили убыток. Бесплатный личный видеоразбор через систему допуска.
+              <div className="text-mono" style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'hsl(var(--accent))' }}>
+                Вердикт · бесплатно
+              </div>
+              <div className="mt-2 text-foreground font-medium">Не готовы решать — пришлите одну свою сделку</div>
+              <p className="mt-1.5 text-sm text-muted-foreground">
+                Ту, где вы всё сделали правильно и всё равно получили убыток. Скрин со входом и стопом
+                и одна фраза, почему вошли. В течение 48 часов пришлю личный видеоразбор: прошла бы
+                эта сделка допуск или нет и на чём именно она сломалась.
               </p>
+              <p className="mt-2 text-sm text-foreground/80">
+                Скажу и то, какой уровень вам нужен. И скажу, если не нужен никакой.
+              </p>
+              <p className="mt-2 text-xs text-muted-foreground">Беру 5 разборов в неделю.</p>
             </div>
             <ArrowRight className="w-4 h-4 flex-shrink-0 mt-1 group-hover:translate-x-1 transition-transform" style={{ color: 'hsl(var(--accent))' }} />
           </a>
 
+          <div className="mt-12 md:mt-16">
+            <WhereYouAreNow showPrices={true} />
+          </div>
+
           <div className="mt-10 md:mt-14">
+            <ProofStrip />
+          </div>
+
+          <div className="mt-12 md:mt-16">
+            <FiveStagesSection showPrices={true} asSection={false} />
+          </div>
+
+          <div className="mt-12 md:mt-16">
             <PackageCards showPrices={true} ctaHref={TELEGRAM_LINKS.dm} />
           </div>
 
+          {/* вопросы перед оплатой — после цен экосистемы */}
+          <PurchaseFAQ />
+
           {/* CTA */}
-          <div className="mt-10 flex flex-col items-center gap-4 text-center">
+          <div className="mt-12 flex flex-col items-center gap-4 text-center">
             <a
               href={TELEGRAM_LINKS.dm}
               target="_blank"

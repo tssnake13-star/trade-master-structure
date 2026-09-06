@@ -1,5 +1,6 @@
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import PackageCards from './PackageCards';
+import WhereYouAreNow from './WhereYouAreNow';
 
 const LevelsSection = () => {
   return (
@@ -8,15 +9,20 @@ const LevelsSection = () => {
         <div className="max-w-3xl">
           <span className="section-label">14 · Сотрудничество</span>
           <h2 className="text-foreground">
-            Выберите <em>глубину</em> погружения
+            4 уровня. <em>Один алгоритм.</em>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '56ch' }}>
-            Не курс ради курса, а система, которая остаётся с вами. От алгоритма принятия решений —
-            до полной инфраструктуры с автоисполнением и защитой капитала.
+            Алгоритм решает, какую сделку брать. Разница между уровнями в одном: сколько раз
+            я стою рядом, когда вы это решение принимаете.
           </p>
           <p className="mt-5 text-base md:text-lg text-foreground">
             Стоимость: <span style={{ color: 'hsl(var(--accent))', fontWeight: 500 }}>от&nbsp;$349</span>, в зависимости от уровня.
           </p>
+        </div>
+
+        {/* навигация по состоянию: цены верхних двух уровней здесь не раскрываются */}
+        <div className="mt-8 md:mt-10">
+          <WhereYouAreNow showPrices={false} />
         </div>
 
         <div className="mt-8 md:mt-12">

@@ -24,9 +24,13 @@ const DISPLAY = "'Cormorant', Georgia, 'Times New Roman', serif";
 const MONO = "'Space Mono', ui-monospace, monospace";
 const SANS = "'Syne', system-ui, sans-serif";
 
-/** Зачёт оплаченного при переходе выше. Те же числа, что на странице цен. */
+/**
+ * Зачёт оплаченного при переходе выше. Те же числа, что на странице цен.
+ * ⚠️ Доплата работает ТОЛЬКО наверх, в годовую программу: из курса
+ * в практикум доплатой перейти нельзя, это отдельная ступень
+ * (решение Сергея 06.09.2026).
+ */
 const UPGRADE_WINDOW_DAYS = 30;
-const PRACTICUM_TOPUP = '$150';
 const TRADE_OS_TOPUP = '$1250';
 const TRADE_SYSTEM_PRICE = '$349';
 
@@ -178,14 +182,14 @@ export default function DashboardBanners({ accessMap }: {
           <div style={label}>Зачёт оплаченного</div>
           <h3 className="mt-2.5" style={{ fontFamily: SANS, fontSize: 19, lineHeight: 1.25, color: '#f0e8d8' }}>
             У вас осталось {daysLeft} {plural(daysLeft, 'день', 'дня', 'дней')}, чтобы перейти
-            в практикум с доплатой {PRACTICUM_TOPUP}
+            в Trade OS Plus с доплатой {TRADE_OS_TOPUP}
           </h3>
           <p className="mt-2.5" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '62ch' }}>
             Оплаченные {TRADE_SYSTEM_PRICE} зачитываются полностью в течение {UPGRADE_WINDOW_DAYS} дней
-            после покупки. После этого практикум будет стоить полную цену.
+            после покупки. Дальше годовая программа будет стоить полную цену.
           </p>
           <p className="mt-1.5" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '62ch' }}>
-            В те же {UPGRADE_WINDOW_DAYS} дней открыт прямой переход в Trade OS Plus с доплатой {TRADE_OS_TOPUP}.
+            За год вы проходите все пять этапов подготовки и выходите на реальный рынок.
           </p>
           {daysLeft <= 7 && (
             <p className="mt-2.5" style={{ fontFamily: MONO, fontSize: 12, color: ACCENT }}>
@@ -193,7 +197,7 @@ export default function DashboardBanners({ accessMap }: {
             </p>
           )}
           <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" style={cta} className="transition hover:brightness-110">
-            Перейти в практикум
+            Перейти в Trade OS Plus
             <ArrowRight size={14} />
           </a>
         </div>

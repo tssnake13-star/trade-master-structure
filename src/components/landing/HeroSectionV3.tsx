@@ -16,7 +16,7 @@ import StructureField from '@/components/landing/StructureField';
 // Original headline, split for the per-word rise.
 const HEAD: { t: string; cls?: 'em' | 'mute' }[] = [
   { t: 'Вы' }, { t: 'читаете' }, { t: 'рынок.', cls: 'em' },
-  { t: 'Но', cls: 'mute' }, { t: 'теряете', cls: 'mute' }, { t: 'из-за', cls: 'mute' }, { t: 'эмоций.', cls: 'mute' },
+  { t: 'Но', cls: 'mute' }, { t: 'теряете', cls: 'mute' }, { t: 'на', cls: 'mute' }, { t: 'эмоциях.', cls: 'mute' },
 ];
 
 // Original positioning offer.

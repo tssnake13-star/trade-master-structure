@@ -75,6 +75,7 @@ const CLICK_NAMES: Record<string, string> = {
   package_trade_os_plus: 'Тариф VIP',
   access_razbor: 'Страница цен → разбор сделок',
   access_apply: 'Страница цен → заявка на обучение',
+  where_you_are_verdict: 'Где вы сейчас → вердикт',
 };
 
 const SOURCE_NAMES: Record<string, string> = {

@@ -16,7 +16,7 @@ import { trackClick } from '@/lib/analytics';
 const STEPS = [
   'Присылаете в бот одну свою сделку: ту, где всё сделали правильно, а убыток всё равно случился. Скрин со входом и стопом и одна фраза, почему вошли.',
   'Я лично прогоняю её через свою систему допуска.',
-  'Вы получаете видео на 5–7 минут: сказала бы система «да» или «нет» и на чём сломалось решение.',
+  'В течение 48 часов присылаю видео на 5–7 минут: сказала бы система «да» или «нет» и на чём сломалось решение.',
 ];
 
 export default function AdmissionCheckSection() {
@@ -24,12 +24,12 @@ export default function AdmissionCheckSection() {
     <section id="verdict" className="section-animate py-12 md:py-20 bg-card/50 border-y border-border">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <span className="section-label" style={{ color: 'hsl(var(--accent))' }}>Разбор сделок</span>
+          <span className="section-label" style={{ color: 'hsl(var(--accent))' }}>Вердикт · бесплатно</span>
           <h2 className="text-foreground">
             Одна ваша сделка покажет, <em>почему счёт не растёт</em>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '56ch' }}>
-            Личный видеоразбор от практикующего трейдера. Бесплатно. Без обязательств.
+            Личный видеоразбор от практикующего трейдера, в течение 48 часов. Бесплатно. Без обязательств.
           </p>
         </div>
 
@@ -45,9 +45,13 @@ export default function AdmissionCheckSection() {
           ))}
         </div>
 
-        {/* честное ограничение — усиливает ценность и мягкую срочность */}
-        <p className="mt-6 text-sm text-muted-foreground" style={{ maxWidth: '56ch' }}>
-          Каждый разбор записываю сам, поэтому беру несколько человек в неделю.
+        {/* честное ограничение — усиливает ценность и мягкую срочность.
+            5 — реальное число разборов, которое Сергей успевает за неделю. */}
+        <p className="mt-6 text-base text-foreground/85" style={{ maxWidth: '56ch' }}>
+          Скажу и то, какой формат обучения вам нужен. И скажу, если не нужен никакой.
+        </p>
+        <p className="mt-2 text-sm text-muted-foreground" style={{ maxWidth: '56ch' }}>
+          Каждый разбор записываю сам, поэтому беру 5 разборов в неделю.
         </p>
 
         <div className="mt-7">

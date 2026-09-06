@@ -20,7 +20,7 @@ import SystemStatsSection from '@/components/landing/SystemStatsSection';
 import ProofSection from '@/components/landing/ProofSection';
 import TradesSection from '@/components/landing/TradesSection';
 import TransformationSection from '@/components/landing/TransformationSection';
-import StagesSection from '@/components/landing/StagesSection';
+import FiveStagesSection from '@/components/landing/FiveStagesSection';
 import FitSection from '@/components/landing/FitSection';
 import ComparisonSection from '@/components/landing/ComparisonSection';
 import FAQSection from '@/components/landing/FAQSection';
@@ -103,7 +103,7 @@ const Index = () => {
 
         <TradingSystemSection />
         <CapitalProtectionSection />
-        <StagesSection />
+        <FiveStagesSection showPrices={false} />
 
         {/* Снимает возражение «зачем мне чужая стратегия» — до того, как человек
             увидит цену. */}
