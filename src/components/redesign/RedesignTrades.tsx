@@ -1,5 +1,8 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import gbpJpyImg from '@/assets/trades/gbp-jpy-14-07-2026.jpg';
+import eurJpyImg from '@/assets/trades/eur-jpy-20-07-2026.jpg';
+import usdJpyImg from '@/assets/trades/usd-jpy-20-07-2026.jpg';
 import eurUsdImg from '@/assets/trades/eur-usd-11-08-2026.jpg';
 import gbpUsdImg from '@/assets/trades/gbp-usd-13-08-2026.jpg';
 import usdCadImg from '@/assets/trades/usd-cad-19-08-2026.jpg';
@@ -14,6 +17,9 @@ import gbpAudImg from '@/assets/trades/gbp-aud-31-08-2026.jpg';
  */
 
 const trades = [
+  { instrument: 'GBP/JPY', date: '14.07.2026', tf: 'H4', dir: 'BUY' as const, description: 'Оригинал из дневника сделок · WORK-BUY · +14R', image: gbpJpyImg },
+  { instrument: 'EUR/JPY', date: '20.07.2026', tf: 'H4', dir: 'BUY' as const, description: 'Оригинал из дневника сделок · WORK-BUY · +12R', image: eurJpyImg },
+  { instrument: 'USD/JPY', date: '20.07.2026', tf: 'H4', dir: 'BUY' as const, description: 'Оригинал из дневника сделок · WORK-BUY · +12R', image: usdJpyImg },
   { instrument: 'EUR/USD', date: '11.08.2026', tf: 'H4', dir: 'BUY' as const, description: 'Оригинал из дневника сделок · WORK-BUY · +11R', image: eurUsdImg },
   { instrument: 'GBP/USD', date: '13.08.2026', tf: 'H4', dir: 'BUY' as const, description: 'Оригинал из дневника сделок · WORK-BUY · +13,7R', image: gbpUsdImg },
   { instrument: 'USD/CAD', date: '19.08.2026', tf: 'H4', dir: 'SELL' as const, description: 'Оригинал из дневника сделок · WORK-SELL · +14,8R', image: usdCadImg },

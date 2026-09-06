@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import gbpJpyImg from '@/assets/trades/gbp-jpy-14-07-2026.jpg';
+import eurJpyImg from '@/assets/trades/eur-jpy-20-07-2026.jpg';
+import usdJpyImg from '@/assets/trades/usd-jpy-20-07-2026.jpg';
 import eurUsdImg from '@/assets/trades/eur-usd-11-08-2026.jpg';
 import gbpUsdImg from '@/assets/trades/gbp-usd-13-08-2026.jpg';
 import usdCadImg from '@/assets/trades/usd-cad-19-08-2026.jpg';
@@ -7,7 +10,7 @@ import eurAudImg from '@/assets/trades/eur-aud-31-08-2026.jpg';
 import gbpAudImg from '@/assets/trades/gbp-aud-31-08-2026.jpg';
 
 /**
- * Скрины из личного дневника сделок за август 2026 (обновлены 06.09.2026).
+ * Скрины из личного дневника сделок за июль и август 2026 (обновлены 06.09.2026).
  * Подписи намеренно короткие: инструмент, дата, направление, результат в R.
  * Раньше под каждой карточкой стоял абзац-шаблон («сигнал получен
  * и отфильтрован…»), одинаковый на все — он читался как вода.
@@ -21,6 +24,9 @@ import gbpAudImg from '@/assets/trades/gbp-aud-31-08-2026.jpg';
  * −1,00 R — одно без другого читается как «система почти всегда ошибается».
  */
 const trades = [
+  { instrument: 'GBP/JPY', date: '14.07.2026', side: 'WORK-BUY', result: '+14R', image: gbpJpyImg },
+  { instrument: 'EUR/JPY', date: '20.07.2026', side: 'WORK-BUY', result: '+12R', image: eurJpyImg },
+  { instrument: 'USD/JPY', date: '20.07.2026', side: 'WORK-BUY', result: '+12R', image: usdJpyImg },
   { instrument: 'EUR/USD', date: '11.08.2026', side: 'WORK-BUY', result: '+11R', image: eurUsdImg },
   { instrument: 'GBP/USD', date: '13.08.2026', side: 'WORK-BUY', result: '+13,7R', image: gbpUsdImg },
   { instrument: 'USD/CAD', date: '19.08.2026', side: 'WORK-SELL', result: '+14,8R', image: usdCadImg },
@@ -55,7 +61,7 @@ const TradesSection = () => {
           </h2>
           
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            Август 2026. Ни одна из этих сделок не была обязательной.<br />
+            Июль и август 2026. Ни одна из этих сделок не была обязательной.<br />
             Все они были разрешены системой.
           </p>
 
