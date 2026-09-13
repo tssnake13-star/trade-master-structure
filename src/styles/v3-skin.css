@@ -97,6 +97,23 @@
 }
 @keyframes v3hRise { to { opacity: 1; transform: none; } }
 
+/* Заголовок первого экрана — две строки, которые не переносятся внутри.
+   Размер от ширины колонки, запас ~4%. Замер в браузере (Cormorant, с курсивом):
+   «Решение — в выходные.» = 9,71 em · «В будни только исполнение.» = 10,75 em.
+   Вторая строка = 0,88 первой — так обе строки выходят почти одной ширины.
+   Колонка: телефон 100vw−40px · планшет 100vw−79px · от 1024px 56% × (100vw−79px), макс. 609px. */
+.v3h-h1 .v3h-line { display: block; white-space: nowrap; }
+.v3h-h1 .v3h-line1 { font-size: calc(9.85vw - 4px) !important; }
+.v3h-h1 .v3h-line2 { font-size: calc(8.67vw - 3.5px) !important; margin-top: 0.1em; }
+@media (min-width: 768px) {
+  .v3h-h1 .v3h-line1 { font-size: min(calc(9.85vw - 7.8px), 76px) !important; }
+  .v3h-h1 .v3h-line2 { font-size: min(calc(8.67vw - 6.9px), 67px) !important; }
+}
+@media (min-width: 1024px) {
+  .v3h-h1 .v3h-line1 { font-size: min(calc(5.5vw - 4.4px), 60px) !important; }
+  .v3h-h1 .v3h-line2 { font-size: min(calc(4.84vw - 3.9px), 52.8px) !important; }
+}
+
 .v3h-offer {
   font-family: var(--font-ui);
   font-size: clamp(20px, 2.2vw, 25px);

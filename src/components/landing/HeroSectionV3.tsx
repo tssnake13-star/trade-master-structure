@@ -26,10 +26,19 @@ import StructureField from '@/components/landing/StructureField';
  * конверсию до и после.
  */
 
-// brAfter — перенос строки: две фразы заголовка не должны сливаться («выходные. В» в конце строки)
-const HEAD: { t: string; cls?: 'em' | 'mute'; brAfter?: boolean }[] = [
-  { t: 'Решение' }, { t: '—' }, { t: 'в' }, { t: 'выходные.', cls: 'em', brAfter: true },
-  { t: 'В', cls: 'mute' }, { t: 'будни', cls: 'mute' }, { t: 'только', cls: 'mute' }, { t: 'исполнение.', cls: 'mute' },
+/**
+ * Заголовок — ровно две строки, и ни одна не ломается внутри (white-space: nowrap).
+ * Сергей 13.09.2026: «в выходные» и «В будни только исполнение» должны стоять
+ * целиком, без висящего предлога и без «исполнение» на отдельной строке.
+ * Размер каждой строки считается от ширины колонки в v3-skin.css (.v3h-line1/2):
+ * замер Cormorant 500 — «Решение — в выходные.» = 8,77 em,
+ * «В будни только исполнение.» = 11,03 em. Вторая строка на 18% мельче.
+ */
+const LINE1: { t: string; em?: boolean }[] = [
+  { t: 'Решение' }, { t: '—' }, { t: 'в' }, { t: 'выходные.', em: true },
+];
+const LINE2: { t: string }[] = [
+  { t: 'В' }, { t: 'будни' }, { t: 'только' }, { t: 'исполнение.' },
 ];
 
 const OFFER: { t: string; cls?: 'gold' | 'mute' | 'uline' }[] = [
@@ -46,7 +55,7 @@ export default function HeroSectionV3() {
   const heroAuthor = useSiteAsset(SITE_ASSET_KEYS.heroAuthor, heroAuthorFallback);
 
   return (
-    <section id="hero" className="v3h relative min-h-[100svh] flex flex-col justify-start lg:justify-center pt-16 md:pt-20 pb-12 md:pb-16">
+    <section id="hero" className="v3h relative min-h-[100svh] flex flex-col justify-start lg:justify-center pt-16 md:pt-20 pb-12 md:pb-16" style={{ overflowX: 'clip' }}>
       {/* abstract market-structure field (nodes + levels) */}
       <StructureField />
 
@@ -74,20 +83,33 @@ export default function HeroSectionV3() {
       </div>
 
       {/* text */}
-      <div className="container-landing relative" style={{ zIndex: 2 }}>
+      {/* w-full обязателен: секция — flex-колонка, и без него контейнер сжимается
+          под ширину содержимого, а колонка заголовка (56%) становится узкой */}
+      <div className="container-landing relative w-full" style={{ zIndex: 2 }}>
         <div className="w-full lg:max-w-[56%]">
           <div className="v3h-eyebrow v3h-mono mb-7">
             <span className="dot" /> Свинг-трейдинг · неделя и дневка
           </div>
 
           <h1 className="v3h-h1">
-            {HEAD.map((w, i) => (
-              <span key={i}>
-                <span className={`word ${w.cls === 'mute' ? 'mute' : ''}`} style={{ animationDelay: `${i * 0.08}s` }}>
-                  {w.cls === 'em' ? <em>{w.t}</em> : w.t}
-                </span>{w.brAfter ? <br /> : ' '}
-              </span>
-            ))}
+            <span className="v3h-line v3h-line1">
+              {LINE1.map((w, i) => (
+                <span key={i}>
+                  <span className="word" style={{ animationDelay: `${i * 0.08}s` }}>
+                    {w.em ? <em>{w.t}</em> : w.t}
+                  </span>{i < LINE1.length - 1 ? ' ' : ''}
+                </span>
+              ))}
+            </span>
+            <span className="v3h-line v3h-line2">
+              {LINE2.map((w, i) => (
+                <span key={i}>
+                  <span className="word mute" style={{ animationDelay: `${(LINE1.length + i) * 0.08}s` }}>
+                    {w.t}
+                  </span>{i < LINE2.length - 1 ? ' ' : ''}
+                </span>
+              ))}
+            </span>
           </h1>
 
           <p className="v3h-offer mt-9">
