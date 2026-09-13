@@ -13,8 +13,6 @@ import TwoStagesSection from '@/components/landing/TwoStagesSection';
 import CoreProblemSection from '@/components/landing/CoreProblemSection';
 import IncludedSection from '@/components/landing/IncludedSection';
 import FourQuestionsSection from '@/components/landing/FourQuestionsSection';
-import WhatYouLearnSection from '@/components/landing/WhatYouLearnSection';
-import TradingSystemSection from '@/components/landing/TradingSystemSection';
 import CapitalProtectionSection from '@/components/landing/CapitalProtectionSection';
 import SystemStatsSection from '@/components/landing/SystemStatsSection';
 import ProofSection from '@/components/landing/ProofSection';
@@ -35,9 +33,9 @@ import WordmarkKinetic from '@/components/preview-next/WordmarkKinetic';
 
 /** Блоки, по которым считаем, до чего люди доскролливают (воронка внимания). */
 const TRACKED_SECTIONS = [
-  'hero', 'problem', 'verdict', 'transformation', 'proof', 'stats',
-  'trades', 'filter', 'difference', 'included', 'questions', 'trading-system',
-  'protection', 'stages', 'learn', 'formats', 'author', 'faq',
+  'hero', 'problem', 'filter', 'week', 'proof', 'stats', 'trades',
+  'difference', 'included', 'questions', 'protection', 'stages',
+  'verdict', 'formats', 'author', 'faq',
 ];
 
 const Index = () => {
@@ -62,60 +60,55 @@ const Index = () => {
       <StickyHeader />
       <SideNav />
       <main>
-        {/* Внимание */}
+        {/* Перестроено 13.09.2026 под «ПОРТРЕТ КЛИЕНТА.md». Логика пути:
+            это для меня? → да, это про меня → точно для меня → как это впишется
+            в мою жизнь → это работает? → чем отличается → что я получаю →
+            попробовать бесплатно → сколько стоит → кто автор → последние сомнения.
+            По аналитике 14.08–13.09 половина уходит сразу после первого экрана,
+            поэтому фильтр и распорядок подняты наверх. */}
+
+        {/* Это для меня? */}
         <HeroSectionV3 />
         <InstrumentTicker />
         <StatsCounter />
 
-        {/* Боль */}
+        {/* Да, это про меня */}
         <CoreProblemSection />
 
-        {/* Первое действие — сразу после боли: личный разбор своих сделок (лид-магнит + фильтр).
-            Боль подводит к офферу «покажу, где ЛИЧНО у вас система сказала бы нет». */}
-        <AdmissionCheckSection />
+        {/* Точно ли для меня — отсев до лички */}
+        <FitSection />
 
-        {/* Состояние: что меняется в поведении (до механики) */}
+        {/* Как это впишется в мою жизнь — УТП простым языком */}
         <TransformationSection />
 
         {/* Мысль-делитель */}
         <WordmarkKinetic text="Система, " emphasis="не эмоция" />
 
-        {/* Доверие / доказательства */}
+        {/* Это работает? */}
         <ProofSection />
         <SystemStatsSection />
         <TradesSection />
 
-        {/* Фильтр: это подойдёт не всем — сразу после живой сделки */}
-        <FitSection />
-
-        {/* Отстройка: чем система отличается от сигналов и «ещё одного курса» */}
+        {/* Чем это отличается от того, что я уже пробовал */}
         <ComparisonSection />
 
-        {/* Мысль-делитель */}
-        <WordmarkKinetic text="Структура " emphasis="важнее сигнала" />
-
-        {/* Механика системы */}
+        {/* Что я получаю. Блоки «Архитектура» (Trend Hunter, H4, W1/D1) и
+            «Чему вы учитесь» («соберите свою систему») сняты: первый — приманка
+            для коллекционера инструментов, второй продаёт свободу трактовки,
+            а клиент хочет правило. Файлы оставлены. */}
         <IncludedSection />
-
-        {/* Суть метода: четыре вопроса, на которые отвечает любая сделка.
-            Стоит после состава — сначала «из чего», сразу за ним «по какому правилу». */}
         <FourQuestionsSection />
-
-        <TradingSystemSection />
         <CapitalProtectionSection />
-        <FiveStagesSection showPrices={false} />
-
-        {/* Снимает возражение «зачем мне чужая стратегия» — до того, как человек
-            увидит цену. */}
-        <WhatYouLearnSection />
-
-        {/* Структура оффера */}
+        <FiveStagesSection showPrices={false} label="11 · Путь" />
         <TwoStagesSection />
 
         {/* Мысль-делитель */}
         <WordmarkKinetic text="Допуск, " emphasis="не сигнал" />
 
-        {/* Оффер и действие */}
+        {/* Попробовать бесплатно на своей сделке — для тех, кто дочитал */}
+        <AdmissionCheckSection />
+
+        {/* Сколько стоит и кто автор */}
         <LevelsSection />
         <AuthorSection />
         <PrincipleSection />

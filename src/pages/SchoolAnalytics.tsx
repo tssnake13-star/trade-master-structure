@@ -48,7 +48,8 @@ const SECTION_NAMES: Record<string, string> = {
   proof: 'Отзывы',
   stats: 'Результаты',
   trades: 'Сделки',
-  filter: 'Фильтр (кому подойдёт)',
+  filter: 'Для кого (фильтр)',
+  week: 'Неделя по системе',
   difference: 'Отличие',
   included: 'Что входит',
   questions: 'Четыре вопроса',
@@ -76,6 +77,8 @@ const CLICK_NAMES: Record<string, string> = {
   access_razbor: 'Страница цен → разбор сделок',
   access_apply: 'Страница цен → заявка на обучение',
   where_you_are_verdict: 'Где вы сейчас → вердикт',
+  header_bot: 'Шапка сайта → бот',
+  sticky_bot: 'Нижняя кнопка на телефоне → бот',
 };
 
 const SOURCE_NAMES: Record<string, string> = {

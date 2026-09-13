@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
+import { trackClick } from '@/lib/analytics';
 import logoVideo from '@/assets/logo-video.mp4';
 
 const StickyHeader = () => {
@@ -25,10 +26,11 @@ const StickyHeader = () => {
           href={TELEGRAM_LINKS.bot}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => trackClick('sticky_bot')}
           className="flex items-center justify-center gap-2 w-full py-3.5 bg-foreground text-background font-semibold rounded-lg hover:bg-foreground/90 transition-colors"
           style={{ animation: 'ctaGlow 2s ease-in-out infinite' }}
         >
-          Получить систему допуска
+          Получить бесплатный протокол
           <ArrowRight className="w-5 h-5" />
         </a>
       </div>

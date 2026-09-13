@@ -8,10 +8,10 @@ export const TELEGRAM_LINKS = {
 
 // Navigation items
 export const NAV_ITEMS = [
-  { label: 'Как работает', href: '#trading-system' },
-  { label: 'Результаты', href: '#stats' },
+  { label: 'Для кого', href: '#filter' },
+  { label: 'Как устроено', href: '#week' },
   { label: 'Отзывы', href: '#proof' },
-  { label: 'Сотрудничество', href: '#formats' },
-  { label: 'Автор', href: '#author' },
+  { label: 'Результаты', href: '#stats' },
+  { label: 'Цены', href: '#formats' },
   { label: 'FAQ', href: '#faq' },
 ] as const;

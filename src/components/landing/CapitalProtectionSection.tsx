@@ -1,5 +1,5 @@
 const limits = [
-  { n: '0.25–0.3%', l: 'риск на сделку' },
+  { n: '0,25–0,3%', l: 'риск на сделку' },
   { n: '~4%', l: 'лимит на неделю' },
   { n: '~8%', l: 'лимит на месяц' },
   { n: 'Авто-стоп', l: 'блок при превышении' },
@@ -10,7 +10,7 @@ const CapitalProtectionSection = () => {
     <section id="protection" className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <span className="section-label">11 · Защита капитала</span>
+          <span className="section-label">10 · Защита капитала</span>
           <h2 className="text-foreground">
             Плохая неделя не <em>превращается</em> в плохой месяц
           </h2>

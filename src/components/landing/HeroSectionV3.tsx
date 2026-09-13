@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowDown, MessageCircle } from 'lucide-react';
+import { ArrowRight, ArrowDown } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
 import heroAuthorFallback from '@/assets/hero-author.jpg';
@@ -6,29 +6,41 @@ import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 import StructureField from '@/components/landing/StructureField';
 
 /**
- * HeroSectionV3 — production landing hero in the v3 "editorial terminal" style.
- * ORIGINAL copy is preserved verbatim; only the presentation is new:
- * Cormorant headline (word-rise), moving gold candle field, author photo flush
- * to the right edge, HUD corner code + live GBP/JPY ticker, sharp CTAs.
- * No reticle. Scoped under .v3h / .v3-skin so the cabinet is untouched.
+ * HeroSectionV3 — первый экран лендинга в стиле v3 «editorial terminal».
+ *
+ * ⚠️ Текст переписан 13.09.2026 под «ПОРТРЕТ КЛИЕНТА.md». Задача экрана одна:
+ * за три секунды человек понимает, для него это или нет.
+ *   · заголовок бьёт в образ жизни (торгует рядом с работой), а не в общую
+ *     боль «теряете на эмоциях» — её узнают и скальперы, и новички, а они
+ *     не клиенты;
+ *   · строка распорядка — факты из FAQ автора (выходные 30–60 минут,
+ *     в будни короткая проверка). «Не нужно смотреть на график» НЕ обещаем:
+ *     проверка в будни есть;
+ *   · строка-фильтр отсекает интрадей сознательно: сейчас этот отсев стоит
+ *     Сергею дней переписки в личке.
+ *
+ * Главная кнопка — бот: по аналитике 14.08–13.09 это единственная кнопка
+ * лендинга, которую нажимают (17 из 132 живых посетителей). Вердикт вторым
+ * действием: 6 из 10 заходят с телефона, а вердикт просит скрин с компьютера.
+ * Метки кликов hero_bot и hero_scroll_verdict не менять — по ним сравниваем
+ * конверсию до и после.
  */
 
-// Original headline, split for the per-word rise.
-const HEAD: { t: string; cls?: 'em' | 'mute' }[] = [
-  { t: 'Вы' }, { t: 'читаете' }, { t: 'рынок.', cls: 'em' },
-  { t: 'Но', cls: 'mute' }, { t: 'теряете', cls: 'mute' }, { t: 'на', cls: 'mute' }, { t: 'эмоциях.', cls: 'mute' },
+// brAfter — перенос строки: две фразы заголовка не должны сливаться («выходные. В» в конце строки)
+const HEAD: { t: string; cls?: 'em' | 'mute'; brAfter?: boolean }[] = [
+  { t: 'Решение' }, { t: '—' }, { t: 'в' }, { t: 'выходные.', cls: 'em', brAfter: true },
+  { t: 'В', cls: 'mute' }, { t: 'будни', cls: 'mute' }, { t: 'только', cls: 'mute' }, { t: 'исполнение.', cls: 'mute' },
 ];
 
-// Original positioning offer.
 const OFFER: { t: string; cls?: 'gold' | 'mute' | 'uline' }[] = [
-  { t: 'Помогаю опытным трейдерам перейти от ' },
-  { t: 'хаотичных входов', cls: 'mute' },
-  { t: ' к системе, где каждую сделку разрешает ' },
+  { t: 'Для тех, кто торгует рядом с ' },
+  { t: 'основной работой', cls: 'uline' },
+  { t: ' и не может сидеть у графика. Какую сделку брать, решает ' },
   { t: 'алгоритм', cls: 'gold' },
-  { t: ', а не ' },
-  { t: 'настроение в моменте', cls: 'uline' },
-  { t: '.' },
+  { t: ', а не настроение в моменте.' },
 ];
+
+const MONO_SMALL: React.CSSProperties = { fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase' };
 
 export default function HeroSectionV3() {
   const heroAuthor = useSiteAsset(SITE_ASSET_KEYS.heroAuthor, heroAuthorFallback);
@@ -48,10 +60,10 @@ export default function HeroSectionV3() {
         8V8<br />01
       </div>
 
-      {/* stacked centered photo for mobile + tablet (desktop ≥lg uses flush-right).
-          -mt-16 pulls it up behind the fixed header so there's no black top band;
-          the top of the gradient keeps the logo/menu legible and blends smoothly. */}
-      <div className="lg:hidden relative w-full mb-6 -mt-16" style={{ height: '48vh', zIndex: 1 }}>
+      {/* фото для телефона и планшета. Ниже, чем было (48vh → 38vh): под заголовком
+          теперь строка распорядка и фильтр, а кнопка должна остаться близко к первому
+          экрану — с телефона приходит 6 человек из 10. */}
+      <div className="lg:hidden relative w-full mb-6 -mt-16" style={{ height: '38vh', zIndex: 1 }}>
         <img
           src={heroAuthor}
           alt="Сергей — автор системы TRADELIKETYO"
@@ -65,7 +77,7 @@ export default function HeroSectionV3() {
       <div className="container-landing relative" style={{ zIndex: 2 }}>
         <div className="w-full lg:max-w-[56%]">
           <div className="v3h-eyebrow v3h-mono mb-7">
-            <span className="dot" /> TLT · Structural trading · Admission system
+            <span className="dot" /> Свинг-трейдинг · неделя и дневка
           </div>
 
           <h1 className="v3h-h1">
@@ -73,7 +85,7 @@ export default function HeroSectionV3() {
               <span key={i}>
                 <span className={`word ${w.cls === 'mute' ? 'mute' : ''}`} style={{ animationDelay: `${i * 0.08}s` }}>
                   {w.cls === 'em' ? <em>{w.t}</em> : w.t}
-                </span>{' '}
+                </span>{w.brAfter ? <br /> : ' '}
               </span>
             ))}
           </h1>
@@ -84,30 +96,43 @@ export default function HeroSectionV3() {
             ))}
           </p>
 
-          <div className="mt-12 flex flex-wrap items-center gap-4">
+          {/* распорядок: факты, а не обещание */}
+          <p className="v3h-mono mt-6" style={{ ...MONO_SMALL, opacity: 0.8 }}>
+            Разбор рынка раз в неделю, 30–60 минут · в будни короткая проверка
+          </p>
+
+          {/* фильтр: отсекает интрадей до лички */}
+          <p
+            className="mt-4 text-sm md:text-base"
+            style={{ color: 'var(--v3-mut)', borderLeft: '2px solid var(--v3-gold-dim)', paddingLeft: 12, maxWidth: '46ch' }}
+          >
+            Если вам нужен рынок каждый день и движение внутри часа — вам не сюда.
+          </p>
+
+          <div className="mt-9 flex flex-wrap items-center gap-4">
             <a href={TELEGRAM_LINKS.bot} target="_blank" rel="noopener noreferrer" className="v3h-btn v3h-btn--solid" onClick={() => trackClick('hero_bot')}>
-              Получить систему допуска <ArrowRight className="arr w-4 h-4" />
+              {/* на телефоне полная надпись переносится на две строки — там короче */}
+              <span className="hidden sm:inline">Получить бесплатный протокол</span>
+              <span className="sm:hidden">Получить протокол</span>
+              <ArrowRight className="arr w-4 h-4" />
             </a>
             <a href="#verdict" className="v3h-btn v3h-btn--ghost" onClick={() => trackClick('hero_scroll_verdict')}>
-              <ArrowDown className="w-4 h-4" /> Разбор ваших сделок
-            </a>
-            <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" className="v3h-btn v3h-btn--ghost" onClick={() => trackClick('hero_dm')}>
-              <MessageCircle className="w-4 h-4" /> Написать Сергею
+              <ArrowDown className="w-4 h-4" /> Вердикт по вашей сделке
             </a>
           </div>
 
-          {/* усилитель под кнопками: снимает страх звонка + говорит, что будет после клика */}
-          <p className="v3h-mono mt-7" style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', opacity: 0.55 }}>
-            Без звонков · бот за 2 минуты покажет, как работает допуск
+          {/* что будет после клика */}
+          <p className="v3h-mono mt-6" style={{ ...MONO_SMALL, opacity: 0.55 }}>
+            Бесплатно · Telegram-бот · 3 вопроса о вашей торговле · без звонков
           </p>
 
-          {/* ранний сигнал доверия (вопрос «а кто ты?») — якорь к блоку «Автор» */}
+          {/* ранний сигнал доверия — факты из журнала, якорь к результатам */}
           <a
-            href="#author"
+            href="#stats"
             className="v3h-mono mt-3 inline-flex items-center gap-1.5 opacity-70 hover:opacity-100 transition-opacity"
             style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}
           >
-            14 лет в рынке · 200+ учеников · автор системы
+            14 лет в рынке · 377 сделок в журнале за 20 месяцев
             <ArrowRight className="arr w-3 h-3" />
           </a>
         </div>

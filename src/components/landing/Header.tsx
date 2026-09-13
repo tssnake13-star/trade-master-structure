@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Menu, X, Send } from 'lucide-react';
 import { NAV_ITEMS, TELEGRAM_LINKS } from '@/lib/constants';
+import { trackClick } from '@/lib/analytics';
 import logoVideoFallback from '@/assets/logo-header.mp4';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 
@@ -73,10 +74,11 @@ const Header = () => {
                 href={TELEGRAM_LINKS.bot}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => trackClick('header_bot')}
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-sm font-medium rounded-lg hover:bg-foreground/90 transition-all duration-200"
               >
                 <Send className="w-4 h-4" />
-                Получить систему допуска
+                Получить протокол
               </a>
             </div>
 
@@ -127,11 +129,11 @@ const Header = () => {
               href={TELEGRAM_LINKS.bot}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => setIsMobileMenuOpen(false)}
+              onClick={() => { trackClick('header_bot'); setIsMobileMenuOpen(false); }}
               className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background font-medium rounded-lg hover:bg-foreground/90 transition-all duration-200"
             >
               <Send className="w-5 h-5" />
-              Получить систему допуска
+              Получить бесплатный протокол
             </a>
           </div>
         </div>

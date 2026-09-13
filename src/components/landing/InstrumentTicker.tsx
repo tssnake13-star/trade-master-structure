@@ -7,7 +7,7 @@ const PAIRS = [
   'EUR / GBP', 'EUR / CHF', 'GBP / CHF', 'CAD / CHF', 'EUR / CAD', 'GBP / CAD', 'NZD / CAD', 'AUD / NZD',
   'XAU / USD', 'XAG / USD',
   'BRENT',
-  'BTC / USDT', 'ETH / USDT',
+  'BTC / USD', 'ETH / USD',
 ];
 
 const TickerRow = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (

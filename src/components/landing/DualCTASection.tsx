@@ -17,7 +17,7 @@ const DualCTASection = () => {
               Хочу разобраться
             </p>
             <p className="text-sm text-muted-foreground mb-6">
-              Бот за 2 минуты покажет, как работает допуск
+              Бот задаст 3 вопроса о вашей торговле и пришлёт протокол «Система допуска»
             </p>
             <a
               href={TELEGRAM_LINKS.bot}
@@ -26,7 +26,7 @@ const DualCTASection = () => {
               onClick={() => trackClick('final_bot')}
               className="btn-primary group w-full justify-center"
             >
-              Перейти в Telegram-бот
+              Получить протокол в Telegram
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>

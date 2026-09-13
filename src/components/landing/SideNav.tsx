@@ -3,26 +3,27 @@ import { useEffect, useState } from 'react';
 const sections = [
   { id: 'hero', num: '00', label: 'Главная' },
   { id: 'problem', num: '01', label: 'Проблема' },
-  { id: 'verdict', num: '★', label: 'Разбор сделок' },
-  { id: 'transformation', num: '02', label: 'Трансформация' },
-  { id: 'proof', num: '03', label: 'Отзывы' },
-  { id: 'stats', num: '04', label: 'Результаты' },
-  { id: 'trades', num: '05', label: 'Сделки' },
-  { id: 'filter', num: '06', label: 'Фильтр' },
+  { id: 'filter', num: '02', label: 'Для кого' },
+  { id: 'week', num: '03', label: 'Неделя по системе' },
+  { id: 'proof', num: '04', label: 'Отзывы' },
+  { id: 'stats', num: '05', label: 'Результаты' },
+  { id: 'trades', num: '06', label: 'Сделки' },
   { id: 'difference', num: '07', label: 'Отличие' },
   { id: 'included', num: '08', label: 'Что входит' },
   { id: 'questions', num: '09', label: 'Четыре вопроса' },
-  { id: 'trading-system', num: '10', label: 'Архитектура' },
-  { id: 'protection', num: '11', label: 'Защита' },
-  { id: 'stages', num: '12', label: 'Путь' },
-  { id: 'learn', num: '13', label: 'Чему вы учитесь' },
-  { id: 'formats', num: '14', label: 'Сотрудничество' },
-  { id: 'author', num: '15', label: 'Автор' },
-  { id: 'faq', num: '16', label: 'Вопросы' },
+  { id: 'protection', num: '10', label: 'Защита' },
+  { id: 'stages', num: '11', label: 'Путь' },
+  { id: 'verdict', num: '★', label: 'Вердикт' },
+  { id: 'formats', num: '12', label: 'Уровни и цены' },
+  { id: 'author', num: '13', label: 'Автор' },
+  { id: 'faq', num: '14', label: 'Вопросы' },
 ];
 
 const SideNav = () => {
   const [active, setActive] = useState<string>(sections[0].id);
+  // на первом экране меню не показываем: там оно перекрывает текст и строку-фильтр,
+  // а листать ещё никто не начал
+  const [pastHero, setPastHero] = useState(false);
 
   useEffect(() => {
     const targets = sections
@@ -33,6 +34,7 @@ const SideNav = () => {
     let raf = 0;
     const update = () => {
       raf = 0;
+      setPastHero(window.scrollY > window.innerHeight * 0.7);
       const probe = window.innerHeight * 0.35; // линия активации сверху вьюпорта
       let current = targets[0].id;
       for (const el of targets) {
@@ -60,7 +62,12 @@ const SideNav = () => {
     <nav
       aria-label="Навигация по разделам"
       className="hidden xl:flex fixed left-8 top-1/2 -translate-y-1/2 z-40 flex-col gap-2.5"
-      style={{ fontFamily: "'Martian Mono', ui-monospace, monospace" }}
+      style={{
+        fontFamily: "'Martian Mono', ui-monospace, monospace",
+        opacity: pastHero ? 1 : 0,
+        pointerEvents: pastHero ? 'auto' : 'none',
+        transition: 'opacity 0.4s ease',
+      }}
     >
       {sections.map((s) => {
         const isActive = s.id === active;
