@@ -61,7 +61,7 @@ const TwoStagesSection = () => {
               Профессиональная среда торговли
             </p>
             <p className="mt-6 text-base md:text-lg text-muted-foreground">
-              Только для выпускников школы. Инструменты, которые берут на себя исполнение — вы остаётесь стратегом. Echo Gate, Hunter Bot, Risk Sentinel.
+              Только для выпускников школы. Инструменты берут на себя исполнение, а каждое решение по-прежнему за вами: вы оператор системы. Echo Gate, Hunter Bot, Risk Sentinel.
             </p>
             <div
               className="mt-8 text-[10px] uppercase tracking-[0.22em]"
