@@ -177,10 +177,19 @@ const PACKAGES: Pkg[] = [
   },
 ];
 
-const ECOSYSTEM: { price: string; period: string; desc: string; gift?: string; featured: boolean }[] = [
+/**
+ * Подписка на экосистему. Подарочных месяцев НЕТ (Сергей 18.09.2026): полгода —
+ * ровно 6 месяцев, год — ровно 12, «в подарок» обещало месяцы, которых подписчик
+ * не получит. Выгода длинного срока зашита в цену и считается от 3 месяцев:
+ * $447 / 3 = $149 в месяц. Зачёркнутая цена — тот же срок по $149:
+ * 6 × 149 = $894, 12 × 149 = $1788. Карточку 3 месяцев не трогать.
+ * Цены, зачёркнутые цены и расчёт видны только на /access: на лендинге
+ * цены экосистемы не раскрываются.
+ */
+const ECOSYSTEM: { price: string; oldPrice?: string; period: string; desc: string; saving?: string; featured: boolean }[] = [
   { price: '$447', period: '3 месяца', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду. Попробовать инфраструктуру.', featured: false },
-  { price: '$840', period: '6 месяцев', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду на полгода.', gift: '+ 1 месяц в подарок', featured: false },
-  { price: '$1490', period: '12 месяцев', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду на год', gift: '+ 2 месяца в подарок', featured: true },
+  { price: '$840', oldPrice: '$894', period: '6 месяцев', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду на полгода.', saving: '140 долларов в месяц вместо 149, экономия 54 доллара.', featured: false },
+  { price: '$1490', oldPrice: '$1788', period: '12 месяцев', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду на год.', saving: 'Около 124 долларов в месяц вместо 149, экономия 298 долларов.', featured: true },
 ];
 
 const GOLD = 'hsl(var(--accent))';
@@ -404,14 +413,17 @@ export default function PackageCards({
         <div className="mt-5 grid sm:grid-cols-3 gap-3">
           {ECOSYSTEM.map((e) => (
             <div key={e.period} className="p-4" style={{ border: `1px solid ${e.featured ? 'hsl(var(--accent) / 0.3)' : 'hsl(var(--rule-soft))'}` }}>
-              <div className="flex items-baseline gap-2">
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                 {showPrices && <span style={{ ...SERIF, fontSize: 26, color: 'hsl(var(--foreground))' }}>{e.price}</span>}
+                {showPrices && e.oldPrice && (
+                  <span className="text-sm line-through" style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }}>{e.oldPrice}</span>
+                )}
                 <span className="text-mono" style={{ ...MONO, fontSize: showPrices ? 10 : 13, letterSpacing: '0.12em', color: showPrices ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground))' }}>
                   {showPrices ? `/ ${e.period}` : e.period}
                 </span>
               </div>
               <p className="mt-1.5 text-xs text-muted-foreground">
-                {e.desc}{e.gift && <> <b className="text-foreground/90">{e.gift}</b>.</>}
+                {e.desc}{showPrices && e.saving && <> <b className="text-foreground/90">{e.saving}</b></>}
               </p>
             </div>
           ))}
