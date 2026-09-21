@@ -43,7 +43,9 @@ export default function SchoolStudentDetail() {
   // Терминал — отдельная подписка экосистемы. Срок обязателен у всех
   // (решение владельца 21.09.2026), бессрочной выдачи тут нет.
   const [terminalUntil, setTerminalUntil] = useState<string | null>(null);
-  const [terminalDays, setTerminalDays] = useState(30);
+  // 21.09.2026, его слово: вместо 30 — пробные 14 дней, и срок можно вписать руками
+  // (например, до конца подписки экосистемы, если у человека осталось 140 с чем-то дней)
+  const [terminalDays, setTerminalDays] = useState('14');
   const [pwModal, setPwModal] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
@@ -97,6 +99,15 @@ export default function SchoolStudentDetail() {
   useEffect(() => { load(); }, [studentId]);
 
   const terminalActive = !!terminalUntil && new Date(terminalUntil).getTime() > Date.now();
+  const termDays = Number.parseInt(terminalDays, 10);
+  const termDaysOk = Number.isFinite(termDays) && termDays >= 1 && termDays <= 3650;
+  // до какой даты откроется — считаем так же, как grantTerminal, чтобы видеть до нажатия
+  const termPreview = (() => {
+    if (!termDaysOk) return null;
+    const base = terminalActive ? new Date(terminalUntil!) : new Date();
+    base.setDate(base.getDate() + termDays);
+    return base.toLocaleDateString('ru-RU');
+  })();
   const isSelf = user?.id === studentId;
   const callerIsSuperAdmin = isSuperAdminEmail(user?.email);
   const targetIsSuperAdmin = isSuperAdminEmail(profile?.email);
@@ -459,18 +470,32 @@ export default function SchoolStudentDetail() {
             </span>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            <select
+            <input
+              type="number"
+              min={1}
+              max={3650}
               value={terminalDays}
-              onChange={e => setTerminalDays(Number(e.target.value))}
-              className="text-[11px] px-2 py-1.5 rounded"
-              style={{ backgroundColor: '#0a0a0a', color: '#e8e0d0', border: '1px solid #1a1a1a', fontFamily: font.mono }}
-            >
-              {[30, 90, 180, 365].map(d => <option key={d} value={d}>{d} дней</option>)}
-            </select>
+              onChange={e => setTerminalDays(e.target.value)}
+              aria-label="срок в днях"
+              className="text-[11px] px-2 py-1.5 rounded w-[72px]"
+              style={{ backgroundColor: '#0a0a0a', color: '#e8e0d0', border: `1px solid ${termDaysOk ? '#1a1a1a' : '#c45050'}`, fontFamily: font.mono }}
+            />
+            <span className="text-[11px]" style={{ color: '#666', fontFamily: font.mono }}>дней</span>
+            {[14, 90, 180, 365].map(d => (
+              <button
+                key={d}
+                onClick={() => setTerminalDays(String(d))}
+                className="text-[11px] px-2 py-1.5 rounded"
+                style={{ color: termDays === d ? '#e1a84d' : '#888', border: `1px solid ${termDays === d ? '#e1a84d55' : '#1a1a1a'}`, fontFamily: font.mono }}
+              >
+                {d}
+              </button>
+            ))}
             <button
-              onClick={() => grantTerminal(terminalDays)}
+              onClick={() => termDaysOk && grantTerminal(termDays)}
+              disabled={!termDaysOk}
               className="text-[11px] px-2.5 py-1.5 rounded flex items-center gap-1"
-              style={{ color: '#4a8a4a', border: '1px solid #1a1a1a', fontFamily: font.mono }}
+              style={{ color: termDaysOk ? '#4a8a4a' : '#444', border: '1px solid #1a1a1a', fontFamily: font.mono, cursor: termDaysOk ? 'pointer' : 'not-allowed' }}
             >
               <Plus size={12} /> {terminalActive ? 'Продлить' : 'Открыть доступ'}
             </button>
@@ -484,6 +509,11 @@ export default function SchoolStudentDetail() {
               </button>
             )}
           </div>
+          <p className="text-[11px] mt-2" style={{ color: termDaysOk ? '#888' : '#c45050', fontFamily: font.mono }}>
+            {termDaysOk
+              ? `${terminalActive ? 'Продлится' : 'Откроется'} до ${termPreview}${terminalActive ? ' — дни добавятся к текущему сроку' : ''}`
+              : 'Срок — от 1 до 3650 дней'}
+          </p>
           <p className="text-[11px] mt-3" style={{ color: '#444', fontFamily: font.mono }}>
             Отдельная подписка экосистемы: рынок, графики и разборы в кабинете. Срок обязателен.
           </p>
