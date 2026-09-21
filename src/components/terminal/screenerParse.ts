@@ -1,0 +1,184 @@
+// Разбор скринера подписчика — тех двух сообщений, что бот шлёт после «✅ ОДОБРЯЮ»
+// (format_groups_for_channel и format_top_for_channel). Бот не меняется: экран сам
+// раскладывает текст по карточкам. Не разобралось — экран покажет текст как есть.
+
+export type Side = 'up' | 'down' | 'flat';
+
+export interface ScrInstrument {
+  symbol: string;
+  side: 'LONG' | 'SHORT';
+  mode: string | null; // импульс, продолжение, выход из диапазона, боковик
+}
+
+export interface ScrGroup {
+  code: string;
+  name: string;
+  dir: Side;
+  trade: string; // BUY / SELL / MIXED …
+  macro: 'за' | 'против' | 'нейтрально' | null;
+  week: { arrow: Side; text: string };
+  day: { arrow: Side; text: string };
+  range: string | null;
+  acc: { verdict: 'за' | 'против' | 'спор' | null; text: string } | null;
+  instruments: ScrInstrument[];
+}
+
+export interface ScrTop {
+  rank: number;
+  symbol: string;
+  side: 'LONG' | 'SHORT';
+  scenario: string | null;
+  tags: string[];
+  week: { angle: string | null; passed: number | null; reserve: string | null };
+  day: { angle: string | null; passed: number | null; reserve: string | null };
+  range: string | null;
+  acc: string | null;
+  agree: boolean;
+}
+
+export interface ScrParsed {
+  groups: ScrGroup[];
+  top: ScrTop[];
+  fresh: string[]; // «свежие развороты, отмены и ложные выходы»
+}
+
+const NAMES: Record<string, string> = {
+  DXY: 'Доллар', JPY: 'Йена', AUD: 'Австралиец', NZD: 'Новозеландец', GBP: 'Фунт', CHF: 'Франк',
+  CAD: 'Канадец', EUR: 'Евро', GOLD: 'Золото', OIL: 'Нефть', BTC: 'Крипто',
+};
+const MODES: Record<string, string> = { '🔥': 'импульс', '✅': 'продолжение', '⚡': 'выход из диапазона', '🚫': 'боковик', '❓': 'режим неясен' };
+
+// «месяц с июня 2026, неделя с 16.08.2026» → «месяц с июня, неделя с 16.08»: год и так понятен
+const shortDates = (t: string) => t.replace(/(\d{2}\.\d{2})\.20\d{2}/g, '$1').replace(/ 20\d{2}\b/g, '').trim();
+
+const arrow = (a: string): Side => (a === '↑' ? 'up' : a === '↓' ? 'down' : 'flat');
+
+function scoreWords(raw: string): string {
+  const t = raw.trim();
+  if (!t) return '';
+  if (/ручн/.test(t)) return 'вручную';
+  const m = t.match(/(\d)\/(\d)(.*)$/);
+  if (!m) return t;
+  return `${m[1]} из ${m[2]}${m[3].trim() ? ' ' + m[3].trim() : ''}`;
+}
+
+export function parseGroups(text: string): ScrGroup[] {
+  const out: ScrGroup[] = [];
+  let cur: ScrGroup | null = null;
+  for (const raw of text.split('\n')) {
+    const line = raw.trim();
+    const g = line.match(/^(📈|📉|➖|❓|🚫)\s+(.+?)\s*(🟢|⚪|⛔)?\s*→\s*([A-Z]+)\s*·\s*W1\s*([↑↓~—])\s*(?:\[([^\]]*)\])?\s*·\s*D1\s*([↑↓~—])\s*(?:\[([^\]]*)\])?/u);
+    if (g) {
+      const label = g[2].trim();
+      const code = (label.match(/\(([A-Z]+)\)\s*$/) || [])[1] || label.replace(/[^A-Z]/g, '') || label;
+      cur = {
+        code,
+        name: NAMES[code] || label.replace(/^Группа\s+/i, ''),
+        dir: g[4] === 'BUY' ? 'up' : g[4] === 'SELL' ? 'down' : 'flat',
+        trade: g[4],
+        macro: g[3] === '🟢' ? 'за' : g[3] === '⛔' ? 'против' : g[3] === '⚪' ? 'нейтрально' : null,
+        week: { arrow: arrow(g[5]), text: scoreWords(g[6] || '') },
+        day: { arrow: arrow(g[7]), text: scoreWords(g[8] || '') },
+        range: null,
+        acc: null,
+        instruments: [],
+      };
+      out.push(cur);
+      continue;
+    }
+    if (!cur) continue;
+    const r = line.match(/^⚠️?\s*рейндж у [^:]+:\s*(.+)$/u);
+    if (r) {
+      cur.range = shortDates(r[1]);
+      continue;
+    }
+    const a = line.match(/^📈\s*накопления у [^—]+—\s*(.+)$/u);
+    if (a) {
+      const body = a[1];
+      const verdict = /в сторону группы/.test(body) ? 'за' : /против группы/.test(body) ? 'против' : /спорят/.test(body) ? 'спор' : null;
+      cur.acc = { verdict, text: body.replace(/\s*·\s*(✅|⚠️)\s*[^·]*$/u, '').trim() };
+      continue;
+    }
+    const ins = line.match(/^→\s*(.+)$/u);
+    if (ins) {
+      for (const part of ins[1].split(',')) {
+        const m = part.trim().match(/^([A-Z0-9_]+)\s+(LONG|SHORT)\s*(\S+)?/u);
+        if (m) cur.instruments.push({ symbol: m[1], side: m[2] as 'LONG' | 'SHORT', mode: m[3] ? MODES[m[3]] || null : null });
+      }
+      continue;
+    }
+    if (/^📌/u.test(line)) cur = null; // дальше — пояснения значков
+  }
+  return out;
+}
+
+export function parseTop(text: string): { top: ScrTop[]; fresh: string[] } {
+  const top: ScrTop[] = [];
+  const fresh: string[] = [];
+  let cur: ScrTop | null = null;
+  let tf: 'week' | 'day' | null = null;
+  let inFresh = false;
+  for (const raw of text.split('\n')) {
+    const line = raw.trim();
+    if (!line) continue;
+    if (/^📈\s*Накопления — свежие/u.test(line)) {
+      inFresh = true;
+      cur = null;
+      continue;
+    }
+    if (inFresh) {
+      if (line.startsWith('•')) fresh.push(line.replace(/^•\s*/, ''));
+      continue;
+    }
+    const h = line.match(/^(\d+)\.\s+([A-Z0-9_]+)\s+(LONG|SHORT)\s*·?\s*(.*)$/);
+    if (h) {
+      const tags = h[4].split('·').map((t) => t.replace(/🔥/gu, '').trim()).filter(Boolean);
+      const sc = tags.find((t) => /^сценарий/.test(t));
+      cur = {
+        rank: +h[1],
+        symbol: h[2],
+        side: h[3] as 'LONG' | 'SHORT',
+        scenario: sc ? sc.replace(/^сценарий\s*/, '') : null,
+        tags: tags.filter((t) => !/^сценарий/.test(t)),
+        week: { angle: null, passed: null, reserve: null },
+        day: { angle: null, passed: null, reserve: null },
+        range: null,
+        acc: null,
+        agree: false,
+      };
+      top.push(cur);
+      tf = null;
+      continue;
+    }
+    if (!cur) continue;
+    const ang = line.match(/^(W1|D1)\s+угол\s+(\S+)/);
+    if (ang) {
+      tf = ang[1] === 'W1' ? 'week' : 'day';
+      cur[tf].angle = ang[2];
+      continue;
+    }
+    const p = line.match(/^пройдено\s+(\d+)%.*?запас\s+[^(]*\(([\d.,]+)\s*ATR\)/);
+    if (p && tf && cur[tf].passed == null) {
+      cur[tf].passed = +p[1];
+      cur[tf].reserve = p[2].replace('.', ',');
+      continue;
+    }
+    const r = line.match(/^⚠️?\s*рейндж:\s*(.+)$/u);
+    if (r) {
+      cur.range = shortDates(r[1]);
+      continue;
+    }
+    const a = line.match(/^📈\s*накопления\s*—\s*(.+)$/u);
+    if (a) {
+      cur.acc = a[1].trim();
+      continue;
+    }
+    if (/в одну сторону/.test(line)) cur.agree = true;
+  }
+  return { top, fresh };
+}
+
+export function parseScreener(groups: string | null | undefined, top: string | null | undefined): ScrParsed {
+  const t = parseTop(top || '');
+  return { groups: parseGroups(groups || ''), top: t.top, fresh: t.fresh };
+}

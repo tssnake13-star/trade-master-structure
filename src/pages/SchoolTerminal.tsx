@@ -7,7 +7,8 @@ import FloatingWatermark from '@/components/school/FloatingWatermark';
 import { ArrowLeft, Search } from 'lucide-react';
 import { ACCENT, BG, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate, fmtWhen } from '@/components/terminal/theme';
 import { Arrow, CycleCard, Lines, Side, type MarketRow } from '@/components/terminal/parts';
-import { FalseExitFeed, ResonanceFeed, ScreenerFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
+import { FalseExitFeed, ResonanceFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
+import { ScreenerCards } from '@/components/terminal/Screener';
 import LiveChart from '@/components/terminal/LiveChart';
 import { LAYERS, layersOf, type Layer, type Scene } from '@/components/terminal/scene';
 
@@ -435,7 +436,7 @@ export default function SchoolTerminal() {
         {sidebar}
         <div style={{ minWidth: 0 }}>
           {section === 'instrument' && instrument}
-          {section === 'screener' && <ScreenerFeed doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />}
+          {section === 'screener' && <ScreenerCards doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />}
           {section === 'trend' && <TrendFeed doc={feeds.trend} symbols={symbols} onOpen={openSymbol} />}
           {section === 'falsex' && <FalseExitFeed doc={feeds.falsex} symbols={symbols} onOpen={openSymbol} />}
           {section === 'resonance' && <ResonanceFeed doc={feeds.resonance} symbols={symbols} onOpen={openSymbol} />}
