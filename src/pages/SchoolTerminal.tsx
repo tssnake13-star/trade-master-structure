@@ -63,6 +63,10 @@ type Tab = 'Анализ' | 'Циклы' | 'Накопления' | 'Рейнд�
 const TABS: Tab[] = ['Анализ', 'Циклы', 'Накопления', 'Рейндж', 'Как в боте'];
 
 type Kind = 'cycles' | 'trend' | 'all';
+// 21.09.2026, его порядок групп в левом списке: доллар, австралиец, йена, новозеландец,
+// канадец, фунт, франк, золото, биткоин (нефть — после золота: группа есть, он её не назвал)
+const GROUP_ORDER = ['DXY', 'AUD', 'JPY', 'NZD', 'CAD', 'GBP', 'CHF', 'GOLD', 'OIL', 'BTC'];
+
 // Почему нет сценария — словами бота из первой строки карточки /info
 // («🌀 USDCNH — Сценария нет: цель недельного цикла вниз взята; …»)
 const noScenReason = (r: MarketRow) => {
@@ -164,6 +168,39 @@ export default function SchoolTerminal() {
     return rows.filter((r) => !q || r.symbol.includes(q) || (r.title || '').toUpperCase().includes(q));
   }, [rows, query]);
 
+  // Левый список по группам (21.09.2026). Поводырь стоит в группе, которую ведёт, и первым.
+  // Кросс — в группе своего поводыря, как в карточке: AUDNZD ведёт NZDUSD — группа
+  // новозеландца, NZDJPY ведёт USDJPY — группа йены (скринер держит их в двух группах).
+  // У кого поводырь индекс доллара — группа из скринера: EURUSD в долларе, эфир у биткоина.
+  const groupedList = useMemo(() => {
+    const norm = (s: string) => s.toUpperCase().replace(/USDT$/, 'USD');
+    const leadOf: Record<string, string> = {};
+    for (const r of rows) if (r.extra?.leads) leadOf[norm(r.symbol)] = r.extra.leads;
+    const groupOf = (r: MarketRow) => {
+      if (r.extra?.leads) return r.extra.leads;
+      const lead = r.extra?.leader;
+      if (lead && lead !== 'DXY' && leadOf[norm(lead)]) return leadOf[norm(lead)];
+      return r.group_key || (lead === 'DXY' ? 'DXY' : 'OTHER');
+    };
+    const by = new Map<string, MarketRow[]>();
+    for (const r of list) {
+      const g = groupOf(r);
+      const arr = by.get(g) || [];
+      arr.push(r);
+      by.set(g, arr);
+    }
+    const pos = (g: string) => {
+      const i = GROUP_ORDER.indexOf(g);
+      return i < 0 ? GROUP_ORDER.length : i;
+    };
+    return [...by.entries()]
+      .sort((a, b) => pos(a[0]) - pos(b[0]))
+      .map(([g, rs]): [string, MarketRow[]] => [
+        g,
+        [...rs].sort((x, y) => Number(!!y.extra?.leads) - Number(!!x.extra?.leads) || x.symbol.localeCompare(y.symbol)),
+      ]);
+  }, [rows, list]);
+
   const cur = useMemo(() => rows.find((r) => r.symbol === selected) || rows[0] || null, [rows, selected]);
 
   const go = useCallback(
@@ -256,7 +293,10 @@ export default function SchoolTerminal() {
           style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: FG, fontFamily: SANS, fontSize: 13 }}
         />
       </div>
-      {list.map((r) => {
+      {groupedList.map(([g, rs]) => (
+        <div key={g} style={{ marginBottom: 6 }}>
+          <div style={{ ...label, color: ACCENT, padding: '10px 8px 4px' }}>{GEN[g] ? `Группа ${GEN[g]}` : 'Другие'}</div>
+          {rs.map((r) => {
         const on = section === 'instrument' && cur?.symbol === r.symbol;
         return (
           <button
@@ -292,7 +332,9 @@ export default function SchoolTerminal() {
             <span style={{ fontFamily: MONO, fontSize: 11, color: DIM, minWidth: 62, textAlign: 'right' }}>{r.price_text || '—'}</span>
           </button>
         );
-      })}
+          })}
+        </div>
+      ))}
     </div>
   );
 
