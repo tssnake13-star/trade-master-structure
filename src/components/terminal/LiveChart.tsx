@@ -1,26 +1,29 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ACCENT, BORDER, DIM, FG, MONO, label, pill } from './theme';
-import { fmtDay, niceTicks, type Layer, type Scene, type ScenePanel, type Shape } from './scene';
+import { fmtDay, niceTicks, type Layer, type Scene, type ScenePanel } from './scene';
+import { DNC, GRID, PAD, PANEL_BG, UPC, placeLabels, shapeNode, tickDigits, yRange } from './chartDraw';
 
 /**
  * Живой график терминала. Рисует ровно то, что нарисовала рисовалка бота, — теми же
  * цветами и штрихами, только с наведением, приближением и слоями. Ничего не считает:
  * все фигуры пришли готовыми в координатах «номер свечи · цена».
+ *
+ * 21.09.2026, его отзыв с телефона: «как-то он стрёмно смотрится». На узком экране
+ * график почти квадратный, номера не наезжают, цены без лишних нулей, служебная
+ * строка сверху убрана, подписи под графиком — под кнопкой, есть «на весь экран».
  */
 
-const PANEL_BG = '#161b22'; // фон поля — как на картинке бота
-const GRID = '#2a3038';
-const UPC = '#26a17b';
-const DNC = '#d1493f';
-const PAD = { l: 6, r: 64, t: 10, b: 24 };
+// служебные строки картинки бота (время расчёта, «csv 110») — ученику ни к чему
+const TECH = /^\d{2}\.\d{2}\.\d{4}\s+\d{2}:\d{2}|\bcsv\s+\d|\bmt5\s+\d/i;
 
 export default function LiveChart({ scene, hidden }: { scene: Scene; hidden: Set<Layer> }) {
+  const texts = scene.texts.filter((t) => !TECH.test(t.t));
   return (
     <div>
-      {scene.title || scene.texts.length ? (
-        <div style={{ marginBottom: 12 }}>
+      {scene.title || texts.length ? (
+        <div style={{ marginBottom: 4 }}>
           {scene.title ? <div style={{ color: FG, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{scene.title}</div> : null}
-          {scene.texts.map((t, i) => (
+          {texts.map((t, i) => (
             <div key={i} style={{ color: t.c, fontSize: 12, lineHeight: 1.55 }}>
               {t.t}
             </div>
@@ -34,110 +37,45 @@ export default function LiveChart({ scene, hidden }: { scene: Scene; hidden: Set
   );
 }
 
-/** По высоте: пока смотрим целиком — как на картинке (видна цель цикла); приблизили
- *  больше чем вдвое — подгоняем под видимые свечи, иначе они сплющиваются. */
-function yRange(p: ScenePanel, v: [number, number], full: [number, number]): [number, number] {
-  const zoomed = v[1] - v[0] < 0.5 * (full[1] - full[0]);
-  let lo = Infinity;
-  let hi = -Infinity;
-  p.bars.forEach((b, i) => {
-    const x = p.x0 + i;
-    if (x >= v[0] - 0.5 && x <= v[1] + 0.5) {
-      lo = Math.min(lo, b[3]);
-      hi = Math.max(hi, b[2]);
-    }
-  });
-  if (zoomed) {
-    for (const s of p.shapes) if (s.k === 'mark' && s.x >= v[0] && s.x <= v[1]) { lo = Math.min(lo, s.y); hi = Math.max(hi, s.y); }
-    for (const l of p.labels) if (l.x >= v[0] && l.x <= v[1]) { lo = Math.min(lo, l.y); hi = Math.max(hi, l.y); }
-  } else {
-    lo = Math.min(lo, p.ylim[0]);
-    hi = Math.max(hi, p.ylim[1]);
-  }
-  if (!Number.isFinite(lo) || !Number.isFinite(hi)) [lo, hi] = p.ylim;
-  const pad = (hi - lo) * (zoomed ? 0.08 : 0.02) || Math.abs(hi) * 0.001 || 1;
-  return [lo - pad, hi + pad];
-}
-
-function shapeNode(s: Shape, key: number, sx: (x: number) => number, sy: (y: number) => number): ReactNode {
-  switch (s.k) {
-    case 'line': {
-      const lw = Math.max(0.8, s.w * 1.15);
-      return (
-        <polyline
-          key={key}
-          points={s.p.map(([x, y]) => `${sx(x).toFixed(1)},${sy(y).toFixed(1)}`).join(' ')}
-          fill="none"
-          stroke={s.c}
-          strokeOpacity={s.a}
-          strokeWidth={lw}
-          strokeDasharray={s.d ? s.d.map((v) => (v * lw).toFixed(1)).join(' ') : undefined}
-          strokeLinecap="round"
-        />
-      );
-    }
-    case 'mark': {
-      const x = sx(s.x);
-      const y = sy(s.y);
-      const r = Math.max(2.5, s.s * 0.62);
-      if (s.m === 'o') return <circle key={key} cx={x} cy={y} r={r} fill={s.c} fillOpacity={s.a} stroke={s.e} strokeWidth={1.2} />;
-      if (s.m === 'x')
-        return (
-          <g key={key} stroke={s.c} strokeWidth={1.8}>
-            <line x1={x - r} y1={y - r} x2={x + r} y2={y + r} />
-            <line x1={x - r} y1={y + r} x2={x + r} y2={y - r} />
-          </g>
-        );
-      const d = s.m === '^' ? `M${x},${y - r} L${x + r},${y + r * 0.8} L${x - r},${y + r * 0.8} Z` : `M${x},${y + r} L${x + r},${y - r * 0.8} L${x - r},${y - r * 0.8} Z`;
-      return <path key={key} d={d} fill={s.c} fillOpacity={s.a} stroke={s.e} strokeWidth={0.6} />;
-    }
-    case 'rect': {
-      const x1 = sx(s.x);
-      const x2 = sx(s.x + s.w);
-      const yt = sy(s.y + s.h);
-      const yb = sy(s.y);
-      return (
-        <rect
-          key={key}
-          x={Math.min(x1, x2)}
-          y={Math.min(yt, yb)}
-          width={Math.abs(x2 - x1)}
-          height={Math.max(0.5, Math.abs(yb - yt))}
-          fill={s.f || 'none'}
-          fillOpacity={s.f ? s.fa : 0}
-          stroke={s.e || 'none'}
-          strokeWidth={s.e ? Math.max(0.8, s.ew) : 0}
-        />
-      );
-    }
-    case 'poly':
-      return (
-        <path
-          key={key}
-          d={s.p.map(([x, y], i) => `${i ? 'L' : 'M'}${sx(x).toFixed(1)},${sy(y).toFixed(1)}`).join(' ') + ' Z'}
-          fill={s.f}
-          fillOpacity={s.fa}
-        />
-      );
-  }
-}
-
 function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
   const boxRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
+  const [fs, setFs] = useState(false);
+  const [more, setMore] = useState(false);
   const [w, setW] = useState(720);
+  const [vh, setVh] = useState(typeof window === 'undefined' ? 800 : window.innerHeight);
   useEffect(() => {
     const el = boxRef.current;
     if (!el) return;
-    const fit = () => setW(Math.max(280, Math.round(el.clientWidth)));
+    const fit = () => setW(Math.max(260, Math.round(el.clientWidth)));
     fit();
     const ro = new ResizeObserver(fit);
     ro.observe(el);
     return () => ro.disconnect();
+  }, [fs]);
+  useEffect(() => {
+    const f = () => setVh(window.innerHeight);
+    window.addEventListener('resize', f);
+    return () => window.removeEventListener('resize', f);
   }, []);
-  const H = Math.round(Math.max(250, Math.min(520, w * 0.56)));
+  // на весь экран — страницу под графиком не листаем
+  useEffect(() => {
+    if (!fs) return;
+    const was = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = was;
+    };
+  }, [fs]);
+  const touch = useMemo(() => typeof window !== 'undefined' && !!window.matchMedia?.('(pointer: coarse)').matches, []);
+
+  const narrow = w < 560;
+  const H = fs
+    ? Math.max(280, vh - 130)
+    : Math.round(narrow ? Math.max(290, Math.min(560, w * 0.98)) : Math.max(250, Math.min(520, w * 0.56)));
   const pw = Math.max(50, w - PAD.l - PAD.r);
   const ph = H - PAD.t - PAD.b;
+  const R = narrow ? 7.5 : 8.5;
 
   const lastX = p.x0 + p.bars.length - 1;
   const full = useMemo<[number, number]>(() => [p.xlim[0], p.edge ?? p.xlim[1]], [p]);
@@ -251,11 +189,11 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
   const body = useMemo(() => {
     const vis = sorted.filter((s) => !hidden.has(s.L));
     const bw = Math.max(1, Math.min(14, (pw / span) * 0.62));
-    const priceTicks = niceTicks(y0, y1, Math.max(3, Math.round(ph / 55)));
+    const priceTicks = niceTicks(y0, y1, Math.max(3, Math.round(ph / 60)));
+    const dec = tickDigits(priceTicks.length > 1 ? priceTicks[1] - priceTicks[0] : 0, p.dg);
     const inView = p.bars.map((b, i) => ({ b, x: p.x0 + i })).filter(({ x }) => x >= view[0] - 1 && x <= view[1] + 1);
     // подпись недели длиннее (дд.мм.гг) — на неё места больше, иначе даты стоят вплотную
     const step = Math.max(1, Math.ceil(inView.length / Math.max(3, Math.floor(pw / (p.tf === 'W1' ? 120 : 90)))));
-    const fmtP = (v: number) => v.toFixed(Math.min(p.dg, Math.abs(v) >= 1000 ? 2 : p.dg));
     return (
       <g>
         <rect x={PAD.l} y={PAD.t} width={pw} height={ph} fill={PANEL_BG} />
@@ -263,7 +201,7 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
           <g key={v}>
             <line x1={PAD.l} x2={PAD.l + pw} y1={sy(v)} y2={sy(v)} stroke={GRID} strokeWidth={0.6} />
             <text x={PAD.l + pw + 6} y={sy(v) + 3.5} fontSize={10} fill="#6b7684" fontFamily={MONO}>
-              {fmtP(v)}
+              {v.toFixed(dec)}
             </text>
           </g>
         ))}
@@ -293,6 +231,11 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
     );
   }, [sorted, hidden, p, view, span, pw, ph, y0, y1, sx, sy, cid]);
 
+  const placed = useMemo(
+    () => placeLabels(p.labels, sx, sy, { x0: PAD.l, x1: PAD.l + pw, y0: PAD.t, y1: PAD.t + ph }, R),
+    [p.labels, sx, sy, pw, ph, R],
+  );
+
   if (p.empty) {
     return (
       <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 12, marginTop: 12 }}>
@@ -318,7 +261,7 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
         <line x1={sx(xi)} x2={sx(xi)} y1={PAD.t} y2={PAD.t + ph} stroke="#8b949e" strokeDasharray="3 3" strokeWidth={0.8} />
         <line x1={PAD.l} x2={PAD.l + pw} y1={cross.py} y2={cross.py} stroke="#8b949e" strokeDasharray="3 3" strokeWidth={0.8} />
         <rect x={PAD.l + pw + 1} y={cross.py - 9} width={PAD.r - 2} height={18} rx={3} fill="#2a3038" />
-        <text x={PAD.l + pw + 5} y={cross.py + 4} fontSize={10} fill={FG} fontFamily={MONO}>
+        <text x={PAD.l + pw + 4} y={cross.py + 4} fontSize={10} fill={FG} fontFamily={MONO}>
           {yv.toFixed(p.dg)}
         </text>
       </g>
@@ -327,7 +270,7 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
       const [d, o, h, l, c] = bar;
       const [yy, mm, dd] = d.split('-');
       tip = (
-        <div style={{ position: 'absolute', left: PAD.l + 8, top: PAD.t + 6, pointerEvents: 'none', background: 'rgba(12,14,18,0.88)', border: `1px solid ${BORDER}`, borderRadius: 6, padding: '4px 8px', fontFamily: MONO, fontSize: 11, color: FG, whiteSpace: 'nowrap' }}>
+        <div style={{ position: 'absolute', left: PAD.l + 6, top: PAD.t + 6, right: PAD.r + 6, pointerEvents: 'none', background: 'rgba(12,14,18,0.9)', border: `1px solid ${BORDER}`, borderRadius: 6, padding: '4px 8px', fontFamily: MONO, fontSize: 11, color: FG, lineHeight: 1.5 }}>
           {p.tf === 'W1' ? 'неделя с ' : ''}
           {dd}.{mm}.{yy} · откр {o.toFixed(p.dg)} · макс {h.toFixed(p.dg)} · мин {l.toFixed(p.dg)} · закр{' '}
           <span style={{ color: c >= o ? UPC : DNC }}>{c.toFixed(p.dg)}</span>
@@ -336,13 +279,19 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
     }
   }
 
-  const hlLabel = hl != null ? p.labels.find((l) => l.n === hl) : undefined;
+  const hlLabel = hl != null ? placed.find((l) => l.n === hl) : undefined;
+  const btn = { ...pill(false), padding: '4px 10px' };
 
-  return (
-    <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 12, marginTop: 12 }}>
+  const content = (
+    <>
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
         <div style={{ color: FG, fontWeight: 700, fontSize: 14 }}>{p.title}</div>
         {p.note ? <div style={{ color: '#e8b830', fontSize: 12 }}>{p.note}</div> : null}
+        {fs ? (
+          <button onClick={() => setFs(false)} style={{ ...btn, marginLeft: 'auto' }}>
+            ✕ свернуть
+          </button>
+        ) : null}
       </div>
       {p.head.map((h, i) => (
         <div key={i} style={{ color: h.c, fontSize: 12, fontWeight: 700, marginTop: 4 }}>
@@ -350,23 +299,32 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
         </div>
       ))}
       <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', margin: '10px 0 8px' }}>
-        <button onClick={() => zoomAt(0.7)} style={{ ...pill(false), padding: '3px 10px' }} aria-label="приблизить">
+        <button onClick={() => zoomAt(0.7)} style={btn} aria-label="приблизить">
           +
         </button>
-        <button onClick={() => zoomAt(1 / 0.7)} style={{ ...pill(false), padding: '3px 10px' }} aria-label="отдалить">
+        <button onClick={() => zoomAt(1 / 0.7)} style={btn} aria-label="отдалить">
           −
         </button>
-        <button onClick={() => setView(full)} style={{ ...pill(false), padding: '3px 10px' }}>
-          весь график
+        <button onClick={() => setView(full)} style={btn} aria-label="весь график">
+          {narrow ? '↺' : 'весь график'}
         </button>
-        <span style={{ ...label, marginLeft: 'auto' }}>тяните — сдвиг · Ctrl+колесо или два пальца — масштаб</span>
+        {!fs ? (
+          <button onClick={() => setFs(true)} style={btn} aria-label="на весь экран">
+            ⤢ на весь экран
+          </button>
+        ) : null}
+        {!narrow || fs ? (
+          <span style={{ ...label, marginLeft: 'auto' }}>
+            {touch ? 'два пальца — масштаб · тяните — сдвиг' : 'тяните — сдвиг · Ctrl+колесо — масштаб · двойной щелчок — сброс'}
+          </span>
+        ) : null}
       </div>
       <div ref={boxRef} style={{ position: 'relative', width: '100%' }}>
         <svg
           ref={svgRef}
           width={w}
           height={H}
-          style={{ display: 'block', touchAction: 'pan-y', userSelect: 'none', cursor: drag.current?.moved ? 'grabbing' : 'crosshair' }}
+          style={{ display: 'block', touchAction: 'pan-y', userSelect: 'none', cursor: 'crosshair' }}
           onPointerDown={onDown}
           onPointerMove={onMove}
           onPointerUp={onUp}
@@ -381,13 +339,14 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
           </defs>
           {body}
           {crossNode}
-          <g clipPath={`url(#${cid})`}>
-            {p.labels.map((l) => {
+          <g>
+            {placed.map((l) => {
               const on = hl === l.n;
               return (
                 <g key={l.n} onPointerEnter={() => setHl(l.n)} onPointerLeave={() => setHl(null)} style={{ cursor: 'pointer' }}>
-                  <circle cx={sx(l.x)} cy={sy(l.y)} r={on ? 11 : 8.5} fill={PANEL_BG} stroke={l.c} strokeWidth={on ? 2 : 1.2} />
-                  <text x={sx(l.x)} y={sy(l.y) + 3.5} textAnchor="middle" fontSize={on ? 11 : 9.5} fontWeight={700} fill={l.c} fontFamily={MONO}>
+                  {l.moved ? <line x1={l.ax} y1={l.ay} x2={l.px} y2={l.py} stroke={l.c} strokeOpacity={0.45} strokeWidth={0.8} /> : null}
+                  <circle cx={l.px} cy={l.py} r={on ? R + 2.5 : R} fill={PANEL_BG} stroke={l.c} strokeWidth={on ? 2 : 1.2} />
+                  <text x={l.px} y={l.py + 3.3} textAnchor="middle" fontSize={on ? 11 : narrow ? 9 : 9.5} fontWeight={700} fill={l.c} fontFamily={MONO}>
                     {l.n}
                   </text>
                 </g>
@@ -400,9 +359,9 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
           <div
             style={{
               position: 'absolute',
-              left: Math.min(Math.max(sx(hlLabel.x) + 14, 4), w - 240),
-              top: Math.min(Math.max(sy(hlLabel.y) - 12, 4), H - 40),
-              maxWidth: 260,
+              left: Math.min(Math.max(hlLabel.px + 14, 4), Math.max(4, w - 230)),
+              top: Math.min(Math.max(hlLabel.py - 12, 4), H - 40),
+              maxWidth: 240,
               pointerEvents: 'none',
               background: 'rgba(12,14,18,0.92)',
               border: `1px solid ${hlLabel.c}`,
@@ -417,7 +376,7 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
         ) : null}
       </div>
       {p.labels.length ? (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '2px 14px', marginTop: 10 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '2px 14px', marginTop: 10 }}>
           {p.labels.map((l) => (
             <div
               key={l.n}
@@ -433,11 +392,25 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
         </div>
       ) : null}
       {p.foot ? (
-        <div style={{ whiteSpace: 'pre-wrap', color: DIM, fontSize: 11, fontFamily: MONO, lineHeight: 1.6, marginTop: 10, borderTop: `1px solid ${BORDER}`, paddingTop: 8 }}>
-          {p.foot}
+        <div style={{ marginTop: 10 }}>
+          <button onClick={() => setMore(!more)} style={{ ...btn, fontSize: 9 }}>
+            {more ? 'скрыть подробности цикла' : 'подробности цикла: запас хода, все переходы угла'}
+          </button>
+          {more ? (
+            <div style={{ whiteSpace: 'pre-wrap', color: DIM, fontSize: 11, fontFamily: MONO, lineHeight: 1.6, marginTop: 8 }}>{p.foot}</div>
+          ) : null}
         </div>
       ) : null}
       {hidden.size ? <div style={{ ...label, marginTop: 6, color: ACCENT }}>часть слоёв скрыта</div> : null}
-    </div>
+    </>
   );
+
+  if (fs) {
+    return (
+      <div style={{ position: 'fixed', inset: 0, zIndex: 80, background: '#0c0e12', overflowY: 'auto', padding: '12px 10px 24px' }}>
+        {content}
+      </div>
+    );
+  }
+  return <div style={{ borderTop: `1px solid ${BORDER}`, paddingTop: 12, marginTop: 12 }}>{content}</div>;
 }

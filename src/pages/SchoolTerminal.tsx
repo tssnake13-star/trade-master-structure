@@ -68,6 +68,9 @@ export default function SchoolTerminal() {
   const [kind, setKind] = useState<Kind>('cycles');
   const [pic, setPic] = useState<string | null>(null);
   const [wide, setWide] = useState(typeof window === 'undefined' ? true : window.innerWidth >= 1100);
+  // телефон: кнопки слоёв — под одной «слои», чтобы не занимали полэкрана
+  const [phone, setPhone] = useState(typeof window === 'undefined' ? false : window.innerWidth < 700);
+  const [showLayers, setShowLayers] = useState(false);
   const [full, setFull] = useState(false);
   // живой график (заход 3): те же фигуры, что на картинке бота, данными; картинка — запасной вид
   const [live, setLive] = useState(true);
@@ -82,7 +85,10 @@ export default function SchoolTerminal() {
   }, [authLoading, session, navigate]);
 
   useEffect(() => {
-    const onResize = () => setWide(window.innerWidth >= 1100);
+    const onResize = () => {
+      setWide(window.innerWidth >= 1100);
+      setPhone(window.innerWidth < 700);
+    };
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
@@ -351,7 +357,12 @@ export default function SchoolTerminal() {
           <button onClick={() => setLive(false)} style={{ ...pill(!live), padding: '4px 9px' }}>
             картинка как в боте
           </button>
-          {live && scene
+          {live && scene && phone ? (
+            <button onClick={() => setShowLayers(!showLayers)} style={{ ...pill(showLayers), padding: '4px 9px' }}>
+              слои {showLayers ? '▴' : '▾'}
+            </button>
+          ) : null}
+          {live && scene && (showLayers || !phone)
             ? LAYERS.filter(([L]) => present.has(L)).map(([L, name]) => (
                 <button
                   key={L}
