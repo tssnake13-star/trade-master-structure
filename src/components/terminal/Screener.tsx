@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { AlertTriangle, TrendingDown, TrendingUp, MoveRight } from 'lucide-react';
-import { ACCENT, BORDER, DIM, DOWN, FG, MONO, UP, card, label } from './theme';
+import { ACCENT, BORDER, DIM, DOWN, FG, MONO, UP, card, fmtWhen, fromBotTime, label } from './theme';
 import { ScreenerFeed, type FeedDocs } from './Feeds';
 import { GEN, parseScreener, type ScrGroup, type ScrInstrument, type ScrTop, type Side } from './screenerParse';
 
@@ -161,15 +161,49 @@ function Block({ title, color, children }: { title: string; color: string; child
   );
 }
 
-export function ScreenerCards({ doc, symbols, onOpen }: { doc?: FeedDocs['screener']; symbols: Set<string>; onOpen: Open }) {
+/**
+ * part — какую половину показать: группы (вкладка «Скринер») или ТОП циклов (своя вкладка
+ * с 21.09.2026 — на телефоне до ТОПа под группами было долго листать).
+ */
+export function ScreenerCards({ doc, symbols, onOpen, part = 'groups' }: { doc?: FeedDocs['screener']; symbols: Set<string>; onOpen: Open; part?: 'groups' | 'top' }) {
   const parsed = parseScreener(doc?.groups, doc?.top, doc?.leaders);
   if (!doc || (!parsed.groups.length && !parsed.top.length)) return <ScreenerFeed doc={doc} symbols={symbols} onOpen={onOpen} />;
+  const when = fmtWhen(fromBotTime(doc.time));
+  if (part === 'top') {
+    return (
+      <div>
+        <div style={{ ...label, marginBottom: 14 }}>ТОП циклов из скринера от {when} · одобрен автором · то же, что получили подписчики</div>
+        {parsed.top.length ? (
+          <Block title={`🏆 ТОП ЦИКЛОВ · ${parsed.top.length} ${plural(parsed.top.length, 'инструмент', 'инструмента', 'инструментов')}`} color={ACCENT}>
+            {parsed.top.map((t) => <TopCard key={t.rank} t={t} symbols={symbols} onOpen={onOpen} />)}
+          </Block>
+        ) : (
+          <div style={{ ...card, padding: 14, color: DIM, fontSize: 13, marginBottom: 14 }}>В этом скринере ТОП циклов пуст.</div>
+        )}
+        {parsed.fresh.length ? (
+          <details style={{ ...card, padding: '10px 12px', marginBottom: 14, fontSize: 12, color: DIM }}>
+            <summary style={{ cursor: 'pointer', color: FG }}>Свежие изменения накоплений · {parsed.fresh.length} ▾</summary>
+            <div style={{ marginTop: 8, lineHeight: 1.6 }}>
+              {parsed.fresh.map((f, i) => (
+                <div key={i}>• {f}</div>
+              ))}
+            </div>
+          </details>
+        ) : null}
+        <div style={{ color: DIM, fontSize: 11, lineHeight: 1.7, display: 'flex', flexWrap: 'wrap', gap: '2px 12px', alignItems: 'center' }}>
+          <span>неделя и дневка — сколько цикла уже пройдено</span>
+          <span>запас дневки — сколько хода осталось до цели дневного цикла</span>
+          <span>рейндж — цена стоит, выхода нет (информация, не запрет)</span>
+        </div>
+      </div>
+    );
+  }
   const up = parsed.groups.filter((g) => g.dir === 'up');
   const down = parsed.groups.filter((g) => g.dir === 'down');
   const flat = parsed.groups.filter((g) => g.dir === 'flat');
   return (
     <div>
-      <div style={{ ...label, marginBottom: 14 }}>скринер от {doc.time || '—'} · одобрен автором · то же, что получили подписчики</div>
+      <div style={{ ...label, marginBottom: 14 }}>скринер от {when} · одобрен автором · то же, что получили подписчики</div>
       {up.length ? (
         <Block title={`↑ ВВЕРХ · BUY · ${groupsN(up.length)}`} color={UP}>
           {up.map((g) => <GroupCard key={g.code} g={g} symbols={symbols} onOpen={onOpen} />)}
@@ -184,21 +218,6 @@ export function ScreenerCards({ doc, symbols, onOpen }: { doc?: FeedDocs['screen
         <Block title={`~ БЕЗ ЧЁТКОГО НАПРАВЛЕНИЯ · ${groupsN(flat.length)}`} color={DIM}>
           {flat.map((g) => <GroupCard key={g.code} g={g} symbols={symbols} onOpen={onOpen} />)}
         </Block>
-      ) : null}
-      {parsed.top.length ? (
-        <Block title={`🏆 ТОП ЦИКЛОВ · ${parsed.top.length} ${plural(parsed.top.length, 'инструмент', 'инструмента', 'инструментов')}`} color={ACCENT}>
-          {parsed.top.map((t) => <TopCard key={t.rank} t={t} symbols={symbols} onOpen={onOpen} />)}
-        </Block>
-      ) : null}
-      {parsed.fresh.length ? (
-        <details style={{ ...card, padding: '10px 12px', marginBottom: 14, fontSize: 12, color: DIM }}>
-          <summary style={{ cursor: 'pointer', color: FG }}>Свежие изменения накоплений · {parsed.fresh.length} ▾</summary>
-          <div style={{ marginTop: 8, lineHeight: 1.6 }}>
-            {parsed.fresh.map((f, i) => (
-              <div key={i}>• {f}</div>
-            ))}
-          </div>
-        </details>
       ) : null}
       <div style={{ color: DIM, fontSize: 11, lineHeight: 1.7, display: 'flex', flexWrap: 'wrap', gap: '2px 12px', alignItems: 'center' }}>
         <span>2 из 3 — сколько из трёх критериев недели (свинг, свеча, накопления) за сторону; у пары — за её сторону</span>

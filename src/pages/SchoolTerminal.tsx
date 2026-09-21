@@ -5,10 +5,11 @@ import { supabase } from '@/integrations/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import FloatingWatermark from '@/components/school/FloatingWatermark';
 import { ArrowLeft, Search } from 'lucide-react';
-import { ACCENT, BG, BLUE, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate, fmtWhen } from '@/components/terminal/theme';
+import { ACCENT, BG, BLUE, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate } from '@/components/terminal/theme';
 import { Arrow, CycleCard, Lines, Side, type MarketRow } from '@/components/terminal/parts';
 import { FalseExitFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
+import StatusStrip from '@/components/terminal/Status';
 import { GEN } from '@/components/terminal/screenerParse';
 import LiveChart from '@/components/terminal/LiveChart';
 import { LAYERS, layersOf, type Layer, type Scene } from '@/components/terminal/scene';
@@ -47,10 +48,12 @@ interface Meta {
 }
 
 // 21.09.2026, его слово: вкладку «Резонанс» из «Глаза системы» убрать
-type Section = 'instrument' | 'screener' | 'trend' | 'falsex' | 'verdicts';
+// 21.09.2026: ТОП циклов — своей вкладкой (на телефоне до него под группами было долго листать)
+type Section = 'instrument' | 'screener' | 'top' | 'trend' | 'falsex' | 'verdicts';
 const SECTIONS: [Section, string][] = [
   ['instrument', 'Инструмент'],
   ['screener', 'Скринер'],
+  ['top', 'ТОП циклов'],
   ['trend', 'Тренд'],
   ['falsex', 'Ложные выходы'],
   ['verdicts', 'Решения'],
@@ -84,6 +87,12 @@ export default function SchoolTerminal() {
   // телефон: кнопки слоёв — под одной «слои», чтобы не занимали полэкрана
   const [phone, setPhone] = useState(typeof window === 'undefined' ? false : window.innerWidth < 700);
   const [showLayers, setShowLayers] = useState(false);
+  // часы для строки свежести: «онлайн» считается от текущего времени, раз в минуту
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const t = window.setInterval(() => setNow(Date.now()), 60000);
+    return () => window.clearInterval(t);
+  }, []);
   const [full, setFull] = useState(false);
   // живой график (заход 3): те же фигуры, что на картинке бота, данными; картинка — запасной вид
   const [live, setLive] = useState(true);
@@ -451,7 +460,7 @@ export default function SchoolTerminal() {
           <span style={label}>Trade Master · TradeLikeTyo</span>
         </div>
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
-          <span style={label}>обновлено {fmtWhen(meta?.updated_at || null)}</span>
+          <StatusStrip updatedAt={meta?.updated_at || null} feeds={feeds} now={now} />
           {until ? <span style={label}>подписка до {fmtDate(until)}</span> : null}
         </div>
       </header>
@@ -469,6 +478,7 @@ export default function SchoolTerminal() {
         <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           {section === 'instrument' && instrument}
           {section === 'screener' && <ScreenerCards doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />}
+          {section === 'top' && <ScreenerCards part="top" doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />}
           {section === 'trend' && <TrendFeed doc={feeds.trend} symbols={symbols} onOpen={openSymbol} />}
           {section === 'falsex' && <FalseExitFeed doc={feeds.falsex} symbols={symbols} onOpen={openSymbol} />}
           {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} symbols={symbols} onOpen={openSymbol} />}

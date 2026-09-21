@@ -53,6 +53,13 @@ export function fmtWhen(iso: string | null | undefined) {
   return `${p(d.getDate())}.${p(d.getMonth() + 1)}.${d.getFullYear()} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
+/** Время из бота вида «21.09.2026 04:38» — бот пишет его по UTC+5 (часы VPS). Переводим
+ *  в ISO с поясом, чтобы показать в поясе зрителя, как и остальные времена экрана. */
+export function fromBotTime(s: string | null | undefined): string | null {
+  const m = (s || '').match(/^(\d{2})\.(\d{2})\.(\d{4})\s+(\d{2}):(\d{2})/);
+  return m ? `${m[3]}-${m[2]}-${m[1]}T${m[4]}:${m[5]}:00+05:00` : null;
+}
+
 export function fmtDate(iso: string | null | undefined) {
   if (!iso) return '—';
   const d = new Date(iso);
