@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import DashboardBanners from '@/components/school/DashboardBanners';
-import { Lock, Settings, LogOut, ArrowRight, Menu, Ticket, Home as HomeIcon, MessageCircle, LineChart } from 'lucide-react';
+import { Lock, Settings, LogOut, ArrowRight, Menu, Ticket, Home as HomeIcon, MessageCircle, Eye } from 'lucide-react';
 import logoVideoFallback from '@/assets/logo-header.mp4';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 import { useDashboardTexts, type DashboardTextKey } from '@/lib/dashboardTexts';
@@ -234,13 +234,13 @@ export default function SchoolDashboard() {
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
-  // Терминал — отдельная подписка экосистемы со сроком (terminal_access).
-  // Ссылку показываем только тому, у кого срок идёт: пустой экран, на котором
-  // «доступа нет», в меню не нужен. Админ видит всегда.
-  const [terminalOn, setTerminalOn] = useState(false);
+  // «Глаз системы» — отдельная подписка экосистемы со сроком (terminal_access).
+  // 21.09.2026, его слово: пункт видят все, как курсы: без доступа — с замком,
+  // открыть нельзя; срок вышел — «Доступ истёк». Админ открывает всегда.
+  const [eyeState, setEyeState] = useState<'open' | 'expired' | 'locked' | null>(null);
   useEffect(() => {
     if (!user) return;
-    if (role === 'admin') { setTerminalOn(true); return; }
+    if (role === 'admin') { setEyeState('open'); return; }
     let alive = true;
     supabase
       .from('terminal_access' as never)
@@ -249,7 +249,9 @@ export default function SchoolDashboard() {
       .maybeSingle()
       .then(({ data }) => {
         const until = (data as { expires_at?: string } | null)?.expires_at;
-        if (alive) setTerminalOn(!!until && new Date(until).getTime() > Date.now());
+        if (!alive) return;
+        if (!until) setEyeState('locked');
+        else setEyeState(new Date(until).getTime() > Date.now() ? 'open' : 'expired');
       });
     return () => { alive = false; };
   }, [user, role]);
@@ -612,20 +614,32 @@ export default function SchoolDashboard() {
           })}
         </nav>
 
-        {/* «Глаз системы» (его название 21.09.2026) — рынок в кабинете. Отдельная подписка, отдельный экран. */}
-        {terminalOn && (
+        {/* «Глаз системы» (его название 21.09.2026) — рынок в кабинете. Отдельная подписка,
+            отдельный экран. Как курс: без доступа виден с замком и не открывается. */}
+        {eyeState && (
           <div className="px-3 pb-3">
             <button
-              onClick={() => { setMobileSidebarOpen(false); navigate('/school/terminal'); }}
-              className="w-full text-left rounded-md px-3 py-2.5 transition-all hover:bg-white/5"
-              style={{ border: `1px solid ${BORDER}` }}
+              onClick={() => { if (eyeState !== 'open') return; setMobileSidebarOpen(false); navigate('/school/terminal'); }}
+              disabled={eyeState !== 'open'}
+              className={`w-full text-left rounded-md px-3.5 py-3 transition-all${eyeState === 'open' ? ' hover:bg-white/5' : ''}`}
+              style={{
+                border: `1px solid ${eyeState === 'open' ? `${ACCENT}55` : BORDER}`,
+                backgroundColor: eyeState === 'open' ? 'rgba(225,168,77,0.06)' : 'transparent',
+                opacity: eyeState === 'open' ? 1 : 0.5,
+                cursor: eyeState === 'open' ? 'pointer' : 'default',
+              }}
             >
-              <div className="flex items-center gap-2">
-                <LineChart size={13} style={{ color: ACCENT, flexShrink: 0 }} />
-                <span style={{ fontFamily: MONO, fontSize: 12, color: FG }}>Глаз системы</span>
+              <div className="flex items-center gap-2.5">
+                <Eye size={18} style={{ color: eyeState === 'open' ? ACCENT : '#555', flexShrink: 0 }} />
+                <span style={{ fontFamily: SANS, fontSize: 15, fontWeight: 600, color: eyeState === 'open' ? FG : '#666' }}>
+                  Глаз системы
+                </span>
+                {eyeState !== 'open' && <Lock size={12} style={{ color: '#444', marginLeft: 'auto', flexShrink: 0 }} />}
               </div>
-              <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#555', marginTop: 4 }}>
-                рынок глазами системы
+              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: 6,
+                            color: eyeState === 'open' ? '#8a8175' : eyeState === 'expired' ? '#8a7048' : '#444' }}>
+                {eyeState === 'open' ? 'рынок глазами системы'
+                  : eyeState === 'expired' ? t('sidebar_locked_expired') : t('sidebar_locked')}
               </div>
             </button>
           </div>
