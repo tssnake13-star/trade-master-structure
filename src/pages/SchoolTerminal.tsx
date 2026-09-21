@@ -26,8 +26,8 @@ html { scrollbar-color: rgba(225,168,77,0.55) ${BG}; }
 `;
 
 /**
- * SchoolTerminal — TRADE MASTER INSIDE, «рынок глазами системы» (/school/terminal).
- * Название — его, 21.09.2026 (вечером; до этого экран звался «Глаз системы»).
+ * SchoolTerminal — TRADE MASTER INSIDE, под ним «Глаз системы» (/school/terminal).
+ * Название — его, 21.09.2026 (вечером; до этого экран звался просто «Глаз системы»).
  * Внутри это терминал рынка.
  *
  * Экран ничего не считает. Всё, что здесь видно, посчитало ядро на VPS и
@@ -274,7 +274,7 @@ export default function SchoolTerminal() {
       <div style={{ minHeight: '100vh', backgroundColor: BG, color: FG, fontFamily: SANS, display: 'grid', placeItems: 'center', padding: 24 }}>
         <div style={{ ...card, padding: 28, maxWidth: 520, textAlign: 'center' }}>
           <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.2em', color: ACCENT }}>TRADE MASTER INSIDE</div>
-          <div style={{ ...label, marginTop: 4 }}>Рынок глазами системы</div>
+          <div style={{ ...label, marginTop: 4 }}>Глаз системы</div>
           <h1 style={{ fontSize: 22, margin: '14px 0 10px' }}>Доступ пока не открыт</h1>
           <p style={{ color: DIM, fontSize: 14, lineHeight: 1.6 }}>
             TRADE MASTER INSIDE входит в подписку экосистемы и выдаётся отдельно, со сроком.
@@ -517,7 +517,7 @@ export default function SchoolTerminal() {
         {/* название — его, 21.09.2026: две строки, как он написал */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
           <span style={{ fontFamily: MONO, letterSpacing: '0.2em', fontSize: 13, color: ACCENT }}>TRADE MASTER INSIDE</span>
-          <span style={label}>Рынок глазами системы</span>
+          <span style={label}>Глаз системы</span>
         </div>
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
           <StatusStrip updatedAt={meta?.updated_at || null} feeds={feeds} now={now} />
