@@ -15,14 +15,19 @@ import { DNC, GRID, PAD, PANEL_BG, UPC, placeLabels, shapeNode, tickDigits, yRan
 
 // служебные строки картинки бота (время расчёта, «csv 110») — ученику ни к чему
 const TECH = /^\d{2}\.\d{2}\.\d{4}\s+\d{2}:\d{2}|\bcsv\s+\d|\bmt5\s+\d/i;
+// 21.09.2026, его слово: «название инструмента идёт два раза… пусть только сверху останется».
+// Заголовок картинки («DXY · СЦЕНАРИЙ 1 · LONG», «DXY · ТРЕНД ПО НАКОПЛЕНИЯМ») и строка
+// «неделя … · дневка … — идём по недельному циклу» повторяют верхний блок инструмента.
+const DUP = /^[A-Za-z_]{3,10}\s+·\s|^неделя\s.+·\s*дневка\s.+\s—\s/;
 
-export default function LiveChart({ scene, hidden }: { scene: Scene; hidden: Set<Layer> }) {
-  const texts = scene.texts.filter((t) => !TECH.test(t.t));
+export default function LiveChart({ scene, hidden, noHead = false }: { scene: Scene; hidden: Set<Layer>; noHead?: boolean }) {
+  const texts = scene.texts.filter((t) => !TECH.test(t.t) && !(noHead && DUP.test(t.t)));
+  const title = noHead ? null : scene.title;
   return (
     <div>
-      {scene.title || texts.length ? (
+      {title || texts.length ? (
         <div style={{ marginBottom: 4 }}>
-          {scene.title ? <div style={{ color: FG, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{scene.title}</div> : null}
+          {title ? <div style={{ color: FG, fontSize: 15, fontWeight: 700, marginBottom: 4 }}>{title}</div> : null}
           {texts.map((t, i) => (
             <div key={i} style={{ color: t.c, fontSize: 12, lineHeight: 1.55 }}>
               {t.t}

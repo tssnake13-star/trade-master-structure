@@ -453,7 +453,7 @@ export default function SchoolTerminal() {
             : null}
         </div>
         {live && scene ? (
-          <LiveChart scene={scene} hidden={hidden} />
+          <LiveChart scene={scene} hidden={hidden} noHead />
         ) : pic ? (
           <img
             src={pic}

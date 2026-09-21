@@ -160,10 +160,19 @@ export function Decision({ r, narrow }: { r: MarketRow; narrow: boolean }) {
     <div style={{ marginTop: 14, border: `1px solid ${ACCENT}33`, borderRadius: 12, overflow: 'hidden', backgroundColor: BORDER, display: 'grid', gap: 1 }}>
       <div style={{ display: 'grid', gridTemplateColumns: narrow ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 1 }}>
         <Cell name="направление" value={s ? `${s} ${arrowOf(s)}` : '—'} color={colorOf(s)} />
+        {/* «идём по недельному циклу» — его слово 21.09.2026: строку с живого графика —
+            сюда, наверх; слова те же, что на картинке бота */}
         <Cell
           name="сценарий"
           value={r.scenario ? `${r.scenario} — ${r.side === 'LONG' ? 'вверх' : 'вниз'}` : 'нет'}
           color={r.scenario ? FG : DIM}
+          sub={
+            r.scenario === '1'
+              ? 'идём по недельному циклу'
+              : r.scenario === '2'
+                ? 'недельный цикл пройден, идём против него'
+                : null
+          }
         />
         <Cell name="подтверждение" value={r.confirmation ? 'ЕСТЬ' : 'нет'} color={r.confirmation ? UP : DIM} />
         <Cell name="поводырь" value={g.main} color={g.color} sub={g.sub ? paint(g.sub) : null} />
