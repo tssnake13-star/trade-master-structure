@@ -42,6 +42,9 @@ function Chip({ i, symbols, onOpen }: { i: ScrInstrument; symbols: Set<string>; 
 
 function GroupCard({ g, symbols, onOpen }: { g: ScrGroup; symbols: Set<string>; onOpen: Open }) {
   const Icon = g.dir === 'up' ? TrendingUp : g.dir === 'down' ? TrendingDown : MoveRight;
+  // поводырь группы — открывается его экран (у индекса доллара символ DXY)
+  const leadSym = g.code === 'DXY' ? 'DXY' : g.leader;
+  const leadKnown = !!leadSym && symbols.has(leadSym);
   return (
     <div style={{ ...card, padding: '10px 12px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
@@ -52,6 +55,17 @@ function GroupCard({ g, symbols, onOpen }: { g: ScrGroup; symbols: Set<string>; 
           {g.trade}
         </span>
       </div>
+      {g.leader ? (
+        <div style={{ fontSize: 12, marginTop: 3, color: DIM }}>
+          поводырь{' '}
+          <button
+            onClick={() => leadKnown && leadSym && onOpen(leadSym)}
+            style={{ fontFamily: g.code === 'DXY' ? undefined : MONO, fontSize: 12, color: ACCENT, background: 'none', border: 'none', padding: 0, cursor: leadKnown ? 'pointer' : 'default', textDecoration: leadKnown ? 'underline' : 'none', textUnderlineOffset: 3 }}
+          >
+            {g.leader}
+          </button>
+        </div>
+      ) : null}
       <div style={{ color: DIM, fontSize: 12, marginTop: 5 }}>
         неделя <span style={{ color: col(g.week.arrow) }}>{arrowCh(g.week.arrow)}</span> {g.week.text}
         {' · '}дневка <span style={{ color: col(g.day.arrow) }}>{arrowCh(g.day.arrow)}</span> {g.day.text}
@@ -68,7 +82,7 @@ function GroupCard({ g, symbols, onOpen }: { g: ScrGroup; symbols: Set<string>; 
       {g.acc ? (
         <details style={{ marginTop: 4, fontSize: 12, color: DIM }}>
           <summary style={{ cursor: 'pointer', listStyle: 'none' }}>
-            накопления поводыря:{' '}
+            накопления {g.code === 'DXY' ? 'индекса доллара' : g.leader || 'поводыря'}:{' '}
             <span style={{ color: g.acc.verdict === 'за' ? UP : g.acc.verdict ? ACCENT : DIM }}>
               {g.acc.verdict === 'за' ? 'в сторону группы' : g.acc.verdict === 'против' ? 'против группы' : g.acc.verdict === 'спор' ? 'неделя и дневка спорят' : 'подробно'}
             </span>{' '}
@@ -108,6 +122,7 @@ function TopCard({ t, symbols, onOpen }: { t: ScrTop; symbols: Set<string>; onOp
         <span style={pillSide(long)}>{t.side}</span>
         {t.scenario ? <span style={{ color: DIM, fontSize: 12, marginLeft: 'auto' }}>сценарий {t.scenario}</span> : null}
       </div>
+      {t.leads ? <div style={{ color: ACCENT, fontSize: 12, marginTop: 4 }}>поводырь группы {t.leads}</div> : null}
       {t.tags.length ? <div style={{ color: DIM, fontSize: 12, marginTop: 4 }}>{t.tags.join(' · ')}</div> : null}
       <div style={{ display: 'grid', gridTemplateColumns: '54px 1fr 38px', gap: '6px 8px', alignItems: 'center', marginTop: 8 }}>
         <Bar name="неделя" v={t.week} />
@@ -137,7 +152,7 @@ function Block({ title, color, children }: { title: string; color: string; child
 }
 
 export function ScreenerCards({ doc, symbols, onOpen }: { doc?: FeedDocs['screener']; symbols: Set<string>; onOpen: Open }) {
-  const parsed = parseScreener(doc?.groups, doc?.top);
+  const parsed = parseScreener(doc?.groups, doc?.top, doc?.leaders);
   if (!doc || (!parsed.groups.length && !parsed.top.length)) return <ScreenerFeed doc={doc} symbols={symbols} onOpen={onOpen} />;
   const up = parsed.groups.filter((g) => g.dir === 'up');
   const down = parsed.groups.filter((g) => g.dir === 'down');

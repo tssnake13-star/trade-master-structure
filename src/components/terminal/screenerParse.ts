@@ -1,6 +1,7 @@
 // Разбор скринера подписчика — тех двух сообщений, что бот шлёт после «✅ ОДОБРЯЮ»
-// (format_groups_for_channel и format_top_for_channel). Бот не меняется: экран сам
-// раскладывает текст по карточкам. Не разобралось — экран покажет текст как есть.
+// (format_groups_for_channel и format_top_for_channel). С 21.09.2026 подписчик получает
+// их в новом виде, а мост кладёт сюда прежний текст (groups_raw / top_raw): экран сам
+// раскладывает его по карточкам. Не разобралось — экран покажет текст как есть.
 
 export type Side = 'up' | 'down' | 'flat';
 
@@ -20,6 +21,7 @@ export interface ScrGroup {
   day: { arrow: Side; text: string };
   range: string | null;
   acc: { verdict: 'за' | 'против' | 'спор' | null; text: string } | null;
+  leader: string | null; // поводырь группы: «индекс доллара», USDJPY, AUDUSD…
   instruments: ScrInstrument[];
 }
 
@@ -34,6 +36,7 @@ export interface ScrTop {
   range: string | null;
   acc: string | null;
   agree: boolean;
+  leads: string | null; // инструмент сам поводырь группы — её название в родительном: «новозеландца»
 }
 
 export interface ScrParsed {
@@ -45,6 +48,11 @@ export interface ScrParsed {
 const NAMES: Record<string, string> = {
   DXY: 'Доллар', JPY: 'Йена', AUD: 'Австралиец', NZD: 'Новозеландец', GBP: 'Фунт', CHF: 'Франк',
   CAD: 'Канадец', EUR: 'Евро', GOLD: 'Золото', OIL: 'Нефть', BTC: 'Крипто',
+};
+// «поводырь группы йены» — его слово 21.09.2026: у поводырей поводырей нет, они сами поводыри
+export const GEN: Record<string, string> = {
+  DXY: 'доллара', JPY: 'йены', AUD: 'австралийца', NZD: 'новозеландца', GBP: 'фунта', CHF: 'франка',
+  CAD: 'канадца', EUR: 'евро', GOLD: 'золота', OIL: 'нефти', BTC: 'крипты',
 };
 const MODES: Record<string, string> = { '🔥': 'импульс', '✅': 'продолжение', '⚡': 'выход из диапазона', '🚫': 'боковик', '❓': 'режим неясен' };
 
@@ -81,6 +89,7 @@ export function parseGroups(text: string): ScrGroup[] {
         day: { arrow: arrow(g[7]), text: scoreWords(g[8] || '') },
         range: null,
         acc: null,
+        leader: code === 'DXY' ? 'индекс доллара' : null,
         instruments: [],
       };
       out.push(cur);
@@ -92,9 +101,11 @@ export function parseGroups(text: string): ScrGroup[] {
       cur.range = shortDates(r[1]);
       continue;
     }
-    const a = line.match(/^📈\s*накопления у [^—]+—\s*(.+)$/u);
+    const a = line.match(/^📈\s*накопления у ([^—]+?)\s*—\s*(.+)$/u);
     if (a) {
-      const body = a[1];
+      const who = a[1].trim();
+      cur.leader = /индекс/.test(who) ? 'индекс доллара' : who;
+      const body = a[2];
       const verdict = /в сторону группы/.test(body) ? 'за' : /против группы/.test(body) ? 'против' : /спорят/.test(body) ? 'спор' : null;
       cur.acc = { verdict, text: body.replace(/\s*·\s*(✅|⚠️)\s*[^·]*$/u, '').trim() };
       continue;
@@ -145,6 +156,7 @@ export function parseTop(text: string): { top: ScrTop[]; fresh: string[] } {
         range: null,
         acc: null,
         agree: false,
+        leads: null,
       };
       top.push(cur);
       tf = null;
@@ -178,7 +190,25 @@ export function parseTop(text: string): { top: ScrTop[]; fresh: string[] } {
   return { top, fresh };
 }
 
-export function parseScreener(groups: string | null | undefined, top: string | null | undefined): ScrParsed {
+/**
+ * leaders — «код группы → поводырь», мост берёт его из screener.LEADERS (тот же источник,
+ * что у скринера). Нет его — поводырь берётся из строки «накопления у …».
+ */
+export function parseScreener(
+  groups: string | null | undefined,
+  top: string | null | undefined,
+  leaders?: Record<string, string> | null,
+): ScrParsed {
   const t = parseTop(top || '');
-  return { groups: parseGroups(groups || ''), top: t.top, fresh: t.fresh };
+  const gs = parseGroups(groups || '');
+  const lead: Record<string, string> = { ...(leaders || {}) };
+  for (const g of gs) {
+    if (leaders?.[g.code]) g.leader = leaders[g.code];
+    if (g.leader && !lead[g.code]) lead[g.code] = g.leader;
+  }
+  for (const x of t.top) {
+    const code = Object.keys(lead).find((c) => c !== 'DXY' && lead[c] === x.symbol);
+    x.leads = code ? GEN[code] || NAMES[code] || code : null;
+  }
+  return { groups: gs, top: t.top, fresh: t.fresh };
 }

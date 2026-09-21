@@ -8,7 +8,7 @@ import { ACCENT, DIM, DOWN, FG, MONO, UP, BORDER, card, label, fmtWhen } from '.
  */
 
 export interface FeedDocs {
-  screener?: { time?: string | null; groups?: string | null; top?: string | null };
+  screener?: { time?: string | null; groups?: string | null; top?: string | null; leaders?: Record<string, string> | null };
   trend?: { lines?: string[] };
   resonance?: { time?: string | null; text?: string | null };
   verdicts?: { items?: Verdict[] };

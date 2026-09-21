@@ -41,6 +41,8 @@ export interface MarketRow {
   chart_cycles: string | null;
   chart_trend: string | null;
   chart_all: string | null;
+  // leads — код группы, которую инструмент ведёт сам (USDJPY → JPY); leader — его поводырь
+  extra?: { leads?: string | null; leader?: string | null } | null;
   bars_at: string | null;
   updated_at: string | null;
 }

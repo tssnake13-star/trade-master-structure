@@ -9,6 +9,7 @@ import { ACCENT, BG, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, p
 import { Arrow, CycleCard, Lines, Side, type MarketRow } from '@/components/terminal/parts';
 import { FalseExitFeed, ResonanceFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
+import { GEN } from '@/components/terminal/screenerParse';
 import LiveChart from '@/components/terminal/LiveChart';
 import { LAYERS, layersOf, type Layer, type Scene } from '@/components/terminal/scene';
 
@@ -248,7 +249,14 @@ export default function SchoolTerminal() {
               color: FG,
             }}
           >
-            <span style={{ fontFamily: MONO, fontSize: 12 }}>{r.symbol}</span>
+            <span style={{ fontFamily: MONO, fontSize: 12 }}>
+              {r.symbol}
+              {r.extra?.leads ? (
+                <span title={`сам — поводырь группы ${GEN[r.extra.leads] || r.extra.leads}`} style={{ fontFamily: SANS, fontSize: 10, color: ACCENT, marginLeft: 6 }}>
+                  поводырь
+                </span>
+              ) : null}
+            </span>
             <span style={{ display: 'flex', gap: 4 }}>
               <Arrow text={r.trend_w1} />
               <Arrow text={r.trend_d1} />
@@ -314,6 +322,11 @@ export default function SchoolTerminal() {
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, flexWrap: 'wrap' }}>
           <h1 style={{ fontSize: 24, margin: 0, fontFamily: MONO, letterSpacing: '0.04em' }}>{cur.symbol}</h1>
           <span style={{ color: DIM, fontSize: 13 }}>{cur.title}</span>
+          {cur.extra?.leads ? (
+            <span style={{ fontSize: 12, color: ACCENT, border: `1px solid ${ACCENT}55`, borderRadius: 6, padding: '1px 8px' }}>
+              поводырь группы {GEN[cur.extra.leads] || cur.extra.leads}
+            </span>
+          ) : null}
           <span style={{ fontFamily: MONO, fontSize: 18, marginLeft: 'auto' }}>{cur.price_text || '—'}</span>
         </div>
         <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', marginTop: 12, alignItems: 'center' }}>
