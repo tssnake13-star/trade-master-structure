@@ -172,6 +172,8 @@ export default function SchoolTerminal() {
   // Кросс — в группе своего поводыря, как в карточке: AUDNZD ведёт NZDUSD — группа
   // новозеландца, NZDJPY ведёт USDJPY — группа йены (скринер держит их в двух группах).
   // У кого поводырь индекс доллара — группа из скринера: EURUSD в долларе, эфир у биткоина.
+  // Его слово 21.09.2026: в группу доллара входят и все поводыри, кроме нефти, — поводырь
+  // с долларом в имени стоит и там, и первым в своей группе.
   const groupedList = useMemo(() => {
     const norm = (s: string) => s.toUpperCase().replace(/USDT$/, 'USD');
     const leadOf: Record<string, string> = {};
@@ -183,21 +185,24 @@ export default function SchoolTerminal() {
       return r.group_key || (lead === 'DXY' ? 'DXY' : 'OTHER');
     };
     const by = new Map<string, MarketRow[]>();
+    const put = (g: string, r: MarketRow) => by.set(g, [...(by.get(g) || []), r]);
     for (const r of list) {
       const g = groupOf(r);
-      const arr = by.get(g) || [];
-      arr.push(r);
-      by.set(g, arr);
+      put(g, r);
+      if (r.extra?.leads && g !== 'DXY' && r.symbol.toUpperCase().includes('USD')) put('DXY', r);
     }
     const pos = (g: string) => {
       const i = GROUP_ORDER.indexOf(g);
       return i < 0 ? GROUP_ORDER.length : i;
     };
+    // внутри группы: её поводырь, за ним поводыри других групп в порядке групп, потом пары по алфавиту
+    const rank = (g: string, r: MarketRow) =>
+      r.extra?.leads === g ? -1 : r.extra?.leads ? pos(r.extra.leads) : GROUP_ORDER.length + 1;
     return [...by.entries()]
       .sort((a, b) => pos(a[0]) - pos(b[0]))
       .map(([g, rs]): [string, MarketRow[]] => [
         g,
-        [...rs].sort((x, y) => Number(!!y.extra?.leads) - Number(!!x.extra?.leads) || x.symbol.localeCompare(y.symbol)),
+        [...rs].sort((x, y) => rank(g, x) - rank(g, y) || x.symbol.localeCompare(y.symbol)),
       ]);
   }, [rows, list]);
 
