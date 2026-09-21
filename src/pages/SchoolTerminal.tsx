@@ -442,7 +442,6 @@ export default function SchoolTerminal() {
           {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} symbols={symbols} onOpen={openSymbol} />}
           <div style={{ ...label, marginTop: 14, lineHeight: 1.7 }}>
             {DISCLAIMER}
-            {meta?.build ? ` · сборка ${meta.build}` : ''}
           </div>
         </div>
         {wide && section === 'instrument' ? right : null}
