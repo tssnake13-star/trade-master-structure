@@ -209,6 +209,8 @@ export function parseScreener(
   for (const x of t.top) {
     const code = Object.keys(lead).find((c) => c !== 'DXY' && lead[c] === x.symbol);
     x.leads = code ? GEN[code] || NAMES[code] || code : null;
+    // у самого поводыря индекс доллара рядом — сверка, а не «его поводырь»
+    if (x.leads && x.range) x.range = x.range.replace(/\s*\(поводырь\)/g, '');
   }
   return { groups: gs, top: t.top, fresh: t.fresh };
 }
