@@ -8,7 +8,9 @@ export type Side = 'up' | 'down' | 'flat';
 export interface ScrInstrument {
   symbol: string;
   side: 'LONG' | 'SHORT';
-  mode: string | null; // импульс, продолжение, выход из диапазона, боковик
+  // сколько из трёх критериев недели за сторону пары (2 или 3). 21.09.2026: вместо значка
+  // режима рынка — режим убран его решением, третий критерий теперь накопления
+  score: number | null;
 }
 
 export interface ScrGroup {
@@ -54,7 +56,6 @@ export const GEN: Record<string, string> = {
   DXY: 'доллара', JPY: 'йены', AUD: 'австралийца', NZD: 'новозеландца', GBP: 'фунта', CHF: 'франка',
   CAD: 'канадца', EUR: 'евро', GOLD: 'золота', OIL: 'нефти', BTC: 'крипты',
 };
-const MODES: Record<string, string> = { '🔥': 'импульс', '✅': 'продолжение', '⚡': 'выход из диапазона', '🚫': 'боковик', '❓': 'режим неясен' };
 
 // «месяц с июня 2026, неделя с 16.08.2026» → «месяц с июня, неделя с 16.08»: год и так понятен
 const shortDates = (t: string) => t.replace(/(\d{2}\.\d{2})\.20\d{2}/g, '$1').replace(/ 20\d{2}\b/g, '').trim();
@@ -114,7 +115,11 @@ export function parseGroups(text: string): ScrGroup[] {
     if (ins) {
       for (const part of ins[1].split(',')) {
         const m = part.trim().match(/^([A-Z0-9_]+)\s+(LONG|SHORT)\s*(\S+)?/u);
-        if (m) cur.instruments.push({ symbol: m[1], side: m[2] as 'LONG' | 'SHORT', mode: m[3] ? MODES[m[3]] || null : null });
+        if (m) {
+          // «3/3» — счёт пары (с 21.09.2026); значки режима из старого кэша не показываем
+          const sc = (m[3] || '').match(/^([23])\/3$/);
+          cur.instruments.push({ symbol: m[1], side: m[2] as 'LONG' | 'SHORT', score: sc ? +sc[1] : null });
+        }
       }
       continue;
     }

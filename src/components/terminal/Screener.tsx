@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { AlertTriangle, Check, Flame, TrendingDown, TrendingUp, MoveRight } from 'lucide-react';
+import { AlertTriangle, TrendingDown, TrendingUp, MoveRight } from 'lucide-react';
 import { ACCENT, BORDER, DIM, DOWN, FG, MONO, UP, card, label } from './theme';
 import { ScreenerFeed, type FeedDocs } from './Feeds';
 import { parseScreener, type ScrGroup, type ScrInstrument, type ScrTop, type Side } from './screenerParse';
@@ -30,12 +30,12 @@ function Chip({ i, symbols, onOpen }: { i: ScrInstrument; symbols: Set<string>; 
   return (
     <button
       onClick={() => known && onOpen(i.symbol)}
-      title={i.mode || undefined}
+      title={i.score ? `${i.score} из 3 критериев за сторону пары` : undefined}
       style={{ display: 'inline-flex', alignItems: 'center', gap: 5, margin: '6px 6px 0 0', padding: '3px 8px', borderRadius: 8, border: `1px solid #2c2a27`, background: 'transparent', color: FG, cursor: known ? 'pointer' : 'default', fontSize: 12 }}
     >
       <span style={{ fontFamily: MONO }}>{i.symbol}</span>
       <span style={{ color: long ? UP : DOWN, fontFamily: MONO, fontSize: 11 }}>{long ? 'LONG' : 'SHORT'}</span>
-      {i.mode === 'импульс' ? <Flame size={12} color={ACCENT} /> : i.mode === 'продолжение' ? <Check size={12} color={DIM} /> : null}
+      {i.score ? <span style={{ fontFamily: MONO, fontSize: 10, color: i.score === 3 ? ACCENT : DIM }}>{i.score}/3</span> : null}
     </button>
   );
 }
@@ -191,9 +191,7 @@ export function ScreenerCards({ doc, symbols, onOpen }: { doc?: FeedDocs['screen
         </details>
       ) : null}
       <div style={{ color: DIM, fontSize: 11, lineHeight: 1.7, display: 'flex', flexWrap: 'wrap', gap: '2px 12px', alignItems: 'center' }}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Flame size={11} color={ACCENT} /> импульс</span>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Check size={11} color={DIM} /> продолжение</span>
-        <span>2 из 3 — критерии за направление</span>
+        <span>2 из 3 — сколько из трёх критериев недели (свинг, свеча, накопления) за сторону; у пары — за её сторону</span>
         <span>макро за / против — подтверждает ли макро</span>
         <span>рейндж — цена стоит, выхода нет (информация, не запрет)</span>
       </div>
