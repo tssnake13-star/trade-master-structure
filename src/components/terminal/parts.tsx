@@ -55,7 +55,12 @@ export interface MarketRow {
     leads?: string | null;
     leader?: string | null;
     w_votes?: [string, string][];
+    // 21.09.2026 вечер: d_votes — НАПРАВЛЕНИЕ дневки (свинг, свеча, накопления), c_votes —
+    // ПОДТВЕРЖДЕНИЕ (свинг, свеча, реверс), c_dir / c_n — его итог. Два разных состояния.
     d_votes?: [string, string][];
+    c_votes?: [string, string][];
+    c_dir?: string | null;
+    c_n?: number | null;
     w_anom?: string | null;
   } | null;
   bars_at: string | null;

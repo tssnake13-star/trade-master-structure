@@ -82,8 +82,9 @@ function guideParts(r: MarketRow): { main: string; sub: string; color: string } 
   return { main, sub, color: FG };
 }
 
-/** Какие критерии сошлись — словами. Дневка: реверс обязателен (его правило, чтение А,
- *  07.09.2026); неделя в споре — сторону задаёт дневка (его правило 02.09.2026). */
+/** Какие критерии сошлись — словами. Неделя и дневка считаются одинаково: свинг, свеча,
+ *  накопления, чистое 2 из 3 (его определение 21.09.2026 вечер — реверс только в
+ *  подтверждении); неделя в споре — сторону задаёт дневка (его правило 02.09.2026). */
 function critNote(tf: 'W1' | 'D1', s: Side3, votes: Vote[], anom: string | null): string {
   if (anom) {
     const d = anom.match(/(\d{2}\.\d{2})\.\d{4}/);
@@ -96,13 +97,29 @@ function critNote(tf: 'W1' | 'D1', s: Side3, votes: Vote[], anom: string | null)
   }
   const up = votes.filter(([, v]) => v === 'UP').length;
   const dn = votes.filter(([, v]) => v === 'DOWN').length;
-  if (tf === 'D1') {
-    const rev = votes.find(([k]) => k === 'реверс')?.[1];
-    if ((up >= 2 && rev !== 'UP') || (dn >= 2 && rev !== 'DOWN')) return 'реверс не согласен — без него дневка направления не даёт';
-    return 'критерии не сошлись';
-  }
-  return up + dn ? 'критерии в споре — сторону задаёт дневка' : 'данных нет';
+  if (!up && !dn) return 'данных нет';
+  return tf === 'W1' ? 'критерии в споре — сторону задаёт дневка' : 'критерии в споре — направления нет';
 }
+
+/** Голоса одной строкой: «свинг ↑  свеча ↑  реверс ↓», каждый своим цветом. */
+function VoteChips({ votes }: { votes: Vote[] }) {
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '4px 14px', marginTop: 6, fontFamily: MONO, fontSize: 12 }}>
+      {votes.map(([k, v]) => {
+        const vs = sideOf(v);
+        return (
+          <span key={k} style={{ color: vs ? colorOf(vs) : DIM, whiteSpace: 'nowrap' }}>
+            {k} {vs ? arrowOf(vs) : '—'}
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Мост до 21.09.2026 (вечер) слал в d_votes подтверждение (свинг, свеча, реверс) под именем
+ *  дневки. Пока на VPS старый мост, эти голоса показываем в подтверждении, а у дневки — без разбивки. */
+const legacyD1 = (r: MarketRow) => (r.extra?.d_votes || []).some(([k]) => k === 'реверс');
 
 function Cell({ name, value, color, sub }: { name: string; value: string; color: string; sub?: ReactNode }) {
   return (
@@ -117,7 +134,7 @@ function Cell({ name, value, color, sub }: { name: string; value: string; color:
 function Crit({ tf, r }: { tf: 'W1' | 'D1'; r: MarketRow }) {
   const dir = tf === 'W1' ? r.w_dir : r.d_dir;
   const n = tf === 'W1' ? r.w_n : r.d_n;
-  const votes = ((tf === 'W1' ? r.extra?.w_votes : r.extra?.d_votes) || []) as Vote[];
+  const votes = ((tf === 'W1' ? r.extra?.w_votes : legacyD1(r) ? [] : r.extra?.d_votes) || []) as Vote[];
   const anom = tf === 'W1' ? r.extra?.w_anom || null : null;
   const s = anom ? null : sideOf(dir);
   const value = anom
@@ -135,16 +152,7 @@ function Crit({ tf, r }: { tf: 'W1' | 'D1'; r: MarketRow }) {
       <div style={bigValue(s ? colorOf(s) : ACCENT)}>{value}</div>
       {votes.length ? (
         <>
-          <div style={{ display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: '4px 14px', marginTop: 6, fontFamily: MONO, fontSize: 12 }}>
-            {votes.map(([k, v]) => {
-              const vs = sideOf(v);
-              return (
-                <span key={k} style={{ color: vs ? colorOf(vs) : DIM, whiteSpace: 'nowrap' }}>
-                  {k} {vs ? arrowOf(vs) : '—'}
-                </span>
-              );
-            })}
-          </div>
+          <VoteChips votes={votes} />
           <div style={note}>{critNote(tf, s, votes, anom)}</div>
         </>
       ) : null}
@@ -156,6 +164,7 @@ function Crit({ tf, r }: { tf: 'W1' | 'D1'; r: MarketRow }) {
 export function Decision({ r, narrow }: { r: MarketRow; narrow: boolean }) {
   const s = sideOf(r.side);
   const g = guideParts(r);
+  const confVotes = ((legacyD1(r) ? r.extra?.d_votes : r.extra?.c_votes) || []) as Vote[];
   return (
     <div style={{ marginTop: 14, border: `1px solid ${ACCENT}33`, borderRadius: 12, overflow: 'hidden', backgroundColor: BORDER, display: 'grid', gap: 1 }}>
       <div style={{ display: 'grid', gridTemplateColumns: narrow ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 1 }}>
@@ -174,7 +183,21 @@ export function Decision({ r, narrow }: { r: MarketRow; narrow: boolean }) {
                 : null
           }
         />
-        <Cell name="подтверждение" value={r.confirmation ? 'ЕСТЬ' : 'нет'} color={r.confirmation ? UP : DIM} />
+        {/* 21.09.2026 вечер, его определение: подтверждение — только на дневке: свинг, свеча,
+            реверс; реверс обязателен. «Если его нет, сделку нельзя делать» */}
+        <Cell
+          name="подтверждение"
+          value={r.confirmation ? 'ЕСТЬ' : 'нет'}
+          color={r.confirmation ? UP : DIM}
+          sub={
+            confVotes.length ? (
+              <>
+                <VoteChips votes={confVotes} />
+                {r.confirmation ? null : <div style={{ marginTop: 4 }}>нужен реверс в сторону сделки и с ним свинг или свеча</div>}
+              </>
+            ) : null
+          }
+        />
         <Cell name="поводырь" value={g.main} color={g.color} sub={g.sub ? paint(g.sub) : null} />
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: narrow ? '1fr' : '1fr 1fr', gap: 1 }}>
