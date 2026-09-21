@@ -14,6 +14,7 @@ import SchoolAdmin from "./pages/SchoolAdmin";
 import SchoolStudentDetail from "./pages/SchoolStudentDetail";
 import SchoolResetPassword from "./pages/SchoolResetPassword";
 import SchoolProfile from "./pages/SchoolProfile";
+import SchoolTerminal from "./pages/SchoolTerminal";
 import SchoolAnalytics from "./pages/SchoolAnalytics";
 import PreviewRedesign from "./pages/PreviewRedesign";
 import PreviewNext from "./pages/PreviewNext";
@@ -52,6 +53,7 @@ const App = () => (
             <Route path="/school/admin/analytics" element={<SchoolAnalytics />} />
             <Route path="/school/reset-password" element={<SchoolResetPassword />} />
             <Route path="/school/profile" element={<SchoolProfile />} />
+            <Route path="/school/terminal" element={<SchoolTerminal />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

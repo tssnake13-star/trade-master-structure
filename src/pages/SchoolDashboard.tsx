@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import DashboardBanners from '@/components/school/DashboardBanners';
-import { Lock, Settings, LogOut, ArrowRight, Menu, Ticket, Home as HomeIcon, MessageCircle } from 'lucide-react';
+import { Lock, Settings, LogOut, ArrowRight, Menu, Ticket, Home as HomeIcon, MessageCircle, LineChart } from 'lucide-react';
 import logoVideoFallback from '@/assets/logo-header.mp4';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 import { useDashboardTexts, type DashboardTextKey } from '@/lib/dashboardTexts';
@@ -233,6 +233,26 @@ export default function SchoolDashboard() {
   const [mainCourseId, setMainCourseId] = useState<string | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<string | null>(null);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+
+  // Терминал — отдельная подписка экосистемы со сроком (terminal_access).
+  // Ссылку показываем только тому, у кого срок идёт: пустой экран, на котором
+  // «доступа нет», в меню не нужен. Админ видит всегда.
+  const [terminalOn, setTerminalOn] = useState(false);
+  useEffect(() => {
+    if (!user) return;
+    if (role === 'admin') { setTerminalOn(true); return; }
+    let alive = true;
+    supabase
+      .from('terminal_access' as never)
+      .select('expires_at')
+      .eq('user_id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        const until = (data as { expires_at?: string } | null)?.expires_at;
+        if (alive) setTerminalOn(!!until && new Date(until).getTime() > Date.now());
+      });
+    return () => { alive = false; };
+  }, [user, role]);
   const logoVideo = useSiteAsset(SITE_ASSET_KEYS.schoolDashboardLogo, logoVideoFallback);
   const now = useNow(1000);
 
@@ -591,6 +611,25 @@ export default function SchoolDashboard() {
             );
           })}
         </nav>
+
+        {/* Терминал — рынок в кабинете. Отдельная подписка, отдельный экран. */}
+        {terminalOn && (
+          <div className="px-3 pb-3">
+            <button
+              onClick={() => { setMobileSidebarOpen(false); navigate('/school/terminal'); }}
+              className="w-full text-left rounded-md px-3 py-2.5 transition-all hover:bg-white/5"
+              style={{ border: `1px solid ${BORDER}` }}
+            >
+              <div className="flex items-center gap-2">
+                <LineChart size={13} style={{ color: ACCENT, flexShrink: 0 }} />
+                <span style={{ fontFamily: MONO, fontSize: 12, color: FG }}>Терминал</span>
+              </div>
+              <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#555', marginTop: 4 }}>
+                рынок и разборы
+              </div>
+            </button>
+          </div>
+        )}
 
         {/* Profile */}
         <div className="border-t p-3 space-y-2" style={{ borderColor: BORDER }}>

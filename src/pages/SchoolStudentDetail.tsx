@@ -40,6 +40,10 @@ export default function SchoolStudentDetail() {
   const [grantDays, setGrantDays] = useState(30);
   const [grantTariff, setGrantTariff] = useState('');
   const [removeAccessConfirm, setRemoveAccessConfirm] = useState<string | null>(null);
+  // Терминал — отдельная подписка экосистемы. Срок обязателен у всех
+  // (решение владельца 21.09.2026), бессрочной выдачи тут нет.
+  const [terminalUntil, setTerminalUntil] = useState<string | null>(null);
+  const [terminalDays, setTerminalDays] = useState(30);
   const [pwModal, setPwModal] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
@@ -67,6 +71,12 @@ export default function SchoolStudentDetail() {
       supabase.from('lesson_progress').select('lesson_id').eq('user_id', studentId),
       supabase.from('invite_codes').select('code').eq('used_by', studentId).limit(1),
     ]);
+    const tRes = await supabase
+      .from('terminal_access' as never)
+      .select('expires_at')
+      .eq('user_id', studentId)
+      .maybeSingle();
+    setTerminalUntil(((tRes.data as { expires_at?: string } | null)?.expires_at) || null);
     setProfile(pRes.data as Profile | null);
     const roleRows = (rRes.data ?? []) as { role: string }[];
     setStudentRole(roleRows.some(r => r.role === 'admin') ? 'admin' : (roleRows[0]?.role || 'student'));
@@ -86,6 +96,7 @@ export default function SchoolStudentDetail() {
 
   useEffect(() => { load(); }, [studentId]);
 
+  const terminalActive = !!terminalUntil && new Date(terminalUntil).getTime() > Date.now();
   const isSelf = user?.id === studentId;
   const callerIsSuperAdmin = isSuperAdminEmail(user?.email);
   const targetIsSuperAdmin = isSuperAdminEmail(profile?.email);
@@ -121,6 +132,24 @@ export default function SchoolStudentDetail() {
     setGrantModal(false);
     setGrantCourseId('');
     setGrantTariff('');
+    load();
+  };
+
+  const grantTerminal = async (days: number) => {
+    if (!studentId) return;
+    // Продление считаем от большей из двух дат: от сегодня или от конца
+    // действующей подписки — иначе продление посреди срока его укорачивает.
+    const base = terminalUntil && new Date(terminalUntil) > new Date() ? new Date(terminalUntil) : new Date();
+    base.setDate(base.getDate() + days);
+    await supabase
+      .from('terminal_access' as never)
+      .upsert({ user_id: studentId, expires_at: base.toISOString() } as never, { onConflict: 'user_id' } as never);
+    load();
+  };
+
+  const revokeTerminal = async () => {
+    if (!studentId) return;
+    await supabase.from('terminal_access' as never).delete().eq('user_id', studentId);
     load();
   };
 
@@ -418,6 +447,46 @@ export default function SchoolStudentDetail() {
               })}
             </div>
           )}
+        </section>
+
+        {/* ======== TERMINAL BLOCK ======== */}
+        <section className="rounded-lg border p-5" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm" style={{ fontFamily: font.heading, color: '#888' }}>Терминал</h2>
+            <span className="text-[11px]" style={{ color: terminalActive ? '#4a8a4a' : '#555', fontFamily: font.mono }}>
+              {terminalActive ? `открыт до ${new Date(terminalUntil!).toLocaleDateString('ru-RU')}`
+                : terminalUntil ? `срок вышел ${new Date(terminalUntil).toLocaleDateString('ru-RU')}` : 'не выдан'}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            <select
+              value={terminalDays}
+              onChange={e => setTerminalDays(Number(e.target.value))}
+              className="text-[11px] px-2 py-1.5 rounded"
+              style={{ backgroundColor: '#0a0a0a', color: '#e8e0d0', border: '1px solid #1a1a1a', fontFamily: font.mono }}
+            >
+              {[30, 90, 180, 365].map(d => <option key={d} value={d}>{d} дней</option>)}
+            </select>
+            <button
+              onClick={() => grantTerminal(terminalDays)}
+              className="text-[11px] px-2.5 py-1.5 rounded flex items-center gap-1"
+              style={{ color: '#4a8a4a', border: '1px solid #1a1a1a', fontFamily: font.mono }}
+            >
+              <Plus size={12} /> {terminalActive ? 'Продлить' : 'Открыть доступ'}
+            </button>
+            {terminalUntil && (
+              <button
+                onClick={revokeTerminal}
+                className="text-[11px] px-2.5 py-1.5 rounded flex items-center gap-1"
+                style={{ color: '#c45050', border: '1px solid #1a1a1a', fontFamily: font.mono }}
+              >
+                <Trash2 size={12} /> Закрыть
+              </button>
+            )}
+          </div>
+          <p className="text-[11px] mt-3" style={{ color: '#444', fontFamily: font.mono }}>
+            Отдельная подписка экосистемы: рынок, графики и разборы в кабинете. Срок обязателен.
+          </p>
         </section>
 
         {/* ======== ACTIONS BLOCK ======== */}
