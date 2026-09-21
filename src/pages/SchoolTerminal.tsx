@@ -8,9 +8,12 @@ import { ArrowLeft, Search } from 'lucide-react';
 import { ACCENT, BG, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate, fmtWhen } from '@/components/terminal/theme';
 import { Arrow, CycleCard, Lines, Side, type MarketRow } from '@/components/terminal/parts';
 import { ResonanceFeed, ScreenerFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
+import LiveChart from '@/components/terminal/LiveChart';
+import { LAYERS, layersOf, type Layer, type Scene } from '@/components/terminal/scene';
 
 /**
- * SchoolTerminal — «Терминал» (/school/terminal).
+ * SchoolTerminal — «Глаз системы» (/school/terminal). Название — его, 21.09.2026:
+ * так он называет скринер в выпусках; внутри это терминал рынка.
  *
  * Экран ничего не считает. Всё, что здесь видно, посчитало ядро на VPS и
  * положило в базу: строка на инструмент, три картинки и общие ленты. Поэтому
@@ -65,6 +68,10 @@ export default function SchoolTerminal() {
   const [pic, setPic] = useState<string | null>(null);
   const [wide, setWide] = useState(typeof window === 'undefined' ? true : window.innerWidth >= 1100);
   const [full, setFull] = useState(false);
+  // живой график (заход 3): те же фигуры, что на картинке бота, данными; картинка — запасной вид
+  const [live, setLive] = useState(true);
+  const [scene, setScene] = useState<Scene | null>(null);
+  const [hidden, setHidden] = useState<Set<Layer>>(new Set());
 
   const selected = params.get('i');
   const section = (SECTIONS.find(([s]) => s === params.get('s'))?.[0] || 'instrument') as Section;
@@ -152,6 +159,29 @@ export default function SchoolTerminal() {
     };
   }, [cur?.symbol, cur?.chart_cycles, cur?.chart_trend, cur?.chart_all, kind, meta?.updated_at]);
 
+  // Данные живого графика: только если есть сама картинка этого вида — иначе
+  // сценария нет, и живому графику показывать нечего (как и в боте).
+  useEffect(() => {
+    let alive = true;
+    setScene(null);
+    const has = kind === 'cycles' ? cur?.chart_cycles : kind === 'trend' ? cur?.chart_trend : cur?.chart_all;
+    const sym = cur?.symbol;
+    if (!sym || !has || !live) return;
+    db.from('market_chart')
+      .select('scene')
+      .eq('symbol', sym)
+      .eq('kind', kind)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (alive) setScene(((data as { scene?: Scene } | null)?.scene) || null);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [cur?.symbol, cur?.chart_cycles, cur?.chart_trend, cur?.chart_all, kind, live, meta?.updated_at]);
+
+  const present = useMemo(() => layersOf(scene), [scene]);
+
   if (authLoading || loading) {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: BG, color: DIM, display: 'grid', placeItems: 'center', fontFamily: SANS }}>
@@ -164,10 +194,10 @@ export default function SchoolTerminal() {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: BG, color: FG, fontFamily: SANS, display: 'grid', placeItems: 'center', padding: 24 }}>
         <div style={{ ...card, padding: 28, maxWidth: 520, textAlign: 'center' }}>
-          <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.2em', color: ACCENT }}>ТЕРМИНАЛ</div>
+          <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.2em', color: ACCENT }}>ГЛАЗ СИСТЕМЫ</div>
           <h1 style={{ fontSize: 22, margin: '14px 0 10px' }}>Доступ пока не открыт</h1>
           <p style={{ color: DIM, fontSize: 14, lineHeight: 1.6 }}>
-            Терминал входит в подписку экосистемы и выдаётся отдельно, со сроком.
+            Глаз системы входит в подписку экосистемы и выдаётся отдельно, со сроком.
             Если подписка у вас есть, а экран пустой — напишите в поддержку, откроем.
           </p>
           <button onClick={() => navigate('/school/dashboard')} style={{ ...pill(true), marginTop: 18, padding: '11px 18px' }}>
@@ -313,7 +343,35 @@ export default function SchoolTerminal() {
           ))}
           <span style={{ ...label, marginLeft: 'auto' }}>{KINDS.find(([k]) => k === kind)?.[2]}</span>
         </div>
-        {pic ? (
+        <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
+          <button onClick={() => setLive(true)} style={{ ...pill(live), padding: '4px 9px' }}>
+            живой график
+          </button>
+          <button onClick={() => setLive(false)} style={{ ...pill(!live), padding: '4px 9px' }}>
+            картинка как в боте
+          </button>
+          {live && scene
+            ? LAYERS.filter(([L]) => present.has(L)).map(([L, name]) => (
+                <button
+                  key={L}
+                  onClick={() =>
+                    setHidden((h) => {
+                      const n = new Set(h);
+                      if (n.has(L)) n.delete(L);
+                      else n.add(L);
+                      return n;
+                    })
+                  }
+                  style={{ ...pill(false), padding: '4px 9px', color: hidden.has(L) ? '#55504a' : FG, textDecoration: hidden.has(L) ? 'line-through' : 'none' }}
+                >
+                  {name}
+                </button>
+              ))
+            : null}
+        </div>
+        {live && scene ? (
+          <LiveChart scene={scene} hidden={hidden} />
+        ) : pic ? (
           <img
             src={pic}
             alt={`${cur.symbol} ${KINDS.find(([k]) => k === kind)?.[1]}`}
@@ -344,8 +402,8 @@ export default function SchoolTerminal() {
           <ArrowLeft size={14} /> кабинет
         </button>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
-          <span style={{ fontFamily: MONO, letterSpacing: '0.2em', fontSize: 13, color: ACCENT }}>TRADE MASTER</span>
-          <span style={label}>by TradeLikeTyo</span>
+          <span style={{ fontFamily: MONO, letterSpacing: '0.2em', fontSize: 13, color: ACCENT }}>ГЛАЗ СИСТЕМЫ</span>
+          <span style={label}>Trade Master · TradeLikeTyo</span>
         </div>
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
           <span style={label}>обновлено {fmtWhen(meta?.updated_at || null)}</span>

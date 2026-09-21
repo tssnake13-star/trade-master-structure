@@ -612,7 +612,7 @@ export default function SchoolDashboard() {
           })}
         </nav>
 
-        {/* Терминал — рынок в кабинете. Отдельная подписка, отдельный экран. */}
+        {/* «Глаз системы» (его название 21.09.2026) — рынок в кабинете. Отдельная подписка, отдельный экран. */}
         {terminalOn && (
           <div className="px-3 pb-3">
             <button
@@ -622,10 +622,10 @@ export default function SchoolDashboard() {
             >
               <div className="flex items-center gap-2">
                 <LineChart size={13} style={{ color: ACCENT, flexShrink: 0 }} />
-                <span style={{ fontFamily: MONO, fontSize: 12, color: FG }}>Терминал</span>
+                <span style={{ fontFamily: MONO, fontSize: 12, color: FG }}>Глаз системы</span>
               </div>
               <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#555', marginTop: 4 }}>
-                рынок и разборы
+                рынок глазами системы
               </div>
             </button>
           </div>
