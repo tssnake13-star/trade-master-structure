@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import FloatingWatermark from '@/components/school/FloatingWatermark';
 import { ArrowLeft, Search } from 'lucide-react';
-import { ACCENT, BG, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate, fmtWhen } from '@/components/terminal/theme';
+import { ACCENT, BG, BLUE, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate, fmtWhen } from '@/components/terminal/theme';
 import { Arrow, CycleCard, Lines, Side, type MarketRow } from '@/components/terminal/parts';
 import { FalseExitFeed, ResonanceFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
@@ -280,6 +280,16 @@ export default function SchoolTerminal() {
     </div>
   );
 
+  // знаков после точки — как у цены инструмента (у золота 2, у евро 5)
+  const cycDg = cur?.price_text?.includes('.') ? cur.price_text.split('.')[1].length : 4;
+  // 21.09.2026, его просьба по макету: цикл со столбиком «пройдено» — неделя синим, дневка зелёным
+  const cycles = cur && (
+    <>
+      <CycleCard title="цикл недели" c={cur.cycle_w1} color={BLUE} dg={cycDg} />
+      <CycleCard title="цикл дневки" c={cur.cycle_d1} color={UP} dg={cycDg} />
+    </>
+  );
+
   const right = cur && (
     <div style={{ ...card, padding: 12 }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
@@ -314,14 +324,10 @@ export default function SchoolTerminal() {
             <br />
             {cur.trend_total ? <span style={{ color: ACCENT }}>{cur.trend_total}</span> : null}
           </div>
+          <div style={{ marginTop: 14 }}>{cycles}</div>
         </div>
       )}
-      {tab === 'Циклы' && (
-        <div>
-          <CycleCard title="цикл недели" c={cur.cycle_w1} />
-          <CycleCard title="цикл дневки" c={cur.cycle_d1} />
-        </div>
-      )}
+      {tab === 'Циклы' && <div>{cycles}</div>}
       {tab === 'Накопления' && <Lines lines={cur.trend_lines} />}
       {tab === 'Рейндж' && <Lines lines={cur.range_lines} />}
       {tab === 'Как в боте' && <Lines lines={cur.card_lines} />}

@@ -9,6 +9,8 @@ export const CARD = '#141210';
 export const BORDER = '#232323';
 export const DIM = '#8a8175';
 export const UP = '#3fb98f';
+// 21.09.2026, его выбор по макету: столбик цикла недели — синий, дневки — зелёный (UP)
+export const BLUE = '#3d7fe0';
 export const DOWN = '#e0604f';
 export const MONO = "'Space Mono', ui-monospace, monospace";
 export const SANS = "'Syne', system-ui, sans-serif";

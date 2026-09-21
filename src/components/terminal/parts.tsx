@@ -13,6 +13,13 @@ export interface Cycle {
   'пройдено'?: number;
   'полтора'?: number;
   'отработан'?: boolean;
+  // с 21.09.2026 мост считает их функциями бота (cycles_report._progress): пройдено —
+  // максимум хода или текущая цена, что дальше; сейчас — где цена; запас — до цели
+  'пройдено_всего'?: number;
+  'сейчас'?: number;
+  'запас_п'?: number | null;
+  'запас_atr'?: number | null;
+  'цель_взята'?: boolean;
 }
 
 export interface MarketRow {
@@ -84,20 +91,25 @@ function num(v: number | undefined | null, digits = 4) {
   return typeof v === 'number' ? v.toFixed(digits) : '—';
 }
 
-/** Полоса «пройдено / осталось» — то же число, что бот называет словами. */
-function Progress({ pct }: { pct: number | undefined }) {
-  const v = Math.max(0, Math.min(100, Math.round(pct || 0)));
+/**
+ * Столбик «пройдено по циклу» — его просьба 21.09.2026 по макету: неделя синим,
+ * дневка зелёным. Заполнен снизу на столько, сколько цикла уже пройдено; пустой
+ * верх — запас хода до цели.
+ */
+function Gauge({ pct, color }: { pct: number; color: string }) {
+  const v = Math.max(0, Math.min(100, Math.round(pct)));
   return (
-    <div style={{ marginTop: 6 }}>
-      <div style={{ height: 6, borderRadius: 4, backgroundColor: '#211e1a', overflow: 'hidden' }}>
-        <div style={{ width: `${v}%`, height: '100%', backgroundColor: ACCENT }} />
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, width: 48, flexShrink: 0 }}>
+      <span style={{ fontFamily: MONO, fontSize: 15, fontWeight: 700, color }}>{v}%</span>
+      <div style={{ width: 28, flex: 1, minHeight: 96, borderRadius: 9, backgroundColor: '#1b1f25', border: `1px solid ${color}40`, display: 'flex', alignItems: 'flex-end', overflow: 'hidden' }}>
+        <div style={{ width: '100%', height: `${v}%`, background: `linear-gradient(180deg, ${color}, ${color}b3)`, borderRadius: 8 }} />
       </div>
-      <div style={{ ...label, marginTop: 4 }}>пройдено {v}% · осталось {100 - v}%</div>
+      <span style={{ ...label, fontSize: 8, letterSpacing: '0.12em' }}>пройдено</span>
     </div>
   );
 }
 
-export function CycleCard({ title, c }: { title: string; c: Cycle | null }) {
+export function CycleCard({ title, c, color = ACCENT, dg = 4 }: { title: string; c: Cycle | null; color?: string; dg?: number }) {
   if (!c) {
     return (
       <div style={{ ...card, padding: 12, marginBottom: 10 }}>
@@ -106,28 +118,48 @@ export function CycleCard({ title, c }: { title: string; c: Cycle | null }) {
       </div>
     );
   }
+  // пока мост на VPS старый — берём прежнее «пройдено» (максимум хода)
+  const done = Math.min(100, c['пройдено_всего'] ?? c['пройдено'] ?? 0);
+  const taken = c['цель_взята'] ?? (c['пройдено'] ?? 0) >= 99.5;
+  const now = c['сейчас'];
+  const passed = taken
+    ? 'цель взята, ход выработан'
+    : `${Math.round(done)}% · осталось ${Math.max(0, 100 - Math.round(done))}%` +
+      (now != null && done - now >= 5 ? ` · цена сейчас на ${Math.round(now)}%` : '');
+  const reserve =
+    c['запас_п'] != null
+      ? `${c['запас_п']} п${c['запас_atr'] != null ? ` · ${String(c['запас_atr']).replace('.', ',')} ATR` : ''}`
+      : null;
   const rows: [string, string][] = [
     ['угол', c['угол'] || '—'],
-    ['начало', `${num(c['якорь'])} от ${fmtDate(c['дата'])}`],
-    ['середина', num(c['средняя'])],
-    ['цель', num(c['цель'])],
-    ['1,5 цикла', num(c['полтора'])],
+    ['начало', `${num(c['якорь'], dg)} от ${fmtDate(c['дата'])}`],
+    ['цель', num(c['цель'], dg)],
+    ['пройдено', passed],
+    ...(reserve && !taken ? ([['запас хода', reserve]] as [string, string][]) : []),
+    ['середина', num(c['средняя'], dg)],
+    ['1,5 цикла', num(c['полтора'], dg)],
     ['спираль', c['спираль'] != null ? String(c['спираль']) : '—'],
     ['переходов', c['переходы'] != null ? String(c['переходы']) : '—'],
   ];
   return (
     <div style={{ ...card, padding: 12, marginBottom: 10 }}>
-      <div style={label}>{title}</div>
-      <div style={{ marginTop: 8 }}>
-        {rows.map(([k, v]) => (
-          <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '3px 0' }}>
-            <span style={{ color: DIM, fontSize: 12 }}>{k}</span>
-            <span style={{ color: FG, fontFamily: MONO, fontSize: 12, textAlign: 'right' }}>{v}</span>
-          </div>
-        ))}
+      <div style={{ ...label, color }}>{title}</div>
+      <div style={{ display: 'flex', gap: 12, marginTop: 8, alignItems: 'stretch' }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          {rows.map(([k, v]) => (
+            <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '3px 0' }}>
+              <span style={{ color: DIM, fontSize: 12, flexShrink: 0 }}>{k}</span>
+              <span style={{ color: FG, fontFamily: MONO, fontSize: 12, textAlign: 'right' }}>{v}</span>
+            </div>
+          ))}
+        </div>
+        <Gauge pct={taken ? 100 : done} color={color} />
       </div>
-      <Progress pct={c['пройдено']} />
-      {c['отработан'] ? <div style={{ ...label, marginTop: 6, color: ACCENT }}>цель взята</div> : null}
+      {taken ? (
+        <div style={{ ...label, marginTop: 6, color: ACCENT }}>цель взята</div>
+      ) : c['отработан'] ? (
+        <div style={{ ...label, marginTop: 6 }}>пройден 90%+ · цель не взята, цикл живой</div>
+      ) : null}
     </div>
   );
 }
