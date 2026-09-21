@@ -2,7 +2,17 @@ import type { CSSProperties, ReactNode } from 'react';
 import { AlertTriangle, TrendingDown, TrendingUp, MoveRight } from 'lucide-react';
 import { ACCENT, BORDER, DIM, DOWN, FG, MONO, UP, card, label } from './theme';
 import { ScreenerFeed, type FeedDocs } from './Feeds';
-import { parseScreener, type ScrGroup, type ScrInstrument, type ScrTop, type Side } from './screenerParse';
+import { GEN, parseScreener, type ScrGroup, type ScrInstrument, type ScrTop, type Side } from './screenerParse';
+
+// 21.09.2026, его просьба с телефона: у цифр — слово («7 групп», «3 инструмента»)
+function plural(n: number, one: string, few: string, many: string) {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return one;
+  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few;
+  return many;
+}
+const groupsN = (n: number) => `${n} ${plural(n, 'группа', 'группы', 'групп')}`;
 
 /**
  * Скринер в «Глазе системы» — его выбор 21.09.2026: группы блоками «вверх» и «вниз»,
@@ -49,7 +59,7 @@ function GroupCard({ g, symbols, onOpen }: { g: ScrGroup; symbols: Set<string>; 
     <div style={{ ...card, padding: '10px 12px' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
         <Icon size={16} color={col(g.dir)} />
-        <span style={{ fontSize: 15, color: FG }}>{g.name}</span>
+        <span style={{ fontSize: 15, color: FG }}>{GEN[g.code] ? `Группа ${GEN[g.code]}` : g.name}</span>
         <span style={{ fontFamily: MONO, fontSize: 11, color: DIM }}>{g.code}</span>
         <span style={{ marginLeft: 'auto', ...pillSide(g.dir !== 'down'), ...(g.dir === 'flat' ? { color: DIM, borderColor: BORDER, backgroundColor: 'transparent' } : {}) }}>
           {g.trade}
@@ -57,7 +67,7 @@ function GroupCard({ g, symbols, onOpen }: { g: ScrGroup; symbols: Set<string>; 
       </div>
       {g.leader ? (
         <div style={{ fontSize: 12, marginTop: 3, color: DIM }}>
-          поводырь{' '}
+          поводырь группы:{' '}
           <button
             onClick={() => leadKnown && leadSym && onOpen(leadSym)}
             style={{ fontFamily: g.code === 'DXY' ? undefined : MONO, fontSize: 12, color: ACCENT, background: 'none', border: 'none', padding: 0, cursor: leadKnown ? 'pointer' : 'default', textDecoration: leadKnown ? 'underline' : 'none', textUnderlineOffset: 3 }}
@@ -161,22 +171,22 @@ export function ScreenerCards({ doc, symbols, onOpen }: { doc?: FeedDocs['screen
     <div>
       <div style={{ ...label, marginBottom: 14 }}>скринер от {doc.time || '—'} · одобрен автором · то же, что получили подписчики</div>
       {up.length ? (
-        <Block title={`↑ ВВЕРХ · BUY · ${up.length}`} color={UP}>
+        <Block title={`↑ ВВЕРХ · BUY · ${groupsN(up.length)}`} color={UP}>
           {up.map((g) => <GroupCard key={g.code} g={g} symbols={symbols} onOpen={onOpen} />)}
         </Block>
       ) : null}
       {down.length ? (
-        <Block title={`↓ ВНИЗ · SELL · ${down.length}`} color={DOWN}>
+        <Block title={`↓ ВНИЗ · SELL · ${groupsN(down.length)}`} color={DOWN}>
           {down.map((g) => <GroupCard key={g.code} g={g} symbols={symbols} onOpen={onOpen} />)}
         </Block>
       ) : null}
       {flat.length ? (
-        <Block title={`~ БЕЗ ЧЁТКОГО НАПРАВЛЕНИЯ · ${flat.length}`} color={DIM}>
+        <Block title={`~ БЕЗ ЧЁТКОГО НАПРАВЛЕНИЯ · ${groupsN(flat.length)}`} color={DIM}>
           {flat.map((g) => <GroupCard key={g.code} g={g} symbols={symbols} onOpen={onOpen} />)}
         </Block>
       ) : null}
       {parsed.top.length ? (
-        <Block title={`🏆 ТОП ЦИКЛОВ · ${parsed.top.length}`} color={ACCENT}>
+        <Block title={`🏆 ТОП ЦИКЛОВ · ${parsed.top.length} ${plural(parsed.top.length, 'инструмент', 'инструмента', 'инструментов')}`} color={ACCENT}>
           {parsed.top.map((t) => <TopCard key={t.rank} t={t} symbols={symbols} onOpen={onOpen} />)}
         </Block>
       ) : null}
