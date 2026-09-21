@@ -3,8 +3,9 @@ import type { FeedDocs } from './Feeds';
 
 /**
  * Строка свежести данных — 21.09.2026, его «да» на совет: ученик должен видеть, насколько
- * свежая картина. Данные VPS шлёт сам раз в час, поэтому «онлайн» — обновление не старше
- * 75 минут; до трёх часов — «обновление задерживается»; дольше — сколько часов его нет.
+ * свежая картина. С 21.09.2026 VPS шлёт данные сам каждые 4 часа в одно и то же время
+ * (00, 04, 08, 12, 16, 20 по часам сервера), поэтому «онлайн» — обновление не старше 4 ч 15 мин;
+ * пропущен один круг (до 8 ч 15 мин) — «обновление задерживается»; дольше — сколько часов его нет.
  */
 export default function StatusStrip({ updatedAt, feeds, now }: { updatedAt: string | null; feeds: FeedDocs; now: number }) {
   const upd = updatedAt ? new Date(updatedAt).getTime() : NaN;
@@ -12,9 +13,9 @@ export default function StatusStrip({ updatedAt, feeds, now }: { updatedAt: stri
   const [word, color] =
     age == null
       ? ['данных нет', DOWN]
-      : age <= 75
+      : age <= 255
         ? ['онлайн', UP]
-        : age <= 180
+        : age <= 495
           ? ['обновление задерживается', ACCENT]
           : [`нет обновлений ${Math.floor(age / 60)} ч`, DOWN];
   const screener = fromBotTime(feeds.screener?.time);
@@ -26,7 +27,7 @@ export default function StatusStrip({ updatedAt, feeds, now }: { updatedAt: stri
   const item = { whiteSpace: 'nowrap' as const };
   return (
     <div
-      title="Данные с сервера бота обновляются сами раз в час. Все времена — по вашему часовому поясу."
+      title="Данные с сервера бота обновляются сами каждые 4 часа: в 00, 04, 08, 12, 16 и 20 часов по часам сервера (UTC+5). Все времена здесь — по вашему часовому поясу."
       style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 14px', fontFamily: MONO, fontSize: 11, color: DIM }}
     >
       <span style={{ ...item, display: 'inline-flex', alignItems: 'center', gap: 6, color }}>
