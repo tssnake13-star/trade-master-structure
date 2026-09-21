@@ -3,7 +3,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import FloatingWatermark from '@/components/school/FloatingWatermark';
 import { ArrowLeft, Search } from 'lucide-react';
 import { ACCENT, BG, BLUE, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate } from '@/components/terminal/theme';
 import { Arrow, CycleCard, Lines, type MarketRow } from '@/components/terminal/parts';
@@ -479,7 +478,8 @@ export default function SchoolTerminal() {
   return (
     <div className="tm-page" style={{ minHeight: '100vh', backgroundColor: BG, color: FG, fontFamily: SANS, position: 'relative' }}>
       <style>{SCROLL_CSS}</style>
-      {user ? <FloatingWatermark email={user.email || ''} fullName={null} /> : null}
+      {/* 21.09.2026, его слово: бегущая по экрану почта здесь лишняя — «на видео такая защита
+          прокатит, а здесь зачем». В уроках с видео она осталась. */}
 
       <header style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', padding: '14px 18px', borderBottom: `1px solid ${BORDER}` }}>
         <button
