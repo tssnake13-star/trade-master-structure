@@ -7,7 +7,7 @@ import FloatingWatermark from '@/components/school/FloatingWatermark';
 import { ArrowLeft, Search } from 'lucide-react';
 import { ACCENT, BG, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate, fmtWhen } from '@/components/terminal/theme';
 import { Arrow, CycleCard, Lines, Side, type MarketRow } from '@/components/terminal/parts';
-import { ResonanceFeed, ScreenerFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
+import { FalseExitFeed, ResonanceFeed, ScreenerFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
 import LiveChart from '@/components/terminal/LiveChart';
 import { LAYERS, layersOf, type Layer, type Scene } from '@/components/terminal/scene';
 
@@ -33,17 +33,18 @@ interface Meta {
   build: string | null;
 }
 
-type Section = 'instrument' | 'screener' | 'trend' | 'resonance' | 'verdicts';
+type Section = 'instrument' | 'screener' | 'trend' | 'falsex' | 'resonance' | 'verdicts';
 const SECTIONS: [Section, string][] = [
   ['instrument', 'Инструмент'],
   ['screener', 'Скринер'],
   ['trend', 'Тренд'],
+  ['falsex', 'Ложные выходы'],
   ['resonance', 'Резонанс'],
   ['verdicts', 'Решения'],
 ];
 
-type Tab = 'Анализ' | 'Циклы' | 'Накопления' | 'Рейндж' | 'Карточка';
-const TABS: Tab[] = ['Анализ', 'Циклы', 'Накопления', 'Рейндж', 'Карточка'];
+type Tab = 'Анализ' | 'Циклы' | 'Накопления' | 'Рейндж' | 'Как в боте';
+const TABS: Tab[] = ['Анализ', 'Циклы', 'Накопления', 'Рейндж', 'Как в боте'];
 
 type Kind = 'cycles' | 'trend' | 'all';
 const KINDS: [Kind, string, string][] = [
@@ -266,12 +267,12 @@ export default function SchoolTerminal() {
           {[
             ['инструмент', cur.symbol],
             ['цена', cur.price_text || '—'],
-            ['неделя', `${cur.w_dir || '—'} ${cur.w_n ?? '—'}/3`],
-            ['дневка', `${cur.d_dir || '—'} ${cur.d_n ?? '—'}/3`],
+            ['неделя', `${cur.w_dir || '—'} · критерии ${cur.w_n ?? '—'} из 3`],
+            ['дневка', `${cur.d_dir || '—'} · критерии ${cur.d_n ?? '—'} из 3`],
             ['сценарий', cur.scenario ? `${cur.scenario} — ${cur.side === 'LONG' ? 'вверх' : 'вниз'}` : 'нет'],
             ['подтверждение', cur.confirmation ? 'есть' : 'нет'],
             ['поводырь', cur.guide || '—'],
-            ['свечи по', fmtDate(cur.bars_at)],
+            ['свечи закрыты по', fmtDate(cur.bars_at)],
           ].map(([k, v]) => (
             <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '6px 0', borderBottom: `1px solid ${BORDER}` }}>
               <span style={{ color: DIM, fontSize: 12 }}>{k}</span>
@@ -290,13 +291,13 @@ export default function SchoolTerminal() {
       )}
       {tab === 'Циклы' && (
         <div>
-          <CycleCard title="цикл W1" c={cur.cycle_w1} />
-          <CycleCard title="цикл D1" c={cur.cycle_d1} />
+          <CycleCard title="цикл недели" c={cur.cycle_w1} />
+          <CycleCard title="цикл дневки" c={cur.cycle_d1} />
         </div>
       )}
       {tab === 'Накопления' && <Lines lines={cur.trend_lines} />}
       {tab === 'Рейндж' && <Lines lines={cur.range_lines} />}
-      {tab === 'Карточка' && <Lines lines={cur.card_lines} />}
+      {tab === 'Как в боте' && <Lines lines={cur.card_lines} />}
     </div>
   );
 
@@ -425,6 +426,7 @@ export default function SchoolTerminal() {
           {section === 'instrument' && instrument}
           {section === 'screener' && <ScreenerFeed doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />}
           {section === 'trend' && <TrendFeed doc={feeds.trend} symbols={symbols} onOpen={openSymbol} />}
+          {section === 'falsex' && <FalseExitFeed doc={feeds.falsex} symbols={symbols} onOpen={openSymbol} />}
           {section === 'resonance' && <ResonanceFeed doc={feeds.resonance} symbols={symbols} onOpen={openSymbol} />}
           {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} symbols={symbols} onOpen={openSymbol} />}
           <div style={{ ...label, marginTop: 14, lineHeight: 1.7 }}>
