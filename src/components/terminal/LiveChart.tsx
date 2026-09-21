@@ -253,7 +253,8 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
     const bw = Math.max(1, Math.min(14, (pw / span) * 0.62));
     const priceTicks = niceTicks(y0, y1, Math.max(3, Math.round(ph / 55)));
     const inView = p.bars.map((b, i) => ({ b, x: p.x0 + i })).filter(({ x }) => x >= view[0] - 1 && x <= view[1] + 1);
-    const step = Math.max(1, Math.ceil(inView.length / Math.max(3, Math.floor(pw / 86))));
+    // подпись недели длиннее (дд.мм.гг) — на неё места больше, иначе даты стоят вплотную
+    const step = Math.max(1, Math.ceil(inView.length / Math.max(3, Math.floor(pw / (p.tf === 'W1' ? 120 : 90)))));
     const fmtP = (v: number) => v.toFixed(Math.min(p.dg, Math.abs(v) >= 1000 ? 2 : p.dg));
     return (
       <g>
