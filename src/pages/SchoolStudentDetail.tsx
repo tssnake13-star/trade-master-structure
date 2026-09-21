@@ -463,7 +463,7 @@ export default function SchoolStudentDetail() {
         {/* ======== TERMINAL BLOCK ======== */}
         <section className="rounded-lg border p-5" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm" style={{ fontFamily: font.heading, color: '#888' }}>Глаз системы</h2>
+            <h2 className="text-sm" style={{ fontFamily: font.heading, color: '#888' }}>TRADE MASTER INSIDE</h2>
             <span className="text-[11px]" style={{ color: terminalActive ? '#4a8a4a' : '#555', fontFamily: font.mono }}>
               {terminalActive ? `открыт до ${new Date(terminalUntil!).toLocaleDateString('ru-RU')}`
                 : terminalUntil ? `срок вышел ${new Date(terminalUntil).toLocaleDateString('ru-RU')}` : 'не выдан'}

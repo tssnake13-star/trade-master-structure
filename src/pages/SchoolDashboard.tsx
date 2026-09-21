@@ -614,8 +614,11 @@ export default function SchoolDashboard() {
           })}
         </nav>
 
-        {/* «Глаз системы» (его название 21.09.2026) — рынок в кабинете. Отдельная подписка,
-            отдельный экран. Как курс: без доступа виден с замком и не открывается. */}
+        {/* TRADE MASTER INSIDE, «рынок глазами системы» — рынок в кабинете (название его,
+            21.09.2026; до этого «Глаз системы»). Отдельная подписка, отдельный экран. Как курс:
+            без доступа виден с замком и не открывается. Название и подпись видны всем, слова
+            «закрыто» нет — его слово: «там же замок висит, и так понятно». Шрифт названия 13:
+            в 15 оно шире плитки (183 пикселя при 168 свободных). */}
         {eyeState && (
           <div className="px-3 pb-3">
             <button
@@ -625,22 +628,25 @@ export default function SchoolDashboard() {
               style={{
                 border: `1px solid ${eyeState === 'open' ? `${ACCENT}55` : BORDER}`,
                 backgroundColor: eyeState === 'open' ? 'rgba(225,168,77,0.06)' : 'transparent',
-                opacity: eyeState === 'open' ? 1 : 0.5,
+                opacity: eyeState === 'open' ? 1 : 0.8,
                 cursor: eyeState === 'open' ? 'pointer' : 'default',
               }}
             >
               <div className="flex items-center gap-2.5">
-                <Eye size={18} style={{ color: eyeState === 'open' ? ACCENT : '#555', flexShrink: 0 }} />
-                <span style={{ fontFamily: SANS, fontSize: 15, fontWeight: 600, color: eyeState === 'open' ? FG : '#666' }}>
-                  Глаз системы
+                {eyeState === 'open'
+                  ? <Eye size={18} style={{ color: ACCENT, flexShrink: 0 }} />
+                  : <Lock size={18} style={{ color: '#6f6a62', flexShrink: 0 }} />}
+                <span style={{ fontFamily: SANS, fontSize: 13, fontWeight: 600, whiteSpace: 'nowrap', color: eyeState === 'open' ? FG : '#8a8175' }}>
+                  TRADE MASTER INSIDE
                 </span>
-                {eyeState !== 'open' && <Lock size={12} style={{ color: '#444', marginLeft: 'auto', flexShrink: 0 }} />}
               </div>
               <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: 6,
-                            color: eyeState === 'open' ? '#8a8175' : eyeState === 'expired' ? '#8a7048' : '#444' }}>
-                {eyeState === 'open' ? 'рынок глазами системы'
-                  : eyeState === 'expired' ? t('sidebar_locked_expired') : t('sidebar_locked')}
+                            color: eyeState === 'open' ? '#8a8175' : '#6f6a62' }}>
+                рынок глазами системы
               </div>
+              {eyeState === 'expired' && (
+                <div style={{ fontFamily: MONO, fontSize: 9, color: '#8a7048', marginTop: 4 }}>{t('sidebar_locked_expired')}</div>
+              )}
             </button>
           </div>
         )}
