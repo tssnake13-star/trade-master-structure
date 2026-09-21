@@ -6,7 +6,8 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import FloatingWatermark from '@/components/school/FloatingWatermark';
 import { ArrowLeft, Search } from 'lucide-react';
 import { ACCENT, BG, BLUE, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate } from '@/components/terminal/theme';
-import { Arrow, CycleCard, Lines, Side, type MarketRow } from '@/components/terminal/parts';
+import { Arrow, CycleCard, Lines, type MarketRow } from '@/components/terminal/parts';
+import { Brand, Decision } from '@/components/terminal/Decision';
 import { FalseExitFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
 import StatusStrip from '@/components/terminal/Status';
@@ -273,8 +274,9 @@ export default function SchoolTerminal() {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: BG, color: FG, fontFamily: SANS, display: 'grid', placeItems: 'center', padding: 24 }}>
         <div style={{ ...card, padding: 28, maxWidth: 520, textAlign: 'center' }}>
-          <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.2em', color: ACCENT }}>TRADE MASTER INSIDE</div>
-          <div style={{ ...label, marginTop: 4 }}>Глаз системы</div>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <Brand />
+          </div>
           <h1 style={{ fontSize: 22, margin: '14px 0 10px' }}>Доступ пока не открыт</h1>
           <p style={{ color: DIM, fontSize: 14, lineHeight: 1.6 }}>
             TRADE MASTER INSIDE входит в подписку экосистемы и выдаётся отдельно, со сроком.
@@ -366,16 +368,9 @@ export default function SchoolTerminal() {
       </div>
       {tab === 'Анализ' && (
         <div>
-          {[
-            ['инструмент', cur.symbol],
-            ['цена', cur.price_text || '—'],
-            ['неделя', `${cur.w_dir || '—'} · критерии ${cur.w_n ?? '—'} из 3`],
-            ['дневка', `${cur.d_dir || '—'} · критерии ${cur.d_n ?? '—'} из 3`],
-            ['сценарий', cur.scenario ? `${cur.scenario} — ${cur.side === 'LONG' ? 'вверх' : 'вниз'}` : 'нет'],
-            ['подтверждение', cur.confirmation ? 'есть' : 'нет'],
-            ['поводырь', cur.guide || '—'],
-            ['свечи закрыты по', fmtDate(cur.bars_at)],
-          ].map(([k, v]) => (
+          {/* 21.09.2026, его слово: инструмент, сценарий, неделя и дневка здесь повторяли
+              верхний блок — «лишняя информация»; главное теперь только наверху */}
+          {[['свечи закрыты по', fmtDate(cur.bars_at)]].map(([k, v]) => (
             <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '6px 0', borderBottom: `1px solid ${BORDER}` }}>
               <span style={{ color: DIM, fontSize: 12 }}>{k}</span>
               <span style={{ color: FG, fontFamily: MONO, fontSize: 12, textAlign: 'right' }}>{v}</span>
@@ -412,30 +407,9 @@ export default function SchoolTerminal() {
           ) : null}
           <span style={{ fontFamily: MONO, fontSize: 18, marginLeft: 'auto' }}>{cur.price_text || '—'}</span>
         </div>
-        <div style={{ display: 'flex', gap: 18, flexWrap: 'wrap', marginTop: 12, alignItems: 'center' }}>
-          <div>
-            <div style={label}>направление</div>
-            <div style={{ marginTop: 5 }}>
-              <Side side={cur.side} />
-            </div>
-          </div>
-          <div>
-            <div style={label}>сценарий</div>
-            <div style={{ marginTop: 5, fontFamily: MONO, fontSize: 13 }}>
-              {cur.scenario ? `${cur.scenario} — ${cur.side === 'LONG' ? 'вверх' : 'вниз'}` : 'нет'}
-            </div>
-          </div>
-          <div>
-            <div style={label}>подтверждение</div>
-            <div style={{ marginTop: 5, fontFamily: MONO, fontSize: 13, color: cur.confirmation ? UP : DIM }}>
-              {cur.confirmation ? 'ЕСТЬ' : 'нет'}
-            </div>
-          </div>
-          <div style={{ minWidth: 180 }}>
-            <div style={label}>поводырь</div>
-            <div style={{ marginTop: 5, fontSize: 13, color: DIM }}>{cur.guide || '—'}</div>
-          </div>
-        </div>
+        {/* 21.09.2026, его слово: направление, сценарий, подтверждение, поводырь и критерии
+            недели и дневки — самое главное об инструменте: крупно, по центру, одним блоком */}
+        <Decision r={cur} narrow={phone} />
       </div>
 
       <div style={{ ...card, padding: 12 }}>
@@ -514,11 +488,8 @@ export default function SchoolTerminal() {
         >
           <ArrowLeft size={14} /> кабинет
         </button>
-        {/* название — его, 21.09.2026: две строки, как он написал */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-          <span style={{ fontFamily: MONO, letterSpacing: '0.2em', fontSize: 13, color: ACCENT }}>TRADE MASTER INSIDE</span>
-          <span style={label}>Глаз системы</span>
-        </div>
+        {/* название — его, 21.09.2026: как плитка в кабинете — глаз на две строки */}
+        <Brand />
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
           <StatusStrip updatedAt={meta?.updated_at || null} feeds={feeds} now={now} />
           {until ? <span style={label}>подписка до {fmtDate(until)}</span> : null}

@@ -48,8 +48,16 @@ export interface MarketRow {
   chart_cycles: string | null;
   chart_trend: string | null;
   chart_all: string | null;
-  // leads — код группы, которую инструмент ведёт сам (USDJPY → JPY); leader — его поводырь
-  extra?: { leads?: string | null; leader?: string | null } | null;
+  // leads — код группы, которую инструмент ведёт сам (USDJPY → JPY); leader — его поводырь.
+  // w_votes / d_votes — голоса недели и дневки по отдельности ([имя, UP/DOWN/NONE]), w_anom —
+  // пометка, если неделю сняла аномальная свеча (мост с 21.09.2026, вечер)
+  extra?: {
+    leads?: string | null;
+    leader?: string | null;
+    w_votes?: [string, string][];
+    d_votes?: [string, string][];
+    w_anom?: string | null;
+  } | null;
   bars_at: string | null;
   updated_at: string | null;
 }
