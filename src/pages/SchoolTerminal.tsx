@@ -13,6 +13,17 @@ import { GEN } from '@/components/terminal/screenerParse';
 import LiveChart from '@/components/terminal/LiveChart';
 import { LAYERS, layersOf, type Layer, type Scene } from '@/components/terminal/scene';
 
+// 21.09.2026, его слово: серые ползунки «ужасно смотрятся» — тонкие, золото на тёмном,
+// как весь кабинет. Стандартные свойства — Chrome и Firefox, ::-webkit — Safari.
+const SCROLL_CSS = `
+html { scrollbar-color: rgba(225,168,77,0.55) ${BG}; }
+.tm-page, .tm-page * { scrollbar-width: thin; scrollbar-color: rgba(225,168,77,0.55) transparent; }
+.tm-page ::-webkit-scrollbar { width: 8px; height: 8px; }
+.tm-page ::-webkit-scrollbar-track { background: transparent; }
+.tm-page ::-webkit-scrollbar-thumb { background: rgba(225,168,77,0.55); border-radius: 8px; }
+.tm-page ::-webkit-scrollbar-thumb:hover { background: ${ACCENT}; }
+`;
+
 /**
  * SchoolTerminal — «Глаз системы» (/school/terminal). Название — его, 21.09.2026:
  * так он называет скринер в выпусках; внутри это терминал рынка.
@@ -218,7 +229,8 @@ export default function SchoolTerminal() {
   }
 
   const sidebar = (
-    <div style={{ ...card, padding: 10, height: wide ? 'calc(100vh - 190px)' : 'auto', maxHeight: wide ? undefined : 320, overflowY: 'auto' }}>
+    // 21.09.2026, его слово: на компьютере список — до низа, до дисклеймера, без ползунка
+    <div style={{ ...card, padding: 10, ...(wide ? {} : { maxHeight: 320, overflowY: 'auto' as const }) }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 6px 10px' }}>
         <Search size={14} color={DIM} />
         <input
@@ -269,7 +281,7 @@ export default function SchoolTerminal() {
   );
 
   const right = cur && (
-    <div style={{ ...card, padding: 12, height: wide ? 'calc(100vh - 190px)' : 'auto', overflowY: 'auto' }}>
+    <div style={{ ...card, padding: 12 }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
         {TABS.map((t) => (
           <button key={t} onClick={() => setTab(t)} style={{ ...pill(tab === t), padding: '5px 9px' }}>
@@ -417,7 +429,8 @@ export default function SchoolTerminal() {
   );
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: BG, color: FG, fontFamily: SANS, position: 'relative' }}>
+    <div className="tm-page" style={{ minHeight: '100vh', backgroundColor: BG, color: FG, fontFamily: SANS, position: 'relative' }}>
+      <style>{SCROLL_CSS}</style>
       {user ? <FloatingWatermark email={user.email || ''} fullName={null} /> : null}
 
       <header style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', padding: '14px 18px', borderBottom: `1px solid ${BORDER}` }}>
@@ -447,14 +460,14 @@ export default function SchoolTerminal() {
 
       <div style={{ display: 'grid', gridTemplateColumns: wide ? (section === 'instrument' ? '240px minmax(0, 1fr) 330px' : '240px minmax(0, 1fr)') : '1fr', gap: 14, padding: 14 }}>
         {sidebar}
-        <div style={{ minWidth: 0 }}>
+        <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           {section === 'instrument' && instrument}
           {section === 'screener' && <ScreenerCards doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />}
           {section === 'trend' && <TrendFeed doc={feeds.trend} symbols={symbols} onOpen={openSymbol} />}
           {section === 'falsex' && <FalseExitFeed doc={feeds.falsex} symbols={symbols} onOpen={openSymbol} />}
           {section === 'resonance' && <ResonanceFeed doc={feeds.resonance} symbols={symbols} onOpen={openSymbol} />}
           {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} symbols={symbols} onOpen={openSymbol} />}
-          <div style={{ ...label, marginTop: 14, lineHeight: 1.7 }}>
+          <div style={{ ...label, marginTop: 'auto', paddingTop: 14, lineHeight: 1.7 }}>
             {DISCLAIMER}
           </div>
         </div>

@@ -256,6 +256,12 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
     const xi = Math.round(toDataX(cross.px));
     const bar = p.bars[xi - p.x0];
     const yv = y1 - ((cross.py - PAD.t) / ph) * (y1 - y0);
+    // 21.09.2026, его просьба: дата свечи под перекрестием — внизу, на оси дат, как цена справа.
+    // Дневка и неделя — только дата, время не нужно.
+    const day = bar ? bar[0].split('-').reverse().join('.') : null;
+    const dayTxt = day ? (p.tf === 'W1' ? `неделя с ${day}` : day) : null;
+    const dw = dayTxt ? dayTxt.length * 6.2 + 12 : 0;
+    const dx = Math.min(Math.max(sx(xi), PAD.l + dw / 2), PAD.l + pw - dw / 2);
     crossNode = (
       <g pointerEvents="none">
         <line x1={sx(xi)} x2={sx(xi)} y1={PAD.t} y2={PAD.t + ph} stroke="#8b949e" strokeDasharray="3 3" strokeWidth={0.8} />
@@ -264,6 +270,14 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
         <text x={PAD.l + pw + 4} y={cross.py + 4} fontSize={10} fill={FG} fontFamily={MONO}>
           {yv.toFixed(p.dg)}
         </text>
+        {dayTxt ? (
+          <>
+            <rect x={dx - dw / 2} y={PAD.t + ph + 3} width={dw} height={18} rx={3} fill="#2a3038" />
+            <text x={dx} y={PAD.t + ph + 15.5} fontSize={10} fill={FG} textAnchor="middle" fontFamily={MONO}>
+              {dayTxt}
+            </text>
+          </>
+        ) : null}
       </g>
     );
     if (bar) {
