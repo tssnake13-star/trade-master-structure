@@ -10,7 +10,6 @@ import { ACCENT, DIM, DOWN, FG, MONO, UP, BORDER, card, label, fmtWhen } from '.
 export interface FeedDocs {
   screener?: { time?: string | null; groups?: string | null; top?: string | null; leaders?: Record<string, string> | null };
   trend?: { lines?: string[] };
-  resonance?: { time?: string | null; text?: string | null };
   verdicts?: { items?: Verdict[] };
   falsex?: { checked?: number; items?: FalseExit[] };
 }
@@ -98,18 +97,6 @@ export function TrendFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['trend']; s
   return (
     <div style={{ ...card, padding: 14 }}>
       <TextBlock text={lines.join('\n')} symbols={symbols} onOpen={onOpen} />
-    </div>
-  );
-}
-
-export function ResonanceFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['resonance']; symbols: Set<string>; onOpen: Open }) {
-  if (!doc?.text) return <Empty what="Резонанс-скана" />;
-  return (
-    <div>
-      <div style={{ ...label, marginBottom: 12 }}>резонанс от {doc.time || '—'}</div>
-      <div style={{ ...card, padding: 14 }}>
-        <TextBlock text={doc.text} symbols={symbols} onOpen={onOpen} />
-      </div>
     </div>
   );
 }

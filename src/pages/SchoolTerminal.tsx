@@ -7,7 +7,7 @@ import FloatingWatermark from '@/components/school/FloatingWatermark';
 import { ArrowLeft, Search } from 'lucide-react';
 import { ACCENT, BG, BLUE, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate, fmtWhen } from '@/components/terminal/theme';
 import { Arrow, CycleCard, Lines, Side, type MarketRow } from '@/components/terminal/parts';
-import { FalseExitFeed, ResonanceFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
+import { FalseExitFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
 import { GEN } from '@/components/terminal/screenerParse';
 import LiveChart from '@/components/terminal/LiveChart';
@@ -46,13 +46,13 @@ interface Meta {
   build: string | null;
 }
 
-type Section = 'instrument' | 'screener' | 'trend' | 'falsex' | 'resonance' | 'verdicts';
+// 21.09.2026, его слово: вкладку «Резонанс» из «Глаза системы» убрать
+type Section = 'instrument' | 'screener' | 'trend' | 'falsex' | 'verdicts';
 const SECTIONS: [Section, string][] = [
   ['instrument', 'Инструмент'],
   ['screener', 'Скринер'],
   ['trend', 'Тренд'],
   ['falsex', 'Ложные выходы'],
-  ['resonance', 'Резонанс'],
   ['verdicts', 'Решения'],
 ];
 
@@ -471,7 +471,6 @@ export default function SchoolTerminal() {
           {section === 'screener' && <ScreenerCards doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />}
           {section === 'trend' && <TrendFeed doc={feeds.trend} symbols={symbols} onOpen={openSymbol} />}
           {section === 'falsex' && <FalseExitFeed doc={feeds.falsex} symbols={symbols} onOpen={openSymbol} />}
-          {section === 'resonance' && <ResonanceFeed doc={feeds.resonance} symbols={symbols} onOpen={openSymbol} />}
           {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} symbols={symbols} onOpen={openSymbol} />}
           <div style={{ ...label, marginTop: 'auto', paddingTop: 14, lineHeight: 1.7 }}>
             {DISCLAIMER}
