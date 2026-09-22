@@ -114,11 +114,13 @@ export function parseGroups(text: string): ScrGroup[] {
     const ins = line.match(/^→\s*(.+)$/u);
     if (ins) {
       for (const part of ins[1].split(',')) {
-        const m = part.trim().match(/^([A-Z0-9_]+)\s+(LONG|SHORT)\s*(\S+)?/u);
+        // 22.09.2026: у крипты в имени маленькая t («ETHUSDt») — берём и её, показываем ETHUSDT,
+        // как в левом списке (иначе эфир в группе биткоина пропадал)
+        const m = part.trim().match(/^([A-Z0-9_]+t?)\s+(LONG|SHORT)\s*(\S+)?/u);
         if (m) {
           // «3/3» — счёт пары (с 21.09.2026); значки режима из старого кэша не показываем
           const sc = (m[3] || '').match(/^([23])\/3$/);
-          cur.instruments.push({ symbol: m[1], side: m[2] as 'LONG' | 'SHORT', score: sc ? +sc[1] : null });
+          cur.instruments.push({ symbol: m[1].toUpperCase(), side: m[2] as 'LONG' | 'SHORT', score: sc ? +sc[1] : null });
         }
       }
       continue;
@@ -146,13 +148,13 @@ export function parseTop(text: string): { top: ScrTop[]; fresh: string[] } {
       if (line.startsWith('•')) fresh.push(line.replace(/^•\s*/, ''));
       continue;
     }
-    const h = line.match(/^(\d+)\.\s+([A-Z0-9_]+)\s+(LONG|SHORT)\s*·?\s*(.*)$/);
+    const h = line.match(/^(\d+)\.\s+([A-Z0-9_]+t?)\s+(LONG|SHORT)\s*·?\s*(.*)$/);
     if (h) {
       const tags = h[4].split('·').map((t) => t.replace(/🔥/gu, '').trim()).filter(Boolean);
       const sc = tags.find((t) => /^сценарий/.test(t));
       cur = {
         rank: +h[1],
-        symbol: h[2],
+        symbol: h[2].toUpperCase(),
         side: h[3] as 'LONG' | 'SHORT',
         scenario: sc ? sc.replace(/^сценарий\s*/, '') : null,
         tags: tags.filter((t) => !/^сценарий/.test(t)),
