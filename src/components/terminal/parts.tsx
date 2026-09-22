@@ -68,13 +68,20 @@ export interface MarketRow {
 }
 
 /** Куда смотрит тренд по накоплениям — стрелкой, как в списке терминала. */
-export function Arrow({ text }: { text: string | null }) {
+/** 22.09.2026, его вопрос: «что обозначают стрелочки? у кого-то две вверх, две вниз…» —
+ *  сдвоенные стрелки путали. Теперь буква таймфрейма и одна стрелка: «Н↑» — неделя вверх,
+ *  «Д↓» — дневка вниз, «~» — тренда по накоплениям нет. */
+export function Arrow({ text, tag, tip }: { text: string | null; tag?: string; tip?: string }) {
   const t = (text || '').toLowerCase();
   const up = t.includes('вверх');
   const down = t.includes('вниз');
   return (
-    <span style={{ fontFamily: MONO, fontSize: 12, color: up ? UP : down ? DOWN : DIM }}>
-      {up ? '↑↑' : down ? '↓↓' : '~'}
+    <span
+      title={tip ? `${tip}: ${up ? 'тренд по накоплениям вверх' : down ? 'тренд по накоплениям вниз' : 'тренда по накоплениям нет'}` : undefined}
+      style={{ fontFamily: MONO, fontSize: 12, color: up ? UP : down ? DOWN : DIM, whiteSpace: 'nowrap' }}
+    >
+      {tag ? <span style={{ fontSize: 10, opacity: 0.75, marginRight: 1 }}>{tag}</span> : null}
+      {up ? '↑' : down ? '↓' : '~'}
     </span>
   );
 }

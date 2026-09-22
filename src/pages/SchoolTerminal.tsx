@@ -301,6 +301,10 @@ export default function SchoolTerminal() {
           style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: FG, fontFamily: SANS, fontSize: 13 }}
         />
       </div>
+      {/* 22.09.2026, его вопрос «что обозначают стрелочки?» — подпись прямо над списком */}
+      <div style={{ ...label, letterSpacing: '0.08em', textTransform: 'none', padding: '0 8px 4px', lineHeight: 1.5 }}>
+        Н — неделя, Д — дневка: тренд по накоплениям · ↑ вверх · ↓ вниз · ~ тренда нет
+      </div>
       {groupedList.map(([g, rs]) => (
         <div key={g} style={{ marginBottom: 6 }}>
           <div style={{ ...label, color: ACCENT, padding: '10px 8px 4px' }}>{GEN[g] ? `Группа ${GEN[g]}` : 'Другие'}</div>
@@ -334,8 +338,8 @@ export default function SchoolTerminal() {
               ) : null}
             </span>
             <span style={{ display: 'flex', gap: 4 }}>
-              <Arrow text={r.trend_w1} />
-              <Arrow text={r.trend_d1} />
+              <Arrow text={r.trend_w1} tag="Н" tip="неделя" />
+              <Arrow text={r.trend_d1} tag="Д" tip="дневка" />
             </span>
             <span style={{ fontFamily: MONO, fontSize: 11, color: DIM, minWidth: 62, textAlign: 'right' }}>{r.price_text || '—'}</span>
           </button>
