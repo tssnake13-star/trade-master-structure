@@ -16,7 +16,7 @@ const AuthorSection = () => {
                 <img 
                   alt="Сергей Тё" 
                   className="w-full h-full object-cover" 
-                  src="/lovable-uploads/b039968f-d8a6-42e3-9c62-6ee1e7af3057.jpg" 
+                  src="/author-sergey-te.jpg"
                 />
               </div>
             </div>
