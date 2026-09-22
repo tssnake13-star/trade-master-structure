@@ -20,6 +20,14 @@ export interface Cycle {
   'запас_п'?: number | null;
   'запас_atr'?: number | null;
   'цель_взята'?: boolean;
+  // 22.09.2026, его правило полупериодов: цель взята, переходов и разворота нет — цикл идёт
+  // дальше. цель_номер 2 — третий полупериод от якоря (цель №1 — обычная цель, два полупериода);
+  // цели — все уровни с датой, когда взяты; разворот — дата якоря нового встречного цикла
+  'цель_номер'?: number;
+  'полупериодов'?: number;
+  'цель_1'?: number;
+  'цели'?: { N: number; 'полупериодов': number; 'цель': number; 'снята': string | null }[];
+  'разворот'?: string;
 }
 
 export interface MarketRow {
@@ -150,14 +158,21 @@ export function CycleCard({ title, c, color = ACCENT, dg = 4 }: { title: string;
     c['запас_п'] != null
       ? `${c['запас_п']} п${c['запас_atr'] != null ? ` · ${String(c['запас_atr']).replace('.', ',')} ATR` : ''}`
       : null;
+  // 22.09.2026: цикл продлён полупериодами — цель называется номером, взятые цели отдельно
+  const hpN = c['цель_номер'];
+  const tgtLabel = hpN ? `цель №${hpN} · ${c['полупериодов']}-й полупериод` : 'цель';
+  const hpTaken: [string, string][] = (c['цели'] || [])
+    .filter((q) => q['снята'])
+    .map((q) => [`цель №${q.N}`, `${num(q['цель'], dg)} · взята ${fmtDate(q['снята'])}`]);
   const rows: [string, string][] = [
     ['угол', c['угол'] || '—'],
     ['начало', `${num(c['якорь'], dg)} от ${fmtDate(c['дата'])}`],
-    ['цель', num(c['цель'], dg)],
+    [tgtLabel, num(c['цель'], dg)],
+    ...hpTaken,
     ['пройдено', passed],
     ...(reserve && !taken ? ([['запас хода', reserve]] as [string, string][]) : []),
     ['середина', num(c['средняя'], dg)],
-    ['1,5 цикла', num(c['полтора'], dg)],
+    ...(hpN ? [] : ([['1,5 цикла', num(c['полтора'], dg)]] as [string, string][])),
     ['спираль', c['спираль'] != null ? String(c['спираль']) : '—'],
     ['переходов', c['переходы'] != null ? String(c['переходы']) : '—'],
   ];
@@ -176,9 +191,13 @@ export function CycleCard({ title, c, color = ACCENT, dg = 4 }: { title: string;
         <Gauge pct={taken ? 100 : done} color={color} />
       </div>
       {taken ? (
-        <div style={{ ...label, marginTop: 6, color: ACCENT }}>цель взята</div>
+        <div style={{ ...label, marginTop: 6, color: ACCENT }}>
+          цель взята{c['разворот'] ? ` · родился цикл в другую сторону от ${fmtDate(c['разворот'])}` : ''}
+        </div>
       ) : c['отработан'] ? (
         <div style={{ ...label, marginTop: 6 }}>пройден 90%+ · цель не взята, цикл живой</div>
+      ) : hpN ? (
+        <div style={{ ...label, marginTop: 6 }}>цель взята, переходов нет — цикл идёт дальше полупериодами</div>
       ) : null}
     </div>
   );
