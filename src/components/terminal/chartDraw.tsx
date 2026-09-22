@@ -120,8 +120,18 @@ export function shapeNode(s: Shape, key: number, sx: (x: number) => number, sy: 
     case 'mark': {
       const x = sx(s.x);
       const y = sy(s.y);
+      // 22.09.2026: точки реверса мелкие (у бота 2.4) — без обводки, как точки Reverse_3 в MT4
+      if (s.m === 'o' && s.s < 3.5) return <circle key={key} cx={x} cy={y} r={Math.max(1.3, s.s * 0.6)} fill={s.c} fillOpacity={s.a} />;
       const r = Math.max(2.5, s.s * 0.62);
       if (s.m === 'o') return <circle key={key} cx={x} cy={y} r={r} fill={s.c} fillOpacity={s.a} stroke={s.e} strokeWidth={1.2} />;
+      // 22.09.2026: стрелки свинга и реверса — остриё и ствол, как у бота (grafik_cikla._arrow_paths)
+      if (s.m === 'au' || s.m === 'ad') {
+        const h = Math.max(4.5, s.s * 0.62);
+        const g = s.m === 'au' ? -1 : 1;
+        const pt = (dx: number, dy: number) => `${(x + dx * h).toFixed(1)},${(y + g * dy * h).toFixed(1)}`;
+        const d = `M${pt(0, 1)} L${pt(0.8, 0.12)} L${pt(0.3, 0.12)} L${pt(0.3, -1)} L${pt(-0.3, -1)} L${pt(-0.3, 0.12)} L${pt(-0.8, 0.12)} Z`;
+        return <path key={key} d={d} fill={s.c} fillOpacity={s.a} stroke={s.e} strokeWidth={0.6} />;
+      }
       if (s.m === 'x')
         return (
           <g key={key} stroke={s.c} strokeWidth={1.8}>
