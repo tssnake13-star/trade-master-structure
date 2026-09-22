@@ -131,6 +131,31 @@ function Cell({ name, value, color, sub }: { name: string; value: string; color:
   );
 }
 
+/** 22.09.2026, его слово: «посередине прям потолще линию, чтобы разделять два таймфрейма…
+ *  сверху крупными буквами — неделя и дневка… лучше по-русски». Слева неделя: направление,
+ *  сценарий и её критерии; справа дневка: подтверждение, поводырь и её критерии. */
+const TF_HEAD = {
+  fontFamily: SANS,
+  fontSize: 17,
+  fontWeight: 700,
+  letterSpacing: '0.22em',
+  textTransform: 'uppercase' as const,
+  color: ACCENT,
+  textAlign: 'center' as const,
+  padding: '10px 8px 9px',
+  backgroundColor: PANEL,
+};
+const DIVIDER = `${ACCENT}99`;
+
+function Half({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 1, backgroundColor: BORDER, minWidth: 0 }}>
+      <div style={TF_HEAD}>{title}</div>
+      {children}
+    </div>
+  );
+}
+
 function Crit({ tf, r }: { tf: 'W1' | 'D1'; r: MarketRow }) {
   const dir = tf === 'W1' ? r.w_dir : r.d_dir;
   const n = tf === 'W1' ? r.w_n : r.d_n;
@@ -147,8 +172,10 @@ function Crit({ tf, r }: { tf: 'W1' | 'D1'; r: MarketRow }) {
           : 'нет'
         : 'нет направления';
   return (
-    <div style={{ backgroundColor: PANEL, padding: '12px 10px' }}>
-      <div style={cellLabel}>{tf === 'W1' ? 'неделя' : 'дневка'}</div>
+    // 22.09.2026: неделя и дневка теперь заголовками половин — здесь только «критерии»;
+    // клетка тянется до низа половины, чтобы половины кончались ровно
+    <div style={{ backgroundColor: PANEL, padding: '12px 10px', flex: 1 }}>
+      <div style={cellLabel}>критерии</div>
       <div style={bigValue(s ? colorOf(s) : ACCENT)}>{value}</div>
       {votes.length ? (
         <>
@@ -160,50 +187,69 @@ function Crit({ tf, r }: { tf: 'W1' | 'D1'; r: MarketRow }) {
   );
 }
 
-/** Блок главного: направление · сценарий · подтверждение · поводырь, под ними неделя и дневка. */
+/** Блок главного: слева НЕДЕЛЯ (направление, сценарий, критерии недели), справа ДНЕВКА
+ *  (подтверждение, поводырь, критерии дневки), между ними толстая линия (22.09.2026).
+ *  На узком экране половины идут друг под другом, линия — поперёк. */
 export function Decision({ r, narrow }: { r: MarketRow; narrow: boolean }) {
   const s = sideOf(r.side);
   const g = guideParts(r);
   const confVotes = ((legacyD1(r) ? r.extra?.d_votes : r.extra?.c_votes) || []) as Vote[];
+  const pair = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 } as const;
   return (
-    <div style={{ marginTop: 14, border: `1px solid ${ACCENT}33`, borderRadius: 12, overflow: 'hidden', backgroundColor: BORDER, display: 'grid', gap: 1 }}>
-      <div style={{ display: 'grid', gridTemplateColumns: narrow ? '1fr 1fr' : 'repeat(4, 1fr)', gap: 1 }}>
-        <Cell name="направление" value={s ? `${s} ${arrowOf(s)}` : '—'} color={colorOf(s)} />
-        {/* «идём по недельному циклу» — его слово 21.09.2026: строку с живого графика —
-            сюда, наверх; слова те же, что на картинке бота */}
-        <Cell
-          name="сценарий"
-          value={r.scenario ? `${r.scenario} — ${r.side === 'LONG' ? 'вверх' : 'вниз'}` : 'нет'}
-          color={r.scenario ? FG : DIM}
-          sub={
-            r.scenario === '1'
-              ? 'идём по недельному циклу'
-              : r.scenario === '2'
-                ? 'недельный цикл пройден, идём против него'
-                : null
-          }
-        />
-        {/* 21.09.2026 вечер, его определение: подтверждение — только на дневке: свинг, свеча,
-            реверс; реверс обязателен. «Если его нет, сделку нельзя делать» */}
-        <Cell
-          name="подтверждение"
-          value={r.confirmation ? 'ЕСТЬ' : 'нет'}
-          color={r.confirmation ? UP : DIM}
-          sub={
-            confVotes.length ? (
-              <>
-                <VoteChips votes={confVotes} />
-                {r.confirmation ? null : <div style={{ marginTop: 4 }}>нужен реверс в сторону сделки и с ним свинг или свеча</div>}
-              </>
-            ) : null
-          }
-        />
-        <Cell name="поводырь" value={g.main} color={g.color} sub={g.sub ? paint(g.sub) : null} />
-      </div>
-      <div style={{ display: 'grid', gridTemplateColumns: narrow ? '1fr' : '1fr 1fr', gap: 1 }}>
+    <div
+      style={{
+        marginTop: 14,
+        border: `1px solid ${ACCENT}33`,
+        borderRadius: 12,
+        overflow: 'hidden',
+        backgroundColor: BORDER,
+        display: 'grid',
+        gridTemplateColumns: narrow ? '1fr' : '1fr 4px 1fr',
+      }}
+    >
+      <Half title="неделя">
+        <div style={pair}>
+          <Cell name="направление" value={s ? `${s} ${arrowOf(s)}` : '—'} color={colorOf(s)} />
+          {/* «идём по недельному циклу» — его слово 21.09.2026: строку с живого графика —
+              сюда, наверх; слова те же, что на картинке бота */}
+          <Cell
+            name="сценарий"
+            value={r.scenario ? `${r.scenario} — ${r.side === 'LONG' ? 'вверх' : 'вниз'}` : 'нет'}
+            color={r.scenario ? FG : DIM}
+            sub={
+              r.scenario === '1'
+                ? 'идём по недельному циклу'
+                : r.scenario === '2'
+                  ? 'недельный цикл пройден, идём против него'
+                  : null
+            }
+          />
+        </div>
         <Crit tf="W1" r={r} />
+      </Half>
+      {/* 22.09.2026: толстая линия между неделей и дневкой */}
+      <div style={{ backgroundColor: DIVIDER, ...(narrow ? { height: 4 } : { width: 4 }) }} />
+      <Half title="дневка">
+        <div style={pair}>
+          {/* 21.09.2026 вечер, его определение: подтверждение — только на дневке: свинг, свеча,
+              реверс; реверс обязателен. «Если его нет, сделку нельзя делать» */}
+          <Cell
+            name="подтверждение"
+            value={r.confirmation ? 'ЕСТЬ' : 'нет'}
+            color={r.confirmation ? UP : DIM}
+            sub={
+              confVotes.length ? (
+                <>
+                  <VoteChips votes={confVotes} />
+                  {r.confirmation ? null : <div style={{ marginTop: 4 }}>нужен реверс в сторону сделки и с ним свинг или свеча</div>}
+                </>
+              ) : null
+            }
+          />
+          <Cell name="поводырь" value={g.main} color={g.color} sub={g.sub ? paint(g.sub) : null} />
+        </div>
         <Crit tf="D1" r={r} />
-      </div>
+      </Half>
     </div>
   );
 }
