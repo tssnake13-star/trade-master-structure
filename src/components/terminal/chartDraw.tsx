@@ -59,7 +59,13 @@ export function placeLabels(
 ): PlacedLabel[] {
   const out: PlacedLabel[] = [];
   const d = 2 * r + 3;
-  const tries: [number, number][] = [[0, 0], [0, d], [0, -d], [d, 0], [-d, 0], [d, d], [-d, -d], [d, -d], [-d, d], [0, 2 * d], [0, -2 * d]];
+  // 22.09.2026, его слово: «цифры подними немного над и сделай тонкую линию едва заметную, как
+  // было раньше» — номер встаёт чуть выше своей точки (не на свечу), к точке идёт бледная линия
+  const up = 2 * r + 6;
+  const tries: [number, number][] = [
+    [0, -up], [0, -up - d], [d, -up], [-d, -up], [0, up], [0, up + d], [d, -up - d], [-d, -up - d],
+    [d, 0], [-d, 0], [0, -up - 2 * d], [0, up + 2 * d], [0, 0],
+  ];
   const inside = (x: number, y: number) => x >= box.x0 + r && x <= box.x1 - r && y >= box.y0 + r && y <= box.y1 - r;
   for (const l of [...labels].sort((a, b) => a.n - b.n)) {
     const ax = sx(l.x);

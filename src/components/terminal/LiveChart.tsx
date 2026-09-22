@@ -193,7 +193,9 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
   // Всё, что не зависит от мыши, собирается один раз на вид — наведение его не перерисовывает.
   const body = useMemo(() => {
     const vis = sorted.filter((s) => !hidden.has(s.L));
-    const bw = Math.max(1, Math.min(14, (pw / span) * 0.62));
+    // 22.09.2026, его слово: «свечи немного толще — из-за свингов не видно тени свечей»:
+    // тело 0.62 → 0.72 шага, тень 1 → 1.6 (толще пунктира свингов)
+    const bw = Math.max(1.5, Math.min(16, (pw / span) * 0.72));
     const priceTicks = niceTicks(y0, y1, Math.max(3, Math.round(ph / 60)));
     const dec = tickDigits(priceTicks.length > 1 ? priceTicks[1] - priceTicks[0] : 0, p.dg);
     const inView = p.bars.map((b, i) => ({ b, x: p.x0 + i })).filter(({ x }) => x >= view[0] - 1 && x <= view[1] + 1);
@@ -225,7 +227,7 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
             const bot = sy(Math.min(b[1], b[4]));
             return (
               <g key={x}>
-                <line x1={sx(x)} x2={sx(x)} y1={sy(b[2])} y2={sy(b[3])} stroke={col} strokeWidth={1} />
+                <line x1={sx(x)} x2={sx(x)} y1={sy(b[2])} y2={sy(b[3])} stroke={col} strokeWidth={1.6} />
                 <rect x={sx(x) - bw / 2} y={top} width={bw} height={Math.max(1, bot - top)} fill={col} />
               </g>
             );
@@ -363,7 +365,8 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
               const on = hl === l.n;
               return (
                 <g key={l.n} onPointerEnter={() => setHl(l.n)} onPointerLeave={() => setHl(null)} style={{ cursor: 'pointer' }}>
-                  {l.moved ? <line x1={l.ax} y1={l.ay} x2={l.px} y2={l.py} stroke={l.c} strokeOpacity={0.45} strokeWidth={0.8} /> : null}
+                  {/* 22.09.2026: к точке — тонкая, едва заметная линия (его «как было раньше») */}
+                  {l.moved ? <line x1={l.ax} y1={l.ay} x2={l.px} y2={l.py} stroke={l.c} strokeOpacity={0.35} strokeWidth={0.7} /> : null}
                   <circle cx={l.px} cy={l.py} r={on ? R + 2.5 : R} fill={PANEL_BG} stroke={l.c} strokeWidth={on ? 2 : 1.2} />
                   <text x={l.px} y={l.py + 3.3} textAnchor="middle" fontSize={on ? 11 : narrow ? 9 : 9.5} fontWeight={700} fill={l.c} fontFamily={MONO}>
                     {l.n}
