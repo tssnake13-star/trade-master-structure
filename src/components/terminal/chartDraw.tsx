@@ -48,40 +48,53 @@ export interface PlacedLabel extends SLabel {
   moved: boolean;
 }
 
-/** Номера пояснений: не наезжают друг на друга и не обрезаются краем поля.
- *  Номер, который пришлось сдвинуть, связан со своей точкой тонкой линией. */
+/** Прямоугольник в пикселях, который номер не должен закрывать (свеча с тенью). */
+export interface Obstacle {
+  l: number;
+  r: number;
+  t: number;
+  b: number;
+}
+
+/** Номера пояснений: не закрывают свечи, не наезжают друг на друга и не обрезаются краем поля.
+ *  22.09.2026, его слово: «задача была сделать так, чтобы цифры не закрывали свечи» — номер ищет
+ *  ближайшее к своей точке место, свободное от свечей (obstacles) и других номеров; вверх-вниз
+ *  дешевле, чем вбок. Номер, который пришлось сдвинуть, связан с точкой тонкой бледной линией. */
 export function placeLabels(
   labels: SLabel[],
   sx: (x: number) => number,
   sy: (y: number) => number,
   box: { x0: number; x1: number; y0: number; y1: number },
   r: number,
+  obstacles: Obstacle[] = [],
 ): PlacedLabel[] {
   const out: PlacedLabel[] = [];
-  const d = 2 * r + 3;
-  // 22.09.2026, его слово: «цифры подними немного над и сделай тонкую линию едва заметную, как
-  // было раньше» — номер встаёт чуть выше своей точки (не на свечу), к точке идёт бледная линия
-  const up = 2 * r + 6;
-  const tries: [number, number][] = [
-    [0, -up], [0, -up - d], [d, -up], [-d, -up], [0, up], [0, up + d], [d, -up - d], [-d, -up - d],
-    [d, 0], [-d, 0], [0, -up - 2 * d], [0, up + 2 * d], [0, 0],
-  ];
+  const step = Math.max(4, r * 0.75);
+  const cands: [number, number][] = [];
+  for (let iy = -24; iy <= 24; iy++) for (let ix = -14; ix <= 14; ix++) cands.push([ix * step, iy * step]);
+  cands.sort((a, b) => Math.abs(a[0]) * 1.6 + Math.abs(a[1]) - (Math.abs(b[0]) * 1.6 + Math.abs(b[1])));
+  const reach = 14 * step + 2 * r;
   const inside = (x: number, y: number) => x >= box.x0 + r && x <= box.x1 - r && y >= box.y0 + r && y <= box.y1 - r;
+  const onLabel = (x: number, y: number) => out.some((o) => Math.hypot(o.px - x, o.py - y) < 2 * r + 2);
   for (const l of [...labels].sort((a, b) => a.n - b.n)) {
     const ax = sx(l.x);
     const ay = sy(l.y);
     if (ax < box.x0 - r || ax > box.x1 + r || ay < box.y0 - r || ay > box.y1 + r) continue; // вне видимого — не рисуем
     const cx = Math.min(Math.max(ax, box.x0 + r), box.x1 - r);
     const cy = Math.min(Math.max(ay, box.y0 + r), box.y1 - r);
-    let pos: [number, number] = [cx, cy];
-    for (const [dx, dy] of tries) {
+    const near = obstacles.filter((o) => o.r > cx - reach && o.l < cx + reach);
+    const onCandle = (x: number, y: number) => near.some((o) => x + r > o.l && x - r < o.r && y + r > o.t && y - r < o.b);
+    let pos: [number, number] | null = null;
+    for (const [dx, dy] of cands) {
       const x = cx + dx;
       const y = cy + dy;
-      if (inside(x, y) && !out.some((o) => Math.hypot(o.px - x, o.py - y) < 2 * r + 1)) {
+      if (inside(x, y) && !onCandle(x, y) && !onLabel(x, y)) {
         pos = [x, y];
         break;
       }
     }
+    // рядом всё занято свечами — хотя бы не на другом номере
+    if (!pos) pos = cands.map(([dx, dy]) => [cx + dx, cy + dy] as [number, number]).find(([x, y]) => inside(x, y) && !onLabel(x, y)) || [cx, cy];
     out.push({ ...l, px: pos[0], py: pos[1], ax, ay, moved: Math.hypot(pos[0] - ax, pos[1] - ay) > 3 });
   }
   return out;

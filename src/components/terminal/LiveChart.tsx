@@ -190,12 +190,13 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
   const sorted = useMemo(() => [...p.shapes].sort((a, b) => a.z - b.z), [p]);
   const cid = useMemo(() => `clip${Math.random().toString(36).slice(2, 9)}`, []);
 
+  // 22.09.2026, его слово: «свечи немного толще — из-за свингов не видно тени свечей»:
+  // тело 0.62 → 0.72 шага, тень 1 → 1.6 (толще пунктира свингов)
+  const bw = Math.max(1.5, Math.min(16, (pw / span) * 0.72));
+
   // Всё, что не зависит от мыши, собирается один раз на вид — наведение его не перерисовывает.
   const body = useMemo(() => {
     const vis = sorted.filter((s) => !hidden.has(s.L));
-    // 22.09.2026, его слово: «свечи немного толще — из-за свингов не видно тени свечей»:
-    // тело 0.62 → 0.72 шага, тень 1 → 1.6 (толще пунктира свингов)
-    const bw = Math.max(1.5, Math.min(16, (pw / span) * 0.72));
     const priceTicks = niceTicks(y0, y1, Math.max(3, Math.round(ph / 60)));
     const dec = tickDigits(priceTicks.length > 1 ? priceTicks[1] - priceTicks[0] : 0, p.dg);
     const inView = p.bars.map((b, i) => ({ b, x: p.x0 + i })).filter(({ x }) => x >= view[0] - 1 && x <= view[1] + 1);
@@ -236,12 +237,18 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
         </g>
       </g>
     );
-  }, [sorted, hidden, p, view, span, pw, ph, y0, y1, sx, sy, cid]);
+  }, [sorted, hidden, p, view, pw, ph, y0, y1, sx, sy, cid, bw]);
 
-  const placed = useMemo(
-    () => placeLabels(p.labels, sx, sy, { x0: PAD.l, x1: PAD.l + pw, y0: PAD.t, y1: PAD.t + ph }, R),
-    [p.labels, sx, sy, pw, ph, R],
-  );
+  // 22.09.2026, его слово: «задача была сделать так, чтобы цифры не закрывали свечи» — свечи
+  // с тенями в пикселях уходят в placeLabels препятствиями, номер ищет место рядом, но мимо них
+  const placed = useMemo(() => {
+    const half = Math.max(bw / 2, 1) + 1.5;
+    const obstacles = p.bars
+      .map((b, i) => ({ b, x: p.x0 + i }))
+      .filter(({ x }) => x >= view[0] - 1 && x <= view[1] + 1)
+      .map(({ b, x }) => ({ l: sx(x) - half, r: sx(x) + half, t: sy(b[2]) - 1.5, b: sy(b[3]) + 1.5 }));
+    return placeLabels(p.labels, sx, sy, { x0: PAD.l, x1: PAD.l + pw, y0: PAD.t, y1: PAD.t + ph }, R, obstacles);
+  }, [p.labels, p.bars, p.x0, view, bw, sx, sy, pw, ph, R]);
 
   if (p.empty) {
     return (
