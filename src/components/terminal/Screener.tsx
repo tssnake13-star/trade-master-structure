@@ -168,7 +168,7 @@ function Block({ title, color, children }: { title: string; color: string; child
 export function ScreenerCards({ doc, symbols, onOpen, part = 'groups' }: { doc?: FeedDocs['screener']; symbols: Set<string>; onOpen: Open; part?: 'groups' | 'top' }) {
   const parsed = parseScreener(doc?.groups, doc?.top, doc?.leaders);
   if (!doc || (!parsed.groups.length && !parsed.top.length)) return <ScreenerFeed doc={doc} symbols={symbols} onOpen={onOpen} />;
-  const when = fmtWhen(fromBotTime(doc.time));
+  const when = fmtWhen(doc.at || fromBotTime(doc.time));
   if (part === 'top') {
     return (
       <div>

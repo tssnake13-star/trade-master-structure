@@ -1,5 +1,5 @@
 import { Fragment, type ReactNode } from 'react';
-import { ACCENT, DIM, DOWN, FG, MONO, UP, BORDER, card, label, fmtWhen } from './theme';
+import { ACCENT, DIM, DOWN, FG, MONO, UP, BORDER, card, label, fmtWhen, fromBotTime } from './theme';
 
 /**
  * Ленты терминала: скринер, тренд по накоплениям, резонанс, решения владельца.
@@ -8,7 +8,8 @@ import { ACCENT, DIM, DOWN, FG, MONO, UP, BORDER, card, label, fmtWhen } from '.
  */
 
 export interface FeedDocs {
-  screener?: { time?: string | null; groups?: string | null; top?: string | null; leaders?: Record<string, string> | null };
+  // at — время скринера с поясом (мост с 22.09.2026); time — строка бота по часам VPS
+  screener?: { time?: string | null; at?: string | null; groups?: string | null; top?: string | null; leaders?: Record<string, string> | null };
   trend?: { lines?: string[] };
   verdicts?: { items?: Verdict[] };
   falsex?: { checked?: number; items?: FalseExit[] };
@@ -76,7 +77,7 @@ export function ScreenerFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['screene
   if (!doc || (!doc.groups && !doc.top)) return <Empty what="Одобренного скринера" />;
   return (
     <div>
-      <div style={{ ...label, marginBottom: 12 }}>скринер от {doc.time || '—'} · одобрен автором</div>
+      <div style={{ ...label, marginBottom: 12 }}>скринер от {fmtWhen(doc.at || fromBotTime(doc.time))} · одобрен автором</div>
       {doc.groups ? (
         <div style={{ ...card, padding: 14, marginBottom: 14 }}>
           <TextBlock text={doc.groups} symbols={symbols} onOpen={onOpen} />

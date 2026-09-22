@@ -5,22 +5,25 @@ import type { FeedDocs } from './Feeds';
  * Строка свежести данных — 21.09.2026, его «да» на совет: ученик должен видеть, насколько
  * свежая картина.
  *
- * График обновления (его решение 21.09.2026): VPS шлёт данные сам каждые 4 часа в одно
- * и то же время — 00, 04, 08, 12, 16, 20 по часам сервера (UTC+5); ручное обновление
- * график не сдвигает. Его вопрос: «как понять, что обновление идёт по графику без
- * задержек?» — экран сам сверяет время последних данных с последней отметкой графика:
+ * График обновления (его решение 22.09.2026: «сделай всё-таки обновление каждый час»): VPS
+ * шлёт данные сам каждый час, в 5 минут каждого часа; ручное обновление график не сдвигает.
+ * 21.09 было «каждые 4 часа в 00, 04, 08…», но часы VPS — UTC+3, а у него UTC+5, и задача
+ * шла в 02, 06, 10… по его времени — сторож поднимал тревогу, которой не было. Отметка
+ * в минутах часа от пояса не зависит (разница целая, в часах).
+ * Его вопрос: «как понять, что обновление идёт по графику без задержек?» — экран сам сверяет
+ * время последних данных с последней отметкой графика:
  *   • данные не старше ожидаемой отметки — «по графику»;
  *   • пропущена одна отметка — «задерживается» и во сколько ждали;
  *   • пропущено больше — «нет обновлений N ч».
  * Круг обновления идёт около 5 минут, поэтому первые 15 минут после отметки ждём ещё
  * предыдущую.
  */
-const SLOT_MS = 4 * 3600e3; // каждые 4 часа
-const SERVER_TZ_MS = 5 * 3600e3; // часы сервера — UTC+5
+const SLOT_MS = 3600e3; // каждый час
+const SLOT_AT_MS = 5 * 60e3; // в 5 минут каждого часа
 const RUN_MS = 15 * 60e3; // сколько после отметки даём кругу закончиться
 
 function lastSlot(now: number) {
-  return Math.floor((now + SERVER_TZ_MS) / SLOT_MS) * SLOT_MS - SERVER_TZ_MS;
+  return Math.floor((now - SLOT_AT_MS) / SLOT_MS) * SLOT_MS + SLOT_AT_MS;
 }
 
 const hhmm = (ms: number) => {
@@ -45,7 +48,7 @@ export default function StatusStrip({ updatedAt, feeds, now }: { updatedAt: stri
   } else {
     [word, color] = [`нет обновлений ${Math.floor((now - upd) / 3600e3)} ч`, DOWN];
   }
-  const screener = fromBotTime(feeds.screener?.time);
+  const screener = feeds.screener?.at || fromBotTime(feeds.screener?.time);
   const lastVerdict = (feeds.verdicts?.items || [])
     .map((v) => v.time)
     .filter(Boolean)
@@ -54,7 +57,7 @@ export default function StatusStrip({ updatedAt, feeds, now }: { updatedAt: stri
   const item = { whiteSpace: 'nowrap' as const };
   return (
     <div
-      title="Данные с сервера бота обновляются сами каждые 4 часа: в 00, 04, 08, 12, 16 и 20 часов по часам сервера (UTC+5). Все времена здесь — по вашему часовому поясу."
+      title="Данные с сервера бота обновляются сами каждый час, в 5 минут каждого часа. Все времена здесь — по вашему часовому поясу."
       style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 14px', fontFamily: MONO, fontSize: 11, color: DIM }}
     >
       <span style={{ ...item, display: 'inline-flex', alignItems: 'center', gap: 6, color }}>
