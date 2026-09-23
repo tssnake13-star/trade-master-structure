@@ -56,7 +56,8 @@ const SECTIONS: [Section, string][] = [
   ['screener', 'Скринер'],
   ['top', 'ТОП циклов'],
   ['trend', 'Тренд'],
-  ['falsex', 'Ложные выходы'],
+  // 23.09.2026, его слово: вкладка — только админу; название пока «как ты предложил»
+  ['falsex', 'Просто выход против недели'],
   ['verdicts', 'Решения'],
 ];
 
@@ -82,7 +83,10 @@ const KINDS: [Kind, string, string][] = [
 ];
 
 export default function SchoolTerminal() {
-  const { session, user, loading: authLoading } = useAuth();
+  const { session, user, role, loading: authLoading } = useAuth();
+  // 23.09.2026, его слово: «Просто выход против недели» — только для админа, другим не видна
+  const isAdmin = role === 'admin';
+  const sections = SECTIONS.filter(([s]) => s !== 'falsex' || isAdmin);
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
 
@@ -130,7 +134,7 @@ export default function SchoolTerminal() {
   const [hidden, setHidden] = useState<Set<Layer>>(new Set());
 
   const selected = params.get('i');
-  const section = (SECTIONS.find(([s]) => s === params.get('s'))?.[0] || 'instrument') as Section;
+  const section = (sections.find(([s]) => s === params.get('s'))?.[0] || 'instrument') as Section;
 
   useEffect(() => {
     if (!authLoading && !session) navigate('/school', { replace: true });
@@ -526,7 +530,7 @@ export default function SchoolTerminal() {
       </header>
 
       <nav style={{ display: 'flex', gap: 6, padding: '12px 14px 0', overflowX: 'auto' }}>
-        {SECTIONS.map(([s, name]) => (
+        {sections.map(([s, name]) => (
           <button key={s} onClick={() => go(s)} style={pill(section === s)}>
             {name}
           </button>
@@ -540,7 +544,7 @@ export default function SchoolTerminal() {
           {section === 'screener' && <ScreenerCards doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />}
           {section === 'top' && <ScreenerCards part="top" doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />}
           {section === 'trend' && <TrendFeed doc={feeds.trend} symbols={symbols} onOpen={openSymbol} />}
-          {section === 'falsex' && <FalseExitFeed doc={feeds.falsex} symbols={symbols} onOpen={openSymbol} />}
+          {section === 'falsex' && isAdmin && <FalseExitFeed doc={feeds.falsex} symbols={symbols} onOpen={openSymbol} />}
           {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} symbols={symbols} onOpen={openSymbol} />}
           <div style={{ ...label, marginTop: 'auto', paddingTop: 14, lineHeight: 1.7 }}>
             {DISCLAIMER}
