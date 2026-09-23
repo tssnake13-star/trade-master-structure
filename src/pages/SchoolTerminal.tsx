@@ -10,7 +10,7 @@ import { Brand, Decision } from '@/components/terminal/Decision';
 import { FalseExitFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
 import StatusStrip from '@/components/terminal/Status';
-import { GEN } from '@/components/terminal/screenerParse';
+import { ALPHA, ALPHA_TIP, GEN } from '@/components/terminal/screenerParse';
 import LiveChart from '@/components/terminal/LiveChart';
 import { LAYERS, layersOf, type Layer, type Scene } from '@/components/terminal/scene';
 
@@ -337,8 +337,12 @@ export default function SchoolTerminal() {
             <span style={{ fontFamily: MONO, fontSize: 12 }}>
               {r.symbol}
               {r.extra?.leads ? (
-                <span title={`сам — поводырь группы ${GEN[r.extra.leads] || r.extra.leads}`} style={{ fontFamily: SANS, fontSize: 10, color: ACCENT, marginLeft: 6 }}>
-                  поводырь
+                // 23.09.2026, его слово: индекс доллара — «поводырь альфа», остальные — «поводырь»
+                <span
+                  title={r.extra.leads === 'DXY' ? ALPHA_TIP : `сам — поводырь группы ${GEN[r.extra.leads] || r.extra.leads}`}
+                  style={{ fontFamily: SANS, fontSize: 10, color: ACCENT, marginLeft: 6 }}
+                >
+                  {r.extra.leads === 'DXY' ? ALPHA : 'поводырь'}
                 </span>
               ) : null}
             </span>
@@ -409,8 +413,11 @@ export default function SchoolTerminal() {
           <h1 style={{ fontSize: 24, margin: 0, fontFamily: MONO, letterSpacing: '0.04em' }}>{cur.symbol}</h1>
           <span style={{ color: DIM, fontSize: 13 }}>{cur.title}</span>
           {cur.extra?.leads ? (
-            <span style={{ fontSize: 12, color: ACCENT, border: `1px solid ${ACCENT}55`, borderRadius: 6, padding: '1px 8px' }}>
-              поводырь группы {GEN[cur.extra.leads] || cur.extra.leads}
+            <span
+              title={cur.extra.leads === 'DXY' ? ALPHA_TIP : undefined}
+              style={{ fontSize: 12, color: ACCENT, border: `1px solid ${ACCENT}55`, borderRadius: 6, padding: '1px 8px' }}
+            >
+              {cur.extra.leads === 'DXY' ? ALPHA : `поводырь группы ${GEN[cur.extra.leads] || cur.extra.leads}`}
             </span>
           ) : null}
           <span style={{ fontFamily: MONO, fontSize: 18, marginLeft: 'auto' }}>{cur.price_text || '—'}</span>
