@@ -196,7 +196,8 @@ export default function SchoolTerminal() {
   // новозеландца, NZDJPY ведёт USDJPY — группа йены (скринер держит их в двух группах).
   // У кого поводырь индекс доллара — группа из скринера: EURUSD в долларе, эфир у биткоина.
   // Его слово 21.09.2026: в группу доллара входят и все поводыри, кроме нефти, — поводырь
-  // с долларом в имени стоит и там, и первым в своей группе.
+  // с долларом в имени стоит и там, и первым в своей группе. 23.09.2026, его слово: биткоина
+  // в группе доллара быть не должно — он только первым в группе биткоина.
   const groupedList = useMemo(() => {
     const norm = (s: string) => s.toUpperCase().replace(/USDT$/, 'USD');
     const leadOf: Record<string, string> = {};
@@ -212,7 +213,7 @@ export default function SchoolTerminal() {
     for (const r of list) {
       const g = groupOf(r);
       put(g, r);
-      if (r.extra?.leads && g !== 'DXY' && r.symbol.toUpperCase().includes('USD')) put('DXY', r);
+      if (r.extra?.leads && g !== 'DXY' && g !== 'BTC' && r.symbol.toUpperCase().includes('USD')) put('DXY', r);
     }
     const pos = (g: string) => {
       const i = GROUP_ORDER.indexOf(g);
