@@ -5,12 +5,12 @@ import { supabase } from '@/integrations/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ArrowLeft, Search } from 'lucide-react';
 import { ACCENT, BG, BLUE, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate } from '@/components/terminal/theme';
-import { Arrow, CycleCard, Lines, type MarketRow } from '@/components/terminal/parts';
+import { ALPHA_TIP, Arrow, CycleCard, GuideAlpha, Lines, type MarketRow } from '@/components/terminal/parts';
 import { Brand, Decision } from '@/components/terminal/Decision';
 import { FalseExitFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
 import StatusStrip from '@/components/terminal/Status';
-import { ALPHA, ALPHA_TIP, GEN } from '@/components/terminal/screenerParse';
+import { GEN } from '@/components/terminal/screenerParse';
 import LiveChart from '@/components/terminal/LiveChart';
 import { LAYERS, layersOf, type Layer, type Scene } from '@/components/terminal/scene';
 
@@ -337,12 +337,12 @@ export default function SchoolTerminal() {
             <span style={{ fontFamily: MONO, fontSize: 12 }}>
               {r.symbol}
               {r.extra?.leads ? (
-                // 23.09.2026, его слово: индекс доллара — «поводырь альфа», остальные — «поводырь»
+                // 23.09.2026, его слово: индекс доллара — «поводырь ALPHA», остальные — «поводырь»
                 <span
                   title={r.extra.leads === 'DXY' ? ALPHA_TIP : `сам — поводырь группы ${GEN[r.extra.leads] || r.extra.leads}`}
                   style={{ fontFamily: SANS, fontSize: 10, color: ACCENT, marginLeft: 6 }}
                 >
-                  {r.extra.leads === 'DXY' ? ALPHA : 'поводырь'}
+                  {r.extra.leads === 'DXY' ? <GuideAlpha /> : 'поводырь'}
                 </span>
               ) : null}
             </span>
@@ -417,7 +417,7 @@ export default function SchoolTerminal() {
               title={cur.extra.leads === 'DXY' ? ALPHA_TIP : undefined}
               style={{ fontSize: 12, color: ACCENT, border: `1px solid ${ACCENT}55`, borderRadius: 6, padding: '1px 8px' }}
             >
-              {cur.extra.leads === 'DXY' ? ALPHA : `поводырь группы ${GEN[cur.extra.leads] || cur.extra.leads}`}
+              {cur.extra.leads === 'DXY' ? <GuideAlpha /> : `поводырь группы ${GEN[cur.extra.leads] || cur.extra.leads}`}
             </span>
           ) : null}
           <span style={{ fontFamily: MONO, fontSize: 18, marginLeft: 'auto' }}>{cur.price_text || '—'}</span>

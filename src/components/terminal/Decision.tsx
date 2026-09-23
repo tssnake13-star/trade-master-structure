@@ -1,8 +1,7 @@
 import type { ReactNode } from 'react';
 import { Eye } from 'lucide-react';
 import { ACCENT, BORDER, DIM, DOWN, FG, MONO, SANS, UP, label } from './theme';
-import type { MarketRow } from './parts';
-import { ALPHA } from './screenerParse';
+import { GuideAlpha, type MarketRow } from './parts';
 
 /**
  * Главное об инструменте — его слово 21.09.2026: «направление, сценарий, подтверждение,
@@ -68,7 +67,7 @@ function paint(t: string): ReactNode {
 
 /** Поводырь из строки моста: «USDJPY · за SHORT» → крупно USDJPY, под ним «за SHORT».
  *  У самого поводыря крупно «сам» — «поводырь группы …» уже стоит в шапке инструмента
- *  (у индекса доллара там «поводырь альфа», 23.09.2026). */
+ *  (у индекса доллара там «поводырь ALPHA», 23.09.2026). */
 function guideParts(r: MarketRow): { main: string; sub: string; color: string } {
   const g = (r.guide || '').trim();
   if (!g) return { main: '—', sub: '', color: DIM };
@@ -123,7 +122,7 @@ function VoteChips({ votes }: { votes: Vote[] }) {
  *  дневки. Пока на VPS старый мост, эти голоса показываем в подтверждении, а у дневки — без разбивки. */
 const legacyD1 = (r: MarketRow) => (r.extra?.d_votes || []).some(([k]) => k === 'реверс');
 
-function Cell({ name, value, color, sub }: { name: string; value: string; color: string; sub?: ReactNode }) {
+function Cell({ name, value, color, sub }: { name: ReactNode; value: string; color: string; sub?: ReactNode }) {
   return (
     <div style={{ backgroundColor: PANEL, padding: '12px 10px' }}>
       <div style={cellLabel}>{name}</div>
@@ -248,9 +247,9 @@ export function Decision({ r, narrow }: { r: MarketRow; narrow: boolean }) {
               ) : null
             }
           />
-          {/* 23.09.2026: у индекса доллара и у пар, которые он ведёт, — «поводырь альфа» */}
+          {/* 23.09.2026: у индекса доллара и у пар, которые он ведёт, — «поводырь ALPHA» */}
           <Cell
-            name={r.extra?.leads === 'DXY' || r.extra?.leader === 'DXY' ? ALPHA : 'поводырь'}
+            name={r.extra?.leads === 'DXY' || r.extra?.leader === 'DXY' ? <GuideAlpha /> : 'поводырь'}
             value={g.main}
             color={g.color}
             sub={g.sub ? paint(g.sub) : null}
