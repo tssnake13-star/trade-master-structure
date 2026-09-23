@@ -54,8 +54,11 @@ const MONO_SMALL: React.CSSProperties = { fontSize: 11, letterSpacing: '0.12em',
 export default function HeroSectionV3() {
   const heroAuthor = useSiteAsset(SITE_ASSET_KEYS.heroAuthor, heroAuthorFallback);
 
+  // ⚠️ justify-start в секцию не возвращать: класс Tailwind грузится позже v3-skin.css
+  // и перебивает .v3h-split-center — на компьютере текст встаёт по верху вместо середины
+  // (поймано Сергеем 23.09.2026). Оба состояния выравнивания заданы в v3-skin.css.
   return (
-    <section id="hero" className="v3h v3h-split-center relative min-h-[100svh] flex flex-col justify-start pt-16 md:pt-20 pb-12 md:pb-16" style={{ overflowX: 'clip' }}>
+    <section id="hero" className="v3h v3h-split-center relative min-h-[100svh] flex flex-col pt-16 md:pt-20 pb-12 md:pb-16" style={{ overflowX: 'clip' }}>
       {/* abstract market-structure field (nodes + levels) */}
       <StructureField />
 

@@ -165,6 +165,7 @@
    текст под ним. Планшет лёжа остаётся на двух колонках: там полоса сверху срезала бы
    фигуру до одной головы. */
 .v3h-split-photo, .v3h-split-hud { display: none; }
+.v3h-split-center { justify-content: flex-start; }
 @media (min-width: 1024px) and (min-aspect-ratio: 1/1) {
   .v3h-split-photo { display: block; }
   .v3h-split-hud { display: block; }
