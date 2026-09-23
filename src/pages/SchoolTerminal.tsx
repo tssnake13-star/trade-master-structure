@@ -121,13 +121,11 @@ export default function SchoolTerminal() {
       window.removeEventListener('keydown', onKey);
     };
   }, [full]);
-  // живой график (заход 3): те же фигуры, что на картинке бота, данными; картинка — запасной вид.
-  // 22.09.2026, его слово: с телефона по умолчанию — «картинка как в боте», с компьютера и
-  // планшета — живой график. Телефон — по меньшей стороне экрана (< 600 px): и повёрнутый
-  // боком остаётся телефоном, а планшет (от 600) и компьютер получают живой график.
-  const [live, setLive] = useState(() =>
-    typeof window === 'undefined' ? true : Math.min(window.screen.width, window.screen.height) >= 600,
-  );
+  // живой график (заход 3): те же фигуры, что на картинке бота, данными.
+  // 22.09.2026 было: с телефона — картинка, с компьютера и планшета — живой график.
+  // 23.09.2026, его слово: «картинку как в боте по умолчанию везде, на компьютере тоже» —
+  // живой график открывается кнопкой.
+  const [live, setLive] = useState(false);
   const [scene, setScene] = useState<Scene | null>(null);
   const [hidden, setHidden] = useState<Set<Layer>>(new Set());
 
