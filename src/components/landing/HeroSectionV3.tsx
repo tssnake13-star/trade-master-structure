@@ -55,38 +55,43 @@ export default function HeroSectionV3() {
   const heroAuthor = useSiteAsset(SITE_ASSET_KEYS.heroAuthor, heroAuthorFallback);
 
   return (
-    <section id="hero" className="v3h relative min-h-[100svh] flex flex-col justify-start lg:justify-center pt-16 md:pt-20 pb-12 md:pb-16" style={{ overflowX: 'clip' }}>
+    <section id="hero" className="v3h v3h-split-center relative min-h-[100svh] flex flex-col justify-start pt-16 md:pt-20 pb-12 md:pb-16" style={{ overflowX: 'clip' }}>
       {/* abstract market-structure field (nodes + levels) */}
       <StructureField />
 
-      {/* author photo flush to the right edge (desktop ≥lg only) */}
-      <div className="v3h-photo absolute top-0 right-0 h-full w-[52%] hidden lg:block" style={{ zIndex: 1 }}>
+      {/* фото у правого края. Показывается только в раскладке из двух колонок —
+          условие в v3-skin.css (.v3h-split-*): шире 1024 И экран не вытянут вверх. */}
+      <div className="v3h-photo v3h-split-photo absolute top-0 right-0 h-full w-[52%]" style={{ zIndex: 1 }}>
         <img src={heroAuthor} alt="Сергей — автор системы TRADELIKETYO" />
       </div>
 
-      {/* HUD corner code (hidden below lg to avoid the header logo) */}
-      <div className="v3h-hud absolute hidden lg:block" style={{ top: 22, left: 22, zIndex: 3, lineHeight: 1.5 }}>
+      {/* HUD corner code (в раскладке стопкой на этом месте лежат фото и логотип) */}
+      <div className="v3h-hud v3h-split-hud absolute" style={{ top: 22, left: 22, zIndex: 3, lineHeight: 1.5 }}>
         8V8<br />01
       </div>
 
-      {/* фото для телефона и планшета. Ниже, чем было (48vh → 38vh): под заголовком
-          теперь строка распорядка и фильтр, а кнопка должна остаться близко к первому
-          экрану — с телефона приходит 6 человек из 10. */}
-      <div className="lg:hidden relative w-full mb-6 -mt-16" style={{ height: '38vh', zIndex: 1 }}>
+      {/* фото для телефона и планшета.
+          На телефоне высота прежняя, 38vh: кнопка должна остаться близко к первому экрану,
+          с телефона приходит 6 человек из 10. На планшете 46–52vh: иначе от фигуры
+          оставалась одна голова, обрезанная по шею. Кнопка там уходит ниже сгиба
+          на треть экрана, но в шапке планшета своя кнопка бота, так что вход не теряется.
+          Затемнение сверху укорочено до 12%, снизу начинается с 80%: прежние 20% и 66%
+          съедали половину полосы и фигура растворялась в фоне. */}
+      <div className="v3h-split-strip relative w-full mb-6 -mt-16 h-[38vh] sm:h-[46vh] md:h-[52vh]" style={{ zIndex: 1 }}>
         <img
           src={heroAuthor}
           alt="Сергей — автор системы TRADELIKETYO"
           className="w-full h-full object-cover"
-          style={{ objectPosition: '50% 6%' }}
+          style={{ objectPosition: '50% 8%' }}
         />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, var(--v3-bg) 0%, transparent 20%, transparent 66%, var(--v3-bg) 96%)' }} />
+        <div className="absolute inset-0" style={{ background: 'linear-gradient(to bottom, var(--v3-bg) 0%, transparent 12%, transparent 80%, var(--v3-bg) 99%)' }} />
       </div>
 
       {/* text */}
       {/* w-full обязателен: секция — flex-колонка, и без него контейнер сжимается
           под ширину содержимого, а колонка заголовка (56%) становится узкой */}
       <div className="container-landing relative w-full" style={{ zIndex: 2 }}>
-        <div className="w-full lg:max-w-[56%]">
+        <div className="w-full v3h-split-text">
           <div className="v3h-eyebrow v3h-mono mb-7">
             <span className="dot" /> Свинг-трейдинг · неделя и дневка
           </div>

@@ -155,6 +155,24 @@
 .v3h-btn .arr { transition: transform 0.4s cubic-bezier(0.22,0.61,0.36,1); }
 .v3h-btn:hover .arr { transform: translateX(4px); }
 
+/* Раскладка первого экрана.
+   ⚠️ 23.09.2026, Сергей: «на планшете и на телефоне фото на главной плохо видно,
+   текст закрывает». Две колонки раньше включались просто по ширине от 1024 px, и на
+   айпаде стоя (1024×1366) выходило два изъяна сразу: фото ужималось в узкую
+   вертикальную полосу и обрезалось до огромного лица, а колонка текста (56% ширины)
+   заходила прямо на него. Теперь условие — ширина от 1024 И экран не вытянут вверх.
+   Планшет стоя и телефон получают раскладку стопкой: фото сверху во всю ширину,
+   текст под ним. Планшет лёжа остаётся на двух колонках: там полоса сверху срезала бы
+   фигуру до одной головы. */
+.v3h-split-photo, .v3h-split-hud { display: none; }
+@media (min-width: 1024px) and (min-aspect-ratio: 1/1) {
+  .v3h-split-photo { display: block; }
+  .v3h-split-hud { display: block; }
+  .v3h-split-strip { display: none; }
+  .v3h-split-text { max-width: 56%; }
+  .v3h-split-center { justify-content: center; }
+}
+
 /* author photo flush to the right edge, fading into the background */
 .v3h-photo { position: relative; }
 .v3h-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; }
