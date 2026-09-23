@@ -208,7 +208,8 @@ export function Decision({ r, narrow }: { r: MarketRow; narrow: boolean }) {
         gridTemplateColumns: narrow ? '1fr' : '1fr 4px 1fr',
       }}
     >
-      <Half title="неделя">
+      {/* 23.09.2026, его слово: «неделя тире шаг 1… дневка тире шаг 2» — шаги алгоритма */}
+      <Half title="неделя — шаг 1">
         <div style={pair}>
           <Cell name="направление" value={s ? `${s} ${arrowOf(s)}` : '—'} color={colorOf(s)} />
           {/* «идём по недельному циклу» — его слово 21.09.2026: строку с живого графика —
@@ -230,7 +231,7 @@ export function Decision({ r, narrow }: { r: MarketRow; narrow: boolean }) {
       </Half>
       {/* 22.09.2026: толстая линия между неделей и дневкой */}
       <div style={{ backgroundColor: DIVIDER, ...(narrow ? { height: 4 } : { width: 4 }) }} />
-      <Half title="дневка">
+      <Half title="дневка — шаг 2">
         <div style={pair}>
           {/* 21.09.2026 вечер, его определение: подтверждение — только на дневке: свинг, свеча,
               реверс; реверс обязателен. «Если его нет, сделку нельзя делать» */}
