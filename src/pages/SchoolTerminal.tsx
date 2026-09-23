@@ -106,6 +106,21 @@ export default function SchoolTerminal() {
     return () => window.clearInterval(t);
   }, []);
   const [full, setFull] = useState(false);
+  // 23.09.2026, его слово: увеличенная картинка прокручивается колесом (дневка внизу, за краем
+  // экрана) — пока она открыта, страница под ней стоит; Esc закрывает
+  useEffect(() => {
+    if (!full) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setFull(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [full]);
   // живой график (заход 3): те же фигуры, что на картинке бота, данными; картинка — запасной вид.
   // 22.09.2026, его слово: с телефона по умолчанию — «картинка как в боте», с компьютера и
   // планшета — живой график. Телефон — по меньшей стороне экрана (< 600 px): и повёрнутый
@@ -537,11 +552,17 @@ export default function SchoolTerminal() {
       </div>
 
       {full && pic ? (
+        // 23.09.2026: картинка во всю ширину (не больше своего размера), слой прокручивается колесом —
+        // неделя сверху, до дневки доезжаем вниз; прокрутка не уходит в страницу под картинкой
         <div
           onClick={() => setFull(false)}
-          style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.92)', zIndex: 60, display: 'grid', placeItems: 'center', padding: 16, cursor: 'zoom-out' }}
+          style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.92)', zIndex: 60, overflowY: 'auto', overscrollBehavior: 'contain', padding: 16, cursor: 'zoom-out' }}
         >
-          <img src={pic} alt={cur?.symbol || ''} style={{ maxWidth: '100%', maxHeight: '100%', borderRadius: 10 }} />
+          <img
+            src={pic}
+            alt={cur?.symbol || ''}
+            style={{ display: 'block', width: '100%', maxWidth: 'max-content', height: 'auto', margin: '0 auto', borderRadius: 10 }}
+          />
         </div>
       ) : null}
     </div>
