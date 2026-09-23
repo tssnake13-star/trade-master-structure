@@ -17,7 +17,7 @@ export interface FeedDocs {
 
 export interface FalseExit {
   instrument: string;
-  state: 'ложный' | 'отменён';
+  state: 'ложный' | 'разворот' | 'отменён';
   hdir: 'вверх' | 'вниз';
   text: string;
   date?: string; // 23.09.2026: свеча события и её возраст в дневках
@@ -108,13 +108,16 @@ export function TrendFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['trend']; s
  *  предварительный уровень против тренда недели, закрытие вернулось. Тот же список, что бот присылает
  *  каждое утро (kontekst_svecha.false_exit_scan). Вкладка — только админу (его слово 23.09.2026). */
 export function FalseExitFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['falsex']; symbols: Set<string>; onOpen: Open }) {
-  if (!doc) return <Empty what="Списка простых выходов" />;
-  const items = (doc.items || []).filter((i) => i.state === 'ложный');
+  if (!doc) return <Empty what="Списка выходов против недели" />;
+  // 23.09.2026 вечер, его «верни оба»: просто выход, выход до зоны (разворот) и отмена выхода
+  const items = (doc.items || []).filter((i) => i.state === 'ложный' || i.state === 'разворот' || i.state === 'отменён');
+  // кружок — куда смотрит событие: у простого выхода и отмены неделя, у выхода до зоны — сам выход
+  const up = (i: FalseExit) => (i.state === 'разворот' ? i.hdir !== 'вверх' : i.hdir === 'вверх');
   const work = items.filter((i) => !i.age);
   const back = items.filter((i) => (i.age || 0) > 0);
   const row = (i: FalseExit) => (
     <div key={i.instrument} style={{ ...card, padding: 12, display: 'flex', gap: 10, alignItems: 'baseline', flexWrap: 'wrap' }}>
-      <span style={{ color: i.hdir === 'вверх' ? UP : DOWN }}>{i.hdir === 'вверх' ? '🟢' : '🔴'}</span>
+      <span style={{ color: up(i) ? UP : DOWN }}>{up(i) ? '🟢' : '🔴'}</span>
       <span style={{ fontFamily: MONO, fontSize: 14, color: FG }}>{i.instrument}</span>
       <span style={{ color: FG, fontSize: 13 }}>{i.text}</span>
       {i.date ? <span style={{ fontFamily: MONO, fontSize: 11, color: DIM }}>{i.date}</span> : null}
@@ -131,12 +134,12 @@ export function FalseExitFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['falsex
   return (
     <div>
       <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
-        Дневка вышла хвостом за предварительный уровень против тренда недели, закрытие вернулось. Список обновляется каждое утро после закрытия дневки. Информация, не запрет.
+        Дневка против тренда недели: просто выход (хвост за предварительным уровнем, закрытие вернулось), выход до зоны (разворот) и отмена выхода (цена вернулась). Список обновляется каждое утро после закрытия дневки. Информация, не запрет.
       </div>
       {doc.checked === 0 ? (
         <div style={{ color: DIM, fontSize: 13 }}>Свечей не было — проверить не удалось.</div>
       ) : !items.length ? (
-        <div style={{ color: DIM, fontSize: 13 }}>За последние дни простых выходов против недели нет.</div>
+        <div style={{ color: DIM, fontSize: 13 }}>За последние дни выходов против недели нет.</div>
       ) : null}
       {work.length ? (
         <>
@@ -146,7 +149,7 @@ export function FalseExitFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['falsex
       ) : null}
       {back.length ? (
         <>
-          <div style={{ ...label, margin: '6px 0 8px' }}>за последние дни — накопление ещё не вышло</div>
+          <div style={{ ...label, margin: '6px 0 8px' }}>за последние дни</div>
           <div style={{ display: 'grid', gap: 8 }}>{back.map(row)}</div>
         </>
       ) : null}

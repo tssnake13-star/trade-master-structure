@@ -56,8 +56,8 @@ const SECTIONS: [Section, string][] = [
   ['screener', 'Скринер'],
   ['top', 'ТОП циклов'],
   ['trend', 'Тренд'],
-  // 23.09.2026, его слово: вкладка — только админу; название пока «как ты предложил»
-  ['falsex', 'Просто выход против недели'],
+  // 23.09.2026, его слово: вкладка — только админу; вечером в ней снова три события — «Выход против недели»
+  ['falsex', 'Выход против недели'],
   ['verdicts', 'Решения'],
 ];
 
@@ -84,7 +84,7 @@ const KINDS: [Kind, string, string][] = [
 
 export default function SchoolTerminal() {
   const { session, user, role, loading: authLoading } = useAuth();
-  // 23.09.2026, его слово: «Просто выход против недели» — только для админа, другим не видна
+  // 23.09.2026, его слово: «Выход против недели» — только для админа, другим не видна
   const isAdmin = role === 'admin';
   const sections = SECTIONS.filter(([s]) => s !== 'falsex' || isAdmin);
   const navigate = useNavigate();
