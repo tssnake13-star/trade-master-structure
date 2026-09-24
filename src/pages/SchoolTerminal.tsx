@@ -150,6 +150,8 @@ export default function SchoolTerminal() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  // время журнала допусков, которое уже на экране (24.09.2026): его пишет загрузка лент
+  const verdictsAt = useRef<string | null>(null);
   const load = useCallback(async () => {
     const [accessRes, metaRes, rowsRes, feedRes] = await Promise.all([
       user
@@ -157,13 +159,16 @@ export default function SchoolTerminal() {
         : Promise.resolve({ data: null }),
       db.from('market_meta').select('updated_at, bars_at, build').maybeSingle(),
       db.from('market_snapshot').select('*').order('sort_order').order('symbol'),
-      db.from('market_feed').select('key, data'),
+      db.from('market_feed').select('key, data, updated_at'),
     ]);
     setUntil(((accessRes.data as { expires_at?: string } | null)?.expires_at) || null);
     setMeta((metaRes.data as Meta) || null);
     setRows((rowsRes.data || []) as MarketRow[]);
     const docs: FeedDocs = {};
-    for (const f of (feedRes.data || []) as { key: keyof FeedDocs; data: never }[]) docs[f.key] = f.data;
+    for (const f of (feedRes.data || []) as { key: keyof FeedDocs; data: never; updated_at?: string }[]) {
+      docs[f.key] = f.data;
+      if (f.key === 'verdicts') verdictsAt.current = f.updated_at || null;
+    }
     setFeeds(docs);
     setLoading(false);
   }, [user]);
@@ -189,7 +194,6 @@ export default function SchoolTerminal() {
   // вердикт… через 2-3 секунды». Бот кладёт журнал в базу сразу после его кнопки; пока открыт «Журнал
   // допусков», раз в 3 секунды смотрим время журнала (строка крошечная) и перечитываем ленты, когда
   // оно изменилось. На остальных вкладках — как было, раз в минуту по времени расчёта.
-  const verdictsAt = useRef<string | null>(null);
   useEffect(() => {
     if (!user || section !== 'verdicts') return;
     let alive = true;
@@ -197,8 +201,8 @@ export default function SchoolTerminal() {
       const { data } = await db.from('market_feed').select('updated_at').eq('key', 'verdicts').maybeSingle();
       const at = (data as { updated_at?: string } | null)?.updated_at || null;
       if (!alive || !at) return;
-      if (verdictsAt.current && at !== verdictsAt.current) {
-        const { data: fd } = await db.from('market_feed').select('key, data');
+      if (at !== verdictsAt.current) {
+        const { data: fd } = await db.from('market_feed').select('key, data, updated_at');
         if (!alive) return;
         const docs: FeedDocs = {};
         for (const f of (fd || []) as { key: keyof FeedDocs; data: never }[]) docs[f.key] = f.data;
