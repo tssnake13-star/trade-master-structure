@@ -158,6 +158,8 @@ export function shapeNode(s: Shape, key: number, sx: (x: number) => number, sy: 
           fillOpacity={s.f ? s.fa : 0}
           stroke={s.e || 'none'}
           strokeWidth={s.e ? Math.max(0.8, s.ew) : 0}
+          // 24.09.2026: накопление внутри накопления — точечная рамка, как у бота и в индикаторе
+          strokeDasharray={s.e && s.d ? s.d.map((v) => (v * Math.max(0.8, s.ew)).toFixed(1)).join(' ') : undefined}
         />
       );
     }
