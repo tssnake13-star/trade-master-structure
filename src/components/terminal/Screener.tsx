@@ -2,7 +2,6 @@ import type { CSSProperties, ReactNode } from 'react';
 import { AlertTriangle, TrendingDown, TrendingUp, MoveRight } from 'lucide-react';
 import { ACCENT, BORDER, DIM, DOWN, FG, MONO, UP, card, fmtWhen, fromBotTime, label } from './theme';
 import { ScreenerFeed, type FeedDocs } from './Feeds';
-import { GuideAlpha } from './parts';
 import { GEN, parseScreener, type ScrGroup, type ScrInstrument, type ScrTop, type Side } from './screenerParse';
 
 // 21.09.2026, его просьба с телефона: у цифр — слово («7 групп», «3 инструмента»)
@@ -68,7 +67,7 @@ function GroupCard({ g, symbols, onOpen }: { g: ScrGroup; symbols: Set<string>; 
       </div>
       {g.leader ? (
         <div style={{ fontSize: 12, marginTop: 3, color: DIM }}>
-          {g.code === 'DXY' ? <GuideAlpha /> : 'поводырь группы'}:{' '}
+          поводырь группы:{' '}
           <button
             onClick={() => leadKnown && leadSym && onOpen(leadSym)}
             style={{ fontFamily: g.code === 'DXY' ? undefined : MONO, fontSize: 12, color: ACCENT, background: 'none', border: 'none', padding: 0, cursor: leadKnown ? 'pointer' : 'default', textDecoration: leadKnown ? 'underline' : 'none', textUnderlineOffset: 3 }}

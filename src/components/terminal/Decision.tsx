@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { Eye } from 'lucide-react';
 import { ACCENT, BORDER, DIM, DOWN, FG, MONO, SANS, UP, label } from './theme';
-import { GuideAlpha, type MarketRow } from './parts';
+import { type MarketRow } from './parts';
 
 /**
  * Главное об инструменте — его слово 21.09.2026: «направление, сценарий, подтверждение,
@@ -67,7 +67,7 @@ function paint(t: string): ReactNode {
 
 /** Поводырь из строки моста: «USDJPY · за SHORT» → крупно USDJPY, под ним «за SHORT».
  *  У самого поводыря крупно «сам» — «поводырь группы …» уже стоит в шапке инструмента
- *  (у индекса доллара там «поводырь ALPHA», 23.09.2026). */
+ *  (ALPHA у индекса доллара убрана 24.09.2026 — просто «поводырь»). */
 function guideParts(r: MarketRow): { main: string; sub: string; color: string } {
   const g = (r.guide || '').trim();
   if (!g) return { main: '—', sub: '', color: DIM };
@@ -248,9 +248,9 @@ export function Decision({ r, narrow }: { r: MarketRow; narrow: boolean }) {
               ) : null
             }
           />
-          {/* 23.09.2026: у индекса доллара и у пар, которые он ведёт, — «поводырь ALPHA» */}
+          {/* 24.09.2026, его слово: ALPHA убрана — у индекса доллара и у пар, которые он ведёт, просто «поводырь» */}
           <Cell
-            name={r.extra?.leads === 'DXY' || r.extra?.leader === 'DXY' ? <GuideAlpha /> : 'поводырь'}
+            name="поводырь"
             value={g.main}
             color={g.color}
             sub={g.sub ? paint(g.sub) : null}

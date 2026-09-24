@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ArrowLeft, Search } from 'lucide-react';
 import { ACCENT, BG, BLUE, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate } from '@/components/terminal/theme';
-import { ALPHA_TIP, Arrow, CycleCard, GuideAlpha, Lines, type MarketRow } from '@/components/terminal/parts';
+import { ALPHA_TIP, Arrow, CycleCard, Lines, type MarketRow } from '@/components/terminal/parts';
 import { Brand, Decision } from '@/components/terminal/Decision';
 import { FalseExitFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
@@ -437,7 +437,7 @@ export default function SchoolTerminal() {
               title={cur.extra.leads === 'DXY' ? ALPHA_TIP : undefined}
               style={{ fontSize: 12, color: ACCENT, border: `1px solid ${ACCENT}55`, borderRadius: 6, padding: '1px 8px' }}
             >
-              {cur.extra.leads === 'DXY' ? <GuideAlpha /> : `поводырь группы ${GEN[cur.extra.leads] || cur.extra.leads}`}
+              {`поводырь группы ${GEN[cur.extra.leads] || cur.extra.leads}`}
             </span>
           ) : null}
           <span style={{ fontFamily: MONO, fontSize: 18, marginLeft: 'auto' }}>{cur.price_text || '—'}</span>
