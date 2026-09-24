@@ -1,4 +1,5 @@
-import { Fragment, type ReactNode } from 'react';
+import { Fragment, useEffect, useState, type ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import { ACCENT, DIM, DOWN, FG, MONO, UP, BORDER, card, label, fmtWhen, fromBotTime } from './theme';
 
 /**
@@ -32,6 +33,7 @@ export interface Verdict {
   verdict: 'ДОПУСК' | 'ОТКАЗ';
   both_layers?: boolean;
   reason?: string;
+  pic?: string | null; // 24.09.2026: картинка H4 решения в закрытом ящике terminal (verdicts/…webp)
 }
 
 type Open = (symbol: string) => void;
@@ -159,6 +161,30 @@ export function FalseExitFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['falsex
 
 export function VerdictsFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['verdicts']; symbols: Set<string>; onOpen: Open }) {
   const items = doc?.items || [];
+  // 24.09.2026, его слово: «в журнале допусков должна быть H4 картинка — инструмент, направление,
+  // допуск, картинка, почему беру». Картинки лежат в закрытом ящике: ссылки одним запросом, живут час.
+  const [urls, setUrls] = useState<Record<string, string>>({});
+  const [full, setFull] = useState<string | null>(null);
+  const picKey = items.map((v) => v.pic || '').join('|');
+  useEffect(() => {
+    const paths = picKey.split('|').filter(Boolean);
+    if (!paths.length) return;
+    let alive = true;
+    supabase.storage
+      .from('terminal')
+      .createSignedUrls(paths, 3600)
+      .then(({ data }) => {
+        if (!alive || !data) return;
+        const m: Record<string, string> = {};
+        data.forEach((d) => {
+          if (d.path && d.signedUrl) m[d.path] = d.signedUrl;
+        });
+        setUrls(m);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [picKey]);
   if (!items.length) return <Empty what="Записей в журнале допусков" />;
   const oldest = items[items.length - 1]?.time;
   return (
@@ -201,11 +227,33 @@ export function VerdictsFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['verdict
                   </button>
                 ) : null}
               </div>
-              {v.reason ? <div style={{ color: FG, fontSize: 13, lineHeight: 1.6, marginTop: 8 }}>{v.reason}</div> : null}
+              {v.pic && urls[v.pic] ? (
+                <img
+                  src={urls[v.pic]}
+                  alt={`${v.instrument} H4`}
+                  loading="lazy"
+                  onClick={() => setFull(urls[v.pic as string])}
+                  style={{ width: '100%', maxWidth: 560, borderRadius: 10, display: 'block', marginTop: 10, cursor: 'zoom-in' }}
+                />
+              ) : null}
+              {v.reason ? (
+                <div style={{ marginTop: 10 }}>
+                  <div style={{ ...label, marginBottom: 4 }}>{ok ? 'Почему беру?' : 'Почему не беру?'}</div>
+                  <div style={{ color: FG, fontSize: 13, lineHeight: 1.6 }}>{v.reason}</div>
+                </div>
+              ) : null}
             </div>
           );
         })}
       </div>
+      {full ? (
+        <div
+          onClick={() => setFull(null)}
+          style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.92)', zIndex: 60, overflowY: 'auto', overscrollBehavior: 'contain', padding: 16, cursor: 'zoom-out' }}
+        >
+          <img src={full} alt="" style={{ display: 'block', width: '100%', maxWidth: 'max-content', height: 'auto', margin: '0 auto', borderRadius: 10 }} />
+        </div>
+      ) : null}
     </div>
   );
 }
