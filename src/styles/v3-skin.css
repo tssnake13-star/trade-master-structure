@@ -177,10 +177,14 @@
 /* author photo flush to the right edge, fading into the background */
 .v3h-photo { position: relative; }
 .v3h-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; }
+/* Затемнение сверху (до 16%) добавлено 24.09.2026 под фото в библиотеке: у исходника
+   почти не было места над головой, в файл дописано тёмное поле, и это затемнение прячет
+   его край под прозрачной шапкой. На тёмном фоне прежних фото оно не заметно. */
 .v3h-photo::after {
   content: ''; position: absolute; inset: 0;
   background: linear-gradient(90deg, var(--v3-bg) 0%, transparent 34%),
-              linear-gradient(0deg, var(--v3-bg) 2%, transparent 26%);
+              linear-gradient(0deg, var(--v3-bg) 2%, transparent 26%),
+              linear-gradient(180deg, var(--v3-bg) 0%, transparent 16%);
 }
 
 /* HUD */
