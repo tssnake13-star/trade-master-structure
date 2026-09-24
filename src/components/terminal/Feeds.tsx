@@ -159,7 +159,7 @@ export function FalseExitFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['falsex
 
 export function VerdictsFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['verdicts']; symbols: Set<string>; onOpen: Open }) {
   const items = doc?.items || [];
-  if (!items.length) return <Empty what="Решений" />;
+  if (!items.length) return <Empty what="Записей в журнале допусков" />;
   const oldest = items[items.length - 1]?.time;
   return (
     <div>
