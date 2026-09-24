@@ -614,7 +614,7 @@ export default function SchoolDashboard() {
           })}
         </nav>
 
-        {/* TRADE MASTER INSIDE, под ним «Глаз системы» — рынок в кабинете (название его,
+        {/* ECHO-GATE INSIDE, под ним «Глаз системы» — рынок в кабинете (название его,
             21.09.2026: сначала «Глаз системы», потом подпись «рынок глазами системы», вечером
             он вернул подписью «Глаз системы»). Отдельная подписка, отдельный экран. Как курс:
             без доступа виден с замком и не открывается. Название и подпись видны всем, слова
@@ -641,7 +641,7 @@ export default function SchoolDashboard() {
                   : <Lock size={36} strokeWidth={1.5} style={{ color: '#6f6a62', flexShrink: 0, margin: '0 -3px' }} />}
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontFamily: SANS, fontSize: 12.5, fontWeight: 600, lineHeight: 1.2, whiteSpace: 'nowrap', color: eyeState === 'open' ? FG : '#8a8175' }}>
-                    TRADE MASTER INSIDE
+                    ECHO-GATE INSIDE
                   </div>
                   <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: 4, lineHeight: 1.3,
                                 color: eyeState === 'open' ? '#8a8175' : '#6f6a62' }}>

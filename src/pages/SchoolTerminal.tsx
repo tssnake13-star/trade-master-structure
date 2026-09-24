@@ -26,7 +26,7 @@ html { scrollbar-color: rgba(225,168,77,0.55) ${BG}; }
 `;
 
 /**
- * SchoolTerminal — TRADE MASTER INSIDE, под ним «Глаз системы» (/school/terminal).
+ * SchoolTerminal — ECHO-GATE INSIDE, под ним «Глаз системы» (/school/terminal).
  * Название — его, 21.09.2026 (вечером; до этого экран звался просто «Глаз системы»).
  * Внутри это терминал рынка.
  *
@@ -301,7 +301,7 @@ export default function SchoolTerminal() {
           </div>
           <h1 style={{ fontSize: 22, margin: '14px 0 10px' }}>Доступ пока не открыт</h1>
           <p style={{ color: DIM, fontSize: 14, lineHeight: 1.6 }}>
-            TRADE MASTER INSIDE входит в подписку экосистемы и выдаётся отдельно, со сроком.
+            ECHO-GATE INSIDE входит в подписку экосистемы и выдаётся отдельно, со сроком.
             Если подписка у вас есть, а экран пустой — напишите в поддержку, откроем.
           </p>
           <button onClick={() => navigate('/school/dashboard')} style={{ ...pill(true), marginTop: 18, padding: '11px 18px' }}>
