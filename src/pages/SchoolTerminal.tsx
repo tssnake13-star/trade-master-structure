@@ -205,7 +205,7 @@ export default function SchoolTerminal() {
         const { data: fd } = await db.from('market_feed').select('key, data, updated_at');
         if (!alive) return;
         const docs: FeedDocs = {};
-        for (const f of (fd || []) as { key: keyof FeedDocs; data: never }[]) docs[f.key] = f.data;
+        for (const f of (fd || []) as unknown as { key: keyof FeedDocs; data: never }[]) docs[f.key] = f.data;
         setFeeds(docs);
       }
       verdictsAt.current = at;
