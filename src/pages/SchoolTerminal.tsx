@@ -355,13 +355,14 @@ export default function SchoolTerminal() {
           >
             <span style={{ fontFamily: MONO, fontSize: 12 }}>
               {r.symbol}
-              {r.extra?.leads ? (
-                // 23.09.2026, его слово: индекс доллара — «поводырь ALPHA», остальные — «поводырь»
+              {r.extra?.leads && (g !== 'DXY' || r.extra.leads === 'DXY') ? (
+                // 24.09.2026, его слово: в группе доллара слово «поводырь» только у индекса доллара,
+                // и без ALPHA; поводыри других групп — без пометки (в своей группе она остаётся)
                 <span
                   title={r.extra.leads === 'DXY' ? ALPHA_TIP : `сам — поводырь группы ${GEN[r.extra.leads] || r.extra.leads}`}
                   style={{ fontFamily: SANS, fontSize: 10, color: ACCENT, marginLeft: 6 }}
                 >
-                  {r.extra.leads === 'DXY' ? <GuideAlpha /> : 'поводырь'}
+                  поводырь
                 </span>
               ) : null}
             </span>
