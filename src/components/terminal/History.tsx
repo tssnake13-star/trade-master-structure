@@ -137,18 +137,20 @@ function TallyRow({ name, t }: { name: ReactNode; t: Tally }) {
 }
 
 function Breakdown({ title, groups }: { title: string; groups: [ReactNode, HistCall[]][] }) {
-  const head = { ...label, letterSpacing: '0.12em', textAlign: 'right' as const };
+  // 25.09.2026, его скрин с iPad: заголовки «пока нет» и «верных» не влезали в карточку и обрезались —
+  // заголовки короче и в одну строку, колонки не уже цифр, карточка при нехватке места прокручивается
+  const head = { ...label, letterSpacing: '0.06em', textAlign: 'right' as const, whiteSpace: 'nowrap' as const };
   const shown = groups.filter(([, cs]) => cs.length);
   if (!shown.length) return null;
   return (
-    <div style={{ ...card, padding: 12 }}>
+    <div style={{ ...card, padding: 12, overflowX: 'auto' }}>
       <div style={{ ...label, marginBottom: 8 }}>{title}</div>
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(110px, 1fr) repeat(5, auto)', gap: '6px 12px', alignItems: 'baseline' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(120px, 1fr) repeat(5, minmax(40px, auto))', gap: '6px 10px', alignItems: 'baseline' }}>
         <span />
-        <span style={head}>вызовов</span>
+        <span style={head}>всего</span>
         <span style={head}>по напр.</span>
         <span style={head}>против</span>
-        <span style={head}>пока нет</span>
+        <span style={head}>ждут</span>
         <span style={head}>верных</span>
         {shown.map(([name, cs], i) => (
           <TallyRow key={i} name={name} t={tally(cs)} />
@@ -214,7 +216,7 @@ export function HistoryView({ doc, order, symbols, onOpen }: { doc?: HistoryDoc;
       {t.ok + t.bad === 0 ? (
         <div style={{ color: DIM, fontSize: 12 }}>Решённых вызовов пока нет — обычно цене нужно от нескольких дней до пары недель.</div>
       ) : null}
-      <div style={{ display: 'grid', gap: 10, gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+      <div style={{ display: 'grid', gap: 10, gridTemplateColumns: 'repeat(auto-fill, minmax(min(420px, 100%), 1fr))' }}>
         <Breakdown title="по сценарию" groups={byScen} />
         <Breakdown title="по неделе" groups={byWeek} />
         <Breakdown title="по подтверждению" groups={byConf} />
@@ -241,7 +243,7 @@ export function HistoryView({ doc, order, symbols, onOpen }: { doc?: HistoryDoc;
           <span><span style={{ color: UP }}>■</span> LONG</span>
           <span><span style={{ color: DOWN }}>■</span> SHORT</span>
           <span><span style={{ color: '#4a443d' }}>■</span> стороны нет</span>
-          <span>в клетке начала вызова: ✓ по направлению · ✗ против · • пока не решила</span>
+          <span>в клетке начала вызова: ✓ по направлению · ✗ против · • пока не решила (в таблицах — «ждут»)</span>
         </div>
       </div>
       <div style={{ ...card, padding: 12 }}>
