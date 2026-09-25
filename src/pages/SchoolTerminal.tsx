@@ -61,6 +61,8 @@ const SECTIONS: [Section, string][] = [
   // 24.09.2026, его слово: «Журнал допусков» — чтобы студент не принял его решения за свои
   ['verdicts', 'Журнал допусков'],
 ];
+// ленты, которые бот кладёт в базу сразу после его кнопки: вкладка → ключ ленты (24.09 журнал, 25.09 скринер)
+const LIVE_FEED: Partial<Record<Section, string>> = { verdicts: 'verdicts', screener: 'screener', top: 'screener' };
 
 type Tab = 'Анализ' | 'Циклы' | 'Накопления' | 'Рейндж' | 'Как в боте';
 const TABS: Tab[] = ['Анализ', 'Циклы', 'Накопления', 'Рейндж', 'Как в боте'];
@@ -150,8 +152,9 @@ export default function SchoolTerminal() {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  // время журнала допусков, которое уже на экране (24.09.2026): его пишет загрузка лент
-  const verdictsAt = useRef<string | null>(null);
+  // время каждой ленты, которая уже на экране (24.09.2026 — журнал допусков, 25.09.2026 — скринер):
+  // его пишет загрузка лент
+  const feedAt = useRef<Record<string, string | null>>({});
   const load = useCallback(async () => {
     const [accessRes, metaRes, rowsRes, feedRes] = await Promise.all([
       user
@@ -167,7 +170,7 @@ export default function SchoolTerminal() {
     const docs: FeedDocs = {};
     for (const f of (feedRes.data || []) as { key: keyof FeedDocs; data: never; updated_at?: string }[]) {
       docs[f.key] = f.data;
-      if (f.key === 'verdicts') verdictsAt.current = f.updated_at || null;
+      feedAt.current[f.key] = f.updated_at || null;
     }
     setFeeds(docs);
     setLoading(false);
@@ -194,21 +197,28 @@ export default function SchoolTerminal() {
   // вердикт… через 2-3 секунды». Бот кладёт журнал в базу сразу после его кнопки; пока открыт «Журнал
   // допусков», раз в 3 секунды смотрим время журнала (строка крошечная) и перечитываем ленты, когда
   // оно изменилось. На остальных вкладках — как было, раз в минуту по времени расчёта.
+  // 25.09.2026, его слово: «со скринером так же, как и с допуском: нажимаю ОДОБРЯЮ — в тот же момент,
+  // как скринер приходит подписчикам, он сразу и в терминал». Бот кладёт ленту скринера в базу сразу
+  // после его кнопки; «Скринер» и «ТОП» (обе из неё) смотрят её время так же, раз в 3 секунды.
   useEffect(() => {
-    if (!user || section !== 'verdicts') return;
+    const key = LIVE_FEED[section];
+    if (!user || !key) return;
     let alive = true;
     const tick = async () => {
-      const { data } = await db.from('market_feed').select('updated_at').eq('key', 'verdicts').maybeSingle();
+      const { data } = await db.from('market_feed').select('updated_at').eq('key', key).maybeSingle();
       const at = (data as { updated_at?: string } | null)?.updated_at || null;
       if (!alive || !at) return;
-      if (at !== verdictsAt.current) {
+      if (at !== feedAt.current[key]) {
         const { data: fd } = await db.from('market_feed').select('key, data, updated_at');
         if (!alive) return;
         const docs: FeedDocs = {};
-        for (const f of (fd || []) as unknown as { key: keyof FeedDocs; data: never }[]) docs[f.key] = f.data;
+        for (const f of (fd || []) as unknown as { key: keyof FeedDocs; data: never; updated_at?: string }[]) {
+          docs[f.key] = f.data;
+          feedAt.current[f.key] = f.updated_at || null;
+        }
         setFeeds(docs);
       }
-      verdictsAt.current = at;
+      feedAt.current[key] = at;
     };
     tick();
     const t = window.setInterval(tick, 3000);
