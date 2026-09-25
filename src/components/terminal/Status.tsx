@@ -17,10 +17,14 @@ import type { FeedDocs } from './Feeds';
  *   • пропущено больше — «нет обновлений N ч».
  * Круг обновления идёт около 5 минут, поэтому первые 15 минут после отметки ждём ещё
  * предыдущую.
+ *
+ * 25.09.2026, его «Да, делай»: полный круг — раз в сутки, в 22:05 UTC (01:05 по часам сервера,
+ * 03:05 по его времени), через час после новой дневной свечи. Скринер и журнал допусков приходят
+ * сразу по его кнопкам, текст карточек — по его ✅ ОДОБРЯЮ скринера.
  */
-const SLOT_MS = 3600e3; // каждый час
-const SLOT_AT_MS = 5 * 60e3; // в 5 минут каждого часа
-const RUN_MS = 15 * 60e3; // сколько после отметки даём кругу закончиться
+const SLOT_MS = 24 * 3600e3; // раз в сутки
+const SLOT_AT_MS = (22 * 60 + 5) * 60e3; // в 22:05 UTC — 03:05 по его времени
+const RUN_MS = 30 * 60e3; // сколько после отметки даём кругу закончиться
 
 function lastSlot(now: number) {
   return Math.floor((now - SLOT_AT_MS) / SLOT_MS) * SLOT_MS + SLOT_AT_MS;
@@ -34,7 +38,7 @@ const hhmm = (ms: number) => {
 export default function StatusStrip({ updatedAt, feeds, now }: { updatedAt: string | null; feeds: FeedDocs; now: number }) {
   const upd = updatedAt ? new Date(updatedAt).getTime() : NaN;
   const last = lastSlot(now);
-  // первые 15 минут после отметки круг ещё может идти — тогда ждём предыдущую
+  // первые 30 минут после отметки круг ещё может идти — тогда ждём предыдущую
   const expected = now - last < RUN_MS ? last - SLOT_MS : last;
   const next = last + SLOT_MS;
   let word: string;
@@ -46,7 +50,8 @@ export default function StatusStrip({ updatedAt, feeds, now }: { updatedAt: stri
   } else if (upd >= expected - SLOT_MS - 60e3) {
     [word, color] = [`задерживается — ждали в ${hhmm(expected)}`, ACCENT];
   } else {
-    [word, color] = [`нет обновлений ${Math.floor((now - upd) / 3600e3)} ч`, DOWN];
+    const h = Math.floor((now - upd) / 3600e3);
+    [word, color] = [h >= 48 ? `нет обновлений ${Math.floor(h / 24)} дн` : `нет обновлений ${h} ч`, DOWN];
   }
   const screener = feeds.screener?.at || fromBotTime(feeds.screener?.time);
   const lastVerdict = (feeds.verdicts?.items || [])
@@ -57,7 +62,7 @@ export default function StatusStrip({ updatedAt, feeds, now }: { updatedAt: stri
   const item = { whiteSpace: 'nowrap' as const };
   return (
     <div
-      title="Данные с сервера бота обновляются сами каждый час, в 5 минут каждого часа. Все времена здесь — по вашему часовому поясу."
+      title="Данные с сервера бота обновляются сами раз в сутки, через час после новой дневной свечи. Скринер и журнал допусков — сразу после решения автора. Все времена здесь — по вашему часовому поясу."
       style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 14px', fontFamily: MONO, fontSize: 11, color: DIM }}
     >
       <span style={{ ...item, display: 'inline-flex', alignItems: 'center', gap: 6, color }}>
