@@ -1,7 +1,9 @@
-import { Fragment, useEffect, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { mondayOfSignal, type JournalVideo } from '@/lib/journalVideos';
 import { ACCENT, DIM, DOWN, FG, MONO, UP, BORDER, card, label, fmtWhen, fromBotTime } from './theme';
 import type { HistoryDoc } from './History';
+import { VideoReviews, WeekHeader } from './Reviews';
 
 /**
  * Ленты терминала: скринер, тренд по накоплениям, резонанс, решения владельца.
@@ -236,8 +238,16 @@ function OutcomeBlock({ o }: { o?: Outcome }) {
   );
 }
 
-export function VerdictsFeed({ doc, outcomes, symbols, onOpen }: { doc?: FeedDocs['verdicts']; outcomes?: FeedDocs['outcomes']; symbols: Set<string>; onOpen: Open }) {
+export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen }: { doc?: FeedDocs['verdicts']; outcomes?: FeedDocs['outcomes']; videos?: JournalVideo[]; symbols: Set<string>; onOpen: Open }) {
   const items = doc?.items || [];
+  // 25.09.2026: серии «Допуск-отказ» — плеер сверху; «разбор этой недели» у карточек включает серию в нём
+  const [vid, setVid] = useState<string | null>(null);
+  const box = useRef<HTMLDivElement>(null);
+  const videoOf = new Map(videos.map((x) => [x.week, x]));
+  const play = (id: string) => {
+    setVid(id);
+    box.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
   // итог решения ищем по времени сигнала, инструменту и стороне — как строка журнала
   const outKey = (time: string, instrument: string, side: string) => `${new Date(time).getTime()}|${instrument}|${side}`;
   const outOf = new Map((outcomes?.items || []).map((o) => [outKey(o.time, o.instrument, o.side), o]));
@@ -272,13 +282,20 @@ export function VerdictsFeed({ doc, outcomes, symbols, onOpen }: { doc?: FeedDoc
       <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
         Допуски и отказы автора, которые получили подписчики{oldest ? `, с ${fmtWhen(oldest).slice(0, 10)}` : ''}. Свежие сверху, хранятся последние 90 дней. Время — по вашему часовому поясу. Под каждым решением — что было дальше: итог из еженедельного разбора и куда пошла цена после сигнала.
       </div>
+      {videos.length ? <VideoReviews videos={videos} currentId={vid} onPick={setVid} boxRef={box} /> : null}
       <div style={{ display: 'grid', gap: 10 }}>
         {items.map((v, i) => {
           const ok = v.verdict === 'ДОПУСК';
           const long = v.side === 'LONG';
           const known = symbols.has(v.instrument);
+          // неделя — по его времени (UTC+5), как у бота; первая карточка недели — с заголовком недели
+          const wk = mondayOfSignal(v.time);
+          const newWeek = i === 0 || wk !== mondayOfSignal(items[i - 1].time);
+          const wv = videoOf.get(wk);
           return (
-            <div key={`${v.time}-${v.instrument}-${i}`} style={{ ...card, padding: 12 }}>
+            <Fragment key={`${v.time}-${v.instrument}-${i}`}>
+            {newWeek ? <WeekHeader monday={wk} video={wv} onPlay={() => wv && play(wv.id)} /> : null}
+            <div style={{ ...card, padding: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                 <span style={{ fontFamily: MONO, fontSize: 11, color: DIM }}>{fmtWhen(v.time)}</span>
                 <span style={{ fontFamily: MONO, fontSize: 14, color: FG }}>{v.instrument}</span>
@@ -324,6 +341,7 @@ export function VerdictsFeed({ doc, outcomes, symbols, onOpen }: { doc?: FeedDoc
               ) : null}
               <OutcomeBlock o={outOf.get(outKey(v.time, v.instrument, v.side))} />
             </div>
+            </Fragment>
           );
         })}
       </div>

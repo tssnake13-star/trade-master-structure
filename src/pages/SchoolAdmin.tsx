@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import BannersSettings from '@/components/school/BannersSettings';
 import InactivePurgeSettings from '@/components/school/InactivePurgeSettings';
+import JournalVideosSettings from '@/components/school/JournalVideosSettings';
 import { tariffLabel, tariffColor, tariffWeight, lastSeenLabel } from '@/lib/tariffs';
 import { ArrowLeft, Plus, Trash2, Pencil, GripVertical, Upload, X, Archive, ArchiveRestore } from 'lucide-react';
 import VideoBlockEditor from '@/components/school/VideoBlockEditor';
@@ -58,7 +59,7 @@ interface Access { id: string; user_id: string; course_id: string; granted_at: s
 export default function SchoolAdmin() {
   const { session, role, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<'courses' | 'students' | 'access' | 'invites' | 'settings'>('courses');
+  const [tab, setTab] = useState<'courses' | 'students' | 'access' | 'invites' | 'journal' | 'settings'>('courses');
 
   useEffect(() => {
     if (!authLoading && !session) navigate('/school', { replace: true });
@@ -98,6 +99,8 @@ export default function SchoolAdmin() {
         <button style={tabStyle(tab === 'students')} onClick={() => setTab('students')}>Аккаунты</button>
         <button style={tabStyle(tab === 'invites')} onClick={() => setTab('invites')}>Инвайт-коды</button>
         <button style={tabStyle(tab === 'access')} onClick={() => setTab('access')}>Доступы</button>
+        {/* 25.09.2026, его слово: серии «Допуск-отказ» в журнал решений терминала — добавляет сам */}
+        <button style={tabStyle(tab === 'journal')} onClick={() => setTab('journal')}>Разборы допусков</button>
         <button style={tabStyle(tab === 'settings')} onClick={() => setTab('settings')}>Настройки</button>
         {/* Аналитика — отдельная страница, а не таб: там свои запросы и графики */}
         <button style={tabStyle(false)} onClick={() => navigate('/school/admin/analytics')}>Аналитика ↗</button>
@@ -108,6 +111,7 @@ export default function SchoolAdmin() {
         {tab === 'students' && <StudentsTab />}
         {tab === 'access' && <AccessTab />}
         {tab === 'invites' && <InviteCodesTab />}
+        {tab === 'journal' && <JournalVideosSettings />}
         {tab === 'settings' && <SettingsTab />}
       </main>
     </div>

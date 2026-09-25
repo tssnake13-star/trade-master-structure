@@ -13,6 +13,7 @@ import StatusStrip from '@/components/terminal/Status';
 import { GEN } from '@/components/terminal/screenerParse';
 import LiveChart from '@/components/terminal/LiveChart';
 import { HistoryOf, HistoryView } from '@/components/terminal/History';
+import { JOURNAL_VIDEOS_KEY, parseJournalVideos, type JournalVideo } from '@/lib/journalVideos';
 import { LAYERS, layersOf, type Layer, type Scene } from '@/components/terminal/scene';
 
 // 21.09.2026, его слово: серые ползунки «ужасно смотрятся» — тонкие, золото на тёмном,
@@ -114,6 +115,8 @@ export default function SchoolTerminal() {
 
   const [rows, setRows] = useState<MarketRow[]>([]);
   const [feeds, setFeeds] = useState<FeedDocs>({});
+  // 25.09.2026: серии «Допуск-отказ» для журнала решений — список правит админ («Разборы допусков»)
+  const [videos, setVideos] = useState<JournalVideo[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
   const [until, setUntil] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -175,14 +178,16 @@ export default function SchoolTerminal() {
   // его пишет загрузка лент
   const feedAt = useRef<Record<string, string | null>>({});
   const load = useCallback(async () => {
-    const [accessRes, metaRes, rowsRes, feedRes] = await Promise.all([
+    const [accessRes, metaRes, rowsRes, feedRes, videoRes] = await Promise.all([
       user
         ? db.from('terminal_access').select('expires_at').eq('user_id', user.id).maybeSingle()
         : Promise.resolve({ data: null }),
       db.from('market_meta').select('updated_at, bars_at, build').maybeSingle(),
       db.from('market_snapshot').select('*').order('sort_order').order('symbol'),
       feedQuery(),
+      db.from('site_settings').select('value').eq('key', JOURNAL_VIDEOS_KEY).maybeSingle(),
     ]);
+    setVideos(parseJournalVideos((videoRes.data as { value?: string } | null)?.value));
     setUntil(((accessRes.data as { expires_at?: string } | null)?.expires_at) || null);
     setMeta((metaRes.data as Meta) || null);
     setRows((rowsRes.data || []) as MarketRow[]);
@@ -624,7 +629,7 @@ export default function SchoolTerminal() {
           {section === 'top' && <ScreenerCards part="top" doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />}
           {section === 'trend' && <TrendFeed doc={feeds.trend} symbols={symbols} onOpen={openSymbol} />}
           {section === 'falsex' && isAdmin && <FalseExitFeed doc={feeds.falsex} symbols={symbols} onOpen={openSymbol} />}
-          {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} outcomes={feeds.outcomes} symbols={symbols} onOpen={openSymbol} />}
+          {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} outcomes={feeds.outcomes} videos={videos} symbols={symbols} onOpen={openSymbol} />}
           {section === 'history' && isAdmin && <HistoryView doc={feeds.history} order={rows.map((r) => r.symbol)} symbols={symbols} onOpen={openSymbol} />}
           <div style={{ ...label, marginTop: 'auto', paddingTop: 14, lineHeight: 1.7 }}>
             {DISCLAIMER}
