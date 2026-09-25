@@ -185,7 +185,7 @@ export function VerdictsFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['verdict
       alive = false;
     };
   }, [picKey]);
-  if (!items.length) return <Empty what="Записей в журнале допусков" />;
+  if (!items.length) return <Empty what="Записей в журнале решений" />;
   const oldest = items[items.length - 1]?.time;
   return (
     <div>

@@ -62,7 +62,7 @@ export default function StatusStrip({ updatedAt, feeds, now }: { updatedAt: stri
   const item = { whiteSpace: 'nowrap' as const };
   return (
     <div
-      title="Данные с сервера бота обновляются сами раз в сутки, через час после новой дневной свечи. Скринер и журнал допусков — сразу после решения автора. Все времена здесь — по вашему часовому поясу."
+      title="Данные с сервера бота обновляются сами раз в сутки, через час после новой дневной свечи. Скринер и журнал решений Сергея — сразу, как он их отправит. Все времена здесь — по вашему часовому поясу."
       style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 14px', fontFamily: MONO, fontSize: 11, color: DIM }}
     >
       <span style={{ ...item, display: 'inline-flex', alignItems: 'center', gap: 6, color }}>
