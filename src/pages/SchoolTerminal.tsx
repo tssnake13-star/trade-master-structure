@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { ArrowLeft, Search } from 'lucide-react';
+import { ArrowLeft, Lock, Search } from 'lucide-react';
 import { ACCENT, BG, BLUE, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate } from '@/components/terminal/theme';
 import { ALPHA_TIP, Arrow, CycleCard, Lines, type MarketRow } from '@/components/terminal/parts';
 import { Brand, Decision } from '@/components/terminal/Decision';
@@ -65,6 +65,10 @@ const SECTIONS: [Section, string][] = [
   // 25.09.2026, его слово: «показывать не один день, а изменения… где ошибается система, где не ошибается»
   ['history', 'История направления'],
 ];
+// 25.09.2026, его слово: «историю направления видел только я, администратор… как выходы против недели… где-нибудь
+// отдельно, не с общими кнопками». Эти вкладки — отдельной строкой «администратор» под общими, ученик их не видит,
+// и их ленты ему не загружаются вовсе (ключ ленты совпадает с вкладкой)
+const ADMIN_ONLY: Section[] = ['falsex', 'history'];
 // ленты, которые бот кладёт в базу сразу после его кнопки: вкладка → ключ ленты (24.09 журнал, 25.09 скринер)
 const LIVE_FEED: Partial<Record<Section, string>> = { verdicts: 'verdicts', screener: 'screener', top: 'screener' };
 
@@ -95,7 +99,16 @@ export default function SchoolTerminal() {
   const { session, user, role, loading: authLoading } = useAuth();
   // 23.09.2026, его слово: «Выход против недели» — только для админа, другим не видна
   const isAdmin = role === 'admin';
-  const sections = SECTIONS.filter(([s]) => s !== 'falsex' || isAdmin);
+  const sections = SECTIONS.filter(([s]) => !ADMIN_ONLY.includes(s) || isAdmin);
+  const mainSections = sections.filter(([s]) => !ADMIN_ONLY.includes(s));
+  const adminSections = sections.filter(([s]) => ADMIN_ONLY.includes(s));
+  // вкладка «История» у инструмента — тоже только ему
+  const tabs = TABS.filter((t) => t !== 'История' || isAdmin);
+  // ленты «только администратору» ученику не запрашиваются
+  const feedQuery = useCallback(() => {
+    const q = db.from('market_feed').select('key, data, updated_at');
+    return isAdmin ? q : q.not('key', 'in', `(${ADMIN_ONLY.join(',')})`);
+  }, [isAdmin]);
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
 
@@ -168,7 +181,7 @@ export default function SchoolTerminal() {
         : Promise.resolve({ data: null }),
       db.from('market_meta').select('updated_at, bars_at, build').maybeSingle(),
       db.from('market_snapshot').select('*').order('sort_order').order('symbol'),
-      db.from('market_feed').select('key, data, updated_at'),
+      feedQuery(),
     ]);
     setUntil(((accessRes.data as { expires_at?: string } | null)?.expires_at) || null);
     setMeta((metaRes.data as Meta) || null);
@@ -180,7 +193,7 @@ export default function SchoolTerminal() {
     }
     setFeeds(docs);
     setLoading(false);
-  }, [user]);
+  }, [user, feedQuery]);
 
   useEffect(() => {
     if (!user) return;
@@ -215,7 +228,7 @@ export default function SchoolTerminal() {
       const at = (data as { updated_at?: string } | null)?.updated_at || null;
       if (!alive || !at) return;
       if (at !== feedAt.current[key]) {
-        const { data: fd } = await db.from('market_feed').select('key, data, updated_at');
+        const { data: fd } = await feedQuery();
         if (!alive) return;
         const docs: FeedDocs = {};
         for (const f of (fd || []) as unknown as { key: keyof FeedDocs; data: never; updated_at?: string }[]) {
@@ -232,7 +245,7 @@ export default function SchoolTerminal() {
       alive = false;
       window.clearInterval(t);
     };
-  }, [user, section]);
+  }, [user, section, feedQuery]);
 
   const symbols = useMemo(() => new Set(rows.map((r) => r.symbol)), [rows]);
 
@@ -441,7 +454,7 @@ export default function SchoolTerminal() {
   const right = cur && (
     <div style={{ ...card, padding: 12 }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
-        {TABS.map((t) => (
+        {tabs.map((t) => (
           <button key={t} onClick={() => setTab(t)} style={{ ...pill(tab === t), padding: '5px 9px' }}>
             {t}
           </button>
@@ -472,7 +485,7 @@ export default function SchoolTerminal() {
       {tab === 'Накопления' && <Lines lines={cur.trend_lines} />}
       {tab === 'Рейндж' && <Lines lines={cur.range_lines} />}
       {tab === 'Как в боте' && <Lines lines={cur.card_lines} />}
-      {tab === 'История' && <HistoryOf doc={feeds.history} symbol={cur.symbol} />}
+      {tab === 'История' && isAdmin && <HistoryOf doc={feeds.history} symbol={cur.symbol} />}
     </div>
   );
 
@@ -583,12 +596,25 @@ export default function SchoolTerminal() {
       </header>
 
       <nav style={{ display: 'flex', gap: 6, padding: '12px 14px 0', overflowX: 'auto' }}>
-        {sections.map(([s, name]) => (
+        {mainSections.map(([s, name]) => (
           <button key={s} onClick={() => go(s)} style={pill(section === s)}>
             {name}
           </button>
         ))}
       </nav>
+      {/* 25.09.2026, его слово: вкладки только для него — отдельно от общих кнопок, своей строкой */}
+      {adminSections.length ? (
+        <nav style={{ display: 'flex', gap: 6, padding: '8px 14px 0', overflowX: 'auto', alignItems: 'center' }}>
+          <span style={{ ...label, display: 'flex', alignItems: 'center', gap: 5, marginRight: 4, whiteSpace: 'nowrap' }}>
+            <Lock size={11} color={ACCENT} /> администратор
+          </span>
+          {adminSections.map(([s, name]) => (
+            <button key={s} onClick={() => go(s)} style={{ ...pill(section === s), borderStyle: section === s ? 'solid' : 'dashed' }}>
+              {name}
+            </button>
+          ))}
+        </nav>
+      ) : null}
 
       <div style={{ display: 'grid', gridTemplateColumns: wide ? (section === 'instrument' ? '240px minmax(0, 1fr) 330px' : '240px minmax(0, 1fr)') : '1fr', gap: 14, padding: 14 }}>
         {sidebar}
@@ -599,7 +625,7 @@ export default function SchoolTerminal() {
           {section === 'trend' && <TrendFeed doc={feeds.trend} symbols={symbols} onOpen={openSymbol} />}
           {section === 'falsex' && isAdmin && <FalseExitFeed doc={feeds.falsex} symbols={symbols} onOpen={openSymbol} />}
           {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} outcomes={feeds.outcomes} symbols={symbols} onOpen={openSymbol} />}
-          {section === 'history' && <HistoryView doc={feeds.history} order={rows.map((r) => r.symbol)} symbols={symbols} onOpen={openSymbol} />}
+          {section === 'history' && isAdmin && <HistoryView doc={feeds.history} order={rows.map((r) => r.symbol)} symbols={symbols} onOpen={openSymbol} />}
           <div style={{ ...label, marginTop: 'auto', paddingTop: 14, lineHeight: 1.7 }}>
             {DISCLAIMER}
           </div>
