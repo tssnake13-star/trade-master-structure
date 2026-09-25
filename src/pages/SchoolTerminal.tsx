@@ -12,6 +12,7 @@ import { ScreenerCards } from '@/components/terminal/Screener';
 import StatusStrip from '@/components/terminal/Status';
 import { GEN } from '@/components/terminal/screenerParse';
 import LiveChart from '@/components/terminal/LiveChart';
+import { HistoryOf, HistoryView } from '@/components/terminal/History';
 import { LAYERS, layersOf, type Layer, type Scene } from '@/components/terminal/scene';
 
 // 21.09.2026, его слово: серые ползунки «ужасно смотрятся» — тонкие, золото на тёмном,
@@ -50,7 +51,7 @@ interface Meta {
 
 // 21.09.2026, его слово: вкладку «Резонанс» из «Глаза системы» убрать
 // 21.09.2026: ТОП циклов — своей вкладкой (на телефоне до него под группами было долго листать)
-type Section = 'instrument' | 'screener' | 'top' | 'trend' | 'falsex' | 'verdicts';
+type Section = 'instrument' | 'screener' | 'top' | 'trend' | 'falsex' | 'verdicts' | 'history';
 const SECTIONS: [Section, string][] = [
   ['instrument', 'Инструмент'],
   ['screener', 'Скринер'],
@@ -61,12 +62,14 @@ const SECTIONS: [Section, string][] = [
   // 24.09.2026, его слово: «Журнал допусков» — чтобы студент не принял его решения за свои;
   // 25.09.2026, его слово: «переименовать в журнал решений… или даже журнал решений Сергея»
   ['verdicts', 'Журнал решений Сергея'],
+  // 25.09.2026, его слово: «показывать не один день, а изменения… где ошибается система, где не ошибается»
+  ['history', 'История направления'],
 ];
 // ленты, которые бот кладёт в базу сразу после его кнопки: вкладка → ключ ленты (24.09 журнал, 25.09 скринер)
 const LIVE_FEED: Partial<Record<Section, string>> = { verdicts: 'verdicts', screener: 'screener', top: 'screener' };
 
-type Tab = 'Анализ' | 'Циклы' | 'Накопления' | 'Рейндж' | 'Как в боте';
-const TABS: Tab[] = ['Анализ', 'Циклы', 'Накопления', 'Рейндж', 'Как в боте'];
+type Tab = 'Анализ' | 'Циклы' | 'Накопления' | 'Рейндж' | 'Как в боте' | 'История';
+const TABS: Tab[] = ['Анализ', 'Циклы', 'Накопления', 'Рейндж', 'Как в боте', 'История'];
 
 type Kind = 'cycles' | 'trend' | 'all';
 // 21.09.2026, его порядок групп в левом списке: доллар, австралиец, йена, новозеландец,
@@ -469,6 +472,7 @@ export default function SchoolTerminal() {
       {tab === 'Накопления' && <Lines lines={cur.trend_lines} />}
       {tab === 'Рейндж' && <Lines lines={cur.range_lines} />}
       {tab === 'Как в боте' && <Lines lines={cur.card_lines} />}
+      {tab === 'История' && <HistoryOf doc={feeds.history} symbol={cur.symbol} />}
     </div>
   );
 
@@ -595,6 +599,7 @@ export default function SchoolTerminal() {
           {section === 'trend' && <TrendFeed doc={feeds.trend} symbols={symbols} onOpen={openSymbol} />}
           {section === 'falsex' && isAdmin && <FalseExitFeed doc={feeds.falsex} symbols={symbols} onOpen={openSymbol} />}
           {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} outcomes={feeds.outcomes} symbols={symbols} onOpen={openSymbol} />}
+          {section === 'history' && <HistoryView doc={feeds.history} order={rows.map((r) => r.symbol)} symbols={symbols} onOpen={openSymbol} />}
           <div style={{ ...label, marginTop: 'auto', paddingTop: 14, lineHeight: 1.7 }}>
             {DISCLAIMER}
           </div>

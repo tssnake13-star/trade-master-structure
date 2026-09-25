@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useState, type ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ACCENT, DIM, DOWN, FG, MONO, UP, BORDER, card, label, fmtWhen, fromBotTime } from './theme';
+import type { HistoryDoc } from './History';
 
 /**
  * Ленты терминала: скринер, тренд по накоплениям, резонанс, решения владельца.
@@ -16,6 +17,8 @@ export interface FeedDocs {
   falsex?: { checked?: number; items?: FalseExit[] };
   // 25.09.2026: итоги решений из его субботнего разбора (таблица допусков) — кладутся раз в неделю
   outcomes?: { items?: Outcome[] };
+  // 25.09.2026: история направления — мост пишет каждый полный круг
+  history?: HistoryDoc;
 }
 
 /** 25.09.2026, его слово: «Почему я решил и что случилось после моего решения?» — итог его решения
