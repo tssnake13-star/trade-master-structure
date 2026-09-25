@@ -14,6 +14,20 @@ export interface FeedDocs {
   trend?: { lines?: string[] };
   verdicts?: { items?: Verdict[] };
   falsex?: { checked?: number; items?: FalseExit[] };
+  // 25.09.2026: итоги решений из его субботнего разбора (таблица допусков) — кладутся раз в неделю
+  outcomes?: { items?: Outcome[] };
+}
+
+/** 25.09.2026, его слово: «Почему я решил и что случилось после моего решения?» — итог его решения
+ *  из еженедельного разбора «Допуск · отказ» (таблица допусков, которую заполняем по субботам) и куда
+ *  пошла цена после сигнала — тем же мерилом, что в субботней сводке: 2 средних дневных хода. */
+export interface Outcome {
+  time: string;
+  instrument: string;
+  side: string;
+  result?: string; // «ВОШЁЛ · СТОП», «ОТМЕНИЛ», «НЕ ВХОДИЛ»…
+  text?: string; // что было дальше — его словами
+  price?: { status: string; fav?: number | null; adv?: number | null; at?: string } | null;
 }
 
 export interface FalseExit {
@@ -159,8 +173,71 @@ export function FalseExitFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['falsex
   );
 }
 
-export function VerdictsFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['verdicts']; symbols: Set<string>; onOpen: Open }) {
+// итог решения: тейк — зелёным, стоп — красным, сделка в работе — золотом, остальное (не входил,
+// отменил, безубыток) — серым
+const resultColor = (r: string) =>
+  /ТЕЙК/.test(r) ? UP : /СТОП/.test(r) ? DOWN : /В РАБОТЕ/.test(r) ? ACCENT : DIM;
+
+// всегда один знак после запятой: «1,0 дневного хода», а не «1 дневного хода»
+const num = (x: number | null | undefined) => (x == null ? '—' : (Math.round(x * 10) / 10).toFixed(1).replace('.', ','));
+
+function priceWords(p: NonNullable<Outcome['price']>) {
+  const head =
+    p.status === 'против'
+      ? 'цена первой прошла 2 дневных хода против сигнала'
+      : p.status === 'по сигналу'
+        ? 'цена первой прошла 2 дневных хода в сторону сигнала'
+        : 'цена пока не прошла 2 дневных хода ни в одну сторону';
+  const at = p.at ? ` · на ${fmtWhen(p.at).slice(0, 5)}` : '';
+  return `${head} · дальше всего: по сигналу ${num(p.fav)}, против ${num(p.adv)} дневного хода${at}`;
+}
+
+function OutcomeBlock({ o }: { o?: Outcome }) {
+  return (
+    <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${BORDER}` }}>
+      <div style={{ ...label, marginBottom: 6 }}>Что было дальше</div>
+      {o ? (
+        <>
+          <div style={{ display: 'flex', gap: 8, alignItems: 'baseline', flexWrap: 'wrap' }}>
+            {o.result ? (
+              <span
+                style={{
+                  fontFamily: MONO,
+                  fontSize: 10,
+                  letterSpacing: '0.12em',
+                  padding: '2px 8px',
+                  borderRadius: 6,
+                  whiteSpace: 'nowrap',
+                  color: resultColor(o.result),
+                  border: `1px solid ${resultColor(o.result)}55`,
+                }}
+              >
+                {o.result}
+              </span>
+            ) : null}
+            {o.text ? <span style={{ color: FG, fontSize: 13, lineHeight: 1.6 }}>{o.text}</span> : null}
+          </div>
+          {o.price ? (
+            <div
+              title="Средний дневной ход — сколько пара в среднем проходила за день в 10 дней до сигнала"
+              style={{ color: DIM, fontSize: 12, lineHeight: 1.5, marginTop: 6 }}
+            >
+              {priceWords(o.price)}
+            </div>
+          ) : null}
+        </>
+      ) : (
+        <div style={{ color: DIM, fontSize: 12 }}>итог — после разбора недели</div>
+      )}
+    </div>
+  );
+}
+
+export function VerdictsFeed({ doc, outcomes, symbols, onOpen }: { doc?: FeedDocs['verdicts']; outcomes?: FeedDocs['outcomes']; symbols: Set<string>; onOpen: Open }) {
   const items = doc?.items || [];
+  // итог решения ищем по времени сигнала, инструменту и стороне — как строка журнала
+  const outKey = (time: string, instrument: string, side: string) => `${new Date(time).getTime()}|${instrument}|${side}`;
+  const outOf = new Map((outcomes?.items || []).map((o) => [outKey(o.time, o.instrument, o.side), o]));
   // 24.09.2026, его слово: «в журнале допусков должна быть H4 картинка — инструмент, направление,
   // допуск, картинка, почему беру». Картинки лежат в закрытом ящике: ссылки одним запросом, живут час.
   const [urls, setUrls] = useState<Record<string, string>>({});
@@ -190,7 +267,7 @@ export function VerdictsFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['verdict
   return (
     <div>
       <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
-        Допуски и отказы автора, которые получили подписчики{oldest ? `, с ${fmtWhen(oldest).slice(0, 10)}` : ''}. Свежие сверху, хранятся последние 90 дней. Время — по вашему часовому поясу.
+        Допуски и отказы автора, которые получили подписчики{oldest ? `, с ${fmtWhen(oldest).slice(0, 10)}` : ''}. Свежие сверху, хранятся последние 90 дней. Время — по вашему часовому поясу. Под каждым решением — что было дальше: итог из еженедельного разбора и куда пошла цена после сигнала.
       </div>
       <div style={{ display: 'grid', gap: 10 }}>
         {items.map((v, i) => {
@@ -242,6 +319,7 @@ export function VerdictsFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['verdict
                   <div style={{ color: FG, fontSize: 13, lineHeight: 1.6 }}>{v.reason}</div>
                 </div>
               ) : null}
+              <OutcomeBlock o={outOf.get(outKey(v.time, v.instrument, v.side))} />
             </div>
           );
         })}
