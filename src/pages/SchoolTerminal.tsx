@@ -70,7 +70,9 @@ const TABS: Tab[] = ['Анализ', 'Циклы', 'Накопления', 'Ре
 type Kind = 'cycles' | 'trend' | 'all';
 // 21.09.2026, его порядок групп в левом списке: доллар, австралиец, йена, новозеландец,
 // канадец, фунт, франк, золото, биткоин (нефть — после золота: группа есть, он её не назвал)
-const GROUP_ORDER = ['DXY', 'AUD', 'JPY', 'NZD', 'CAD', 'GBP', 'CHF', 'GOLD', 'OIL', 'BTC'];
+// 25.09.2026, его слово: «создать новую группу — группа без поводыря… туда нефть, туда S&P 500… и все
+// инструменты, у которых нет поводырей, которых нет в других группах» — NONE, последней
+const GROUP_ORDER = ['DXY', 'AUD', 'JPY', 'NZD', 'CAD', 'GBP', 'CHF', 'GOLD', 'OIL', 'BTC', 'NONE'];
 
 // Почему нет сценария — словами бота из первой строки карточки /info
 // («🌀 USDCNH — Сценария нет: цель недельного цикла вниз взята; …»)
@@ -250,7 +252,7 @@ export default function SchoolTerminal() {
       if (r.extra?.leads) return r.extra.leads;
       const lead = r.extra?.leader;
       if (lead && lead !== 'DXY' && leadOf[norm(lead)]) return leadOf[norm(lead)];
-      return r.group_key || (lead === 'DXY' ? 'DXY' : 'OTHER');
+      return r.group_key || (lead === 'DXY' ? 'DXY' : 'NONE');
     };
     const by = new Map<string, MarketRow[]>();
     const put = (g: string, r: MarketRow) => by.set(g, [...(by.get(g) || []), r]);
@@ -374,7 +376,7 @@ export default function SchoolTerminal() {
       </div>
       {groupedList.map(([g, rs]) => (
         <div key={g} style={{ marginBottom: 6 }}>
-          <div style={{ ...label, color: ACCENT, padding: '10px 8px 4px' }}>{GEN[g] ? `Группа ${GEN[g]}` : 'Другие'}</div>
+          <div style={{ ...label, color: ACCENT, padding: '10px 8px 4px' }}>{GEN[g] ? `Группа ${GEN[g]}` : 'Группа без поводыря'}</div>
           {rs.map((r) => {
         const on = section === 'instrument' && cur?.symbol === r.symbol;
         return (
