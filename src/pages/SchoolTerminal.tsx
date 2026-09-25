@@ -252,7 +252,16 @@ export default function SchoolTerminal() {
     };
   }, [user, section, feedQuery]);
 
-  const symbols = useMemo(() => new Set(rows.map((r) => r.symbol)), [rows]);
+  // 25.09.2026, его вопрос «почему нету кнопки разбор» у биткоина в журнале решений: бот пишет решение
+  // под именем из MT5 (BTCUSD), а строка терминала названа по скринеру (BTCUSDT) — имена не сошлись,
+  // кнопки не было. Имя без «T» ведёт на строку с «T»; сам журнал не трогаем — по нему сходятся итоги недели.
+  const rowOf = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const r of rows) m.set(r.symbol, r.symbol);
+    for (const r of rows) if (/USDT$/.test(r.symbol) && !m.has(r.symbol.slice(0, -1))) m.set(r.symbol.slice(0, -1), r.symbol);
+    return m;
+  }, [rows]);
+  const symbols = useMemo(() => new Set(rowOf.keys()), [rowOf]);
 
   const list = useMemo(() => {
     const q = query.trim().toUpperCase();
@@ -310,7 +319,7 @@ export default function SchoolTerminal() {
     },
     [cur?.symbol, section, setParams],
   );
-  const openSymbol = useCallback((sym: string) => go('instrument', sym), [go]);
+  const openSymbol = useCallback((sym: string) => go('instrument', rowOf.get(sym) || sym), [go, rowOf]);
 
   // Картинки лежат в закрытом ящике: ссылка живёт час и только для вошедшего.
   useEffect(() => {
