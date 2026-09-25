@@ -21,6 +21,8 @@ export interface ScrGroup {
   macro: 'за' | 'против' | 'нейтрально' | null;
   week: { arrow: Side; text: string };
   day: { arrow: Side; text: string };
+  // почему сторона группы не совпала с неделей (25.09.2026): «сценарий 2» или «по дневке»
+  note: string | null;
   range: string | null;
   acc: { verdict: 'за' | 'против' | 'спор' | null; text: string } | null;
   leader: string | null; // поводырь группы: «индекс доллара», USDJPY, AUDUSD…
@@ -76,8 +78,15 @@ export function parseGroups(text: string): ScrGroup[] {
   let cur: ScrGroup | null = null;
   for (const raw of text.split('\n')) {
     const line = raw.trim();
-    const g = line.match(/^(📈|📉|➖|❓|🚫)\s+(.+?)\s*(🟢|⚪|⛔)?\s*→\s*([A-Z]+)\s*·\s*W1\s*([↑↓~—])\s*(?:\[([^\]]*)\])?\s*·\s*D1\s*([↑↓~—])\s*(?:\[([^\]]*)\])?/u);
+    // 25.09.2026: строка группы узнаётся по началу («значок, группа, → BUY / SELL · W1»), а неделя,
+    // дневка и пометка ищутся в ней отдельно. Прежний строгий образец терял группу целиком, когда между
+    // неделей и дневкой встала пометка «сценарий 2» (австралиец 25.09: вывод SHORT при неделе вверх),
+    // и её рейндж и накопления уходили к соседней группе.
+    const g = line.match(/^(📈|📉|➖|❓|🚫)\s+(.+?)\s*(🟢|⚪|⛔)?\s*→\s*([A-Z]+)\s*·\s*W1/u);
     if (g) {
+      const w = line.match(/·\s*W1\s*([↑↓~—])\s*(?:\[([^\]]*)\])?/u);
+      const d = line.match(/·\s*D1\s*([↑↓~—])\s*(?:\[([^\]]*)\])?/u);
+      const n = line.match(/·\s*(сценарий\s*\d+|по дневке)/u);
       const label = g[2].trim();
       const code = (label.match(/\(([A-Z]+)\)\s*$/) || [])[1] || label.replace(/[^A-Z]/g, '') || label;
       cur = {
@@ -86,8 +95,9 @@ export function parseGroups(text: string): ScrGroup[] {
         dir: g[4] === 'BUY' ? 'up' : g[4] === 'SELL' ? 'down' : 'flat',
         trade: g[4],
         macro: g[3] === '🟢' ? 'за' : g[3] === '⛔' ? 'против' : g[3] === '⚪' ? 'нейтрально' : null,
-        week: { arrow: arrow(g[5]), text: scoreWords(g[6] || '') },
-        day: { arrow: arrow(g[7]), text: scoreWords(g[8] || '') },
+        week: { arrow: arrow(w ? w[1] : '~'), text: scoreWords((w && w[2]) || '') },
+        day: { arrow: arrow(d ? d[1] : '~'), text: scoreWords((d && d[2]) || '') },
+        note: n ? n[1].replace(/\s+/g, ' ') : null,
         range: null,
         acc: null,
         leader: code === 'DXY' ? 'индекс доллара' : null,

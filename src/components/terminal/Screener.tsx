@@ -79,6 +79,8 @@ function GroupCard({ g, symbols, onOpen }: { g: ScrGroup; symbols: Set<string>; 
       <div style={{ color: DIM, fontSize: 12, marginTop: 5 }}>
         неделя <span style={{ color: col(g.week.arrow) }}>{arrowCh(g.week.arrow)}</span> {g.week.text}
         {' · '}дневка <span style={{ color: col(g.day.arrow) }}>{arrowCh(g.day.arrow)}</span> {g.day.text}
+        {/* 25.09.2026: почему группа смотрит не туда, куда неделя — «сценарий 2» или «по дневке» */}
+        {g.note ? <span style={{ color: FG }}>{` · ${g.note}`}</span> : null}
         {g.macro ? (
           <span style={{ color: g.macro === 'за' ? UP : g.macro === 'против' ? DOWN : DIM }}>{` · макро ${g.macro}`}</span>
         ) : null}
