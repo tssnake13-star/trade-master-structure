@@ -1,4 +1,4 @@
-import { ACCENT, DIM, DOWN, FG, MONO, UP, card, label, fmtDate } from './theme';
+import { ACCENT, DIM, DOWN, FG, MONO, SANS, UP, card, label, fmtDate } from './theme';
 
 // Форма данных витрины — то, что кладёт мост с VPS (terminal_publish.py).
 
@@ -93,6 +93,22 @@ export function GuideAlpha() {
         ALPHA
       </span>
     </>
+  );
+}
+
+/** Название инструмента в левом списке. 26.09.2026, его слово: «у поводырей из-за слова поводырь не
+ *  влезает цена… название инструмента, а внизу, если это поводырь, пускай написано поводырь. Только
+ *  центруй» — слово под названием, по центру названия. */
+export function SymbolName({ symbol, guide, tip }: { symbol: string; guide: boolean; tip?: string }) {
+  return (
+    <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', justifySelf: 'start', minWidth: 0 }}>
+      <span style={{ fontFamily: MONO, fontSize: 12, lineHeight: 1.25 }}>{symbol}</span>
+      {guide ? (
+        <span title={tip} style={{ fontFamily: SANS, fontSize: 10, lineHeight: 1.2, color: ACCENT, marginTop: 1 }}>
+          поводырь
+        </span>
+      ) : null}
+    </span>
   );
 }
 

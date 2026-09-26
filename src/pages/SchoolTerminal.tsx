@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ArrowLeft, Lock, Search } from 'lucide-react';
 import { ACCENT, BG, BLUE, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate } from '@/components/terminal/theme';
-import { ALPHA_TIP, CritMarks, CycleCard, Lines, type MarketRow } from '@/components/terminal/parts';
+import { ALPHA_TIP, CritMarks, CycleCard, Lines, SymbolName, type MarketRow } from '@/components/terminal/parts';
 import { Brand, Decision } from '@/components/terminal/Decision';
 import { FalseExitFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
@@ -430,19 +430,14 @@ export default function SchoolTerminal() {
               color: FG,
             }}
           >
-            <span style={{ fontFamily: MONO, fontSize: 12 }}>
-              {r.symbol}
-              {r.extra?.leads && (g !== 'DXY' || r.extra.leads === 'DXY') ? (
-                // 24.09.2026, его слово: в группе доллара слово «поводырь» только у индекса доллара,
-                // и без ALPHA; поводыри других групп — без пометки (в своей группе она остаётся)
-                <span
-                  title={r.extra.leads === 'DXY' ? ALPHA_TIP : `сам — поводырь группы ${GEN[r.extra.leads] || r.extra.leads}`}
-                  style={{ fontFamily: SANS, fontSize: 10, color: ACCENT, marginLeft: 6 }}
-                >
-                  поводырь
-                </span>
-              ) : null}
-            </span>
+            {/* 24.09.2026, его слово: в группе доллара слово «поводырь» только у индекса доллара,
+                и без ALPHA; поводыри других групп — без пометки (в своей группе она остаётся).
+                26.09.2026: слово — под названием, по центру (рядом с ним не влезала цена) */}
+            <SymbolName
+              symbol={r.symbol}
+              guide={!!r.extra?.leads && (g !== 'DXY' || r.extra.leads === 'DXY')}
+              tip={r.extra?.leads === 'DXY' ? ALPHA_TIP : `сам — поводырь группы ${GEN[r.extra?.leads || ''] || r.extra?.leads || ''}`}
+            />
             <CritMarks r={r} />
             <span style={{ fontFamily: MONO, fontSize: 11, color: DIM, minWidth: 62, textAlign: 'right' }}>{r.price_text || '—'}</span>
           </button>
