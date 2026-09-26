@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ArrowLeft, Lock, Search } from 'lucide-react';
 import { ACCENT, BG, BLUE, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate } from '@/components/terminal/theme';
-import { ALPHA_TIP, Arrow, CycleCard, Lines, type MarketRow } from '@/components/terminal/parts';
+import { ALPHA_TIP, CritMarks, CycleCard, Lines, type MarketRow } from '@/components/terminal/parts';
 import { Brand, Decision } from '@/components/terminal/Decision';
 import { FalseExitFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
@@ -401,9 +401,10 @@ export default function SchoolTerminal() {
           style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: FG, fontFamily: SANS, fontSize: 13 }}
         />
       </div>
-      {/* 22.09.2026, его вопрос «что обозначают стрелочки?» — подпись прямо над списком */}
+      {/* 22.09.2026, его вопрос «что обозначают стрелочки?» — подпись прямо над списком;
+          26.09.2026, его слово: не накопления, а итог — неделя, дневка и подтверждение дневки */}
       <div style={{ ...label, letterSpacing: '0.08em', textTransform: 'none', padding: '0 8px 4px', lineHeight: 1.5 }}>
-        Н — неделя, Д — дневка: тренд по накоплениям · ↑ вверх · ↓ вниз · ~ тренда нет
+        Н — неделя, Д — дневка: итог критериев · П — подтверждение дневки · ↑ вверх · ↓ вниз · ~ спор или нет
       </div>
       {groupedList.map(([g, rs]) => (
         <div key={g} style={{ marginBottom: 6 }}>
@@ -442,10 +443,7 @@ export default function SchoolTerminal() {
                 </span>
               ) : null}
             </span>
-            <span style={{ display: 'flex', gap: 4 }}>
-              <Arrow text={r.trend_w1} tag="Н" tip="неделя" />
-              <Arrow text={r.trend_d1} tag="Д" tip="дневка" />
-            </span>
+            <CritMarks r={r} />
             <span style={{ fontFamily: MONO, fontSize: 11, color: DIM, minWidth: 62, textAlign: 'right' }}>{r.price_text || '—'}</span>
           </button>
         );

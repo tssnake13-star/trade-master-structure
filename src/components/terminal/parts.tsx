@@ -96,21 +96,53 @@ export function GuideAlpha() {
   );
 }
 
-/** Куда смотрит тренд по накоплениям — стрелкой, как в списке терминала. */
-/** 22.09.2026, его вопрос: «что обозначают стрелочки? у кого-то две вверх, две вниз…» —
- *  сдвоенные стрелки путали. Теперь буква таймфрейма и одна стрелка: «Н↑» — неделя вверх,
- *  «Д↓» — дневка вниз, «~» — тренда по накоплениям нет. */
-export function Arrow({ text, tag, tip }: { text: string | null; tag?: string; tip?: string }) {
-  const t = (text || '').toLowerCase();
-  const up = t.includes('вверх');
-  const down = t.includes('вниз');
+/** Одна метка списка: буква таймфрейма и одна стрелка (22.09.2026, его вопрос «что обозначают
+ *  стрелочки?» — сдвоенные путали), «~» — направления нет или спор. */
+type Dir3 = 'LONG' | 'SHORT' | null;
+const dir3 = (d: string | null | undefined): Dir3 =>
+  d === 'LONG' || d === 'UP' ? 'LONG' : d === 'SHORT' || d === 'DOWN' ? 'SHORT' : null;
+const WORD = { LONG: 'вверх', SHORT: 'вниз' } as const;
+
+function Mark({ tag, d, tip }: { tag: string; d: Dir3; tip: string }) {
   return (
-    <span
-      title={tip ? `${tip}: ${up ? 'тренд по накоплениям вверх' : down ? 'тренд по накоплениям вниз' : 'тренда по накоплениям нет'}` : undefined}
-      style={{ fontFamily: MONO, fontSize: 12, color: up ? UP : down ? DOWN : DIM, whiteSpace: 'nowrap' }}
-    >
-      {tag ? <span style={{ fontSize: 10, opacity: 0.75, marginRight: 1 }}>{tag}</span> : null}
-      {up ? '↑' : down ? '↓' : '~'}
+    <span title={tip} style={{ fontFamily: MONO, fontSize: 12, color: d === 'LONG' ? UP : d === 'SHORT' ? DOWN : DIM, whiteSpace: 'nowrap' }}>
+      <span style={{ fontSize: 10, opacity: 0.75, marginRight: 1 }}>{tag}</span>
+      {d === 'LONG' ? '↑' : d === 'SHORT' ? '↓' : '~'}
+    </span>
+  );
+}
+
+/** 26.09.2026, его слово: «у каждого инструмента написано направление недели и дневки, но это
+ *  направление только по накоплениям. А я хочу, чтобы был итог… недельное направление и дневное…
+ *  и хорошо бы изобразить подтверждение на D1 — на D1 два значения». Н — итог критериев недели
+ *  (свинг, свеча, накопления, 2 из 3), Д — итог критериев дневки, П — подтверждение дневки
+ *  (свинг, свеча, реверс; реверс обязателен). Данные те же, что в главном блоке (Decision):
+ *  w_dir/w_n, d_dir/d_n, extra.c_dir/c_n — экран ничего не считает. */
+export function CritMarks({ r }: { r: MarketRow }) {
+  const anom = r.extra?.w_anom || null;
+  const w = anom ? null : dir3(r.w_dir);
+  const d = dir3(r.d_dir);
+  const c = dir3(r.extra?.c_dir);
+  const wTip = anom
+    ? 'неделя: снята аномальной свечой — сторону задаёт дневка'
+    : w
+      ? `неделя: ${WORD[w]}, ${r.w_n ?? '—'} из 3 (свинг, свеча, накопления)`
+      : r.w_dir === 'MIXED'
+        ? 'неделя: критерии в споре — сторону задаёт дневка'
+        : 'неделя: направления нет';
+  const dTip = d
+    ? `дневка: ${WORD[d]}, ${r.d_n ?? '—'} из 3 (свинг, свеча, накопления)`
+    : 'дневка: критерии в споре — направления нет';
+  const cTip = c
+    ? `подтверждение дневки: ${WORD[c]}, ${r.extra?.c_n ?? '—'} из 3 (свинг, свеча, реверс)`
+    : 'подтверждения на дневке нет: нужен реверс и с ним свинг или свеча';
+  return (
+    <span style={{ display: 'flex', gap: 4, alignItems: 'center' }}>
+      <Mark tag="Н" d={w} tip={wTip} />
+      {/* неделя отдельно, у дневки два значения — направление и подтверждение */}
+      <span style={{ width: 1, height: 12, backgroundColor: `${DIM}66`, margin: '0 2px' }} />
+      <Mark tag="Д" d={d} tip={dTip} />
+      <Mark tag="П" d={c} tip={cTip} />
     </span>
   );
 }
