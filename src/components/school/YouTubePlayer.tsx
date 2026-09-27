@@ -60,21 +60,6 @@ function formatTime(s: number, withHours = false): string {
 
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 
-/**
- * Качество. 27.09.2026, его просьба: «контроль качества видео… как на ютубе… автомат» — в терминале видео шло
- * размытым. Выставить качество командой YouTube больше не даёт (setPlaybackQuality убран из API), в «Авто» он
- * выбирает по связи и по размеру окна плеера: окно 720×405 (журнал на компьютере), 360×203 (телефон) и даже 854×480
- * — 360p, окно 1920×1080, уменьшенное на экране, — 1080p (замер 27.09 на сериях «Допуск-отказ»). Поэтому YouTube
- * всегда получает окно Full HD, а на экране оно уменьшается до размера плеера. Потолки «720/480/360» пробовали: окно
- * меньше давало 360p, а во время показа YouTube вниз не переключается — меню убрано, на панели только то, что играет.
- */
-const VIEW_W = 1920;
-const VIEW_H = 1080;
-const QUALITY_WORD: Record<string, string> = {
-  highres: '4K', hd2160: '4K', hd1440: '1440p', hd1080: '1080p', hd720: '720p',
-  large: '480p', medium: '360p', small: '240p', tiny: '144p',
-};
-
 interface Props {
   url: string;
   watermark?: React.ReactNode;
@@ -96,8 +81,6 @@ export default function YouTubePlayer({ url, watermark }: Props) {
   const [showVolume, setShowVolume] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [fakeFullscreen, setFakeFullscreen] = useState(false);
-  // что YouTube играет на самом деле — метка на панели
-  const [actualQuality, setActualQuality] = useState('');
   // Субтитры всегда выключены. Кнопку включения убрали: YouTube не отдаёт
   // управление дорожками, когда плеер стартовал с отключёнными субтитрами
   // (loadModule для html5-плеера не срабатывает), а нерабочая кнопка хуже, чем
@@ -113,33 +96,6 @@ export default function YouTubePlayer({ url, watermark }: Props) {
       if (playerRef.current?.getPlayerState?.() === 1) setControlsVisible(false);
     }, 3000);
   }, []);
-
-  // Окно YouTube — Full HD, на экране уменьшено и вписано в плеер (по центру, с полями)
-  const fitFrame = useCallback(() => {
-    const box = containerRef.current;
-    const iframe = playerRef.current?.getIframe?.();
-    if (!box || !(iframe instanceof HTMLIFrameElement)) return;
-    const cw = box.clientWidth;
-    const ch = box.clientHeight;
-    if (!cw || !ch) return;
-    const k = Math.min(cw / VIEW_W, ch / VIEW_H);
-    iframe.style.position = 'absolute';
-    iframe.style.left = '0';
-    iframe.style.top = '0';
-    iframe.style.width = `${VIEW_W}px`;
-    iframe.style.height = `${VIEW_H}px`;
-    iframe.style.transformOrigin = '0 0';
-    iframe.style.transform = `translate(${(cw - VIEW_W * k) / 2}px, ${(ch - VIEW_H * k) / 2}px) scale(${k})`;
-  }, []);
-
-  // плеер поменял размер (поворот телефона, полный экран) — окно YouTube вписывается заново
-  useEffect(() => {
-    const box = containerRef.current;
-    if (!box || typeof ResizeObserver === 'undefined') return;
-    const ro = new ResizeObserver(() => fitFrame());
-    ro.observe(box);
-    return () => ro.disconnect();
-  }, [fitFrame]);
 
   const togglePlay = useCallback(() => {
     const p = playerRef.current;
@@ -243,14 +199,16 @@ export default function YouTubePlayer({ url, watermark }: Props) {
           onReady: () => {
             const iframe = player.getIframe?.();
             if (iframe instanceof HTMLIFrameElement) {
-              // размер и место окна — fitFrame (окно выбранного качества, уменьшенное до размера плеера)
+              iframe.style.position = 'absolute';
+              iframe.style.inset = '0';
+              iframe.style.width = '100%';
+              iframe.style.height = '100%';
               iframe.style.border = '0';
               iframe.style.pointerEvents = 'none';
               iframe.setAttribute('allowfullscreen', 'true');
               iframe.setAttribute('webkitallowfullscreen', 'true');
               iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen';
             }
-            fitFrame();
             const d = player.getDuration();
             if (d > 0) setDuration(d);
             try {
@@ -269,17 +227,11 @@ export default function YouTubePlayer({ url, watermark }: Props) {
               player.seekTo(savedPositionRef.current, true);
             }
           },
-          // что YouTube играет на самом деле — на кнопке качества
-          onPlaybackQualityChange: (e: any) => setActualQuality(String(e?.data || '')),
           onStateChange: (e: any) => {
             const isPlaying = e.data === 1;
             setPlaying(isPlaying);
             if (isPlaying) {
               setStarted(true);
-              try {
-                const q = player.getPlaybackQuality?.();
-                if (q && q !== 'unknown') setActualQuality(String(q));
-              } catch {}
               // Гасим субтитры ПОСЛЕ старта: до первого воспроизведения модуля
               // субтитров ещё нет, и команда уходит впустую — из-за этого они
               // включались сами (по настройке аккаунта зрителя). Повторяем
@@ -315,11 +267,10 @@ export default function YouTubePlayer({ url, watermark }: Props) {
       setStarted(false);
       setCurrentTime(0);
       setDuration(0);
-      setActualQuality('');
       // при смене видео субтитры гасим заново
       captionsInitRef.current = false;
     };
-  }, [videoId, updateProgress, scheduleHide, fitFrame]);
+  }, [videoId, updateProgress, scheduleHide]);
 
   const seek = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
     const p = playerRef.current;
@@ -549,19 +500,6 @@ export default function YouTubePlayer({ url, watermark }: Props) {
                 />
               </div>
             </div>
-
-            {/* Качество — что YouTube играет сейчас (выбирает сам: лучшее, что позволяет связь) */}
-            {QUALITY_WORD[actualQuality] ? (
-              <span
-                title="Качество выбирает YouTube: лучшее, что позволяет связь"
-                style={{
-                  border: '1px solid rgba(255,255,255,0.3)', borderRadius: '4px', color: '#fff', fontSize: '11px',
-                  padding: '2px 6px', fontFamily: "'Martian Mono', monospace", whiteSpace: 'nowrap',
-                }}
-              >
-                {QUALITY_WORD[actualQuality]}
-              </span>
-            ) : null}
 
             {/* Speed */}
             <div style={{ position: 'relative' }}>
