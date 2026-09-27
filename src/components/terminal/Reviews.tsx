@@ -1,5 +1,4 @@
 import type { RefObject } from 'react';
-import YouTubePlayer from '@/components/school/YouTubePlayer';
 import { weekLabel, youTubeId, type JournalVideo } from '@/lib/journalVideos';
 import { ACCENT, BORDER, DIM, FG, MONO, card, label } from './theme';
 
@@ -29,8 +28,22 @@ export function VideoReviews({
         Каждую неделю Сергей разбирает свои допуски и отказы: почему решил и что случилось после решения.
       </div>
       {yt ? (
-        <div style={{ maxWidth: 720 }}>
-          <YouTubePlayer key={cur.id} url={cur.url} />
+        // 27.09.2026, его слово: «качество в плеере пишет 360… изменить я его не могу… картинка не на весь экран».
+        // Выбрать качество вручную во встроенном видео можно только шестерёнкой самого YouTube — командой сайт его больше
+        // не выставляет. Поэтому разбор недели — в родном плеере YouTube: шестерёнка с качеством (Авто, 1080p…), скорость
+        // и полный экран, как на самом YouTube. Свой плеер (YouTubePlayer) остался у уроков, где кнопки YouTube скрыты.
+        <div style={{ maxWidth: 960 }}>
+          <div style={{ position: 'relative', width: '100%', aspectRatio: '16/9', backgroundColor: '#000', borderRadius: 10, overflow: 'hidden' }}>
+            <iframe
+              key={cur.id}
+              src={`https://www.youtube.com/embed/${yt}?rel=0&modestbranding=1&playsinline=1`}
+              title={cur.title}
+              style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', border: 0 }}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+              referrerPolicy="strict-origin-when-cross-origin"
+              allowFullScreen
+            />
+          </div>
         </div>
       ) : (
         <a
