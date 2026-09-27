@@ -32,6 +32,16 @@ export interface ScrGroup {
   instruments: ScrInstrument[];
 }
 
+// 27.09.2026, его слово: «в скринере должны быть все инструменты с направлениями… у нефти нет лидера» —
+// раздел «Без поводыря» (нефть, S&P 500): у каждого своё направление, группы и поводыря нет
+export interface ScrSolo {
+  symbol: string;
+  side: 'LONG' | 'SHORT' | null;
+  week: { arrow: Side; text: string };
+  day: { arrow: Side; text: string };
+  note: string | null; // «сценарий 2», «по дневке» — почему сторона не совпала с неделей
+}
+
 export interface ScrTop {
   rank: number;
   symbol: string;
@@ -48,6 +58,7 @@ export interface ScrTop {
 
 export interface ScrParsed {
   groups: ScrGroup[];
+  solo: ScrSolo[];
   top: ScrTop[];
   fresh: string[]; // «свежие развороты, отмены и ложные выходы»
 }
@@ -81,6 +92,11 @@ export function parseGroups(text: string): ScrGroup[] {
   let cur: ScrGroup | null = null;
   for (const raw of text.split('\n')) {
     const line = raw.trim();
+    // 27.09.2026: дальше — «Без поводыря» (parseSolo), к группе не относится
+    if (/^⚪\s*Без поводыря/u.test(line)) {
+      cur = null;
+      continue;
+    }
     // 25.09.2026: строка группы узнаётся по началу («значок, группа, → BUY / SELL · W1»), а неделя,
     // дневка и пометка ищутся в ней отдельно. Прежний строгий образец терял группу целиком, когда между
     // неделей и дневкой встала пометка «сценарий 2» (австралиец 25.09: вывод SHORT при неделе вверх),
@@ -145,6 +161,34 @@ export function parseGroups(text: string): ScrGroup[] {
       continue;
     }
     if (/^📌/u.test(line)) cur = null; // дальше — пояснения значков
+  }
+  return out;
+}
+
+/** 27.09.2026: раздел «Без поводыря» — по строке на инструмент: «🟢 CL_BRENT LONG · W1↑ [3/3] · D1↑[3/3]». */
+export function parseSolo(text: string): ScrSolo[] {
+  const out: ScrSolo[] = [];
+  let on = false;
+  for (const raw of text.split('\n')) {
+    const line = raw.trim();
+    if (/^⚪\s*Без поводыря/u.test(line)) {
+      on = true;
+      continue;
+    }
+    if (!on) continue;
+    if (/^📌/u.test(line)) break;
+    const m = line.match(/^(🟢|🔴|⚪)\s+([A-Z0-9_]+t?)\s+(LONG|SHORT|без направления)/u);
+    if (!m) continue;
+    const w = line.match(/·\s*W1\s*([↑↓~—])\s*(?:\[([^\]]*)\])?/u);
+    const d = line.match(/·\s*D1\s*([↑↓~—])\s*(?:\[([^\]]*)\])?/u);
+    const n = line.match(/·\s*(сценарий\s*\d+|по дневке)/u);
+    out.push({
+      symbol: m[2].toUpperCase(),
+      side: m[3] === 'LONG' || m[3] === 'SHORT' ? m[3] : null,
+      week: { arrow: arrow(w ? w[1] : '~'), text: scoreWords((w && w[2]) || '') },
+      day: { arrow: arrow(d ? d[1] : '~'), text: scoreWords((d && d[2]) || '') },
+      note: n ? n[1].replace(/\s+/g, ' ') : null,
+    });
   }
   return out;
 }
@@ -238,5 +282,5 @@ export function parseScreener(
     // у самого поводыря индекс доллара рядом — сверка, а не «его поводырь»
     if (x.leads && x.range) x.range = x.range.replace(/\s*\(поводырь\)/g, '');
   }
-  return { groups: gs, top: t.top, fresh: t.fresh };
+  return { groups: gs, solo: parseSolo(groups || ''), top: t.top, fresh: t.fresh };
 }

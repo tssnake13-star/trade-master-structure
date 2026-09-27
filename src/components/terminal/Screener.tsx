@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { AlertTriangle, TrendingDown, TrendingUp, MoveRight } from 'lucide-react';
 import { ACCENT, BORDER, DIM, DOWN, FG, MONO, UP, card, fmtWhen, fromBotTime, label } from './theme';
 import { ScreenerFeed, type FeedDocs } from './Feeds';
-import { GEN, parseScreener, type ScrGroup, type ScrInstrument, type ScrTop, type Side } from './screenerParse';
+import { GEN, parseScreener, type ScrGroup, type ScrInstrument, type ScrSolo, type ScrTop, type Side } from './screenerParse';
 
 // 21.09.2026, его просьба с телефона: у цифр — слово («7 групп», «3 инструмента»)
 function plural(n: number, one: string, few: string, many: string) {
@@ -106,6 +106,35 @@ function GroupCard({ g, symbols, onOpen }: { g: ScrGroup; symbols: Set<string>; 
         </details>
       ) : null}
       {g.instruments.length ? <div>{g.instruments.map((i) => <Chip key={i.symbol + i.side} i={i} symbols={symbols} onOpen={onOpen} />)}</div> : null}
+    </div>
+  );
+}
+
+// 27.09.2026, его слово: «в скринере должны быть все инструменты с направлениями… у нефти нет лидера» — инструмент
+// без поводыря: своя карточка, сторона — его общий вывод, неделя и дневка — его критерии
+function SoloCard({ s, symbols, onOpen }: { s: ScrSolo; symbols: Set<string>; onOpen: Open }) {
+  const dir: Side = s.side === 'LONG' ? 'up' : s.side === 'SHORT' ? 'down' : 'flat';
+  const Icon = dir === 'up' ? TrendingUp : dir === 'down' ? TrendingDown : MoveRight;
+  const known = symbols.has(s.symbol);
+  return (
+    <div style={{ ...card, padding: '10px 12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+        <Icon size={16} color={col(dir)} />
+        <button
+          onClick={() => known && onOpen(s.symbol)}
+          style={{ fontFamily: MONO, fontSize: 15, color: FG, background: 'none', border: 'none', padding: 0, cursor: known ? 'pointer' : 'default', textDecoration: known ? 'underline' : 'none', textUnderlineOffset: 3 }}
+        >
+          {s.symbol}
+        </button>
+        <span style={{ marginLeft: 'auto', ...pillSide(dir !== 'down'), ...(dir === 'flat' ? { color: DIM, borderColor: BORDER, backgroundColor: 'transparent' } : {}) }}>
+          {s.side || 'нет направления'}
+        </span>
+      </div>
+      <div style={{ color: DIM, fontSize: 12, marginTop: 5 }}>
+        неделя <span style={{ color: col(s.week.arrow) }}>{arrowCh(s.week.arrow)}</span> {s.week.text}
+        {' · '}дневка <span style={{ color: col(s.day.arrow) }}>{arrowCh(s.day.arrow)}</span> {s.day.text}
+        {s.note ? <span style={{ color: FG }}>{` · ${s.note}`}</span> : null}
+      </div>
     </div>
   );
 }
@@ -224,9 +253,15 @@ export function ScreenerCards({ doc, symbols, onOpen, part = 'groups' }: { doc?:
           {flat.map((g) => <GroupCard key={g.code} g={g} symbols={symbols} onOpen={onOpen} />)}
         </Block>
       ) : null}
+      {parsed.solo.length ? (
+        <Block title={`⚪ БЕЗ ПОВОДЫРЯ · ${parsed.solo.length} ${plural(parsed.solo.length, 'инструмент', 'инструмента', 'инструментов')}`} color={ACCENT}>
+          {parsed.solo.map((s) => <SoloCard key={s.symbol} s={s} symbols={symbols} onOpen={onOpen} />)}
+        </Block>
+      ) : null}
       <div style={{ color: DIM, fontSize: 11, lineHeight: 1.7, display: 'flex', flexWrap: 'wrap', gap: '2px 12px', alignItems: 'center' }}>
         <span>2 из 3 — сколько из трёх критериев недели (свинг, свеча, накопления) за сторону; у пары — за её сторону</span>
         <span>по контексту — неделя пары против, но поводырь, дневка и подтверждение за</span>
+        <span>без поводыря — у инструмента нет группы, направление по нему самому</span>
         <span>макро за / против — подтверждает ли макро</span>
         <span>рейндж — цена стоит, выхода нет (информация, не запрет)</span>
       </div>
