@@ -216,14 +216,23 @@ export function Decision({ r, narrow }: { r: MarketRow; narrow: boolean }) {
               сюда, наверх; слова те же, что на картинке бота */}
           <Cell
             name="сценарий"
-            value={r.scenario ? `${r.scenario} — ${r.side === 'LONG' ? 'вверх' : 'вниз'}` : 'нет'}
+            value={
+              r.scenario === 'итог'
+                ? 'по дневке'
+                : r.scenario
+                  ? `${r.scenario} — ${r.side === 'LONG' ? 'вверх' : 'вниз'}`
+                  : 'нет'
+            }
             color={r.scenario ? FG : DIM}
             sub={
               r.scenario === '1'
                 ? 'идём по недельному циклу'
                 : r.scenario === '2'
                   ? 'недельный цикл пройден, идём против него'
-                  : null
+                  : r.scenario === 'итог'
+                    ? // 27.09.2026, его правило итога: «ключевое — контекст»
+                      'итог: неделя и недельный цикл против, а дневка, подтверждение и поводырь за'
+                    : null
             }
           />
         </div>

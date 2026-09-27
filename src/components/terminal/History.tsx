@@ -109,7 +109,7 @@ function CallRow({ c, onOpen, known }: { c: HistCall; onOpen?: Open; known?: boo
         </button>
       ) : null}
       <span style={{ fontFamily: MONO, fontSize: 11, color: long ? UP : DOWN }}>{c.side}</span>
-      <span style={{ ...label, letterSpacing: '0.12em' }}>{c.scenario ? `сценарий ${c.scenario}` : 'без сценария'}</span>
+      <span style={{ ...label, letterSpacing: '0.12em' }}>{c.scenario === 'итог' ? 'итог по дневке' : c.scenario ? `сценарий ${c.scenario}` : 'без сценария'}</span>
       <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.1em', padding: '1px 7px', borderRadius: 6, color: stColor(c.status), border: `1px solid ${stColor(c.status)}55`, whiteSpace: 'nowrap' }}>
         {c.status}
       </span>
@@ -184,6 +184,7 @@ export function HistoryView({ doc, order, symbols, onOpen }: { doc?: HistoryDoc;
   const byScen: [ReactNode, HistCall[]][] = [
     ['сценарий 1', calls.filter((c) => c.scenario === '1')],
     ['сценарий 2', calls.filter((c) => c.scenario === '2')],
+    ['итог по дневке', calls.filter((c) => c.scenario === 'итог')],
     ['без сценария', calls.filter((c) => !c.scenario || c.scenario === 'нет')],
   ];
   const byWeek: [ReactNode, HistCall[]][] = ['неделя за', 'неделя против', 'неделя в споре'].map((w) => [w, calls.filter((c) => weekRel(c) === w)]);

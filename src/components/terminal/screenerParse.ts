@@ -11,6 +11,9 @@ export interface ScrInstrument {
   // сколько из трёх критериев недели за сторону пары (2 или 3). 21.09.2026: вместо значка
   // режима рынка — режим убран его решением, третий критерий теперь накопления
   score: number | null;
+  // 27.09.2026, его правило итога: неделя пары против группы, а дневка, подтверждение и поводырь за —
+  // пара в списке группы с пометкой «по дневке» вместо счёта недели
+  note?: string | null;
 }
 
 export interface ScrGroup {
@@ -130,7 +133,12 @@ export function parseGroups(text: string): ScrGroup[] {
         if (m) {
           // «3/3» — счёт пары (с 21.09.2026); значки режима из старого кэша не показываем
           const sc = (m[3] || '').match(/^([23])\/3$/);
-          cur.instruments.push({ symbol: m[1].toUpperCase(), side: m[2] as 'LONG' | 'SHORT', score: sc ? +sc[1] : null });
+          cur.instruments.push({
+            symbol: m[1].toUpperCase(),
+            side: m[2] as 'LONG' | 'SHORT',
+            score: sc ? +sc[1] : null,
+            note: /по дневке/u.test(part) ? 'по дневке' : null,
+          });
         }
       }
       continue;

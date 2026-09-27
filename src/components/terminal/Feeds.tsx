@@ -314,7 +314,7 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen }: { 
                   {v.verdict}
                   {v.both_layers ? ' · оба слоя' : ''}
                 </span>
-                {v.scenario ? <span style={{ ...label }}>сценарий {v.scenario}</span> : null}
+                {v.scenario ? <span style={{ ...label }}>{v.scenario === 'итог' ? 'итог по дневке' : `сценарий ${v.scenario}`}</span> : null}
                 {known ? (
                   <button
                     onClick={() => onOpen(v.instrument)}
