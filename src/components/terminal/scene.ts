@@ -6,8 +6,10 @@ export type Layer = 'acc' | 'cycle' | 'trans' | 'add' | 'swing' | 'rev' | 'zone'
 export interface SLine { k: 'line'; p: [number, number][]; c: string; a: number; w: number; d: number[] | null; z: number; L: Layer }
 // 22.09.2026: «au» / «ad» — стрелки свинга и реверса (как Wingdings 233/234 в MT4), «o» малого
 // размера — точки реверса
-export interface SMark { k: 'mark'; x: number; y: number; m: 'o' | '^' | 'v' | 'x' | 'au' | 'ad'; c: string; a: number; e: string; s: number; z: number; L: Layer }
-export interface SRect { k: 'rect'; x: number; y: number; w: number; h: number; f: string | null; fa: number; e: string | null; ew: number; d?: number[] | null; z: number; L: Layer }
+// 27.09.2026: h — полый треугольник: ложный выход (выход — сплошной)
+export interface SMark { k: 'mark'; x: number; y: number; m: 'o' | '^' | 'v' | 'x' | 'au' | 'ad'; c: string; a: number; e: string; s: number; h?: number | null; z: number; L: Layer }
+// 27.09.2026: hc — штриховка этого цвета: прирост накопления после ложного выхода
+export interface SRect { k: 'rect'; x: number; y: number; w: number; h: number; f: string | null; fa: number; e: string | null; ew: number; d?: number[] | null; hc?: string | null; z: number; L: Layer }
 export interface SPoly { k: 'poly'; p: [number, number][]; f: string; fa: number; z: number; L: Layer }
 export type Shape = SLine | SMark | SRect | SPoly;
 

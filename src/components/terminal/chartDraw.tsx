@@ -140,6 +140,8 @@ export function shapeNode(s: Shape, key: number, sx: (x: number) => number, sy: 
           </g>
         );
       const d = s.m === '^' ? `M${x},${y - r} L${x + r},${y + r * 0.8} L${x - r},${y + r * 0.8} Z` : `M${x},${y + r} L${x + r},${y - r * 0.8} L${x - r},${y - r * 0.8} Z`;
+      // 27.09.2026: полый треугольник — ложный выход (выход — сплошной), как у бота
+      if (s.h) return <path key={key} d={d} fill="none" stroke={s.e || s.c} strokeOpacity={s.a} strokeWidth={1.4} />;
       return <path key={key} d={d} fill={s.c} fillOpacity={s.a} stroke={s.e} strokeWidth={0.6} />;
     }
     case 'rect': {
@@ -147,13 +149,17 @@ export function shapeNode(s: Shape, key: number, sx: (x: number) => number, sy: 
       const x2 = sx(s.x + s.w);
       const yt = sy(s.y + s.h);
       const yb = sy(s.y);
-      return (
+      const rx = Math.min(x1, x2);
+      const ry = Math.min(yt, yb);
+      const rw = Math.abs(x2 - x1);
+      const rh = Math.max(0.5, Math.abs(yb - yt));
+      const body = (
         <rect
-          key={key}
-          x={Math.min(x1, x2)}
-          y={Math.min(yt, yb)}
-          width={Math.abs(x2 - x1)}
-          height={Math.max(0.5, Math.abs(yb - yt))}
+          key={s.hc ? 'b' : key}
+          x={rx}
+          y={ry}
+          width={rw}
+          height={rh}
           fill={s.f || 'none'}
           fillOpacity={s.f ? s.fa : 0}
           stroke={s.e || 'none'}
@@ -161,6 +167,23 @@ export function shapeNode(s: Shape, key: number, sx: (x: number) => number, sy: 
           // 24.09.2026: накопление внутри накопления — точечная рамка, как у бота и в индикаторе
           strokeDasharray={s.e && s.d ? s.d.map((v) => (v * Math.max(0.8, s.ew)).toFixed(1)).join(' ') : undefined}
         />
+      );
+      if (!s.hc) return body;
+      // 27.09.2026: штриховка — прирост накопления после ложного выхода: косые линии через 6 точек внутри прямоугольника
+      const hatch: ReactNode[] = [];
+      for (let c = -rh; c < rw; c += 6) {
+        const xa = Math.max(0, c);
+        const xb = Math.min(rw, c + rh);
+        if (xa < xb)
+          hatch.push(<line key={c} x1={(rx + xa).toFixed(1)} y1={(ry + rh + c - xa).toFixed(1)} x2={(rx + xb).toFixed(1)} y2={(ry + rh + c - xb).toFixed(1)} />);
+      }
+      return (
+        <g key={key}>
+          {body}
+          <g stroke={s.hc} strokeOpacity={0.55} strokeWidth={1}>
+            {hatch}
+          </g>
+        </g>
       );
     }
     case 'poly':
