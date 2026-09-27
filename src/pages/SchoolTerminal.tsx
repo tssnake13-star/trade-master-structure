@@ -18,6 +18,8 @@ import { LAYERS, layersOf, type Layer, type Scene } from '@/components/terminal/
 
 // 21.09.2026, его слово: серые ползунки «ужасно смотрятся» — тонкие, золото на тёмном,
 // как весь кабинет. Стандартные свойства — Chrome и Firefox, ::-webkit — Safari.
+// 27.09.2026, его слово (телефон): у строки вкладок ползунок «весь вид портит» — вкладки листаются свайпом,
+// ползунка у них нет (.tm-tabs); у остальных прокруток на странице он прежний.
 const SCROLL_CSS = `
 html { scrollbar-color: rgba(225,168,77,0.55) ${BG}; }
 .tm-page, .tm-page * { scrollbar-width: thin; scrollbar-color: rgba(225,168,77,0.55) transparent; }
@@ -25,6 +27,8 @@ html { scrollbar-color: rgba(225,168,77,0.55) ${BG}; }
 .tm-page ::-webkit-scrollbar-track { background: transparent; }
 .tm-page ::-webkit-scrollbar-thumb { background: rgba(225,168,77,0.55); border-radius: 8px; }
 .tm-page ::-webkit-scrollbar-thumb:hover { background: ${ACCENT}; }
+.tm-page .tm-tabs { scrollbar-width: none; -ms-overflow-style: none; }
+.tm-page .tm-tabs::-webkit-scrollbar { display: none; width: 0; height: 0; }
 `;
 
 /**
@@ -602,7 +606,7 @@ export default function SchoolTerminal() {
         </div>
       </header>
 
-      <nav style={{ display: 'flex', gap: 6, padding: '12px 14px 0', overflowX: 'auto' }}>
+      <nav className="tm-tabs" style={{ display: 'flex', gap: 6, padding: '12px 14px 0', overflowX: 'auto' }}>
         {mainSections.map(([s, name]) => (
           <button key={s} onClick={() => go(s)} style={pill(section === s)}>
             {name}
@@ -611,7 +615,7 @@ export default function SchoolTerminal() {
       </nav>
       {/* 25.09.2026, его слово: вкладки только для него — отдельно от общих кнопок, своей строкой */}
       {adminSections.length ? (
-        <nav style={{ display: 'flex', gap: 6, padding: '8px 14px 0', overflowX: 'auto', alignItems: 'center' }}>
+        <nav className="tm-tabs" style={{ display: 'flex', gap: 6, padding: '8px 14px 0', overflowX: 'auto', alignItems: 'center' }}>
           <span style={{ ...label, display: 'flex', alignItems: 'center', gap: 5, marginRight: 4, whiteSpace: 'nowrap' }}>
             <Lock size={11} color={ACCENT} /> администратор
           </span>
