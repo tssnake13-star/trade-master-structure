@@ -176,13 +176,14 @@ export function ScreenerCards({ doc, symbols, onOpen, part = 'groups' }: { doc?:
   if (part === 'top') {
     return (
       <div>
-        <div style={{ ...label, marginBottom: 14 }}>ТОП циклов из скринера от {when} · одобрен автором · то же, что получили подписчики</div>
+        {/* 27.09.2026, его слово: «ТОП циклов» в терминале — просто «ТОП» */}
+        <div style={{ ...label, marginBottom: 14 }}>ТОП из скринера от {when} · одобрен автором · то же, что получили подписчики</div>
         {parsed.top.length ? (
-          <Block title={`🏆 ТОП ЦИКЛОВ · ${parsed.top.length} ${plural(parsed.top.length, 'инструмент', 'инструмента', 'инструментов')}`} color={ACCENT}>
+          <Block title={`🏆 ТОП · ${parsed.top.length} ${plural(parsed.top.length, 'инструмент', 'инструмента', 'инструментов')}`} color={ACCENT}>
             {parsed.top.map((t) => <TopCard key={t.rank} t={t} symbols={symbols} onOpen={onOpen} />)}
           </Block>
         ) : (
-          <div style={{ ...card, padding: 14, color: DIM, fontSize: 13, marginBottom: 14 }}>В этом скринере ТОП циклов пуст.</div>
+          <div style={{ ...card, padding: 14, color: DIM, fontSize: 13, marginBottom: 14 }}>В этом скринере ТОП пуст.</div>
         )}
         {parsed.fresh.length ? (
           <details style={{ ...card, padding: '10px 12px', marginBottom: 14, fontSize: 12, color: DIM }}>
