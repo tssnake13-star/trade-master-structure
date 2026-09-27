@@ -74,6 +74,8 @@ export interface MarketRow {
     c_dir?: string | null;
     c_n?: number | null;
     w_anom?: string | null;
+    // 27.09.2026: у сценария по контексту — что с неделей, словами бота («недельного цикла вверх нет»)
+    itog_why?: string | null;
   } | null;
   bars_at: string | null;
   updated_at: string | null;
