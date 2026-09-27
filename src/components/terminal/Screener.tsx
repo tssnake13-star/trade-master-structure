@@ -40,13 +40,13 @@ function Chip({ i, symbols, onOpen }: { i: ScrInstrument; symbols: Set<string>; 
   return (
     <button
       onClick={() => known && onOpen(i.symbol)}
-      title={i.score ? `${i.score} из 3 критериев за сторону пары` : i.note ? 'неделя пары против, а дневка, подтверждение и поводырь за' : undefined}
+      title={i.score ? `${i.score} из 3 критериев за сторону пары` : i.note ? 'неделя пары против, но поводырь, дневка и подтверждение за' : undefined}
       style={{ display: 'inline-flex', alignItems: 'center', gap: 5, margin: '6px 6px 0 0', padding: '3px 8px', borderRadius: 8, border: `1px solid #2c2a27`, background: 'transparent', color: FG, cursor: known ? 'pointer' : 'default', fontSize: 12 }}
     >
       <span style={{ fontFamily: MONO }}>{i.symbol}</span>
       <span style={{ color: long ? UP : DOWN, fontFamily: MONO, fontSize: 11 }}>{long ? 'LONG' : 'SHORT'}</span>
       {i.score ? <span style={{ fontFamily: MONO, fontSize: 10, color: i.score === 3 ? ACCENT : DIM }}>{i.score}/3</span> : null}
-      {/* 27.09.2026: итог пары по дневке — неделя против, дневка, подтверждение и поводырь за */}
+      {/* 27.09.2026: сценарий по контексту — неделя пары против, но поводырь, дневка и подтверждение за */}
       {!i.score && i.note ? <span style={{ fontSize: 10, color: DIM }}>{i.note}</span> : null}
     </button>
   );
@@ -225,7 +225,7 @@ export function ScreenerCards({ doc, symbols, onOpen, part = 'groups' }: { doc?:
       ) : null}
       <div style={{ color: DIM, fontSize: 11, lineHeight: 1.7, display: 'flex', flexWrap: 'wrap', gap: '2px 12px', alignItems: 'center' }}>
         <span>2 из 3 — сколько из трёх критериев недели (свинг, свеча, накопления) за сторону; у пары — за её сторону</span>
-        <span>по дневке — неделя пары против, а дневка, подтверждение и поводырь за</span>
+        <span>по контексту — неделя пары против, но поводырь, дневка и подтверждение за</span>
         <span>макро за / против — подтверждает ли макро</span>
         <span>рейндж — цена стоит, выхода нет (информация, не запрет)</span>
       </div>
