@@ -86,7 +86,12 @@ type Kind = 'cycles' | 'trend' | 'all';
 // канадец, фунт, франк, золото, биткоин (нефть — после золота: группа есть, он её не назвал)
 // 25.09.2026, его слово: «создать новую группу — группа без поводыря… туда нефть, туда S&P 500… и все
 // инструменты, у которых нет поводырей, которых нет в других группах» — NONE, последней
-const GROUP_ORDER = ['DXY', 'AUD', 'JPY', 'NZD', 'CAD', 'GBP', 'CHF', 'GOLD', 'OIL', 'BTC', 'NONE'];
+// 29.09.2026, его слово: «группу йены поставь первой после доллара, ну то есть второй, потом идёт австралиец,
+// новозеландец, фунт, канада, франк, золото, биткоин, ну и все остальные» — нефть и NONE после биткоина
+const GROUP_ORDER = ['DXY', 'JPY', 'AUD', 'NZD', 'GBP', 'CAD', 'CHF', 'GOLD', 'BTC', 'OIL', 'NONE'];
+// 29.09.2026, его порядок внутри группы доллара: индекс, евро, фунт, австралиец, новозеландец, канада, франк, йена,
+// сингапурский доллар, юань, золото. Внутри остальных групп — как было («не надо, вот как я сказал»)
+const DXY_ORDER = ['DXY', 'EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'USDSGD', 'USDCNH', 'XAUUSD'];
 
 // Почему нет сценария — словами бота из первой строки карточки /info
 // («🌀 USDCNH — Сценария нет: цель недельного цикла вниз взята; …»)
@@ -304,14 +309,21 @@ export default function SchoolTerminal() {
       const i = GROUP_ORDER.indexOf(g);
       return i < 0 ? GROUP_ORDER.length : i;
     };
-    // внутри группы: её поводырь, за ним поводыри других групп в порядке групп, потом пары по алфавиту
+    // внутри группы: её поводырь, за ним поводыри других групп в порядке групп, потом пары по алфавиту;
+    // у группы доллара — его порядок (DXY_ORDER), кого в нём нет — после, по тем же правилам
     const rank = (g: string, r: MarketRow) =>
       r.extra?.leads === g ? -1 : r.extra?.leads ? pos(r.extra.leads) : GROUP_ORDER.length + 1;
+    const dxyAt = (r: MarketRow) => {
+      const i = DXY_ORDER.indexOf(r.symbol.toUpperCase());
+      return i < 0 ? DXY_ORDER.length : i;
+    };
     return [...by.entries()]
       .sort((a, b) => pos(a[0]) - pos(b[0]))
       .map(([g, rs]): [string, MarketRow[]] => [
         g,
-        [...rs].sort((x, y) => rank(g, x) - rank(g, y) || x.symbol.localeCompare(y.symbol)),
+        [...rs].sort(
+          (x, y) => (g === 'DXY' ? dxyAt(x) - dxyAt(y) : 0) || rank(g, x) - rank(g, y) || x.symbol.localeCompare(y.symbol),
+        ),
       ]);
   }, [rows, list]);
 
