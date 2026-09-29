@@ -297,11 +297,19 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
     if (bar) {
       const [d, o, h, l, c] = bar;
       const [yy, mm, dd] = d.split('-');
+      // 29.09.2026, его слово: подписи по-английски, как в MT4/MT5 (Open · High · Low · Close); плашка не на всю
+      // ширину графика, а по длине текста, и стоит в правом нижнем углу поля свечей (было — полоса сверху).
+      // На узком экране переносится целыми парами «Open 0.60489 ·» — новая строка начинается со слова, не с точки
+      const cell = (k: string, v: ReactNode, last = false) => (
+        <span style={{ whiteSpace: 'nowrap' }}>
+          {k} {v}
+          {last ? '' : ' ·'}
+        </span>
+      );
       tip = (
-        <div style={{ position: 'absolute', left: PAD.l + 6, top: PAD.t + 6, right: PAD.r + 6, pointerEvents: 'none', background: 'rgba(12,14,18,0.9)', border: `1px solid ${BORDER}`, borderRadius: 6, padding: '4px 8px', fontFamily: MONO, fontSize: 11, color: FG, lineHeight: 1.5 }}>
-          {p.tf === 'W1' ? 'неделя с ' : ''}
-          {dd}.{mm}.{yy} · откр {o.toFixed(p.dg)} · макс {h.toFixed(p.dg)} · мин {l.toFixed(p.dg)} · закр{' '}
-          <span style={{ color: c >= o ? UPC : DNC }}>{c.toFixed(p.dg)}</span>
+        <div style={{ position: 'absolute', right: PAD.r + 6, bottom: PAD.b + 6, maxWidth: pw - 12, pointerEvents: 'none', background: 'rgba(12,14,18,0.9)', border: `1px solid ${BORDER}`, borderRadius: 6, padding: '4px 8px', fontFamily: MONO, fontSize: 11, color: FG, lineHeight: 1.5 }}>
+          <span style={{ whiteSpace: 'nowrap' }}>{dd}.{mm}.{yy} ·</span> {cell('Open', o.toFixed(p.dg))} {cell('High', h.toFixed(p.dg))}{' '}
+          {cell('Low', l.toFixed(p.dg))} {cell('Close', <span style={{ color: c >= o ? UPC : DNC }}>{c.toFixed(p.dg)}</span>, true)}
         </div>
       );
     }
