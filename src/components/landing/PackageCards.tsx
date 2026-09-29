@@ -182,14 +182,19 @@ const PACKAGES: Pkg[] = [
  * ровно 6 месяцев, год — ровно 12, «в подарок» обещало месяцы, которых подписчик
  * не получит. Выгода длинного срока зашита в цену и считается от 3 месяцев:
  * $447 / 3 = $149 в месяц. Зачёркнутая цена — тот же срок по $149:
- * 6 × 149 = $894, 12 × 149 = $1788. Карточку 3 месяцев не трогать.
+ * 6 × 149 = $894, 12 × 149 = $1788. Цену 3 месяцев не трогать.
  * Цены, зачёркнутые цены и расчёт видны только на /access: на лендинге
  * цены экосистемы не раскрываются.
+ *
+ * ⚠️ Советники в аренду — только с 6 месяцев (Сергей 29.09.2026: «Советники в аренду
+ * на три месяца не идут. Советники начинаются с 6 месяцев и в 12 месяцах пускай будет»).
+ * 3 месяца — только ECHO-GATE INSIDE в кабинете; 6 и 12 — он же плюс Echo Gate,
+ * Hunter Bot и Risk Sentinel в аренду.
  */
 const ECOSYSTEM: { price: string; oldPrice?: string; period: string; desc: string; saving?: string; featured: boolean }[] = [
-  { price: '$447', period: '3 месяца', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду. Попробовать инфраструктуру.', featured: false },
-  { price: '$840', oldPrice: '$894', period: '6 месяцев', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду на полгода.', saving: '$140 в месяц вместо $149, экономия $54.', featured: false },
-  { price: '$1490', oldPrice: '$1788', period: '12 месяцев', desc: 'Echo Gate, Hunter Bot и Risk Sentinel в аренду на год.', saving: 'Около $124 в месяц вместо $149, экономия $298.', featured: true },
+  { price: '$447', period: '3 месяца', desc: 'ECHO-GATE INSIDE в личном кабинете. Советники в аренду — от 6 месяцев.', featured: false },
+  { price: '$840', oldPrice: '$894', period: '6 месяцев', desc: 'ECHO-GATE INSIDE и советники Echo Gate, Hunter Bot и Risk Sentinel в аренду на полгода.', saving: '$140 в месяц вместо $149, экономия $54.', featured: false },
+  { price: '$1490', oldPrice: '$1788', period: '12 месяцев', desc: 'ECHO-GATE INSIDE и советники Echo Gate, Hunter Bot и Risk Sentinel в аренду на год.', saving: 'Около $124 в месяц вместо $149, экономия $298.', featured: true },
 ];
 
 const GOLD = 'hsl(var(--accent))';
@@ -408,7 +413,7 @@ export default function PackageCards({
         <h3 className="text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>Подписка на экосистему</h3>
         <div className="text-mono mt-1.5" style={{ ...MONO, letterSpacing: '0.16em', color: 'hsl(var(--cool))' }}>только выпускникам</div>
         <p className="mt-3 text-sm md:text-base text-muted-foreground" style={{ maxWidth: '70ch' }}>
-          Доступ к инфраструктуре исполнения для выпускников: <b className="text-foreground/90">Echo Gate</b> — допуск: присылает разрешённые входы, <b className="text-foreground/90">Hunter Bot</b> — исполняет одобренный вами приказ и сопровождает позицию, <b className="text-foreground/90">Risk Sentinel</b> — защита капитала. Подписка — аренда на срок; решение всегда за вами.
+          Подписка открывает <b className="text-foreground/90">ECHO-GATE INSIDE</b> — «Глаз системы» в личном кабинете: живые графики, допуски и отказы по системе в том виде, как их получают подписчики. С 6 месяцев к нему добавляются советники в аренду: <b className="text-foreground/90">Echo Gate</b> — допуск: присылает разрешённые входы, <b className="text-foreground/90">Hunter Bot</b> — исполняет одобренный вами приказ и сопровождает позицию, <b className="text-foreground/90">Risk Sentinel</b> — защита капитала. Решение всегда за вами.
         </p>
         <div className="mt-5 grid sm:grid-cols-3 gap-3">
           {ECOSYSTEM.map((e) => (
