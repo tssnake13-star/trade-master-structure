@@ -6,7 +6,7 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { ArrowLeft, Lock, Search } from 'lucide-react';
 import { ACCENT, BG, BLUE, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate } from '@/components/terminal/theme';
 import { ALPHA_TIP, CritMarks, CycleCard, Lines, SymbolName, type MarketRow } from '@/components/terminal/parts';
-import { Brand, Decision } from '@/components/terminal/Decision';
+import { Brand, Decision, TradingStyle } from '@/components/terminal/Decision';
 import { FalseExitFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
 import StatusStrip from '@/components/terminal/Status';
@@ -621,6 +621,11 @@ export default function SchoolTerminal() {
           {until ? <span style={label}>подписка до {fmtDate(until)}</span> : null}
         </div>
       </header>
+
+      {/* 30.09.2026, его слово: стиль торговли — над кнопками разделов, крупнее */}
+      <div style={{ padding: '14px 14px 0' }}>
+        <TradingStyle />
+      </div>
 
       <nav className="tm-tabs" style={{ display: 'flex', gap: 6, padding: '12px 14px 0', overflowX: 'auto' }}>
         {mainSections.map(([s, name]) => (
