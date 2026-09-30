@@ -23,18 +23,27 @@ const colorOf = (s: Side3) => (s === 'LONG' ? UP : s === 'SHORT' ? DOWN : DIM);
 const arrowOf = (s: Side3) => (s === 'LONG' ? '↑' : s === 'SHORT' ? '↓' : '');
 
 /** Название экрана — как плитка в кабинете (его слово 21.09.2026): глаз на две строки,
- *  справа ECHO-GATE INSIDE и ровно под ним «Глаз системы». */
+ *  справа ECHO-GATE INSIDE и ровно под ним «Глаз системы».
+ *  30.09.2026, его слово: ниже — «Стиль торговли: Swing Trading». Строка стоит под
+ *  надписями, а не рядом с глазом: глаз остаётся на две строки, как он утвердил. */
 export function Brand({ size = 40, title = 15 }: { size?: number; title?: number }) {
+  const inset = Math.round(size / 12);
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-      <Eye size={size} strokeWidth={1.5} color={ACCENT} style={{ flexShrink: 0, margin: `0 -${Math.round(size / 12)}px` }} />
-      <div style={{ minWidth: 0, textAlign: 'left' }}>
-        <div style={{ fontFamily: SANS, fontSize: title, fontWeight: 600, lineHeight: 1.2, whiteSpace: 'nowrap', color: FG }}>
-          ECHO-GATE INSIDE
+    <div style={{ textAlign: 'left' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        <Eye size={size} strokeWidth={1.5} color={ACCENT} style={{ flexShrink: 0, margin: `0 -${inset}px` }} />
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontFamily: SANS, fontSize: title, fontWeight: 600, lineHeight: 1.2, whiteSpace: 'nowrap', color: FG }}>
+            ECHO-GATE INSIDE
+          </div>
+          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: 4, lineHeight: 1.3, color: DIM }}>
+            Глаз системы
+          </div>
         </div>
-        <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: 4, lineHeight: 1.3, color: DIM }}>
-          Глаз системы
-        </div>
+      </div>
+      {/* отступ = видимая ширина глаза + зазор: строка начинается ровно под надписями */}
+      <div style={{ paddingLeft: size - 2 * inset + 10, marginTop: 6, fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', lineHeight: 1.3, whiteSpace: 'nowrap', color: DIM }}>
+        Стиль торговли: <span style={{ color: ACCENT }}>Swing Trading</span>
       </div>
     </div>
   );
