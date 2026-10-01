@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ACCENT, BORDER, DIM, FG, MONO, label, pill } from './theme';
-import { fmtDay, niceTicks, type Layer, type Scene, type ScenePanel } from './scene';
+import { HIDDEN_LAYERS, fmtDay, niceTicks, type Layer, type Scene, type ScenePanel } from './scene';
 import { DNC, GRID, PAD, PANEL_BG, UPC, placeLabels, shapeNode, tickDigits, yRange } from './chartDraw';
 
 /**
@@ -196,7 +196,8 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
 
   // Всё, что не зависит от мыши, собирается один раз на вид — наведение его не перерисовывает.
   const body = useMemo(() => {
-    const vis = sorted.filter((s) => !hidden.has(s.L));
+    // 01.10.2026, его слово: линия текущей цены лишняя и путает — её слой не рисуем вовсе
+    const vis = sorted.filter((s) => !HIDDEN_LAYERS.has(s.L) && !hidden.has(s.L));
     const priceTicks = niceTicks(y0, y1, Math.max(3, Math.round(ph / 60)));
     const dec = tickDigits(priceTicks.length > 1 ? priceTicks[1] - priceTicks[0] : 0, p.dg);
     const inView = p.bars.map((b, i) => ({ b, x: p.x0 + i })).filter(({ x }) => x >= view[0] - 1 && x <= view[1] + 1);

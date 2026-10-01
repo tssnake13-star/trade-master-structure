@@ -41,6 +41,8 @@ export interface Scene {
 }
 
 // Слои — названия его словами. «other» не выключается: это то, что не удалось отнести.
+// 01.10.2026, его слово: «цену надо убрать, она лишняя… создаёт линию, которая будет путать… и кнопку
+// из графика тоже» — кнопки слоя «цена» больше нет, саму линию живой график не рисует (HIDDEN_LAYERS).
 export const LAYERS: [Layer, string][] = [
   ['acc', 'накопления'],
   ['cycle', 'цикл'],
@@ -49,8 +51,10 @@ export const LAYERS: [Layer, string][] = [
   ['swing', 'свинги'],
   ['rev', 'реверс'],
   ['zone', 'ложный выход'],
-  ['price', 'цена'],
 ];
+
+/** Слои, которые приходят от бота, но в живом графике не рисуются никогда: линия текущей цены. */
+export const HIDDEN_LAYERS: ReadonlySet<Layer> = new Set<Layer>(['price']);
 
 export function layersOf(scene: Scene | null): Set<Layer> {
   const s = new Set<Layer>();
