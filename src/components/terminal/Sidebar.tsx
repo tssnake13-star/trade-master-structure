@@ -16,9 +16,9 @@ import { groupRows, scenarioRows, type ScenBlock, type ScenKey } from './sidebar
  */
 
 // слова разделов — те же, что в главном блоке инструмента (Decision)
-const SCEN_META: Record<ScenKey, { n?: string; title: string; note?: string }> = {
-  '1': { n: '1', title: 'Первый сценарий', note: 'идём по недельному циклу' },
-  '2': { n: '2', title: 'Второй сценарий', note: 'недельный цикл пройден, идём против него' },
+const SCEN_META: Record<ScenKey, { title: string; note?: string }> = {
+  '1': { title: 'Первый сценарий', note: 'идём по недельному циклу' },
+  '2': { title: 'Второй сценарий', note: 'недельный цикл пройден, идём против него' },
   ctx: { title: 'По контексту', note: 'сценария 1 и 2 нет, но поводырь, дневка и подтверждение за' },
   none: { title: 'Сценария нет' },
 };
@@ -131,8 +131,12 @@ function InstrumentRow({ r, on, guide, tip, edge, onOpen }: { r: MarketRow; on: 
 const leadTip = (r: MarketRow) =>
   r.extra?.leads === 'DXY' ? ALPHA_TIP : `сам — поводырь группы ${GEN[r.extra?.leads || ''] || r.extra?.leads || ''}`;
 
-/** Шапка первого и второго сценария: крупный номер, название, чем сценарий живёт, сколько инструментов
- *  и полоска «сколько из них LONG и сколько SHORT». */
+/** Шапка первого и второго сценария: слева крупно — сколько в сценарии инструментов, справа название словами
+ *  и чем сценарий живёт, ниже полоска «сколько из них LONG и сколько SHORT».
+ *  01.10.2026 вечер, его поправка: «если написано второй сценарий… не знаю, зачем тогда 1 и 2… убрать цифру 1 и 2,
+ *  а общее количество поставить где были 1 и 2, с левой стороны… пояснение немножко сдвинуть вправо и немножко
+ *  увеличить… но не сильно крупно, чтобы не портило эстетику» — крупного номера сценария больше нет, на его
+ *  месте число инструментов (раньше оно стояло мелко справа). */
 function ScenPlate({ b }: { b: ScenBlock }) {
   const meta = SCEN_META[b.key];
   // счёт — по всему сценарию, не по найденному: шапка от поиска не меняется
@@ -140,15 +144,18 @@ function ScenPlate({ b }: { b: ScenBlock }) {
   const rest = b.total - long - short;
   return (
     <div style={{ margin: '10px 0 4px', padding: '11px 11px 10px', borderRadius: 10, backgroundColor: PLATE, border: `1px solid ${ACCENT}33` }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto', columnGap: 11, alignItems: 'center' }}>
-        <span style={{ fontFamily: SANS, fontWeight: 700, fontSize: 36, lineHeight: 0.85, color: ACCENT }}>{meta.n}</span>
-        <div style={{ minWidth: 0 }}>
-          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: FG }}>{meta.title}</div>
-          <div style={{ fontSize: 11, color: DIM, lineHeight: 1.35, marginTop: 3 }}>{meta.note}</div>
-        </div>
-        <span title="инструментов в сценарии" style={{ fontFamily: MONO, fontSize: 14, fontWeight: 700, color: b.total ? ACCENT : DIM, alignSelf: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', columnGap: 15, alignItems: 'center' }}>
+        <span
+          title="инструментов в сценарии"
+          style={{ fontFamily: SANS, fontWeight: 700, fontSize: 32, lineHeight: 0.9, minWidth: 24, textAlign: 'center', color: b.total ? ACCENT : DIM }}
+        >
           {b.total}
         </span>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontFamily: MONO, fontSize: 11.5, letterSpacing: '0.12em', textTransform: 'uppercase', color: FG }}>{meta.title}</div>
+          {/* строки пояснения — ровными по длине, без одинокого слова на второй строке */}
+          <div style={{ fontSize: 12, color: DIM, lineHeight: 1.35, marginTop: 4, textWrap: 'balance' }}>{meta.note}</div>
+        </div>
       </div>
       {b.total ? (
         <div style={{ marginTop: 10 }}>
