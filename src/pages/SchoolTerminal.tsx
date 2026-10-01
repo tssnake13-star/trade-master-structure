@@ -3,9 +3,10 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { ArrowLeft, Lock, Search } from 'lucide-react';
+import { ArrowLeft, Lock } from 'lucide-react';
 import { ACCENT, BG, BLUE, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate } from '@/components/terminal/theme';
-import { ALPHA_TIP, CritMarks, CycleCard, Lines, SymbolName, type MarketRow } from '@/components/terminal/parts';
+import { ALPHA_TIP, CycleCard, Lines, type MarketRow } from '@/components/terminal/parts';
+import TerminalSidebar from '@/components/terminal/Sidebar';
 import { Brand, Decision, TradingStyle } from '@/components/terminal/Decision';
 import { FalseExitFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
@@ -82,16 +83,8 @@ type Tab = 'Анализ' | 'Циклы' | 'Накопления' | 'Рейнд�
 const TABS: Tab[] = ['Анализ', 'Циклы', 'Накопления', 'Рейндж', 'Как в боте', 'История'];
 
 type Kind = 'cycles' | 'trend' | 'all';
-// 21.09.2026, его порядок групп в левом списке: доллар, австралиец, йена, новозеландец,
-// канадец, фунт, франк, золото, биткоин (нефть — после золота: группа есть, он её не назвал)
-// 25.09.2026, его слово: «создать новую группу — группа без поводыря… туда нефть, туда S&P 500… и все
-// инструменты, у которых нет поводырей, которых нет в других группах» — NONE, последней
-// 29.09.2026, его слово: «группу йены поставь первой после доллара, ну то есть второй, потом идёт австралиец,
-// новозеландец, фунт, канада, франк, золото, биткоин, ну и все остальные» — нефть и NONE после биткоина
-const GROUP_ORDER = ['DXY', 'JPY', 'AUD', 'NZD', 'GBP', 'CAD', 'CHF', 'GOLD', 'BTC', 'OIL', 'NONE'];
-// 29.09.2026, его порядок внутри группы доллара: индекс, евро, фунт, австралиец, новозеландец, канада, франк, йена,
-// сингапурский доллар, юань, золото. Внутри остальных групп — как было («не надо, вот как я сказал»)
-const DXY_ORDER = ['DXY', 'EURUSD', 'GBPUSD', 'AUDUSD', 'NZDUSD', 'USDCAD', 'USDCHF', 'USDJPY', 'USDSGD', 'USDCNH', 'XAUUSD'];
+// порядок групп и порядок внутри группы доллара — в components/terminal/Sidebar.tsx (01.10.2026: боковая
+// панель вынесена туда целиком — у неё теперь два вида, «группы» и «сценарии»)
 
 // Почему нет сценария — словами бота из первой строки карточки /info
 // («🌀 USDCNH — Сценария нет: цель недельного цикла вниз взята; …»)
@@ -281,51 +274,7 @@ export default function SchoolTerminal() {
     return rows.filter((r) => !q || r.symbol.includes(q) || (r.title || '').toUpperCase().includes(q));
   }, [rows, query]);
 
-  // Левый список по группам (21.09.2026). Поводырь стоит в группе, которую ведёт, и первым.
-  // Кросс — в группе своего поводыря, как в карточке: AUDNZD ведёт NZDUSD — группа
-  // новозеландца, NZDJPY ведёт USDJPY — группа йены (скринер держит их в двух группах).
-  // У кого поводырь индекс доллара — группа из скринера: EURUSD в долларе, эфир у биткоина.
-  // Его слово 21.09.2026: в группу доллара входят и все поводыри, кроме нефти, — поводырь
-  // с долларом в имени стоит и там, и первым в своей группе. 23.09.2026, его слово: биткоина
-  // в группе доллара быть не должно — он только первым в группе биткоина.
-  const groupedList = useMemo(() => {
-    const norm = (s: string) => s.toUpperCase().replace(/USDT$/, 'USD');
-    const leadOf: Record<string, string> = {};
-    for (const r of rows) if (r.extra?.leads) leadOf[norm(r.symbol)] = r.extra.leads;
-    const groupOf = (r: MarketRow) => {
-      if (r.extra?.leads) return r.extra.leads;
-      const lead = r.extra?.leader;
-      if (lead && lead !== 'DXY' && leadOf[norm(lead)]) return leadOf[norm(lead)];
-      return r.group_key || (lead === 'DXY' ? 'DXY' : 'NONE');
-    };
-    const by = new Map<string, MarketRow[]>();
-    const put = (g: string, r: MarketRow) => by.set(g, [...(by.get(g) || []), r]);
-    for (const r of list) {
-      const g = groupOf(r);
-      put(g, r);
-      if (r.extra?.leads && g !== 'DXY' && g !== 'BTC' && r.symbol.toUpperCase().includes('USD')) put('DXY', r);
-    }
-    const pos = (g: string) => {
-      const i = GROUP_ORDER.indexOf(g);
-      return i < 0 ? GROUP_ORDER.length : i;
-    };
-    // внутри группы: её поводырь, за ним поводыри других групп в порядке групп, потом пары по алфавиту;
-    // у группы доллара — его порядок (DXY_ORDER), кого в нём нет — после, по тем же правилам
-    const rank = (g: string, r: MarketRow) =>
-      r.extra?.leads === g ? -1 : r.extra?.leads ? pos(r.extra.leads) : GROUP_ORDER.length + 1;
-    const dxyAt = (r: MarketRow) => {
-      const i = DXY_ORDER.indexOf(r.symbol.toUpperCase());
-      return i < 0 ? DXY_ORDER.length : i;
-    };
-    return [...by.entries()]
-      .sort((a, b) => pos(a[0]) - pos(b[0]))
-      .map(([g, rs]): [string, MarketRow[]] => [
-        g,
-        [...rs].sort(
-          (x, y) => (g === 'DXY' ? dxyAt(x) - dxyAt(y) : 0) || rank(g, x) - rank(g, y) || x.symbol.localeCompare(y.symbol),
-        ),
-      ]);
-  }, [rows, list]);
+  // раскладка левого списка по группам и по сценариям — в components/terminal/Sidebar.tsx (groupRows, scenarioRows)
 
   const cur = useMemo(() => rows.find((r) => r.symbol === selected) || rows[0] || null, [rows, selected]);
 
@@ -409,63 +358,18 @@ export default function SchoolTerminal() {
     );
   }
 
+  // 01.10.2026, его слово: в боковой панели две вкладки — «группы» (как было) и «сценарии»; сама панель —
+  // components/terminal/Sidebar.tsx. Выбранный инструмент подсвечен только на вкладке «Инструмент», как раньше
   const sidebar = (
-    // 21.09.2026, его слово: на компьютере список — до низа, до дисклеймера, без ползунка
-    <div style={{ ...card, padding: 10, ...(wide ? {} : { maxHeight: 320, overflowY: 'auto' as const }) }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 6px 10px' }}>
-        <Search size={14} color={DIM} />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="поиск инструмента"
-          style={{ flex: 1, background: 'transparent', border: 'none', outline: 'none', color: FG, fontFamily: SANS, fontSize: 13 }}
-        />
-      </div>
-      {/* 22.09.2026, его вопрос «что обозначают стрелочки?» — подпись прямо над списком;
-          26.09.2026, его слово: не накопления, а итог — неделя, дневка и подтверждение дневки */}
-      <div style={{ ...label, letterSpacing: '0.08em', textTransform: 'none', padding: '0 8px 4px', lineHeight: 1.5 }}>
-        Н — неделя, Д — дневка: итог критериев · П — подтверждение дневки · ↑ вверх · ↓ вниз · ~ спор или нет
-      </div>
-      {groupedList.map(([g, rs]) => (
-        <div key={g} style={{ marginBottom: 6 }}>
-          <div style={{ ...label, color: ACCENT, padding: '10px 8px 4px' }}>{GEN[g] ? `Группа ${GEN[g]}` : 'Группа без поводыря'}</div>
-          {rs.map((r) => {
-        const on = section === 'instrument' && cur?.symbol === r.symbol;
-        return (
-          <button
-            key={r.symbol}
-            onClick={() => openSymbol(r.symbol)}
-            style={{
-              display: 'grid',
-              gridTemplateColumns: '1fr auto auto',
-              alignItems: 'center',
-              gap: 8,
-              width: '100%',
-              textAlign: 'left',
-              padding: '8px 8px',
-              borderRadius: 8,
-              backgroundColor: on ? '#221d16' : 'transparent',
-              border: `1px solid ${on ? `${ACCENT}55` : 'transparent'}`,
-              cursor: 'pointer',
-              color: FG,
-            }}
-          >
-            {/* 24.09.2026, его слово: в группе доллара слово «поводырь» только у индекса доллара,
-                и без ALPHA; поводыри других групп — без пометки (в своей группе она остаётся).
-                26.09.2026: слово — под названием, по центру (рядом с ним не влезала цена) */}
-            <SymbolName
-              symbol={r.symbol}
-              guide={!!r.extra?.leads && (g !== 'DXY' || r.extra.leads === 'DXY')}
-              tip={r.extra?.leads === 'DXY' ? ALPHA_TIP : `сам — поводырь группы ${GEN[r.extra?.leads || ''] || r.extra?.leads || ''}`}
-            />
-            <CritMarks r={r} />
-            <span style={{ fontFamily: MONO, fontSize: 11, color: DIM, minWidth: 62, textAlign: 'right' }}>{r.price_text || '—'}</span>
-          </button>
-        );
-          })}
-        </div>
-      ))}
-    </div>
+    <TerminalSidebar
+      rows={rows}
+      list={list}
+      query={query}
+      onQuery={setQuery}
+      selected={section === 'instrument' ? cur?.symbol || null : null}
+      onOpen={openSymbol}
+      wide={wide}
+    />
   );
 
   // знаков после точки — как у цены инструмента (у золота 2, у евро 5)
