@@ -83,9 +83,6 @@ function GroupCard({ g, symbols, onOpen }: { g: ScrGroup; symbols: Set<string>; 
         {' · '}дневка <span style={{ color: col(g.day.arrow) }}>{arrowCh(g.day.arrow)}</span> {g.day.text}
         {/* 25.09.2026: почему группа смотрит не туда, куда неделя — «сценарий 2» или «по дневке» */}
         {g.note ? <span style={{ color: FG }}>{` · ${g.note}`}</span> : null}
-        {g.macro ? (
-          <span style={{ color: g.macro === 'за' ? UP : g.macro === 'против' ? DOWN : DIM }}>{` · макро ${g.macro}`}</span>
-        ) : null}
       </div>
       {g.range ? (
         <div style={{ color: DIM, fontSize: 12, marginTop: 4, display: 'flex', gap: 5, alignItems: 'baseline' }}>
@@ -262,7 +259,6 @@ export function ScreenerCards({ doc, symbols, onOpen, part = 'groups' }: { doc?:
         <span>2 из 3 — сколько из трёх критериев недели (свинг, свеча, накопления) за сторону; у пары — за её сторону</span>
         <span>по контексту — неделя пары против, но поводырь, дневка и подтверждение за</span>
         <span>без поводыря — у инструмента нет группы, направление по нему самому</span>
-        <span>макро за / против — подтверждает ли макро</span>
         <span>рейндж — цена стоит, выхода нет (информация, не запрет)</span>
       </div>
     </div>
