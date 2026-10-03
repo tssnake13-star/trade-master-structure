@@ -129,7 +129,7 @@ function InstrumentRow({ r, on, guide, tip, edge, onOpen }: { r: MarketRow; on: 
 }
 
 const leadTip = (r: MarketRow) =>
-  r.extra?.leads === 'DXY' ? ALPHA_TIP : `сам — поводырь группы ${GEN[r.extra?.leads || ''] || r.extra?.leads || ''}`;
+  r.extra?.leads === 'DXY' ? ALPHA_TIP : `главный в группе ${GEN[r.extra?.leads || ''] || r.extra?.leads || ''}`; // 03.10.2026, его слово: вместо «сам — поводырь группы»
 
 /** Шапка первого и второго сценария: слева крупно — сколько в сценарии инструментов, справа название словами
  *  и чем сценарий живёт, ниже полоска «сколько из них LONG и сколько SHORT».
