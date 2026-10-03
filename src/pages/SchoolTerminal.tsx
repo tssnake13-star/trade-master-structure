@@ -93,6 +93,9 @@ const noScenReason = (r: MarketRow) => {
   return m ? m[1].trim() : 'Сценария нет.';
 };
 
+// высота боковой панели с вкладки «Инструмент» (03.10.2026) — чтобы на других вкладках она была той же
+const SIDE_H_KEY = 'tm-side-h';
+
 const KINDS: [Kind, string, string][] = [
   ['cycles', 'сценарий', 'неделя сверху · дневка снизу · циклы сценария'],
   ['trend', 'накопления', 'неделя сверху · дневка снизу · накопления, свинги, реверс'],
@@ -166,6 +169,44 @@ export default function SchoolTerminal() {
 
   const selected = params.get('i');
   const section = (sections.find(([s]) => s === params.get('s'))?.[0] || 'instrument') as Section;
+
+  // ⛔ 03.10.2026, его слово: боковая панель «привязана к нижней карточке графика… на других вкладках уменьшается,
+  // увеличивается… надо её зафиксировать, как она есть на вкладке инструмент». Высота ряда на вкладке «Инструмент»
+  // запоминается (и в браузере — если страница открыта сразу на другой вкладке); на остальных вкладках панель стоит
+  // ровно этой высоты и от их содержимого не зависит
+  // элемент — через состояние, а не useRef: ряд появляется только после загрузки витрины, и замер должен
+  // включиться в этот момент (с useRef эффект уже отработал на пустом месте и больше не запускался)
+  const [sideEl, setSideEl] = useState<HTMLDivElement | null>(null);
+  const [sideH, setSideH] = useState<number | null>(() => {
+    if (typeof window === 'undefined') return null;
+    try {
+      const v = Number(window.localStorage.getItem(SIDE_H_KEY));
+      return v > 0 ? v : null;
+    } catch {
+      return null;
+    }
+  });
+  useEffect(() => {
+    const el = sideEl;
+    if (!wide || section !== 'instrument' || !el) return;
+    const measure = () => {
+      const h = Math.round(el.getBoundingClientRect().height);
+      if (h <= 0) return;
+      setSideH(h);
+      try {
+        window.localStorage.setItem(SIDE_H_KEY, String(h));
+      } catch {
+        // хранилище браузера закрыто — высота живёт до перезагрузки страницы
+      }
+    };
+    // сразу при открытии вкладки, дальше — на каждое изменение высоты ряда (график догрузился, сменился инструмент);
+    // наблюдатель в фоновой вкладке молчит, поэтому первый замер — без него
+    measure();
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [wide, section, sideEl]);
 
   useEffect(() => {
     if (!authLoading && !session) navigate('/school', { replace: true });
@@ -557,7 +598,14 @@ export default function SchoolTerminal() {
             высоту ряда задают график и карточки, панель инструментов растягивается на неё и листается внутри
             (раньше длинный список уводил страницу вниз, и дисклеймер оказывался далеко под графиком) */}
         {wide ? (
-          <div style={{ position: 'relative', minHeight: 520 }}>
+          <div
+            ref={setSideEl}
+            style={
+              section === 'instrument' || !sideH
+                ? { position: 'relative', minHeight: 520 }
+                : { position: 'relative', height: Math.max(520, sideH), alignSelf: 'start' }
+            }
+          >
             <div style={{ position: 'absolute', inset: 0 }}>{sidebar}</div>
           </div>
         ) : (
