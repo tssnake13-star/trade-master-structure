@@ -1,7 +1,7 @@
 import type { RefObject } from 'react';
 import YouTubePlayer from '@/components/school/YouTubePlayer';
 import { weekLabel, youTubeId, type JournalVideo } from '@/lib/journalVideos';
-import { ACCENT, BORDER, DIM, FG, MONO, card, label } from './theme';
+import { ACCENT, BG, BORDER, DIM, FG, MONO, card, label } from './theme';
 
 /**
  * Видеоразборы в «Журнале решений Сергея» — его слово 25.09.2026: серия «Допуск-отказ» рядом с решениями,
@@ -68,17 +68,32 @@ export function VideoReviews({
 // «серия 10» из названия «Серия 10 · …» — на кнопке недели полное название длинное
 const epNo = (t: string) => (t.match(/сери[яи]\s*№?\s*\d+/i) || [''])[0].toLowerCase();
 
-/** Заголовок недели в ленте карточек; есть серия про эту неделю — кнопка, которая включает её сверху. */
+/** Заголовок недели в ленте карточек; есть серия про эту неделю — кнопка, которая включает её сверху.
+ *  03.10.2026, его слово: «эту строчку крупнее, чтобы она была заметна, чтобы она не сливалась с другими» —
+ *  была строка 11 px без фона, стала золотой полосой: неделя 16 px, кнопка разбора — золотая, 13 px. */
 export function WeekHeader({ monday, video, onPlay }: { monday: string; video?: JournalVideo; onPlay: () => void }) {
   return (
-    <div style={{ display: 'flex', gap: 10, alignItems: 'baseline', flexWrap: 'wrap', margin: '8px 2px 0' }}>
-      <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: ACCENT }}>
+    <div
+      style={{
+        display: 'flex',
+        gap: 12,
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        margin: '18px 0 2px',
+        padding: '12px 14px',
+        borderRadius: 10,
+        background: `${ACCENT}14`,
+        border: `1px solid ${ACCENT}66`,
+        borderLeft: `4px solid ${ACCENT}`,
+      }}
+    >
+      <span style={{ fontFamily: MONO, fontSize: 16, fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase', color: ACCENT }}>
         неделя {weekLabel(monday)}
       </span>
       {video ? (
         <button
           onClick={onPlay}
-          style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.1em', textTransform: 'uppercase', color: FG, background: 'none', border: `1px solid ${ACCENT}66`, borderRadius: 7, padding: '4px 9px', cursor: 'pointer' }}
+          style={{ marginLeft: 'auto', fontFamily: MONO, fontSize: 13, fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase', color: BG, background: ACCENT, border: 'none', borderRadius: 8, padding: '9px 14px', cursor: 'pointer' }}
         >
           ▶ разбор этой недели{epNo(video.title) ? ` · ${epNo(video.title)}` : ''}
         </button>
