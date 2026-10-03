@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Search } from 'lucide-react';
 import { ACCENT, BORDER, DIM, DOWN, FG, MONO, SANS, UP, card, label } from './theme';
 import { ALPHA_TIP, CritMarks, SymbolName, type MarketRow } from './parts';
@@ -35,6 +35,10 @@ const SIDE_CSS = `
   .tm-side-list { animation: none; }
   .tm-seg * { transition: none !important; }
 }
+.tm-side-scroll { scrollbar-width: thin; scrollbar-color: #4a443b transparent; }
+.tm-side-scroll::-webkit-scrollbar { width: 8px; }
+.tm-side-scroll::-webkit-scrollbar-thumb { background: #4a443b; border-radius: 4px; }
+.tm-side-scroll::-webkit-scrollbar-track { background: transparent; }
 `;
 
 export type SideMode = 'groups' | 'scen';
@@ -100,6 +104,7 @@ function InstrumentRow({ r, on, guide, tip, edge, onOpen }: { r: MarketRow; on: 
   return (
     <button
       className="tm-side-row"
+      aria-current={on ? 'true' : undefined}
       onClick={() => onOpen(r.symbol)}
       style={{
         position: 'relative',
@@ -264,10 +269,34 @@ export default function TerminalSidebar({
   }, [mode]);
   const groupedList = useMemo(() => groupRows(rows, list), [rows, list]);
   const blocks = useMemo(() => scenarioRows(rows, list), [rows, list]);
+  // 03.10.2026: на компьютере список листается внутри — выбранный инструмент держим в поле видимости списка
+  // (двигается только сам список, страница стоит на месте)
+  const scroller = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const box = scroller.current;
+    if (!wide || !box) return;
+    const el = box.querySelector<HTMLElement>('[aria-current="true"]');
+    if (!el) return;
+    const b = box.getBoundingClientRect();
+    const r = el.getBoundingClientRect();
+    if (r.top < b.top || r.bottom > b.bottom) box.scrollTop += r.top - b.top - b.height / 3;
+  }, [selected, mode, wide]);
 
   return (
-    // 21.09.2026, его слово: на компьютере список — до низа, до дисклеймера, без ползунка
-    <div style={{ ...card, padding: 10, ...(wide ? {} : { maxHeight: 320, overflowY: 'auto' as const }) }}>
+    // 21.09.2026, его слово: на компьютере список — до низа, до дисклеймера, без ползунка.
+    // ⛔ 03.10.2026, его слово: «мы добавили инструменты и список увеличился. Надо сделать прокрутку, как на планшете,
+    // как на телефоне… чтобы список заканчивался вместе с графиком… если список не помещается, нужна прокрутка» —
+    // на компьютере панель высотой с ряд графика (её обёртка в SchoolTerminal не задаёт высоту ряда), переключатель,
+    // поиск и подпись стоят, листается только список. На телефоне и планшете — как было: вся панель 320 px с прокруткой.
+    <div
+      style={{
+        ...card,
+        padding: 10,
+        ...(wide
+          ? { height: '100%', boxSizing: 'border-box' as const, display: 'flex', flexDirection: 'column' as const }
+          : { maxHeight: 320, overflowY: 'auto' as const }),
+      }}
+    >
       <style>{SIDE_CSS}</style>
       <ModeSwitch mode={mode} onChange={setMode} />
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 6px 10px' }}>
@@ -284,7 +313,13 @@ export default function TerminalSidebar({
       <div style={{ ...label, letterSpacing: '0.08em', textTransform: 'none', padding: '0 8px 4px', lineHeight: 1.5 }}>
         Н — неделя, Д — дневка: итог критериев · П — подтверждение дневки · ↑ вверх · ↓ вниз · ~ спор или нет
       </div>
-      <div key={mode} className="tm-side-list" role="tabpanel">
+      <div
+        key={mode}
+        ref={scroller}
+        className={wide ? 'tm-side-list tm-side-scroll' : 'tm-side-list'}
+        role="tabpanel"
+        style={wide ? { flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: 2 } : undefined}
+      >
         {mode === 'groups' ? (
           groupedList.map(([g, rs]) => (
             <div key={g} style={{ marginBottom: 6 }}>

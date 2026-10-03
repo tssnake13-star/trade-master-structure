@@ -553,7 +553,16 @@ export default function SchoolTerminal() {
       ) : null}
 
       <div style={{ display: 'grid', gridTemplateColumns: wide ? (section === 'instrument' ? '240px minmax(0, 1fr) 330px' : '240px minmax(0, 1fr)') : '1fr', gap: 14, padding: 14 }}>
-        {sidebar}
+        {/* ⛔ 03.10.2026, его слово: «список заканчивался вместе с графиком… если не помещается — прокрутка»: на компьютере
+            высоту ряда задают график и карточки, панель инструментов растягивается на неё и листается внутри
+            (раньше длинный список уводил страницу вниз, и дисклеймер оказывался далеко под графиком) */}
+        {wide ? (
+          <div style={{ position: 'relative', minHeight: 520 }}>
+            <div style={{ position: 'absolute', inset: 0 }}>{sidebar}</div>
+          </div>
+        ) : (
+          sidebar
+        )}
         <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           {section === 'instrument' && instrument}
           {section === 'screener' && <ScreenerCards doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />}
