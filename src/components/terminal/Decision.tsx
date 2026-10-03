@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Eye } from 'lucide-react';
 import { ACCENT, BORDER, DIM, DOWN, FG, MONO, SANS, UP, label } from './theme';
 import { type MarketRow } from './parts';
+import { GEN } from './screenerParse';
 
 /**
  * Главное об инструменте — его слово 21.09.2026: «направление, сценарий, подтверждение,
@@ -81,21 +82,55 @@ function paint(t: string): ReactNode {
   );
 }
 
-/** Поводырь из строки моста: «USDJPY · за SHORT» → крупно USDJPY, под ним «за SHORT».
- *  У самого поводыря крупно «сам» — «поводырь группы …» уже стоит в шапке инструмента
- *  (ALPHA у индекса доллара убрана 24.09.2026 — просто «поводырь»). */
-function guideParts(r: MarketRow): { main: string; sub: string; color: string } {
+/** Поддерживает ли поводырь сделку по направлению карточки — 03.10.2026, его слово: «по выражению
+ *  „индекс доллара за LONG“ не сразу понятно… должно быть сразу понятно, поводырь поддерживает
+ *  направление или он против». «за X» в строке моста — сторона, которую поводырь даёт этой паре;
+ *  сравниваем с направлением карточки. Направления у карточки нет — остаётся «за X». */
+function stanceOf(g: string, side: Side3): ReactNode {
+  const lead = sideOf((g.match(/за (LONG|SHORT)/) || [])[1]);
+  if (!lead) return /без направления/.test(g) ? 'без направления' : null;
+  if (!side) return <>за {paint(lead)}</>;
+  return lead === side ? (
+    <span style={{ color: UP, fontWeight: 600 }}>✅ поддерживает {side}</span>
+  ) : (
+    <span style={{ color: DOWN, fontWeight: 600 }}>⛔ против {side}</span>
+  );
+}
+
+/** Поводырь из строки моста: «USDJPY · за SHORT» → крупно USDJPY, под ним — поддерживает ли он сделку.
+ *  03.10.2026, его слово: у самого поводыря вместо «сам» — «главный в группе доллара», у поводырей
+ *  групп — «главный в группе йены» и под ним его собственный поводырь (индекс доллара) с той же
+ *  строкой «поддерживает / против»; у биткоина доллара нет — сторону ему даёт своя группа.
+ *  (ALPHA у индекса доллара убрана 24.09.2026, «сам» — 03.10.2026.) */
+function guideParts(r: MarketRow): { main: string; sub: ReactNode; color: string } {
   const g = (r.guide || '').trim();
-  if (!g) return { main: '—', sub: '', color: DIM };
+  if (!g) return { main: '—', sub: null, color: DIM };
+  const side = sideOf(r.side);
   const parts = g.split(' · ');
-  if (r.extra?.leads) return { main: 'сам', sub: parts.slice(1).join(' · '), color: ACCENT };
+  const leads = r.extra?.leads;
+  if (leads) {
+    const main = `главный в группе ${GEN[leads] || leads}`;
+    if (leads === 'DXY') return { main, sub: null, color: ACCENT };
+    const rest = parts.slice(1).join(' · ');
+    const who = /индекс доллара/.test(rest) ? 'его поводырь — индекс доллара' : 'сторону даёт своя группа';
+    const st = stanceOf(rest, side);
+    return { main, sub: <>{who}{st ? <><br />{st}</> : null}</>, color: ACCENT };
+  }
   let main = parts[0];
-  let sub = parts.slice(1).join(' · ');
+  let rest = parts.slice(1).join(' · ');
   const m = main.match(/^(.*?)\s*\((.*)\)$/); // «не задан (в ТОП не идёт)»
   if (m) {
     main = m[1];
-    sub = [m[2], sub].filter(Boolean).join(' · ');
+    rest = [m[2], rest].filter(Boolean).join(' · ');
   }
+  const st = stanceOf(rest, side);
+  // у нефти «контекст группы нефти за LONG» — слова про группу остаются над строкой «поддерживает»
+  const head = rest
+    .replace(/\s*за (LONG|SHORT)\b/, '')
+    .replace(/\s*без направления/, '')
+    .trim()
+    .replace(/^\((.*)\)$/, '$1');
+  const sub = st && head ? <>{head}<br />{st}</> : st || (head ? paint(head) : null);
   return { main, sub, color: FG };
 }
 
@@ -138,11 +173,12 @@ function VoteChips({ votes }: { votes: Vote[] }) {
  *  дневки. Пока на VPS старый мост, эти голоса показываем в подтверждении, а у дневки — без разбивки. */
 const legacyD1 = (r: MarketRow) => (r.extra?.d_votes || []).some(([k]) => k === 'реверс');
 
-function Cell({ name, value, color, sub }: { name: ReactNode; value: string; color: string; sub?: ReactNode }) {
+function Cell({ name, value, color, sub, small }: { name: ReactNode; value: string; color: string; sub?: ReactNode; small?: boolean }) {
+  // small — длинное значение («главный в группе новозеландца»): шрифт меньше, чтобы влезало в половину блока
   return (
     <div style={{ backgroundColor: PANEL, padding: '12px 10px' }}>
       <div style={cellLabel}>{name}</div>
-      <div style={bigValue(color)}>{value}</div>
+      <div style={small ? { ...bigValue(color), fontSize: 14, lineHeight: '20px' } : bigValue(color)}>{value}</div>
       {sub ? <div style={note}>{sub}</div> : null}
     </div>
   );
@@ -279,7 +315,8 @@ export function Decision({ r, narrow }: { r: MarketRow; narrow: boolean }) {
             name="поводырь"
             value={g.main}
             color={g.color}
-            sub={g.sub ? paint(g.sub) : null}
+            sub={g.sub}
+            small={g.main.length > 14}
           />
         </div>
         <Crit tf="D1" r={r} />
