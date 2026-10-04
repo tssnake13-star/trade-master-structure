@@ -49,30 +49,51 @@ const MODES: [SideMode, string][] = [
 ];
 
 // ⛔ 04.10.2026, его слово: «как красиво отделить крипту от Форекса… делай первый вариант, с переключателем рынка».
-// Сверху панели — рынок: «Форекс» (валюты, металлы, индексы, нефть) или «Крипта» (группа биткоина); у крипты свой
-// фиолетовый цвет, чтобы рынок было видно сразу. На кнопке другого рынка — сколько там инструментов в сценарии
-// С ПОДТВЕРЖДЕНИЕМ, чтобы, глядя на форекс, не пропустить крипту. Просто «в сценарии» не годится: 04.10 сценарий был
-// у всех 34 инструментов форекса — цифра совпадала бы с их числом и ничего не говорила. «Группы» и «Сценарии» — внутри рынка.
+// Сверху панели — рынок: «Форекс» (валюты, металлы, индексы, нефть) или «Крипта» (группа крипты); у крипты свой
+// фиолетовый цвет, чтобы рынок было видно сразу. «Группы» и «Сценарии» — внутри рынка.
+// ⛔ В тот же день: «цифры надо вообще убрать» — на кнопках только знак и слово, без числа инструментов и без бейджа.
 export type Market = 'fx' | 'crypto';
 const MARKET_KEY = 'tm_side_market';
 const CRYPTO = '#7F77DD';
 const CRYPTO_TEXT = '#AFA9EC';
 const isCrypto = (r: MarketRow) => r.group_key === 'BTC' || /USDT$/i.test(r.symbol);
 const marketOf = (r: MarketRow): Market => (isCrypto(r) ? 'crypto' : 'fx');
-// первый, второй сценарий или по контексту — и подтверждение на дневке есть
-const ready = (r: MarketRow) => (r.scenario === '1' || r.scenario === '2' || r.scenario === 'итог') && !!r.confirmation;
 // цвета рынка: плашка и заголовки, подпись «поводырь», фон выбранной строки
-const LOOK: Record<Market, { accent: string; text: string; sel: string; name: string }> = {
-  fx: { accent: ACCENT, text: ACCENT, sel: '#221d16', name: 'Форекс' },
-  crypto: { accent: CRYPTO, text: CRYPTO_TEXT, sel: '#1b1830', name: 'Крипта' },
+const LOOK: Record<Market, { accent: string; text: string; sel: string; name: string; tip: string }> = {
+  fx: { accent: ACCENT, text: ACCENT, sel: '#221d16', name: 'Форекс', tip: 'валюты, металлы, индексы и нефть' },
+  crypto: { accent: CRYPTO, text: CRYPTO_TEXT, sel: '#1b1830', name: 'Крипта', tip: 'группа крипты' },
 };
 
-/** Переключатель рынка: плашка цвета рынка ездит между «Форекс» и «Крипта»; рядом — сколько инструментов,
- *  на другом рынке — сколько из них в сценарии с подтверждением. */
-function MarketSwitch({ market, onChange, counts }: { market: Market; onChange: (m: Market) => void; counts: Record<Market, { n: number; scen: number }> }) {
+/** Знак форекса, его слово 04.10.2026: «доллар в центре, а вокруг него основные валюты — йена, евро, фунт,
+ *  можно ещё франк». Доллар в кружке, вокруг по сторонам €, £, ¥, ₣; цвет — от кнопки. */
+function ForexEmblem({ size }: { size: number }) {
+  const around: [string, number, number][] = [
+    ['€', 12, 2.9],
+    ['£', 21.1, 12.4],
+    ['¥', 12, 21.6],
+    ['₣', 2.9, 12.4],
+  ];
+  const font = "Arial, 'Segoe UI', sans-serif";
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden style={{ flexShrink: 0 }}>
+      <circle cx="12" cy="12" r="5.6" fill="none" stroke="currentColor" strokeWidth="1.1" />
+      <text x="12" y="12.5" textAnchor="middle" dominantBaseline="middle" fontSize="8.4" fontWeight="700" fill="currentColor" fontFamily={font}>
+        $
+      </text>
+      {around.map(([g, x, y]) => (
+        <text key={g} x={x} y={y} textAnchor="middle" dominantBaseline="middle" fontSize="6.2" fontWeight="700" fill="currentColor" fontFamily={font}>
+          {g}
+        </text>
+      ))}
+    </svg>
+  );
+}
+
+/** Переключатель рынка: плашка цвета рынка ездит между «Форекс» и «Крипта». Только знак и слово, цифр нет. */
+function MarketSwitch({ market, onChange }: { market: Market; onChange: (m: Market) => void }) {
   const items: [Market, ReactNode][] = [
-    ['fx', <ArrowLeftRight key="i" size={13} aria-hidden />],
-    ['crypto', <Bitcoin key="i" size={13} aria-hidden />],
+    ['fx', <ForexEmblem key="i" size={26} />],
+    ['crypto', <Bitcoin key="i" size={18} aria-hidden style={{ flexShrink: 0 }} />],
   ];
   return (
     <div
@@ -97,22 +118,22 @@ function MarketSwitch({ market, onChange, counts }: { market: Market; onChange: 
       />
       {items.map(([m, icon]) => {
         const on = market === m;
-        const { n, scen } = counts[m];
         return (
           <button
             key={m}
             role="tab"
             aria-selected={on}
             onClick={() => onChange(m)}
-            title={`${LOOK[m].name}: инструментов ${n}, в сценарии с подтверждением ${scen}`}
+            title={`${LOOK[m].name}: ${LOOK[m].tip}`}
             style={{
               position: 'relative',
               zIndex: 1,
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 5,
-              padding: '8px 4px',
+              gap: 6,
+              padding: '4px 4px',
+              minHeight: 34,
               border: 'none',
               background: 'transparent',
               cursor: 'pointer',
@@ -127,15 +148,6 @@ function MarketSwitch({ market, onChange, counts }: { market: Market; onChange: 
           >
             {icon}
             <span>{LOOK[m].name}</span>
-            <span style={{ opacity: on ? 0.65 : 1 }}>{n}</span>
-            {!on && scen ? (
-              <span
-                aria-label={`в сценарии с подтверждением ${scen}`}
-                style={{ minWidth: 15, padding: '0 4px', borderRadius: 8, backgroundColor: LOOK[m].accent, color: '#0a0a0a', fontSize: 10, lineHeight: '15px', letterSpacing: 0, textAlign: 'center' }}
-              >
-                {scen}
-              </span>
-            ) : null}
           </button>
         );
       })}
@@ -391,14 +403,6 @@ export default function TerminalSidebar({
   }, [selected, rows]);
   const rowsM = useMemo(() => rows.filter((r) => marketOf(r) === market), [rows, market]);
   const listM = useMemo(() => list.filter((r) => marketOf(r) === market), [list, market]);
-  const counts = useMemo(() => {
-    const c: Record<Market, { n: number; scen: number }> = { fx: { n: 0, scen: 0 }, crypto: { n: 0, scen: 0 } };
-    for (const r of rows) {
-      c[marketOf(r)].n += 1;
-      if (ready(r)) c[marketOf(r)].scen += 1;
-    }
-    return c;
-  }, [rows]);
   const other: Market = market === 'fx' ? 'crypto' : 'fx';
   const searching = query.trim() !== '';
   const otherHits = searching ? list.length - listM.length : 0;
@@ -434,7 +438,7 @@ export default function TerminalSidebar({
       }}
     >
       <style>{SIDE_CSS}</style>
-      <MarketSwitch market={market} onChange={setMarket} counts={counts} />
+      <MarketSwitch market={market} onChange={setMarket} />
       <ModeSwitch mode={mode} onChange={setMode} />
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 6px 10px' }}>
         <Search size={14} color={DIM} />
@@ -465,7 +469,7 @@ export default function TerminalSidebar({
                 onClick={() => setMarket(other)}
                 style={{ display: 'block', width: '100%', textAlign: 'left', padding: '9px 10px', borderRadius: 8, cursor: 'pointer', background: 'transparent', border: `1px solid ${LOOK[other].accent}55`, color: LOOK[other].text, fontFamily: SANS, fontSize: 12 }}
               >
-                {`На рынке «${LOOK[market].name}» не нашлось. На рынке «${LOOK[other].name}» — ${otherHits}: показать`}
+                {`На рынке «${LOOK[market].name}» не нашлось. Есть на рынке «${LOOK[other].name}» — показать`}
               </button>
             ) : (
               'По такому названию инструмента нет.'
