@@ -107,11 +107,42 @@ const IG_PLACES: Record<string, string> = {
 };
 const isInstagram = (s: string) => s === 'instagram' || s === 'ig' || s in IG_PLACES;
 
+/**
+ * Переходы из ИИ-ассистентов (04.10.2026) — тоже одной строкой «ИИ-ассистенты» с расшифровкой.
+ * ChatGPT сам дописывает к ссылкам utm_source=chatgpt.com, остальные приходят доменом
+ * в referrer (perplexity.ai, claude.ai…). Сводим при показе, поэтому в строку попадают
+ * и старые переходы, записанные доменом.
+ */
+const AI_SOURCES: [RegExp, string][] = [
+  [/chatgpt|openai/, 'ChatGPT'],
+  [/perplexity/, 'Perplexity'],
+  [/claude\.ai|anthropic/, 'Claude'],
+  [/gemini/, 'Gemini'],
+  [/copilot/, 'Copilot'],
+  [/deepseek/, 'DeepSeek'],
+  [/grok\.com|(^|\.)x\.ai$/, 'Grok'],
+  [/gigachat|giga\.chat/, 'GigaChat'],
+  [/mistral/, 'Mistral'],
+  [/(^|\.)you\.com$/, 'You.com'],
+];
+const aiName = (s: string) => AI_SOURCES.find(([re]) => re.test(s))?.[1];
+
 function groupSources(rows: { source: string; visits: number }[]) {
   const ig = rows.filter(r => isInstagram(r.source));
+  const ai = rows.filter(r => !isInstagram(r.source) && aiName(r.source));
   const out = rows
-    .filter(r => !isInstagram(r.source))
+    .filter(r => !isInstagram(r.source) && !aiName(r.source))
     .map(r => ({ name: SOURCE_NAMES[r.source] || r.source, value: r.visits, extra: undefined as string | undefined }));
+
+  if (ai.length > 0) {
+    const byName = new Map<string, number>();
+    ai.forEach(r => { const n = aiName(r.source)!; byName.set(n, (byName.get(n) || 0) + r.visits); });
+    out.push({
+      name: 'ИИ-ассистенты',
+      value: ai.reduce((sum, r) => sum + r.visits, 0),
+      extra: [...byName.entries()].sort((a, b) => b[1] - a[1]).map(([n, v]) => `${n} ${v}`).join(' · '),
+    });
+  }
 
   if (ig.length > 0) {
     const places = ig

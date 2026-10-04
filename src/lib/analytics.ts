@@ -50,6 +50,9 @@ function detectSource(): string {
       [/instagram|ig\.me/, 'instagram'],
       [/(^|\.)t\.me$|telegram/, 'telegram'],
       [/youtube|youtu\.be/, 'youtube'],
+      // ИИ-ассистент Google живёт на gemini.google.com — до правила «google», иначе
+      // его переходы записывались как поиск Google (04.10.2026)
+      [/^(gemini|bard)\.google\./, 'gemini.google.com'],
       [/google\./, 'google'],
       [/yandex\.|ya\.ru/, 'yandex'],
       [/dzen\.ru|zen\.yandex/, 'dzen'],
