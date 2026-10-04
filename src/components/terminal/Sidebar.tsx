@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { ArrowLeftRight, Bitcoin, Search } from 'lucide-react';
-import { ACCENT, BORDER, DIM, DOWN, FG, MONO, SANS, UP, card, label } from './theme';
+import { Bitcoin, Search } from 'lucide-react';
+import { ACCENT, BORDER, CRYPTO, CRYPTO_TEXT, DIM, DOWN, FG, MONO, SANS, UP, card, label } from './theme';
 import { ALPHA_TIP, CritMarks, SymbolName, type MarketRow } from './parts';
 import { GEN } from './screenerParse';
 import { groupRows, scenarioRows, type ScenBlock, type ScenKey } from './sidebarRows';
@@ -54,8 +54,6 @@ const MODES: [SideMode, string][] = [
 // ⛔ В тот же день: «цифры надо вообще убрать» — на кнопках только знак и слово, без числа инструментов и без бейджа.
 export type Market = 'fx' | 'crypto';
 const MARKET_KEY = 'tm_side_market';
-const CRYPTO = '#7F77DD';
-const CRYPTO_TEXT = '#AFA9EC';
 const isCrypto = (r: MarketRow) => r.group_key === 'BTC' || /USDT$/i.test(r.symbol);
 const marketOf = (r: MarketRow): Market => (isCrypto(r) ? 'crypto' : 'fx');
 // цвета рынка: плашка и заголовки, подпись «поводырь», фон выбранной строки

@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react';
-import { ACCENT, BORDER, DIM, DOWN, FG, MONO, UP, card, label, fmtWhen } from './theme';
+import { ACCENT, BORDER, CRYPTO_TEXT, DIM, DOWN, FG, MONO, UP, card, label, fmtWhen } from './theme';
 import { GEN } from './screenerParse';
 
 /**
@@ -179,8 +179,23 @@ export function HistoryView({ doc, order, symbols, onOpen }: { doc?: HistoryDoc;
   const rows = doc.rows || {};
   const t = tally(calls);
   const startsOf = (sym: string) => new Map(calls.filter((c) => c.symbol === sym).map((c) => [c.day, c]));
-  const syms = [...order.filter((s) => rows[s] != null), ...Object.keys(rows).filter((s) => !order.includes(s))];
-  const recent = [...calls].sort((a, b) => (a.start < b.start ? 1 : -1));
+  // ⛔ 04.10.2026, его слово: «отделить крипту в этой вкладке, чтобы крипта была внизу, в последних рядах.
+  // Сначала Форекс инструменты, а потом крипта. Вся» — в сетке, в списке вызовов и в разбивке по группам
+  // сначала форекс, потом отдельным разделом крипта (группа BTC или имя на USDT), порядок внутри — прежний
+  const cryptoSyms = new Set(calls.filter((c) => c.group === 'BTC').map((c) => c.symbol));
+  const isCr = (s: string) => /USDT$/i.test(s) || cryptoSyms.has(s);
+  const allSyms = [...order.filter((s) => rows[s] != null), ...Object.keys(rows).filter((s) => !order.includes(s))];
+  const fxSyms = allSyms.filter((s) => !isCr(s));
+  const crSyms = allSyms.filter(isCr);
+  const fresh = [...calls].sort((a, b) => (a.start < b.start ? 1 : -1));
+  const recent = [...fresh.filter((c) => !isCr(c.symbol)), ...fresh.filter((c) => isCr(c.symbol))];
+  const shownCalls = all ? recent : recent.slice(0, 40);
+  const firstCrCall = shownCalls.findIndex((c) => isCr(c.symbol));
+  const part = (name: string, color: string, top: boolean) => (
+    <div style={{ gridColumn: '1 / -1', ...label, color, padding: top ? '2px 0 2px' : '10px 0 2px', marginTop: top ? 0 : 4, borderTop: top ? 'none' : `1px solid ${BORDER}` }}>
+      {name}
+    </div>
+  );
   const byScen: [ReactNode, HistCall[]][] = [
     ['сценарий 1', calls.filter((c) => c.scenario === '1')],
     ['сценарий 2', calls.filter((c) => c.scenario === '2')],
@@ -192,7 +207,8 @@ export function HistoryView({ doc, order, symbols, onOpen }: { doc?: HistoryDoc;
     ['подтверждение есть', calls.filter((c) => c.conf)],
     ['подтверждения нет', calls.filter((c) => !c.conf)],
   ];
-  const gKeys = [...new Set(calls.map((c) => c.group || 'NONE'))];
+  // группа крипты — последней (его слово 04.10.2026: крипта внизу)
+  const gKeys = [...new Set(calls.map((c) => c.group || 'NONE'))].sort((a, b) => Number(a === 'BTC') - Number(b === 'BTC'));
   const byGroup: [ReactNode, HistCall[]][] = gKeys.map((g) => [GEN[g] ? `группа ${GEN[g]}` : 'без поводыря', calls.filter((c) => (c.group || 'NONE') === g)]);
   const tile = (name: string, v: ReactNode, color: string) => (
     <div style={{ ...card, padding: '10px 12px', minWidth: 110 }}>
@@ -235,7 +251,12 @@ export function HistoryView({ doc, order, symbols, onOpen }: { doc?: HistoryDoc;
                 </div>
               ))}
             </div>
-            {syms.map((s) => (
+            {crSyms.length ? part('Форекс', ACCENT, true) : null}
+            {fxSyms.map((s) => (
+              <FragmentRow key={s} sym={s} days={days} line={(rows[s] || '').slice(off)} starts={startsOf(s)} onOpen={onOpen} known={symbols.has(s)} />
+            ))}
+            {crSyms.length ? part('Крипта', CRYPTO_TEXT, false) : null}
+            {crSyms.map((s) => (
               <FragmentRow key={s} sym={s} days={days} line={(rows[s] || '').slice(off)} starts={startsOf(s)} onOpen={onOpen} known={symbols.has(s)} />
             ))}
           </div>
@@ -248,9 +269,12 @@ export function HistoryView({ doc, order, symbols, onOpen }: { doc?: HistoryDoc;
         </div>
       </div>
       <div style={{ ...card, padding: 12 }}>
-        <div style={{ ...label, marginBottom: 4 }}>вызовы · свежие сверху</div>
-        {(all ? recent : recent.slice(0, 40)).map((c) => (
-          <CallRow key={`${c.symbol}-${c.start}`} c={c} onOpen={onOpen} known={symbols.has(c.symbol)} />
+        <div style={{ ...label, marginBottom: 4 }}>вызовы · свежие сверху{crSyms.length ? ' · сначала форекс, крипта ниже' : ''}</div>
+        {shownCalls.map((c, i) => (
+          <div key={`${c.symbol}-${c.start}`}>
+            {i === firstCrCall ? <div style={{ ...label, color: CRYPTO_TEXT, padding: '12px 0 2px' }}>Крипта</div> : null}
+            <CallRow c={c} onOpen={onOpen} known={symbols.has(c.symbol)} />
+          </div>
         ))}
         {recent.length > 40 ? (
           <button onClick={() => setAll(!all)} style={{ marginTop: 10, fontFamily: MONO, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT, background: 'none', border: `1px solid ${BORDER}`, borderRadius: 7, padding: '5px 9px', cursor: 'pointer' }}>
