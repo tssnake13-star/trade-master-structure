@@ -1,21 +1,9 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
-# ИИ-ассистенты и их боты (GPTBot, ChatGPT-User, ClaudeBot, Claude-User, PerplexityBot,
-# Google-Extended и другие) читают сайт по общему правилу ниже — главная им открыта.
-# Текстовая версия сайта для ИИ: https://www.tradeliketyo.com/llms.txt
+# Одно общее правило для всех роботов — поисковиков, соцсетей и ИИ-ассистентов
+# (GPTBot, ChatGPT-User, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended и др.).
+# Отдельные группы для Googlebot и Bingbot были убраны 04.10.2026: робот слушается
+# только самой точной группы, и группа с одним «Allow: /» снимала с него запреты ниже.
+# Запреты стоят перед «Allow: /» — так их одинаково понимают все парсеры.
 User-agent: *
-Allow: /
-
 # Служебные разделы — не для поиска:
 # /school — вход в кабинет (форма логина, полезного контента нет)
 # /access — приватная страница с ценами, ссылку выдаёт бот
@@ -23,5 +11,7 @@ Allow: /
 Disallow: /school
 Disallow: /access
 Disallow: /preview-
+Allow: /
 
+# Текстовая версия сайта для ИИ: https://www.tradeliketyo.com/llms.txt
 Sitemap: https://www.tradeliketyo.com/sitemap.xml
