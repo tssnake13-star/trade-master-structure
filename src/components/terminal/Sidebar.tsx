@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { Search } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { ArrowLeftRight, Bitcoin, Search } from 'lucide-react';
 import { ACCENT, BORDER, DIM, DOWN, FG, MONO, SANS, UP, card, label } from './theme';
 import { ALPHA_TIP, CritMarks, SymbolName, type MarketRow } from './parts';
 import { GEN } from './screenerParse';
@@ -48,14 +48,38 @@ const MODES: [SideMode, string][] = [
   ['scen', 'Сценарии'],
 ];
 
-/** Переключатель вида: одна золотая плашка ездит между двумя словами. */
-function ModeSwitch({ mode, onChange }: { mode: SideMode; onChange: (m: SideMode) => void }) {
+// ⛔ 04.10.2026, его слово: «как красиво отделить крипту от Форекса… делай первый вариант, с переключателем рынка».
+// Сверху панели — рынок: «Форекс» (валюты, металлы, индексы, нефть) или «Крипта» (группа биткоина); у крипты свой
+// фиолетовый цвет, чтобы рынок было видно сразу. На кнопке другого рынка — сколько там инструментов в сценарии
+// С ПОДТВЕРЖДЕНИЕМ, чтобы, глядя на форекс, не пропустить крипту. Просто «в сценарии» не годится: 04.10 сценарий был
+// у всех 34 инструментов форекса — цифра совпадала бы с их числом и ничего не говорила. «Группы» и «Сценарии» — внутри рынка.
+export type Market = 'fx' | 'crypto';
+const MARKET_KEY = 'tm_side_market';
+const CRYPTO = '#7F77DD';
+const CRYPTO_TEXT = '#AFA9EC';
+const isCrypto = (r: MarketRow) => r.group_key === 'BTC' || /USDT$/i.test(r.symbol);
+const marketOf = (r: MarketRow): Market => (isCrypto(r) ? 'crypto' : 'fx');
+// первый, второй сценарий или по контексту — и подтверждение на дневке есть
+const ready = (r: MarketRow) => (r.scenario === '1' || r.scenario === '2' || r.scenario === 'итог') && !!r.confirmation;
+// цвета рынка: плашка и заголовки, подпись «поводырь», фон выбранной строки
+const LOOK: Record<Market, { accent: string; text: string; sel: string; name: string }> = {
+  fx: { accent: ACCENT, text: ACCENT, sel: '#221d16', name: 'Форекс' },
+  crypto: { accent: CRYPTO, text: CRYPTO_TEXT, sel: '#1b1830', name: 'Крипта' },
+};
+
+/** Переключатель рынка: плашка цвета рынка ездит между «Форекс» и «Крипта»; рядом — сколько инструментов,
+ *  на другом рынке — сколько из них в сценарии с подтверждением. */
+function MarketSwitch({ market, onChange, counts }: { market: Market; onChange: (m: Market) => void; counts: Record<Market, { n: number; scen: number }> }) {
+  const items: [Market, ReactNode][] = [
+    ['fx', <ArrowLeftRight key="i" size={13} aria-hidden />],
+    ['crypto', <Bitcoin key="i" size={13} aria-hidden />],
+  ];
   return (
     <div
       className="tm-seg"
       role="tablist"
-      aria-label="как разложить список инструментов"
-      style={{ position: 'relative', display: 'grid', gridTemplateColumns: '1fr 1fr', padding: 3, borderRadius: 9, border: `1px solid ${BORDER}`, backgroundColor: '#0d0c0b', marginBottom: 8 }}
+      aria-label="рынок"
+      style={{ position: 'relative', display: 'grid', gridTemplateColumns: '1fr 1fr', padding: 3, borderRadius: 9, border: `1px solid ${BORDER}`, backgroundColor: '#0d0c0b', marginBottom: 6 }}
     >
       <span
         aria-hidden
@@ -66,7 +90,78 @@ function ModeSwitch({ mode, onChange }: { mode: SideMode; onChange: (m: SideMode
           left: 3,
           width: 'calc(50% - 3px)',
           borderRadius: 6,
-          backgroundColor: ACCENT,
+          backgroundColor: LOOK[market].accent,
+          transform: `translateX(${market === 'crypto' ? '100%' : '0'})`,
+          transition: 'transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1), background-color 180ms',
+        }}
+      />
+      {items.map(([m, icon]) => {
+        const on = market === m;
+        const { n, scen } = counts[m];
+        return (
+          <button
+            key={m}
+            role="tab"
+            aria-selected={on}
+            onClick={() => onChange(m)}
+            title={`${LOOK[m].name}: инструментов ${n}, в сценарии с подтверждением ${scen}`}
+            style={{
+              position: 'relative',
+              zIndex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 5,
+              padding: '8px 4px',
+              border: 'none',
+              background: 'transparent',
+              cursor: 'pointer',
+              fontFamily: MONO,
+              fontSize: 10,
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              whiteSpace: 'nowrap',
+              color: on ? '#0a0a0a' : DIM,
+              transition: 'color 180ms',
+            }}
+          >
+            {icon}
+            <span>{LOOK[m].name}</span>
+            <span style={{ opacity: on ? 0.65 : 1 }}>{n}</span>
+            {!on && scen ? (
+              <span
+                aria-label={`в сценарии с подтверждением ${scen}`}
+                style={{ minWidth: 15, padding: '0 4px', borderRadius: 8, backgroundColor: LOOK[m].accent, color: '#0a0a0a', fontSize: 10, lineHeight: '15px', letterSpacing: 0, textAlign: 'center' }}
+              >
+                {scen}
+              </span>
+            ) : null}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** Переключатель вида: с 04.10.2026 — второй, под рынком, поэтому тише: тёмная плашка, светлое слово. */
+function ModeSwitch({ mode, onChange }: { mode: SideMode; onChange: (m: SideMode) => void }) {
+  return (
+    <div
+      className="tm-seg"
+      role="tablist"
+      aria-label="как разложить список инструментов"
+      style={{ position: 'relative', display: 'grid', gridTemplateColumns: '1fr 1fr', padding: 3, borderRadius: 9, border: '1px solid #1c1a17', backgroundColor: '#0d0c0b', marginBottom: 8 }}
+    >
+      <span
+        aria-hidden
+        style={{
+          position: 'absolute',
+          top: 3,
+          bottom: 3,
+          left: 3,
+          width: 'calc(50% - 3px)',
+          borderRadius: 6,
+          backgroundColor: '#2a241b',
           transform: `translateX(${mode === 'scen' ? '100%' : '0'})`,
           transition: 'transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1)',
         }}
@@ -80,7 +175,7 @@ function ModeSwitch({ mode, onChange }: { mode: SideMode; onChange: (m: SideMode
           style={{
             position: 'relative',
             zIndex: 1,
-            padding: '7px 6px',
+            padding: '6px 6px',
             border: 'none',
             background: 'transparent',
             cursor: 'pointer',
@@ -88,7 +183,7 @@ function ModeSwitch({ mode, onChange }: { mode: SideMode; onChange: (m: SideMode
             fontSize: 10,
             letterSpacing: '0.14em',
             textTransform: 'uppercase',
-            color: mode === m ? '#0a0a0a' : DIM,
+            color: mode === m ? FG : DIM,
             transition: 'color 180ms',
           }}
         >
@@ -99,8 +194,9 @@ function ModeSwitch({ mode, onChange }: { mode: SideMode; onChange: (m: SideMode
   );
 }
 
-/** Строка инструмента — одна на оба вида. edge — цветная полоска стороны слева (вид «сценарии»). */
-function InstrumentRow({ r, on, guide, tip, edge, onOpen }: { r: MarketRow; on: boolean; guide: boolean; tip?: string; edge?: string; onOpen: (sym: string) => void }) {
+/** Строка инструмента — одна на оба вида. edge — цветная полоска стороны слева (вид «сценарии»).
+ *  market — чьими цветами подсвечивать выбранную строку и подпись «поводырь». */
+function InstrumentRow({ r, on, guide, tip, edge, market, onOpen }: { r: MarketRow; on: boolean; guide: boolean; tip?: string; edge?: string; market: Market; onOpen: (sym: string) => void }) {
   return (
     <button
       className="tm-side-row"
@@ -116,8 +212,8 @@ function InstrumentRow({ r, on, guide, tip, edge, onOpen }: { r: MarketRow; on: 
         textAlign: 'left',
         padding: edge ? '8px 8px 8px 12px' : '8px 8px',
         borderRadius: 8,
-        backgroundColor: on ? '#221d16' : 'transparent',
-        border: `1px solid ${on ? `${ACCENT}55` : 'transparent'}`,
+        backgroundColor: on ? LOOK[market].sel : 'transparent',
+        border: `1px solid ${on ? `${LOOK[market].accent}55` : 'transparent'}`,
         cursor: 'pointer',
         color: FG,
       }}
@@ -126,7 +222,7 @@ function InstrumentRow({ r, on, guide, tip, edge, onOpen }: { r: MarketRow; on: 
       {/* 24.09.2026, его слово: в группе доллара слово «поводырь» только у индекса доллара,
           и без ALPHA; поводыри других групп — без пометки (в своей группе она остаётся).
           26.09.2026: слово — под названием, по центру (рядом с ним не влезала цена) */}
-      <SymbolName symbol={r.symbol} guide={guide} tip={tip} />
+      <SymbolName symbol={r.symbol} guide={guide} tip={tip} color={LOOK[market].text} />
       <CritMarks r={r} />
       <span style={{ fontFamily: MONO, fontSize: 11, color: DIM, minWidth: 62, textAlign: 'right' }}>{r.price_text || '—'}</span>
     </button>
@@ -142,17 +238,17 @@ const leadTip = (r: MarketRow) =>
  *  а общее количество поставить где были 1 и 2, с левой стороны… пояснение немножко сдвинуть вправо и немножко
  *  увеличить… но не сильно крупно, чтобы не портило эстетику» — крупного номера сценария больше нет, на его
  *  месте число инструментов (раньше оно стояло мелко справа). */
-function ScenPlate({ b }: { b: ScenBlock }) {
+function ScenPlate({ b, market }: { b: ScenBlock; market: Market }) {
   const meta = SCEN_META[b.key];
   // счёт — по всему сценарию, не по найденному: шапка от поиска не меняется
   const { long, short } = b;
   const rest = b.total - long - short;
   return (
-    <div style={{ margin: '10px 0 4px', padding: '11px 11px 10px', borderRadius: 10, backgroundColor: PLATE, border: `1px solid ${ACCENT}33` }}>
+    <div style={{ margin: '10px 0 4px', padding: '11px 11px 10px', borderRadius: 10, backgroundColor: PLATE, border: `1px solid ${LOOK[market].accent}33` }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', columnGap: 15, alignItems: 'center' }}>
         <span
           title="инструментов в сценарии"
-          style={{ fontFamily: SANS, fontWeight: 700, fontSize: 32, lineHeight: 0.9, minWidth: 24, textAlign: 'center', color: b.total ? ACCENT : DIM }}
+          style={{ fontFamily: SANS, fontWeight: 700, fontSize: 32, lineHeight: 0.9, minWidth: 24, textAlign: 'center', color: b.total ? LOOK[market].text : DIM }}
         >
           {b.total}
         </span>
@@ -190,12 +286,12 @@ function SubCap({ text, n }: { text: string; n: number }) {
   );
 }
 
-function ScenarioList({ blocks, searching, selected, onOpen }: { blocks: ScenBlock[]; searching: boolean; selected: string | null; onOpen: (sym: string) => void }) {
+function ScenarioList({ blocks, searching, selected, market, onOpen }: { blocks: ScenBlock[]; searching: boolean; selected: string | null; market: Market; onOpen: (sym: string) => void }) {
   const row = (r: MarketRow) => (
-    <InstrumentRow key={r.symbol} r={r} on={selected === r.symbol} guide={!!r.extra?.leads} tip={leadTip(r)} edge={sideColor(r.side)} onOpen={onOpen} />
+    <InstrumentRow key={r.symbol} r={r} on={selected === r.symbol} guide={!!r.extra?.leads} tip={leadTip(r)} edge={sideColor(r.side)} market={market} onOpen={onOpen} />
   );
   const any = blocks.some((b) => b.rows.length);
-  if (!any && searching) return <div style={{ color: DIM, fontSize: 12, padding: '12px 8px' }}>По такому названию инструмента нет.</div>;
+  if (!any && searching) return null; // «не найдено» и подсказку про другой рынок пишет сама панель
   return (
     <>
       {blocks.map((b) => {
@@ -207,10 +303,10 @@ function ScenarioList({ blocks, searching, selected, onOpen }: { blocks: ScenBlo
         return (
           <div key={b.key} style={{ marginBottom: 6 }}>
             {numbered ? (
-              <ScenPlate b={b} />
+              <ScenPlate b={b} market={market} />
             ) : (
               <div style={{ padding: '14px 8px 2px' }}>
-                <div style={{ ...label, color: b.key === 'ctx' ? ACCENT : DIM, display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ ...label, color: b.key === 'ctx' ? LOOK[market].text : DIM, display: 'flex', justifyContent: 'space-between' }}>
                   <span>{SCEN_META[b.key].title}</span>
                   <span>{b.total}</span>
                 </div>
@@ -242,6 +338,14 @@ function readMode(): SideMode {
   }
 }
 
+function readMarket(): Market {
+  try {
+    return window.localStorage.getItem(MARKET_KEY) === 'crypto' ? 'crypto' : 'fx';
+  } catch {
+    return 'fx';
+  }
+}
+
 export default function TerminalSidebar({
   rows,
   list,
@@ -267,8 +371,40 @@ export default function TerminalSidebar({
       /* закрытое окно браузера — вид просто не запомнится */
     }
   }, [mode]);
-  const groupedList = useMemo(() => groupRows(rows, list), [rows, list]);
-  const blocks = useMemo(() => scenarioRows(rows, list), [rows, list]);
+  const [market, setMarket] = useState<Market>(readMarket);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(MARKET_KEY, market);
+    } catch {
+      /* закрытое окно браузера — рынок просто не запомнится */
+    }
+  }, [market]);
+  // открыли инструмент другого рынка (из скринера, ТОП-листа, журнала) — список переходит на его рынок.
+  // Только при смене инструмента: вернулся на ту же вкладку с тем же инструментом — выбранный вручную рынок стоит
+  const lastSel = useRef<string | null>(null);
+  useEffect(() => {
+    if (!selected || selected === lastSel.current) return;
+    const r = rows.find((x) => x.symbol === selected);
+    if (!r) return; // строки витрины ещё не пришли
+    lastSel.current = selected;
+    setMarket(marketOf(r));
+  }, [selected, rows]);
+  const rowsM = useMemo(() => rows.filter((r) => marketOf(r) === market), [rows, market]);
+  const listM = useMemo(() => list.filter((r) => marketOf(r) === market), [list, market]);
+  const counts = useMemo(() => {
+    const c: Record<Market, { n: number; scen: number }> = { fx: { n: 0, scen: 0 }, crypto: { n: 0, scen: 0 } };
+    for (const r of rows) {
+      c[marketOf(r)].n += 1;
+      if (ready(r)) c[marketOf(r)].scen += 1;
+    }
+    return c;
+  }, [rows]);
+  const other: Market = market === 'fx' ? 'crypto' : 'fx';
+  const searching = query.trim() !== '';
+  const otherHits = searching ? list.length - listM.length : 0;
+  // кто кого ведёт — по всем строкам, показываем только свой рынок
+  const groupedList = useMemo(() => groupRows(rows, listM), [rows, listM]);
+  const blocks = useMemo(() => scenarioRows(rowsM, listM), [rowsM, listM]);
   // 03.10.2026: на компьютере список листается внутри — выбранный инструмент держим в поле видимости списка
   // (двигается только сам список, страница стоит на месте)
   const scroller = useRef<HTMLDivElement>(null);
@@ -280,7 +416,7 @@ export default function TerminalSidebar({
     const b = box.getBoundingClientRect();
     const r = el.getBoundingClientRect();
     if (r.top < b.top || r.bottom > b.bottom) box.scrollTop += r.top - b.top - b.height / 3;
-  }, [selected, mode, wide]);
+  }, [selected, mode, wide, market]);
 
   return (
     // 21.09.2026, его слово: на компьютере список — до низа, до дисклеймера, без ползунка.
@@ -298,6 +434,7 @@ export default function TerminalSidebar({
       }}
     >
       <style>{SIDE_CSS}</style>
+      <MarketSwitch market={market} onChange={setMarket} counts={counts} />
       <ModeSwitch mode={mode} onChange={setMode} />
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 6px 10px' }}>
         <Search size={14} color={DIM} />
@@ -314,16 +451,31 @@ export default function TerminalSidebar({
         Н — неделя, Д — дневка: итог критериев · П — подтверждение дневки · ↑ вверх · ↓ вниз · ~ спор или нет
       </div>
       <div
-        key={mode}
+        key={`${market}-${mode}`}
         ref={scroller}
         className={wide ? 'tm-side-list tm-side-scroll' : 'tm-side-list'}
         role="tabpanel"
         style={wide ? { flex: 1, minHeight: 0, overflowY: 'auto', paddingRight: 2 } : undefined}
       >
+        {/* поиск ищет на выбранном рынке; нашлось только на другом — так и пишем, одним нажатием туда */}
+        {searching && !listM.length ? (
+          <div style={{ color: DIM, fontSize: 12, padding: '12px 8px', lineHeight: 1.5 }}>
+            {otherHits ? (
+              <button
+                onClick={() => setMarket(other)}
+                style={{ display: 'block', width: '100%', textAlign: 'left', padding: '9px 10px', borderRadius: 8, cursor: 'pointer', background: 'transparent', border: `1px solid ${LOOK[other].accent}55`, color: LOOK[other].text, fontFamily: SANS, fontSize: 12 }}
+              >
+                {`На рынке «${LOOK[market].name}» не нашлось. На рынке «${LOOK[other].name}» — ${otherHits}: показать`}
+              </button>
+            ) : (
+              'По такому названию инструмента нет.'
+            )}
+          </div>
+        ) : null}
         {mode === 'groups' ? (
           groupedList.map(([g, rs]) => (
             <div key={g} style={{ marginBottom: 6 }}>
-              <div style={{ ...label, color: ACCENT, padding: '10px 8px 4px' }}>{GEN[g] ? `Группа ${GEN[g]}` : 'Группа без поводыря'}</div>
+              <div style={{ ...label, color: LOOK[market].text, padding: '10px 8px 4px' }}>{GEN[g] ? `Группа ${GEN[g]}` : 'Группа без поводыря'}</div>
               {rs.map((r) => (
                 <InstrumentRow
                   key={r.symbol}
@@ -331,13 +483,14 @@ export default function TerminalSidebar({
                   on={selected === r.symbol}
                   guide={!!r.extra?.leads && (g !== 'DXY' || r.extra.leads === 'DXY')}
                   tip={leadTip(r)}
+                  market={market}
                   onOpen={onOpen}
                 />
               ))}
             </div>
           ))
         ) : (
-          <ScenarioList blocks={blocks} searching={query.trim() !== ''} selected={selected} onOpen={onOpen} />
+          <ScenarioList blocks={blocks} searching={searching} selected={selected} market={market} onOpen={onOpen} />
         )}
       </div>
     </div>
