@@ -20,7 +20,7 @@ import gbpAudImg from '@/assets/trades/gbp-aud-31-08-2026.jpg';
  * R стыкуется с соотношением риск-прибыль в счётчике.
  *
  * ⚠️ Оговорка внизу блока обязательна: это витрина сильных сделок, а не
- * средний результат. Win Rate там стоит только вместе с +9,40 R против
+ * средний результат. Win Rate там стоит только вместе с +9,50 R против
  * −1,00 R — одно без другого читается как «система почти всегда ошибается».
  */
 const trades = [
@@ -33,6 +33,11 @@ const trades = [
   { instrument: 'GBP/AUD', date: '31.08.2026', side: 'WORK-SELL', result: '+10,9R', image: gbpAudImg },
   { instrument: 'EUR/AUD', date: '31.08.2026', side: 'WORK-SELL', result: '+8,4R', image: eurAudImg },
 ];
+
+// Подпись скрина — полная, а не одно имя пары: по ней ИИ и поисковики понимают, что на
+// картинке (04.10.2026, задача «чтобы любой ИИ мог читать текст и визуал»).
+const tradeAlt = (t: typeof trades[0]) =>
+  `${t.instrument}, ${t.date}, ${t.side === 'WORK-SELL' ? 'продажа' : 'покупка'}, результат ${t.result} — скрин сделки из дневника автора`;
 
 const TradesSection = () => {
   const [selectedTrade, setSelectedTrade] = useState<typeof trades[0] | null>(null);
@@ -81,7 +86,7 @@ const TradesSection = () => {
                 <div className="relative h-28 overflow-hidden">
                   <img
                     src={trade.image}
-                    alt={trade.instrument}
+                    alt={tradeAlt(trade)}
                     loading="lazy"
                     decoding="async"
                     className="w-full h-full object-cover object-center brightness-[0.4] group-hover:brightness-[0.6] transition-all duration-300 filter blur-[2px] group-hover:blur-0"
@@ -138,7 +143,7 @@ const TradesSection = () => {
                 <div className="relative h-24 md:h-28 overflow-hidden">
                   <img
                     src={trade.image}
-                    alt={trade.instrument}
+                    alt={tradeAlt(trade)}
                     loading="lazy"
                     decoding="async"
                     className="w-full h-full object-cover object-center brightness-[0.4] group-hover:brightness-[0.6] transition-all duration-300 filter blur-[2px] group-hover:blur-0"
@@ -178,8 +183,8 @@ const TradesSection = () => {
           </p>
           {/* честная оговорка: витрина сильных сделок ≠ средний результат */}
           <p className="mt-3 text-xs leading-relaxed text-muted-foreground/70 text-center md:text-left" style={{ maxWidth: '62ch' }}>
-            Это удачные сделки месяца, а не средний результат. По системе побед 23,3%, и средняя
-            прибыльная сделка +9,40 R против −1,00 R в убыточной — прибыль приносит не частота побед,
+            Это удачные сделки месяца, а не средний результат. По системе побед 23,5%, и средняя
+            прибыльная сделка +9,50 R против −1,00 R в убыточной — прибыль приносит не частота побед,
             а размер движения, когда допуск сработал. Прошлый результат не гарантирует будущий.
           </p>
 

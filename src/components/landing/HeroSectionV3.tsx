@@ -162,7 +162,7 @@ export default function HeroSectionV3() {
             className="v3h-mono mt-3 inline-flex items-center gap-1.5 opacity-70 hover:opacity-100 transition-opacity"
             style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}
           >
-            14 лет в рынке · 377 сделок в журнале за 20 месяцев
+            14 лет в рынке · 387 сделок в журнале за 21 месяц
             <ArrowRight className="arr w-3 h-3" />
           </a>
         </div>

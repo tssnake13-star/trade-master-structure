@@ -1,10 +1,11 @@
-// Срез таблицы «TLT_Statement_Tactic1» от 05.09.2026. Обновлять только отсюда.
+// Срез таблицы «TLT_Statement_2025-2026» (январь 2025 — сентябрь 2026), обновлено 04.10.2026.
+// Обновлять только отсюда.
 const stats = [
-  { n: '+128,5%', l: 'доходность · 20 мес' },
-  { n: '2,86', l: 'profit factor' },
+  { n: '+136,0%', l: 'доходность · 21 мес' },
+  { n: '2,92', l: 'profit factor' },
   { n: '−2,23%', l: 'макс. просадка' },
-  { n: '17/20', l: 'прибыльных месяцев' },
-  { n: '377', l: 'сделок за 20 мес' },
+  { n: '18/21', l: 'прибыльных месяцев' },
+  { n: '387', l: 'сделок за 21 мес' },
 ];
 
 const SystemStatsSection = () => {
@@ -17,8 +18,8 @@ const SystemStatsSection = () => {
             Цифры, которые <em>не зависят</em> от настроения
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            Статистика системы за 20 месяцев — 377 сделок. Риск 0,25% на сделку, без компаундинга.
-            В среднем это 6,4% в месяц, при этом 3 месяца из 20 закрылись в минус.
+            Статистика системы за 21 месяц — 387 сделок. Риск 0,25% на сделку, без компаундинга.
+            В среднем это 6,5% в месяц, при этом 3 месяца из 21 закрылись в минус.
             Прошлый результат не гарантирует будущий.
           </p>
         </div>
@@ -37,12 +38,12 @@ const SystemStatsSection = () => {
 
         <div className="mt-3 grid md:grid-cols-2 gap-3">
           <div className="border border-border rounded-xl bg-card p-5">
-            <div className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--accent))' }}>Win Rate 23% · R:R 10:1</div>
+            <div className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--accent))' }}>Win Rate 23,5% · R:R 9,5:1</div>
             <p className="mt-2 text-sm text-muted-foreground">Точка безубытка ~11%. Большинство думает, что нужно 70%+ побед — это миф. Важно не как часто ты прав, а сколько берёшь, когда прав.</p>
           </div>
           <div className="border border-border rounded-xl bg-card p-5">
-            <div className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--accent))' }}>Profit Factor 2,86</div>
-            <p className="mt-2 text-sm text-muted-foreground">На каждый потерянный $1 система возвращает $2,86. Результат на фиксированном риске — не «разгон депозита», а устойчивая работа.</p>
+            <div className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--accent))' }}>Profit Factor 2,92</div>
+            <p className="mt-2 text-sm text-muted-foreground">На каждый потерянный $1 система возвращает $2,92. Результат на фиксированном риске — не «разгон депозита», а устойчивая работа.</p>
           </div>
         </div>
 

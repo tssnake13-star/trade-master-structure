@@ -1,34 +1,40 @@
 import { useState, useEffect, useRef } from 'react';
 
+// Win Rate и R:R — таблица «TLT_Statement_2025-2026» (январь 2025 — сентябрь 2026):
+// побед 23,5%, средний выигрыш +9,50 R против −1,00 R.
 const stats = [
   { value: 14, suffix: '', label: 'лет в рынке' },
   { value: 200, suffix: '+', label: 'учеников в системе' },
   { value: 1000, suffix: '+', label: 'эталонных сделок в архиве' },
-  { value: 23, suffix: '%', label: 'Win Rate · среднее R:R 10:1' },
+  { value: 23.5, suffix: '%', label: 'Win Rate · среднее R:R 9,5:1', decimals: 1 },
 ];
 
-const useCountUp = (end: number, duration = 1500, start = false) => {
-  const [count, setCount] = useState(0);
+// Начальное значение — итоговое число, а не 0: версию для роботов и ИИ сайт рендерит
+// на сервере, анимация там не запускается, и до 04.10.2026 они читали «0 лет в рынке»,
+// «0% Win Rate». В браузере отсчёт с нуля начинается, когда блок попадает на экран.
+const useCountUp = (end: number, duration = 1500, start = false, decimals = 0) => {
+  const [count, setCount] = useState(end);
   useEffect(() => {
     if (!start) return;
     let startTime: number;
+    const k = 10 ** decimals;
     const step = (timestamp: number) => {
       if (!startTime) startTime = timestamp;
       const progress = Math.min((timestamp - startTime) / duration, 1);
-      setCount(Math.floor(progress * end));
+      setCount(Math.floor(progress * end * k) / k);
       if (progress < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);
-  }, [end, duration, start]);
+  }, [end, duration, start, decimals]);
   return count;
 };
 
-const StatItem = ({ value, suffix, label, animate }: { value: number; suffix: string; label: string; animate: boolean }) => {
-  const count = useCountUp(value, 1500, animate);
+const StatItem = ({ value, suffix, label, animate, decimals = 0 }: { value: number; suffix: string; label: string; animate: boolean; decimals?: number }) => {
+  const count = useCountUp(value, 1500, animate, decimals);
   return (
     <div className="text-center py-4 md:py-0">
       <div className="stat-number text-foreground">
-        {count}{suffix}
+        {count.toFixed(decimals).replace('.', ',')}{suffix}
       </div>
       <div className="stat-label text-muted-foreground">{label}</div>
     </div>
