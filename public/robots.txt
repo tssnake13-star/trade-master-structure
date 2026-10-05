@@ -1,5 +1,5 @@
 # Одно общее правило для всех роботов — поисковиков, соцсетей и ИИ-ассистентов
-# (GPTBot, ChatGPT-User, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended и др.).
+# (GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended и др.).
 # Отдельные группы для Googlebot и Bingbot были убраны 04.10.2026: робот слушается
 # только самой точной группы, и группа с одним «Allow: /» снимала с него запреты ниже.
 # Запреты стоят перед «Allow: /» — так их одинаково понимают все парсеры.
@@ -10,6 +10,18 @@ User-agent: *
 # /preview-* — черновики дизайна
 Disallow: /school
 Disallow: /access
+Disallow: /preview-
+Allow: /
+
+# ИИ-помощники, которые открывают ссылку по просьбе человека в чате (не обходят сайт
+# и не индексируют): им открыта и страница цен /access — человек сам дал им ссылку
+# (05.10.2026, Сергей: «опять gpt не может прочитать страницу»). В поиск /access
+# по-прежнему не попадёт: поисковые роботы живут по правилу выше, а у самой страницы
+# в ответе заголовок noindex.
+User-agent: ChatGPT-User
+User-agent: Claude-User
+User-agent: Perplexity-User
+Disallow: /school
 Disallow: /preview-
 Allow: /
 

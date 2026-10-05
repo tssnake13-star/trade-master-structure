@@ -32,6 +32,19 @@ fs.writeFileSync(path.join(distDir, 'prerendered.html'), html);
 
 console.log(`✓ pre-rendered bots variant → dist/prerendered.html (${appHtml.length} bytes of content)`);
 
+// Страница цен /access — тот же приём (05.10.2026). Она закрыта от поиска: в заголовке
+// ответа noindex, в robots.txt Disallow для поисковых роботов; ИИ-помощникам, которые
+// открывают ссылку по просьбе человека, она доступна. В <head> — свои title, robots
+// и canonical, остальное из того же шаблона.
+const accessApp = render('/access');
+const accessHtml = template
+  .replace('<div id="root"></div>', `<div id="root">${accessApp}</div>`)
+  .replace(/<title>[^<]*<\/title>/, '<title>Цены и уровни обучения — TRADELIKETYO</title>')
+  .replace(/<meta name="robots" content="[^"]*"\s*\/?>/, '<meta name="robots" content="noindex, nofollow" />')
+  .replace(/<link rel="canonical" href="[^"]*"\s*\/?>/, '<link rel="canonical" href="https://www.tradeliketyo.com/access" />');
+fs.writeFileSync(path.join(distDir, 'access-prerendered.html'), accessHtml);
+console.log(`✓ pre-rendered /access → dist/access-prerendered.html (${accessApp.length} bytes of content)`);
+
 // ---------- llms.txt / llms-full.txt ----------
 
 const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', mdash: '—', ndash: '–', laquo: '«', raquo: '»', hellip: '…', middot: '·', minus: '−', rarr: '→', larr: '←' };
