@@ -23,6 +23,12 @@ export default function Access() {
   // страница цен — считаем отдельно от лендинга: сюда приходят из бота, и важно
   // видеть, сколько дошло до цен и кто нажал «оформить»
   useEffect(() => { trackPageview('/access'); }, []);
+  // свой заголовок вкладки: по нему и ИИ-читатели понимают, что это страница цен (05.10.2026)
+  useEffect(() => {
+    const prev = document.title;
+    document.title = 'Цены и уровни обучения — TRADELIKETYO';
+    return () => { document.title = prev; };
+  }, []);
 
   return (
     <div className="landing-skin v3-skin min-h-screen relative" style={{ background: 'var(--v3-bg, hsl(var(--background)))', color: 'hsl(var(--foreground))' }}>
