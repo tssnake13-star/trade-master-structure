@@ -125,6 +125,10 @@ const ProofSection = () => {
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
             Отзывы без редактуры: в карточке выдержка, по нажатию открывается оригинал из Telegram.
           </p>
+          {/* CLAUDE.md: цифры учеников показываем всегда с этой оговоркой */}
+          <p className="mt-2 text-sm text-muted-foreground" style={{ maxWidth: '62ch' }}>
+            Это результаты учеников, а не обещание: у кого-то получается и так, всё зависит от человека.
+          </p>
 
           {/* Mobile — horizontal scroll snap */}
           <div

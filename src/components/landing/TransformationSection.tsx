@@ -57,6 +57,8 @@ const TransformationSection = () => {
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '58ch' }}>
             Свинг на неделе и дневке. Сделка живёт днями, и сидеть у графика ради неё не нужно.
+            Ниже неделя для тех, кто работает по системе сам. На подписке ECHO-GATE INSIDE рынок
+            разбирает терминал, а от вас 2 действия по каждой сделке.
           </p>
         </div>
 
@@ -111,13 +113,13 @@ const TransformationSection = () => {
           }}
         >
           <span className="section-label" style={{ display: 'inline-block' }}>
-            Зачем и школа, и экосистема
+            Два пути, один алгоритм
           </span>
           <p className="font-['Bricolage_Grotesque'] text-3xl md:text-5xl leading-[1.12] tracking-tight text-foreground">
-            Школа <em className="not-italic" style={{ color: ACCENT }}>учит</em> вас принимать решения.
+            Школа <em className="not-italic" style={{ color: ACCENT }}>учит</em> принимать решения самому.
             <br className="hidden md:block" />{' '}
-            Экосистема <em className="not-italic" style={{ color: ACCENT }}>следит</em> за тем,
-            чтобы вы их не нарушали.
+            ECHO-GATE INSIDE <em className="not-italic" style={{ color: ACCENT }}>считает</em> рынок за вас:
+            от вас 2 действия.
           </p>
         </div>
       </div>

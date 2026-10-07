@@ -69,7 +69,7 @@ export const DASHBOARD_TEXT_DEFAULTS = {
 
   // ===== Free home =====
   free_hero_title: 'Добро пожаловать в *систему*.',
-  free_hero_subtitle_template: 'Вы получили доступ к {total} вводным блокам TLT. Они показывают, как устроена система. Основная программа TRADE MASTER открывается по коду доступа от администратора.',
+  free_hero_subtitle_template: 'Вы получили доступ к {total} вводным блокам TLT. Они показывают, как устроена система. Обучение и подписка ECHO-GATE INSIDE открываются после оплаты: напишите мне, и я скажу, какой путь ваш.',
   free_kpi_intro_label: 'Вводный курс',
   free_kpi_main_label: 'Основная программа',
   free_kpi_main_value_suffix: 'блоков · Trade Master',
@@ -82,12 +82,12 @@ export const DASHBOARD_TEXT_DEFAULTS = {
   free_continue_open: 'Открыть',
   free_done_eyebrow: '◆ Готовы к следующему шагу',
   free_done_title: 'Вы готовы к *основной* программе.',
-  free_done_subtitle: 'Свяжитесь с автором — он подскажет как получить доступ.',
+  free_done_subtitle: 'Напишите мне, и я подскажу, как получить доступ.',
   free_done_cta: 'Написать Сергею',
   free_locked_label: 'Программы по допуску',
   free_locked_master: 'Допуск через администратора',
-  free_locked_elite: 'По приглашению',
-  free_locked_other: 'После Trade Master',
+  free_locked_elite: 'После оплаты',
+  free_locked_other: 'После оплаты',
 
   // ===== Live streams card =====
   live_label: 'Закрытые прямые эфиры',
@@ -119,7 +119,7 @@ export const DASHBOARD_TEXT_DEFAULTS = {
   // 2) доступ был и закончился → нужно продлить (прогресс сохранён)
   sidebar_locked_expired: 'Доступ истёк',
   locked_unpaid_title: 'Программа ещё не открыта',
-  locked_unpaid_text: 'Эта программа доступна после оформления обучения. Напишите — подскажу, какой уровень подойдёт.',
+  locked_unpaid_text: 'Эта программа открывается после оплаты. Напишите, и я подскажу, какой путь вам подойдёт: подписка ECHO-GATE INSIDE или обучение.',
   locked_unpaid_cta: 'Оформить доступ',
   locked_expired_title: 'Срок доступа закончился',
   locked_expired_text: 'Обучение по этой программе завершено {date}. Ваш прогресс сохранён — после продления вы продолжите с того же места.',

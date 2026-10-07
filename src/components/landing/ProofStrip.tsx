@@ -16,7 +16,7 @@ const MONO: React.CSSProperties = { fontSize: 10, letterSpacing: '0.18em', textT
 const SERIF: React.CSSProperties = { fontFamily: "'Cormorant', serif", fontWeight: 500 };
 
 const NUMBERS: { value: string; label: string }[] = [
-  { value: '21', label: 'месяц подряд' },
+  { value: '21', label: 'месяц в журнале' },
   { value: '387', label: 'сделок' },
   { value: '6,5%', label: 'в месяц в среднем' },
   { value: '2,23%', label: 'максимальная просадка' },

@@ -9,7 +9,6 @@ import HeroSectionV3 from '@/components/landing/HeroSectionV3';
 import StructureField from '@/components/landing/StructureField';
 import InstrumentTicker from '@/components/landing/InstrumentTicker';
 import StatsCounter from '@/components/landing/StatsCounter';
-import TwoStagesSection from '@/components/landing/TwoStagesSection';
 import CoreProblemSection from '@/components/landing/CoreProblemSection';
 import IncludedSection from '@/components/landing/IncludedSection';
 import FourQuestionsSection from '@/components/landing/FourQuestionsSection';
@@ -100,7 +99,8 @@ const Index = () => {
         <FourQuestionsSection />
         <CapitalProtectionSection />
         <FiveStagesSection showPrices={false} label="11 · Путь" />
-        <TwoStagesSection />
+        {/* «Два этапа: школа, потом экосистема только выпускникам» снят 07.10.2026:
+            спорил с линейкой «два пути» в разделе 12. Файл оставлен. */}
 
         {/* Мысль-делитель */}
         <WordmarkKinetic text="Допуск, " emphasis="не сигнал" />

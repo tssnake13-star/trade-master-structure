@@ -39,7 +39,7 @@ console.log(`✓ pre-rendered bots variant → dist/prerendered.html (${appHtml.
 const accessApp = render('/access');
 const accessHtml = template
   .replace('<div id="root"></div>', `<div id="root">${accessApp}</div>`)
-  .replace(/<title>[^<]*<\/title>/, '<title>Цены и уровни обучения — TRADELIKETYO</title>')
+  .replace(/<title>[^<]*<\/title>/, '<title>Цены и условия — TRADELIKETYO</title>')
   .replace(/<meta name="robots" content="[^"]*"\s*\/?>/, '<meta name="robots" content="noindex, nofollow" />')
   .replace(/<link rel="canonical" href="[^"]*"\s*\/?>/, '<link rel="canonical" href="https://www.tradeliketyo.com/access" />');
 fs.writeFileSync(path.join(distDir, 'access-prerendered.html'), accessHtml);

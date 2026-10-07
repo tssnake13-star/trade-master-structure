@@ -79,11 +79,11 @@ export default function Access() {
               onClick={() => trackClick('access_apply')}
               className="btn-primary group text-base md:text-lg"
             >
-              Оставить заявку на обучение
+              Написать Сергею
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
             <p className="text-sm text-muted-foreground">
-              Каждую заявку разбираю лично, поэтому беру не всех ·{' '}
+              Каждую заявку разбираю лично. Если вам ко мне пока рано, скажу прямо ·{' '}
               <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground transition-colors">
                 задать вопрос Сергею
               </a>

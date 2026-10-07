@@ -145,6 +145,12 @@ export default function SchoolAuth() {
             Регис<em>трация</em>
           </h1>
         )}
+        {/* 07.10.2026: при регистрации сам открывается пробный доступ к терминалу (триггер в базе) */}
+        {!isLogin && (
+          <p className="-mt-4 mb-6 text-center text-sm leading-relaxed px-2" style={{ color: '#a8a090' }}>
+            Регистрация открывает бесплатный вводный курс и 7 дней пробного доступа к терминалу ECHO-GATE INSIDE.
+          </p>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {!isLogin && (

@@ -33,7 +33,7 @@ const columns = [
     accent: true,
     values: [
       'Алгоритм допуска — Echo Gate',
-      'Система решений — ваша навсегда',
+      'Изучили систему — она ваша; подписка — на её срок',
       'Risk Sentinel: −4% в неделю → блок',
       'Встроена в исполнение',
     ],
@@ -52,7 +52,7 @@ const ComparisonSection = () => {
             Это не <em>сигналы</em>. И не <span className="mute">«ещё один курс»</span>.
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '58ch' }}>
-            Опытные трейдеры обычно выбирают из трёх путей. Разница — по сути:
+            Опытные трейдеры обычно сравнивают три варианта. Разница — по сути:
           </p>
         </div>
 
@@ -90,8 +90,8 @@ const ComparisonSection = () => {
         </div>
 
         <p className="mt-6 text-base md:text-lg text-foreground font-medium" style={{ maxWidth: '64ch' }}>
-          Поэтому здесь безопаснее: риск ограничен — 0,25–0,3% на сделку, максимальная просадка
-          за 21 месяц — <span style={{ color: ACCENT }}>2,23%</span>.
+          Поэтому здесь безопаснее: я торгую с риском 0,25% на сделку, максимальная просадка
+          за 21 месяц — <span style={{ color: ACCENT }}>2,23%</span>. Ваш риск выбираете вы.
         </p>
       </div>
     </section>

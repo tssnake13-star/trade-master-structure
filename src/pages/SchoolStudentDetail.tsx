@@ -43,9 +43,12 @@ export default function SchoolStudentDetail() {
   // Терминал — отдельная подписка экосистемы. Срок обязателен у всех
   // (решение владельца 21.09.2026), бессрочной выдачи тут нет.
   const [terminalUntil, setTerminalUntil] = useState<string | null>(null);
+  // 07.10.2026: пробный доступ (7 дней при регистрации, с замками). Выдача через админку снимает его
+  const [terminalTrial, setTerminalTrial] = useState(false);
   // 21.09.2026, его слово: вместо 30 — пробные 14 дней, и срок можно вписать руками
   // (например, до конца подписки экосистемы, если у человека осталось 140 с чем-то дней)
-  const [terminalDays, setTerminalDays] = useState('14');
+  // 07.10.2026: пробные 7 дней открываются сами при регистрации; здесь выдаётся оплаченный срок, по умолчанию 3 месяца
+  const [terminalDays, setTerminalDays] = useState('90');
   const [pwModal, setPwModal] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [showPw, setShowPw] = useState(false);
@@ -73,12 +76,15 @@ export default function SchoolStudentDetail() {
       supabase.from('lesson_progress').select('lesson_id').eq('user_id', studentId),
       supabase.from('invite_codes').select('code').eq('used_by', studentId).limit(1),
     ]);
+    // '*' — чтобы читать is_trial (07.10.2026) и не падать, пока столбца ещё нет в базе
     const tRes = await supabase
       .from('terminal_access' as never)
-      .select('expires_at')
+      .select('*')
       .eq('user_id', studentId)
       .maybeSingle();
-    setTerminalUntil(((tRes.data as { expires_at?: string } | null)?.expires_at) || null);
+    const tRow = tRes.data as { expires_at?: string; is_trial?: boolean } | null;
+    setTerminalUntil(tRow?.expires_at || null);
+    setTerminalTrial(!!tRow?.is_trial);
     setProfile(pRes.data as Profile | null);
     const roleRows = (rRes.data ?? []) as { role: string }[];
     setStudentRole(roleRows.some(r => r.role === 'admin') ? 'admin' : (roleRows[0]?.role || 'student'));
@@ -104,7 +110,8 @@ export default function SchoolStudentDetail() {
   // до какой даты откроется — считаем так же, как grantTerminal, чтобы видеть до нажатия
   const termPreview = (() => {
     if (!termDaysOk) return null;
-    const base = terminalActive ? new Date(terminalUntil!) : new Date();
+    // пробные дни в оплаченный срок не входят: подписка считается от сегодня
+    const base = terminalActive && !terminalTrial ? new Date(terminalUntil!) : new Date();
     base.setDate(base.getDate() + termDays);
     return base.toLocaleDateString('ru-RU');
   })();
@@ -158,11 +165,13 @@ export default function SchoolStudentDetail() {
     if (!studentId) return;
     // Продление считаем от большей из двух дат: от сегодня или от конца
     // действующей подписки — иначе продление посреди срока его укорачивает.
-    const base = terminalUntil && new Date(terminalUntil) > new Date() ? new Date(terminalUntil) : new Date();
+    // Пробный доступ (07.10.2026) не продлеваем: оплаченный срок идёт от сегодня,
+    // а is_trial: false открывает всё, что в пробном было под замком.
+    const base = !terminalTrial && terminalUntil && new Date(terminalUntil) > new Date() ? new Date(terminalUntil) : new Date();
     base.setDate(base.getDate() + days);
     await supabase
       .from('terminal_access' as never)
-      .upsert({ user_id: studentId, expires_at: base.toISOString() } as never, { onConflict: 'user_id' } as never);
+      .upsert({ user_id: studentId, expires_at: base.toISOString(), is_trial: false } as never, { onConflict: 'user_id' } as never);
     load();
   };
 
@@ -474,7 +483,7 @@ export default function SchoolStudentDetail() {
             {/* 07.10.2026, его слово: старое название «TRADE MASTER INSIDE» — должно быть ECHO-GATE INSIDE */}
             <h2 className="text-sm" style={{ fontFamily: font.heading, color: '#888' }}>ECHO-GATE INSIDE</h2>
             <span className="text-[11px]" style={{ color: terminalActive ? '#4a8a4a' : '#555', fontFamily: font.mono }}>
-              {terminalActive ? `открыт до ${new Date(terminalUntil!).toLocaleDateString('ru-RU')}`
+              {terminalActive ? `${terminalTrial ? 'пробный, с замками, до' : 'открыт до'} ${new Date(terminalUntil!).toLocaleDateString('ru-RU')}`
                 : terminalUntil ? `срок вышел ${new Date(terminalUntil).toLocaleDateString('ru-RU')}` : 'не выдан'}
             </span>
           </div>

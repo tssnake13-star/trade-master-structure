@@ -286,7 +286,7 @@ export default function SchoolLesson() {
         {isFreeCourse && (
           <>
             <a
-              href="http://t.me/tradeliketyo"
+              href="https://t.me/tradeliketyo"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-3 w-full py-4 mb-6 transition hover:brightness-110"

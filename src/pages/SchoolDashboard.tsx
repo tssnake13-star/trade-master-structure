@@ -238,18 +238,22 @@ export default function SchoolDashboard() {
   // 21.09.2026, его слово: пункт видят все, как курсы: без доступа — с замком,
   // открыть нельзя; срок вышел — «Доступ истёк». Админ открывает всегда.
   const [eyeState, setEyeState] = useState<'open' | 'expired' | 'locked' | null>(null);
+  // 07.10.2026: пробный доступ на 7 дней при регистрации (is_trial) — подпись «пробный доступ»
+  const [eyeTrial, setEyeTrial] = useState(false);
   useEffect(() => {
     if (!user) return;
     if (role === 'admin') { setEyeState('open'); return; }
     let alive = true;
     supabase
       .from('terminal_access' as never)
-      .select('expires_at')
+      .select('*')
       .eq('user_id', user.id)
       .maybeSingle()
       .then(({ data }) => {
-        const until = (data as { expires_at?: string } | null)?.expires_at;
+        const row = data as { expires_at?: string; is_trial?: boolean } | null;
+        const until = row?.expires_at;
         if (!alive) return;
+        setEyeTrial(!!row?.is_trial);
         if (!until) setEyeState('locked');
         else setEyeState(new Date(until).getTime() > Date.now() ? 'open' : 'expired');
       });
@@ -650,6 +654,9 @@ export default function SchoolDashboard() {
                   {eyeState === 'expired' && (
                     <div style={{ fontFamily: MONO, fontSize: 9, color: '#8a7048', marginTop: 4 }}>{t('sidebar_locked_expired')}</div>
                   )}
+                  {eyeState === 'open' && eyeTrial && (
+                    <div style={{ fontFamily: MONO, fontSize: 9, color: ACCENT, marginTop: 4 }}>пробный доступ</div>
+                  )}
                 </div>
               </div>
             </button>
@@ -736,7 +743,7 @@ export default function SchoolDashboard() {
                 {now.toLocaleDateString('ru-RU', { day: '2-digit', month: 'short', year: 'numeric' })}
               </span>
               <a
-                href="http://t.me/tradeliketyo"
+                href="https://t.me/tradeliketyo"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#888' }}
@@ -788,7 +795,7 @@ export default function SchoolDashboard() {
                   {isExpired ? t('locked_expired_text', { date: dateStr }) : t('locked_unpaid_text')}
                 </p>
                 <a
-                  href="http://t.me/tradeliketyo"
+                  href="https://t.me/tradeliketyo"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-7 inline-flex items-center gap-2 transition hover:brightness-110"
@@ -864,7 +871,7 @@ export default function SchoolDashboard() {
             {t('footer_copyright')}
           </span>
           <a
-            href="http://t.me/tradeliketyo"
+            href="https://t.me/tradeliketyo"
             target="_blank"
             rel="noopener noreferrer"
             style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666' }}
@@ -1362,7 +1369,7 @@ export function FreeHome({
                 {t('free_done_subtitle')}
               </p>
               <a
-                href="http://t.me/tradeliketyo"
+                href="https://t.me/tradeliketyo"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -1495,7 +1502,7 @@ function CourseLadder({
                 }}
               >
                 <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 5 }}>
-                  {t('course_eyebrow')} · этап {pad(num)} · сейчас
+                  {t('course_eyebrow')} · блок {pad(num)} · сейчас
                 </div>
                 <h3 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 25, lineHeight: 1.15, color: FG, marginBottom: l.description ? 10 : 14 }}>{l.title}</h3>
                 {l.description && (
@@ -1530,7 +1537,7 @@ function CourseLadder({
                 <div className="min-w-0">
                   <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: done ? '#888' : openable ? ACCENT : '#55504a', marginBottom: 3 }}>
                     {/* вместо голого «закрыто» — что нужно, чтобы блок открылся */}
-                    Этап {pad(num)}{done ? ' · пройден' : openable ? '' : ` · ${isFree ? t('course_lesson_locked_prev') : t('course_lesson_locked_mentor')}`}
+                    Блок {pad(num)}{done ? ' · пройден' : openable ? '' : ` · ${isFree ? t('course_lesson_locked_prev') : t('course_lesson_locked_mentor')}`}
                   </div>
                   <h3 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 24, lineHeight: 1.1, color: done ? '#cfc7b8' : openable ? FG : '#55504a', overflowWrap: 'anywhere' }}>{l.title}</h3>
                 </div>
@@ -1573,8 +1580,8 @@ function CourseLadder({
                   Экосистема
                 </div>
                 <h3 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 25, lineHeight: 1.28, color: FG, marginBottom: 12, maxWidth: '34ch' }}>
-                  Школа <span style={{ color: ACCENT }}>учит</span> вас принимать решения.<br />
-                  Экосистема <span style={{ color: ACCENT }}>следит</span> за тем, чтобы вы их не нарушали.
+                  Школа <span style={{ color: ACCENT }}>учит</span> принимать решения самому.<br />
+                  ECHO-GATE INSIDE <span style={{ color: ACCENT }}>считает</span> рынок за вас: от вас 2 действия.
                 </h3>
                 <p style={{ fontFamily: SANS, fontSize: 12, lineHeight: 1.55, color: '#8a857c', maxWidth: '52ch', marginBottom: 18 }}>
                   Echo Gate · Hunter Bot · Risk Sentinel — инфраструктура исполнения на вашем счёте.
@@ -1599,11 +1606,11 @@ function CourseLadder({
                   Программа завершена
                 </div>
                 <h3 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 26, lineHeight: 1.15, color: FG, marginBottom: 10 }}>
-                  Путь пройден. Дальше — экосистема.
+                  Курс пройден. Дальше ECHO-GATE INSIDE.
                 </h3>
                 <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.55, color: '#a8a090', maxWidth: '56ch', marginBottom: 16 }}>
-                  Все этапы закрыты. Следующий уровень — инфраструктура исполнения:
-                  Echo Gate, Hunter Bot и Risk Sentinel в работе на вашем счёте.
+                  Все блоки пройдены. Дальше можно подключить ECHO-GATE INSIDE: терминал,
+                  мой вердикт по каждому допуску и советники на вашем счёте.
                 </p>
                 <button
                   onClick={onOpenEcosystem}
@@ -1845,7 +1852,7 @@ function ActivateCodeSection({ userId, onActivated, compact, t }: { userId?: str
         </p>
       )}
       <a
-        href="http://t.me/tradeliketyo"
+        href="https://t.me/tradeliketyo"
         target="_blank"
         rel="noopener noreferrer"
         className="mt-auto pt-3 hover:opacity-80 transition"

@@ -185,7 +185,7 @@ export default function DashboardBanners({ accessMap }: {
             в VIP с доплатой {VIP_TOPUP}
           </h3>
           <p className="mt-2.5" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '62ch' }}>
-            Оплаченные {TRADE_SYSTEM_PRICE} зачитываются полностью в течение {UPGRADE_WINDOW_DAYS} дней
+            Оплаченные {TRADE_SYSTEM_PRICE} засчитываются полностью в течение {UPGRADE_WINDOW_DAYS} дней
             после покупки. Дальше VIP будет стоить полную цену.
           </p>
           <p className="mt-1.5" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '62ch' }}>

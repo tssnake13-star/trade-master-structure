@@ -35,7 +35,7 @@ const AuthorSection = () => {
                   Мои лучшие сделки — те, которые я <span style={{ color: 'hsl(var(--accent))' }}>не совершил</span>
                 </p>
                 <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                  Поэтому я не учу искать входы
+                  Поэтому я не учу угадывать входы
                 </p>
                 <p className="text-sm md:text-base text-foreground font-medium leading-relaxed">
                   Я выстраиваю систему<br />

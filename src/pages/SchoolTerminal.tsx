@@ -8,7 +8,8 @@ import { ACCENT, BG, BLUE, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, la
 import { ALPHA_TIP, CycleCard, Lines, type MarketRow } from '@/components/terminal/parts';
 import TerminalSidebar from '@/components/terminal/Sidebar';
 import { Brand, Decision, TradingStyle } from '@/components/terminal/Decision';
-import { FalseExitFeed, TrendFeed, VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
+import { FalseExitFeed, TrendFeed, VerdictsFeed, type FeedDocs, type Verdict } from '@/components/terminal/Feeds';
+import { TELEGRAM_LINKS } from '@/lib/constants';
 import { ScreenerCards } from '@/components/terminal/Screener';
 import StatusStrip from '@/components/terminal/Status';
 import { GEN } from '@/components/terminal/screenerParse';
@@ -43,7 +44,37 @@ html { scrollbar-color: rgba(225,168,77,0.55) ${BG}; }
  *
  * Доступ — отдельная подписка со сроком (terminal_access). Закрывает её RLS
  * в базе, а не этот код: без действующей подписки запрос возвращает пусто.
+ *
+ * 07.10.2026, его слово: при регистрации человек сам получает пробный доступ
+ * на 7 дней (terminal_access.is_trial). Замки тоже стоят в базе: пробному
+ * отдаются только открытые инструменты, итоги решений и журнал решений
+ * с задержкой в сутки (функция terminal_trial_verdicts). Скринер, ТОП-лист
+ * и тренд он видит закрытыми. Выдача через админку снимает is_trial — открыто всё.
  */
+
+/** Закрытый раздел пробного доступа: что здесь и как открыть */
+function TrialLock({ what }: { what: string }) {
+  return (
+    <div style={{ ...card, padding: 28, textAlign: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
+        <Lock size={22} color={ACCENT} />
+      </div>
+      <div style={{ fontSize: 16, marginTop: 10, color: FG }}>{what} открывается в подписке</div>
+      <p style={{ color: DIM, fontSize: 13, lineHeight: 1.6, maxWidth: 480, margin: '8px auto 0' }}>
+        В пробном доступе открыты журнал моих решений с задержкой в сутки, итоги решений и несколько
+        инструментов целиком. {what} показывает, куда смотреть на этой неделе, и работает у подписчиков.
+      </p>
+      <a
+        href={TELEGRAM_LINKS.dm}
+        target="_blank"
+        rel="noopener noreferrer"
+        style={{ ...pill(true), display: 'inline-block', marginTop: 16, padding: '10px 16px', textDecoration: 'none' }}
+      >
+        Открыть всё: написать Сергею
+      </a>
+    </div>
+  );
+}
 
 // Таблицы терминала ещё не попали в сгенерированные типы базы — читаем их
 // через клиент без схемы, а форму данных держим интерфейсами (parts, Feeds).
@@ -125,6 +156,10 @@ export default function SchoolTerminal() {
   const [videos, setVideos] = useState<JournalVideo[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
   const [until, setUntil] = useState<string | null>(null);
+  // 07.10.2026: пробный доступ — что под замком и сколько решений ещё скрыто задержкой
+  const [trial, setTrial] = useState(false);
+  const [lockedList, setLockedList] = useState<{ symbol: string; title: string | null }[]>([]);
+  const [hiddenVerdicts, setHiddenVerdicts] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
   const [tab, setTab] = useState<Tab>('Анализ');
@@ -227,7 +262,8 @@ export default function SchoolTerminal() {
   const load = useCallback(async () => {
     const [accessRes, metaRes, rowsRes, feedRes, videoRes] = await Promise.all([
       user
-        ? db.from('terminal_access').select('expires_at').eq('user_id', user.id).maybeSingle()
+        // '*' — чтобы читать is_trial и не падать, пока столбца ещё нет в базе
+        ? db.from('terminal_access').select('*').eq('user_id', user.id).maybeSingle()
         : Promise.resolve({ data: null }),
       db.from('market_meta').select('updated_at, bars_at, build').maybeSingle(),
       db.from('market_snapshot').select('*').order('sort_order').order('symbol'),
@@ -235,17 +271,30 @@ export default function SchoolTerminal() {
       db.from('site_settings').select('value').eq('key', JOURNAL_VIDEOS_KEY).maybeSingle(),
     ]);
     setVideos(parseJournalVideos((videoRes.data as { value?: string } | null)?.value));
-    setUntil(((accessRes.data as { expires_at?: string } | null)?.expires_at) || null);
+    const acc = accessRes.data as { expires_at?: string; is_trial?: boolean } | null;
+    setUntil(acc?.expires_at || null);
+    const isTrial = !isAdmin && !!acc?.is_trial && !!acc.expires_at && new Date(acc.expires_at).getTime() > Date.now();
+    setTrial(isTrial);
     setMeta((metaRes.data as Meta) || null);
-    setRows((rowsRes.data || []) as MarketRow[]);
+    const marketRows = (rowsRes.data || []) as MarketRow[];
+    setRows(marketRows);
     const docs: FeedDocs = {};
     for (const f of (feedRes.data || []) as { key: keyof FeedDocs; data: never; updated_at?: string }[]) {
       docs[f.key] = f.data;
       feedAt.current[f.key] = f.updated_at || null;
     }
+    if (isTrial) {
+      // журнал решений пробному — только решения старше суток; список закрытых инструментов — одни названия
+      const [vRes, cRes] = await Promise.all([db.rpc('terminal_trial_verdicts'), db.rpc('terminal_trial_catalog')]);
+      const v = vRes.data as { items?: Verdict[]; hidden?: (string | null)[] } | null;
+      docs.verdicts = { items: v?.items || [] };
+      setHiddenVerdicts((v?.hidden || []).filter((t): t is string => !!t));
+      const open = new Set(marketRows.map((r) => r.symbol));
+      setLockedList(((cRes.data || []) as { symbol: string; title: string | null }[]).filter((c) => !open.has(c.symbol)));
+    }
     setFeeds(docs);
     setLoading(false);
-  }, [user, feedQuery]);
+  }, [user, feedQuery, isAdmin]);
 
   useEffect(() => {
     if (!user) return;
@@ -273,7 +322,8 @@ export default function SchoolTerminal() {
   // после его кнопки; «Скринер» и «ТОП» (обе из неё) смотрят её время так же, раз в 3 секунды.
   useEffect(() => {
     const key = LIVE_FEED[section];
-    if (!user || !key) return;
+    // пробному живые ленты не отдаются вовсе (замки в базе) — опрашивать нечего
+    if (!user || !key || trial) return;
     let alive = true;
     const tick = async () => {
       const { data } = await db.from('market_feed').select('updated_at').eq('key', key).maybeSingle();
@@ -297,7 +347,7 @@ export default function SchoolTerminal() {
       alive = false;
       window.clearInterval(t);
     };
-  }, [user, section, feedQuery]);
+  }, [user, section, feedQuery, trial]);
 
   // 25.09.2026, его вопрос «почему нету кнопки разбор» у биткоина в журнале решений: бот пишет решение
   // под именем из MT5 (BTCUSD), а строка терминала названа по скринеру (BTCUSDT) — имена не сошлись,
@@ -379,25 +429,40 @@ export default function SchoolTerminal() {
     );
   }
 
-  if (!rows.length) {
+  if (!rows.length && !trial) {
+    // 07.10.2026: у кого пробный доступ закончился, видят «срок закончился», а не «не открыт»
+    const expired = !!until && new Date(until).getTime() <= Date.now();
     return (
       <div style={{ minHeight: '100vh', backgroundColor: BG, color: FG, fontFamily: SANS, display: 'grid', placeItems: 'center', padding: 24 }}>
         <div style={{ ...card, padding: 28, maxWidth: 520, textAlign: 'center' }}>
           <div style={{ display: 'flex', justifyContent: 'center' }}>
             <Brand />
           </div>
-          <h1 style={{ fontSize: 22, margin: '14px 0 10px' }}>Доступ пока не открыт</h1>
+          <h1 style={{ fontSize: 22, margin: '14px 0 10px' }}>{expired ? 'Срок доступа закончился' : 'Доступ пока не открыт'}</h1>
           <p style={{ color: DIM, fontSize: 14, lineHeight: 1.6 }}>
-            ECHO-GATE INSIDE входит в подписку экосистемы и выдаётся отдельно, со сроком.
-            Если подписка у вас есть, а экран пустой — напишите в поддержку, откроем.
+            ECHO-GATE INSIDE открывается подпиской. Чтобы узнать стоимость и подключиться, напишите Сергею.
+            Если подписка у вас есть, а экран пустой, тоже напишите: откроем.
           </p>
-          <button onClick={() => navigate('/school/dashboard')} style={{ ...pill(true), marginTop: 18, padding: '11px 18px' }}>
-            в кабинет
-          </button>
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginTop: 18 }}>
+            <a
+              href={TELEGRAM_LINKS.dm}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ ...pill(true), padding: '11px 18px', textDecoration: 'none' }}
+            >
+              написать Сергею
+            </a>
+            <button onClick={() => navigate('/school/dashboard')} style={{ ...pill(false), padding: '11px 18px' }}>
+              в кабинет
+            </button>
+          </div>
         </div>
       </div>
     );
   }
+
+  // 07.10.2026: сколько дней пробного доступа осталось — для плашки сверху
+  const trialDays = trial && until ? Math.max(1, Math.ceil((new Date(until).getTime() - now) / 86400000)) : 0;
 
   // 01.10.2026, его слово: в боковой панели две вкладки — «группы» (как было) и «сценарии»; сама панель —
   // components/terminal/Sidebar.tsx. Выбранный инструмент подсвечен только на вкладке «Инструмент», как раньше
@@ -563,9 +628,44 @@ export default function SchoolTerminal() {
         <Brand />
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
           <StatusStrip updatedAt={meta?.updated_at || null} feeds={feeds} now={now} />
-          {until ? <span style={label}>подписка до {fmtDate(until)}</span> : null}
+          {until ? <span style={label}>{trial ? 'пробный доступ до' : 'подписка до'} {fmtDate(until)}</span> : null}
         </div>
       </header>
+
+      {/* 07.10.2026: плашка пробного доступа — что открыто, что под замком, как открыть всё */}
+      {trial ? (
+        <div style={{ padding: '14px 14px 0' }}>
+          <div style={{ ...card, padding: 14, border: `1px solid ${ACCENT}55` }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              <span style={{ ...label, color: ACCENT, whiteSpace: 'nowrap' }}>
+                пробный доступ · {trialDays} {trialDays === 1 ? 'день' : trialDays < 5 ? 'дня' : 'дней'}
+              </span>
+              <span style={{ color: FG, fontSize: 13, lineHeight: 1.6, flex: '1 1 360px' }}>
+                Открыты журнал моих решений с задержкой в сутки, итоги решений
+                {rows.length ? ` и ${rows.map((r) => r.symbol).join(', ')} целиком` : ''}. Скринер, ТОП-лист, тренд
+                и остальные инструменты открываются в подписке.
+              </span>
+              <a
+                href={TELEGRAM_LINKS.dm}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ ...pill(true), padding: '9px 14px', textDecoration: 'none', whiteSpace: 'nowrap' }}
+              >
+                Открыть всё
+              </a>
+            </div>
+            {lockedList.length ? (
+              <div style={{ color: DIM, fontSize: 12, marginTop: 10, lineHeight: 1.7, display: 'flex', gap: 6, alignItems: 'baseline', flexWrap: 'wrap' }}>
+                <Lock size={11} color={DIM} style={{ flexShrink: 0, alignSelf: 'center' }} />
+                <span>
+                  под замком {lockedList.length}: {lockedList.slice(0, 16).map((c) => c.symbol).join(' · ')}
+                  {lockedList.length > 16 ? ` и ещё ${lockedList.length - 16}` : ''}
+                </span>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       {/* 30.09.2026, его слово: стиль торговли — над кнопками разделов, крупнее */}
       <div style={{ padding: '14px 14px 0' }}>
@@ -613,10 +713,19 @@ export default function SchoolTerminal() {
         )}
         <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           {section === 'instrument' && instrument}
-          {section === 'screener' && <ScreenerCards doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />}
-          {section === 'top' && <ScreenerCards part="top" doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />}
-          {section === 'trend' && <TrendFeed doc={feeds.trend} symbols={symbols} onOpen={openSymbol} />}
+          {section === 'screener' && (trial ? <TrialLock what="Скринер" /> : <ScreenerCards doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />)}
+          {section === 'top' && (trial ? <TrialLock what="ТОП-лист" /> : <ScreenerCards part="top" doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />)}
+          {section === 'trend' && (trial ? <TrialLock what="Тренд" /> : <TrendFeed doc={feeds.trend} symbols={symbols} onOpen={openSymbol} />)}
           {section === 'falsex' && isAdmin && <FalseExitFeed doc={feeds.falsex} symbols={symbols} onOpen={openSymbol} />}
+          {section === 'verdicts' && trial && hiddenVerdicts.length ? (
+            <div style={{ ...card, padding: 12, marginBottom: 14, color: DIM, fontSize: 13, lineHeight: 1.6, display: 'flex', gap: 8, alignItems: 'center' }}>
+              <Lock size={13} color={ACCENT} style={{ flexShrink: 0 }} />
+              <span>
+                Решений за последние сутки: {hiddenVerdicts.length}. В пробном доступе они открываются через сутки
+                после публикации, у подписчиков приходят сразу.
+              </span>
+            </div>
+          ) : null}
           {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} outcomes={feeds.outcomes} videos={videos} symbols={symbols} onOpen={openSymbol} />}
           {section === 'history' && isAdmin && <HistoryView doc={feeds.history} order={rows.map((r) => r.symbol)} symbols={symbols} onOpen={openSymbol} />}
           <div style={{ ...label, marginTop: 'auto', paddingTop: 14, lineHeight: 1.7 }}>

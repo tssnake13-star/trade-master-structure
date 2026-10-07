@@ -62,6 +62,10 @@ const LEVELS: { name: string; price?: string; alwaysPrice?: boolean; text: strin
     price: '$2990',
     text: 'Все пять этапов до конца и выход на реальный рынок.',
   },
+  {
+    name: 'ECHO-GATE INSIDE',
+    text: 'Этапов нет: один урок «Точка входа», дальше 2 действия на сделку.',
+  },
 ];
 
 export default function FiveStagesSection({

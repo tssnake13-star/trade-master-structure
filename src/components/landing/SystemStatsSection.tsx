@@ -39,7 +39,7 @@ const SystemStatsSection = () => {
         <div className="mt-3 grid md:grid-cols-2 gap-3">
           <div className="border border-border rounded-xl bg-card p-5">
             <div className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--accent))' }}>Win Rate 23,5% · R:R 9,5:1</div>
-            <p className="mt-2 text-sm text-muted-foreground">Точка безубытка ~11%. Большинство думает, что нужно 70%+ побед — это миф. Важно не как часто ты прав, а сколько берёшь, когда прав.</p>
+            <p className="mt-2 text-sm text-muted-foreground">Точка безубытка около 9,5%: при +9,5 R на прибыльную сделку и −1 R на стоп хватает одной прибыльной из десяти с половиной. Важно не как часто вы правы, а сколько берёте, когда правы.</p>
           </div>
           <div className="border border-border rounded-xl bg-card p-5">
             <div className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--accent))' }}>Profit Factor 2,92</div>

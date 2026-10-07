@@ -113,7 +113,7 @@ const TradesSection = () => {
                     </span>
                   </div>
                   <span className="text-xs text-muted-foreground/60 mt-3 block group-hover:text-muted-foreground">
-                    Открыть разбор ↗
+                    Открыть скрин ↗
                   </span>
                 </div>
               </button>
@@ -170,7 +170,7 @@ const TradesSection = () => {
                     </span>
                   </div>
                   <span className="text-xs text-muted-foreground/60 mt-3 block group-hover:text-muted-foreground">
-                    Открыть разбор ↗
+                    Открыть скрин ↗
                   </span>
                 </div>
               </button>
