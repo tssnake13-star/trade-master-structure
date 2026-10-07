@@ -281,7 +281,8 @@ export default function SchoolAnalytics() {
       >
         <div className="max-w-6xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between gap-4">
           <button
-            onClick={() => navigate('/school/admin')}
+            // 07.10.2026, его слово «возвращаться туда, откуда я зашёл»: на ту вкладку админки, с которой открыта аналитика
+            onClick={() => ((window.history.state?.idx ?? 0) > 0 ? navigate(-1) : navigate('/school/admin'))}
             className="flex items-center gap-2 hover:opacity-70 transition"
             style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#888' }}
           >

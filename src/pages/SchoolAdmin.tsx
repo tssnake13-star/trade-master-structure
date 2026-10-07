@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import BannersSettings from '@/components/school/BannersSettings';
@@ -56,10 +56,20 @@ interface Profile { user_id: string; email: string; full_name: string | null; cr
 interface UserRole { user_id: string; role: string; }
 interface Access { id: string; user_id: string; course_id: string; granted_at: string; expires_at: string | null; unlocked_lessons: number[]; }
 
+type AdminTab = 'courses' | 'students' | 'access' | 'invites' | 'journal' | 'settings';
+const ADMIN_TABS: AdminTab[] = ['courses', 'students', 'access', 'invites', 'journal', 'settings'];
+
 export default function SchoolAdmin() {
   const { session, role, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
-  const [tab, setTab] = useState<'courses' | 'students' | 'access' | 'invites' | 'journal' | 'settings'>('courses');
+  // 07.10.2026, его слово: «открываешь аккаунт, сделал свои дела, нажимаешь назад — открывается программа… я хочу
+  // возвращаться туда, откуда я зашёл». Вкладка живёт в адресе (?tab=students): «Назад» из карточки аккаунта, из
+  // аналитики и кнопкой браузера возвращает на ту же вкладку. «Программы» — без параметра, как было. Смена вкладки
+  // заменяет адрес, а не добавляет шаг в историю.
+  const [params, setParams] = useSearchParams();
+  const tabParam = params.get('tab') as AdminTab | null;
+  const tab: AdminTab = tabParam && ADMIN_TABS.includes(tabParam) ? tabParam : 'courses';
+  const setTab = (t: AdminTab) => setParams(t === 'courses' ? {} : { tab: t }, { replace: true });
 
   useEffect(() => {
     if (!authLoading && !session) navigate('/school', { replace: true });

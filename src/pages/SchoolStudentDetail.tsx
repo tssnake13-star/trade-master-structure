@@ -120,9 +120,17 @@ export default function SchoolStudentDetail() {
     load();
   };
 
+  // 07.10.2026, его слово: «открываешь аккаунт, сделал свои дела, нажимаешь кнопку назад — открывается программа. Должны
+  // открываться аккаунты». Карточка открывается из вкладки «Аккаунты» — туда и возвращаемся: шагом назад по истории
+  // (вкладка записана в адресе админки), а если карточку открыли напрямую — на «Аккаунты».
+  const backToAccounts = () => {
+    if ((window.history.state?.idx ?? 0) > 0) navigate(-1);
+    else navigate('/school/admin?tab=students', { replace: true });
+  };
+
   const deleteStudent = async () => {
     await supabase.rpc('delete_student', { _user_id: studentId! });
-    navigate('/school/admin');
+    navigate('/school/admin?tab=students', { replace: true });
   };
 
   const grantAccess = async () => {
@@ -293,7 +301,7 @@ export default function SchoolStudentDetail() {
   return (
     <div data-school-skin className="min-h-screen" style={{ backgroundColor: '#080808', color: '#e8e0d0' }}>
       <header className="border-b px-4 py-3 flex items-center gap-3" style={{ borderColor: '#1a1a1a' }}>
-        <button onClick={() => navigate('/school/admin')} className="hover:opacity-70 transition">
+        <button onClick={backToAccounts} className="hover:opacity-70 transition" aria-label="Назад к аккаунтам">
           <ArrowLeft size={18} style={{ color: '#666' }} />
         </button>
         <h1 className="text-xl" style={{ fontFamily: font.heading }}>
@@ -463,7 +471,8 @@ export default function SchoolStudentDetail() {
         {/* ======== TERMINAL BLOCK ======== */}
         <section className="rounded-lg border p-5" style={{ borderColor: '#1a1a1a', backgroundColor: '#0d0d0d' }}>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm" style={{ fontFamily: font.heading, color: '#888' }}>TRADE MASTER INSIDE</h2>
+            {/* 07.10.2026, его слово: старое название «TRADE MASTER INSIDE» — должно быть ECHO-GATE INSIDE */}
+            <h2 className="text-sm" style={{ fontFamily: font.heading, color: '#888' }}>ECHO-GATE INSIDE</h2>
             <span className="text-[11px]" style={{ color: terminalActive ? '#4a8a4a' : '#555', fontFamily: font.mono }}>
               {terminalActive ? `открыт до ${new Date(terminalUntil!).toLocaleDateString('ru-RU')}`
                 : terminalUntil ? `срок вышел ${new Date(terminalUntil).toLocaleDateString('ru-RU')}` : 'не выдан'}
