@@ -5,7 +5,7 @@ import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackPageview, trackClick } from '@/lib/analytics';
 import StructureField from '@/components/landing/StructureField';
 import PackageCards from '@/components/landing/PackageCards';
-import WhereYouAreNow from '@/components/landing/WhereYouAreNow';
+import TwoPathsScheme from '@/components/landing/TwoPathsScheme';
 import ProofStrip from '@/components/landing/ProofStrip';
 import FiveStagesSection from '@/components/landing/FiveStagesSection';
 import PurchaseFAQ from '@/components/landing/PurchaseFAQ';
@@ -17,7 +17,8 @@ import PurchaseFAQ from '@/components/landing/PurchaseFAQ';
  *
  * Порядок блоков задан Сергеем 06.09.2026: шапка → бесплатный вердикт →
  * где вы сейчас → доказательства → пять этапов → карточки и экосистема →
- * вопросы перед оплатой → заявка.
+ * вопросы перед оплатой → заявка. 07.10.2026 «где вы сейчас» заменено
+ * схемой «вход и два пути» (TwoPathsScheme), здесь она со всеми ценами.
  */
 export default function Access() {
   // страница цен — считаем отдельно от лендинга: сюда приходят из бота, и важно
@@ -26,7 +27,7 @@ export default function Access() {
   // свой заголовок вкладки: по нему и ИИ-читатели понимают, что это страница цен (05.10.2026)
   useEffect(() => {
     const prev = document.title;
-    document.title = 'Цены и уровни обучения — TRADELIKETYO';
+    document.title = 'Цены и условия — TRADELIKETYO';
     return () => { document.title = prev; };
   }, []);
 
@@ -39,48 +40,19 @@ export default function Access() {
           <div className="max-w-3xl">
             <span className="section-label" style={{ color: 'hsl(var(--accent))' }}>TLT · Доступ · цены и условия</span>
             <h1 className="text-foreground" style={{ fontSize: 'clamp(44px, 7vw, 88px)', lineHeight: 0.98 }}>
-              4 уровня. <em>Один алгоритм.</em>
+              Два пути. <em>Один алгоритм.</em>
             </h1>
             <p className="mt-5 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '58ch' }}>
-              Алгоритм решает, какую сделку брать. Разница между уровнями в одном: сколько раз
-              я стою рядом, когда вы это решение принимаете.
+              Можно торговать по системе, не изучая её целиком: рынок считает терминал, исполняет
+              советник, от вас 2 действия. А можно изучить систему, самому или вместе со мной.
             </p>
           </div>
 
-          {/* бесплатный вход. Лимит настоящий: 5 разборов в неделю — столько
-              Сергей реально успевает. Число не завышаем никогда. */}
-          <a
-            href={TELEGRAM_LINKS.razbor}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackClick('access_razbor')}
-            className="mt-8 flex items-start justify-between gap-4 max-w-2xl border rounded-xl p-5 transition-colors group"
-            style={{ borderColor: 'hsl(var(--accent) / 0.35)', background: 'hsl(var(--accent) / 0.05)' }}
-          >
-            <div>
-              <div className="text-mono" style={{ fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'hsl(var(--accent))' }}>
-                Вердикт · бесплатно
-              </div>
-              <div className="mt-2 text-foreground font-medium">Не готовы решать — пришлите одну свою сделку</div>
-              <p className="mt-1.5 text-sm text-muted-foreground">
-                Ту, где вы всё сделали правильно и всё равно получили убыток. Нужен скрин с компьютера,
-                где виден вход и стоп, и пара фраз, почему вы вошли. В течение 48 часов отвечу лично
-                голосовым: прошла бы эта сделка допуск или нет и на чём именно она сломалась. Случай
-                требует объяснений — запишу видеоразбор.
-              </p>
-              <p className="mt-2 text-sm text-foreground/80">
-                Скажу и то, какой уровень вам нужен. И скажу, если не нужен никакой.
-              </p>
-              <p className="mt-2 text-xs text-muted-foreground">
-                Разбираю валютные пары, золото и металлы, нефть, биткоин и эфир. Другую крипту не смотрю.
-                Скрины с телефона и сделки без описания не разбираю. Беру 5 разборов в неделю.
-              </p>
-            </div>
-            <ArrowRight className="w-4 h-4 flex-shrink-0 mt-1 group-hover:translate-x-1 transition-transform" style={{ color: 'hsl(var(--accent))' }} />
-          </a>
-
-          <div className="mt-12 md:mt-16">
-            <WhereYouAreNow showPrices={true} />
+          {/* Бесплатный вход — первый узел схемы, отдельной карточки вердикта
+              больше нет (Сергей 07.10.2026: «убери одно»). Полный текст и три
+              условия разбора живут внутри схемы (detailedEntry). */}
+          <div className="mt-10 md:mt-12">
+            <TwoPathsScheme showPrices={true} detailedEntry entryClickId="access_razbor" />
           </div>
 
           <div className="mt-10 md:mt-14">

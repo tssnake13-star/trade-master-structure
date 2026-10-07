@@ -14,7 +14,7 @@ const sections = [
   { id: 'protection', num: '10', label: 'Защита' },
   { id: 'stages', num: '11', label: 'Путь' },
   { id: 'verdict', num: '★', label: 'Вердикт' },
-  { id: 'formats', num: '12', label: 'Уровни и цены' },
+  { id: 'formats', num: '12', label: 'Сотрудничество' },
   { id: 'author', num: '13', label: 'Автор' },
   { id: 'faq', num: '14', label: 'Вопросы' },
 ];
@@ -61,7 +61,9 @@ const SideNav = () => {
   return (
     <nav
       aria-label="Навигация по разделам"
-      className="hidden xl:flex fixed left-8 top-1/2 -translate-y-1/2 z-40 flex-col gap-2.5"
+      // с 1680px: при меньшей ширине подписи меню (правый край около 268px)
+      // наезжали на левый край содержимого (07.10.2026, замер на 1600px: 268 против 249)
+      className="hidden min-[1680px]:flex fixed left-8 top-1/2 -translate-y-1/2 z-40 flex-col gap-2.5"
       style={{
         fontFamily: "'Martian Mono', ui-monospace, monospace",
         opacity: pastHero ? 1 : 0,

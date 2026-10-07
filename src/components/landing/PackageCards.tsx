@@ -6,10 +6,11 @@ import { trackClick } from '@/lib/analytics';
  * PackageCards — shared package/pricing cards used on the homepage (without
  * prices) and on the hidden /access page (with prices).
  *
- * Layout: Trade System is content-heavy (что входит + чего нет + архив + переход),
- * so it renders as ONE full-width card with a 2-column inner body — that keeps it
- * short instead of a tall narrow column. Practicum + Trade OS Plus + VIP sit
- * below it as a three-step ladder. On mobile everything stacks to one column.
+ * Линейка «вход и два пути» (Сергей 07.10.2026): первым идёт путь 01 —
+ * подписка ECHO-GATE INSIDE для всех; дальше путь 02 — Trade System одной
+ * широкой карточкой (что входит + чего нет + архив + переход) и практикум
+ * рядом с VIP. Trade OS Plus снят с витрины 07.10.2026. На телефоне всё
+ * складывается в одну колонку.
  *
  * Ни у одного тарифа больше нет пометки «популярный»: пока непонятно, что
  * окажется популярным, а метка на витрине выбирает за человека.
@@ -23,8 +24,8 @@ type Pkg = {
   notIncluded?: string[];
   upsell?: string;
   /**
-   * Тот же переход выше, но без сумм — для лендинга, где цены Trade OS Plus и VIP
-   * не раскрываются. По доплате они считаются в уме: $349 + $1250 = $1599.
+   * Тот же переход выше, но без сумм — для лендинга, где цена VIP
+   * не раскрывается. По доплате она считается в уме: $349 + $2641 = $2990.
    */
   upsellPublic?: string;
   addon?: {
@@ -37,7 +38,7 @@ type Pkg = {
   admission?: string;
   /**
    * Снятие риска. Правило первого блока действует ТОЛЬКО на практикуме
-   * и годовой: курс за $349 — самая низкая цена входа, там возврата нет,
+   * (и на годовой у тех, кто её уже купил): курс за $349 — самая низкая цена входа, там возврата нет,
    * и это сказано прямо (решение Сергея 06.09.2026). У VIP своя причина:
    * инструменты лицензируются под счёт и остаются навсегда.
    */
@@ -60,7 +61,7 @@ type Pkg = {
 
 const PACKAGES: Pkg[] = [
   {
-    tag: '01 · Старт',
+    tag: 'Путь 02 · самостоятельно',
     name: 'Trade System',
     clickId: 'trade_system',
     subtitle: 'Полностью самостоятельный',
@@ -69,14 +70,14 @@ const PACKAGES: Pkg[] = [
       'Курс TRADE SYSTEM 2.0: 10 глав в личном кабинете',
       'Полный PDF-алгоритм системы',
       'Финальный зачёт и статус выпускника школы',
-      'После зачёта — право подключить экосистему (Echo Gate, Hunter Bot, Risk Sentinel)',
+      'После курса подписка ECHO-GATE INSIDE подключается сразу',
     ],
     notIncluded: [
       'Пяти этапов подготовки: здесь вы получаете саму систему и проходите её сами',
-      'Моего участия — разборы ваших сделок, обратная связь и личный чат начинаются на следующем уровне',
+      'Моего участия — разборы ваших сделок, обратная связь и личный чат начинаются в практикуме',
     ],
-    upsell: 'В течение 30 дней после покупки оплаченные $349 зачитываются в Trade OS Plus полностью. Доплата $1250. В практикум доплатой перейти нельзя — это отдельная ступень.',
-    upsellPublic: 'В течение 30 дней после покупки оплаченное зачитывается в Trade OS Plus полностью. В практикум доплатой перейти нельзя — это отдельная ступень.',
+    upsell: 'В течение 30 дней после покупки оплаченные $349 зачитываются в VIP полностью. Доплата $2641. В практикум доплатой перейти нельзя — это отдельная ступень.',
+    upsellPublic: 'В течение 30 дней после покупки оплаченное зачитывается в VIP полностью. В практикум доплатой перейти нельзя — это отдельная ступень.',
     addon: {
       label: 'Дополнительно',
       title: 'ГОД ОТВЕТОВ — архив мастер-группы за 2025',
@@ -97,7 +98,7 @@ const PACKAGES: Pkg[] = [
     showPriceAlways: true,
   },
   {
-    tag: '02 · Практикум',
+    tag: 'Путь 02 · вместе со мной',
     name: 'Trade System Practicum',
     clickId: 'practicum',
     subtitle: '60 дней работы со мной',
@@ -119,8 +120,8 @@ const PACKAGES: Pkg[] = [
         text: 'Первый блок вводный. Пройдите его целиком и решите. Не ваше — возвращаю деньги в полном объёме, объяснять ничего не нужно. Открыли второй блок — значит решение принято, и дальше мы идём до конца.',
       },
     ],
-    upsell: 'В течение 67 дней (60 дней потока плюс неделя после) оплаченные $499 зачитываются в Trade OS Plus полностью. Доплата $1100.',
-    upsellPublic: 'В течение 67 дней (60 дней потока плюс неделя после) оплаченное зачитывается в Trade OS Plus полностью.',
+    upsell: 'В течение 67 дней (60 дней потока плюс неделя после) оплаченные $499 зачитываются в VIP полностью. Доплата $2491. После практикума подписка ECHO-GATE INSIDE подключается сразу.',
+    upsellPublic: 'В течение 67 дней (60 дней потока плюс неделя после) оплаченное зачитывается в VIP полностью. После практикума подписка ECHO-GATE INSIDE подключается сразу.',
     outcome: 'К концу 60 дней вы принимаете решения по алгоритму сами. До пятого этапа за два месяца обычно не доходят, и я говорю об этом сразу.',
     price: '$499',
     period: '60 дней',
@@ -128,38 +129,16 @@ const PACKAGES: Pkg[] = [
     ctaHref: TELEGRAM_LINKS.dm,
     showPriceAlways: true,
   },
+  // Trade OS Plus ($1599) снят с витрины 07.10.2026: три годовых продукта рядом
+  // (годовая, год подписки, VIP) клиент не различал. Обещанное доводится лично.
   {
-    tag: '03 · Сопровождение',
-    name: 'Trade OS Plus',
-    clickId: 'trade_os',
-    forWhom: 'Вы торгуете больше полугода. Проблема уже не в знаниях: решения разные, размер риска разный, в каждой фазе рынка вы действуете по-новому.',
-    points: [
-      'Всё из практикума',
-      'Полная настройка вашей торговли',
-      'Сценарии под разные фазы рынка',
-      'Система сопровождения и выхода из сделки',
-      'Проверка ваших решений весь год',
-      'Закрытая дисциплинарная группа',
-    ],
-    guarantee: [
-      {
-        title: 'Правило первого блока',
-        text: 'Первый блок вводный. Пройдите его целиком и решите. Не ваше — возвращаю деньги в полном объёме. Открыли второй блок — значит решение принято, и дальше мы идём до конца.',
-      },
-    ],
-    outcome: 'За год проходите все пять этапов и выходите на реальный рынок. Вопрос «что сейчас делать» сменяется вопросом «что делает моя система в этой ситуации».',
-    oldPrice: '$1799',
-    price: '$1599',
-    period: '365 дней',
-    ctaText: 'Выбрать Trade OS Plus',
-  },
-  {
-    tag: '04 · Всё включено',
+    tag: 'Всё сразу',
     name: 'VIP',
     clickId: 'trade_os_plus',
     forWhom: 'Для тех, кому нужна не ещё одна программа, а вся инфраструктура школы — собранная, настроенная и оставшаяся у вас.',
     points: [
-      'Всё из Trade OS Plus',
+      'Все пять этапов обучения и год сопровождения',
+      'ECHO-GATE INSIDE на год',
       'Индикаторы, скрипты и таблицы системы',
       'Hunter Bot и Risk Sentinel — навсегда, остаются у вас',
     ],
@@ -184,15 +163,15 @@ const PACKAGES: Pkg[] = [
  * $447 / 3 = $149 в месяц. Зачёркнутая цена — тот же срок по $149:
  * 6 × 149 = $894, 12 × 149 = $1788. Цену 3 месяцев не трогать.
  * Цены, зачёркнутые цены и расчёт видны только на /access: на лендинге
- * цены экосистемы не раскрываются.
+ * цены подписки не раскрываются.
  *
- * ⚠️ Советники в аренду — только с 6 месяцев (Сергей 29.09.2026: «Советники в аренду
- * на три месяца не идут. Советники начинаются с 6 месяцев и в 12 месяцах пускай будет»).
- * 3 месяца — только ECHO-GATE INSIDE в кабинете; 6 и 12 — он же плюс Echo Gate,
- * Hunter Bot и Risk Sentinel в аренду.
+ * ⚠️ С 07.10.2026 подписка открыта всем, не только выпускникам, и советники
+ * Echo Gate, Hunter Bot и Risk Sentinel входят во все сроки (решение Сергея:
+ * без советника нет кнопки, а на ней держится обещание «2 действия»).
+ * Правило 29.09 «советники только с 6 месяцев» отменено.
  */
 const ECOSYSTEM: { price: string; oldPrice?: string; period: string; desc: string; saving?: string; featured: boolean }[] = [
-  { price: '$447', period: '3 месяца', desc: 'ECHO-GATE INSIDE в личном кабинете. Советники в аренду — от 6 месяцев.', featured: false },
+  { price: '$447', period: '3 месяца', desc: 'ECHO-GATE INSIDE и советники Echo Gate, Hunter Bot и Risk Sentinel в аренду на 3 месяца.', featured: false },
   { price: '$840', oldPrice: '$894', period: '6 месяцев', desc: 'ECHO-GATE INSIDE и советники Echo Gate, Hunter Bot и Risk Sentinel в аренду на полгода.', saving: '$140 в месяц вместо $149, экономия $54.', featured: false },
   { price: '$1490', oldPrice: '$1788', period: '12 месяцев', desc: 'ECHO-GATE INSIDE и советники Echo Gate, Hunter Bot и Risk Sentinel в аренду на год.', saving: 'Около $124 в месяц вместо $149, экономия $298.', featured: true },
 ];
@@ -315,16 +294,74 @@ export default function PackageCards({
 
   return (
     <>
-      {/* Курс и практикум — разные ступени, а не версии одного продукта.
-          Доплата работает только наверх, в годовую: решение о ступени
-          принимается на берегу (Сергей, 06.09.2026). */}
+      {/* Два пути (Сергей, 07.10.2026). Курс и практикум — разные ступени,
+          а не версии одного продукта: решение о ступени принимается на берегу.
+          Доплата работает наверх, в VIP. */}
       <div className="mb-3 p-4 md:p-5" style={{ border: '1px solid hsl(var(--accent) / 0.28)', background: 'hsl(var(--accent) / 0.04)' }}>
         <div className="text-mono" style={{ ...MONO, color: GOLD }}>Как устроен выбор</div>
         <p className="mt-2 text-sm text-foreground/85 leading-relaxed" style={{ maxWidth: '78ch' }}>
-          Trade System и практикум — разные ступени, а не версии одного. Перейти из курса в практикум
-          доплатой нельзя, выбирайте сразу. Доплата работает только наверх: и курс, и практикум
-          зачитываются в годовую программу полностью, ваши деньги не сгорают.
+          Хотите торговать по системе, не изучая её целиком, — подписка ECHO-GATE INSIDE, обучение для неё
+          не нужно. Хотите изучить систему — курс или практикум. Это разные ступени: перейти из курса
+          в практикум доплатой нельзя, выбирайте сразу. Доплата работает наверх: и курс, и практикум
+          зачитываются в VIP полностью, ваши деньги не сгорают. После любого обучения подписка подключается сразу.
         </p>
+      </div>
+
+      {/* путь 01 — подписка для всех, главный продукт */}
+      <div className="mb-3 p-6 md:p-7" style={{ background: 'radial-gradient(120% 80% at 50% 0%, hsl(var(--accent) / 0.08), hsl(var(--card)) 60%)', border: '1px solid hsl(var(--accent) / 0.45)' }}>
+        <div className="text-mono" style={{ ...MONO, color: GOLD }}>Путь 01 · подписка для всех</div>
+        <h3 className="mt-2 text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>ECHO-GATE INSIDE</h3>
+        <p className="mt-3 text-sm md:text-base text-muted-foreground" style={{ maxWidth: '72ch' }}>
+          Для тех, кто хочет торговать по системе, не изучая её целиком. Терминал в личном кабинете считает рынок
+          по правилам алгоритма: направление, подтверждение, сценарий, допуски и отказы. По каждому допуску — мой
+          вердикт с причиной. Советники работают на вашем счёте: <b className="text-foreground/90">Echo Gate</b> присылает
+          разрешённые входы, <b className="text-foreground/90">Hunter Bot</b> входит в сделку, ставит стоп и тейк
+          и переводит в безубыток, <b className="text-foreground/90">Risk Sentinel</b> держит лимиты риска.
+        </p>
+        <p className="mt-3 text-sm md:text-base text-foreground/90" style={{ maxWidth: '72ch' }}>
+          От вас 2 действия: отметить точку входа и нажать СТАРТ. Один раз в начале — урок «Точка входа»
+          и настройка советников по пошаговой инструкции.
+        </p>
+        <p className="mt-3 text-sm text-muted-foreground" style={{ maxWidth: '72ch' }}>
+          Что нужно для старта: MT4 или MT5 у любого брокера и VPS, удалённый сервер, чтобы советники работали
+          круглосуточно. Размер депозита и риск на сделку вы выбираете сами: я торгую с риском 0,25% на сделку,
+          но ваш риск остаётся вашим решением.
+        </p>
+        <p className="mt-3 text-xs md:text-sm" style={{ maxWidth: '72ch', color: 'hsl(var(--accent-dim))' }}>
+          Честно: стопы никуда не делись, за 21 месяц у меня 3 убыточных месяца. Точку входа вы ставите сами,
+          поэтому ваш результат может отличаться от моего. Прошлый результат не гарантирует будущий.
+        </p>
+        <div className="mt-5 grid sm:grid-cols-3 gap-3">
+          {ECOSYSTEM.map((e) => (
+            <div key={e.period} className="p-4" style={{ border: `1px solid ${e.featured ? 'hsl(var(--accent) / 0.3)' : 'hsl(var(--rule-soft))'}` }}>
+              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                {showPrices && <span style={{ ...SERIF, fontSize: 26, color: 'hsl(var(--foreground))' }}>{e.price}</span>}
+                {showPrices && e.oldPrice && (
+                  <span className="text-sm line-through" style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }}>{e.oldPrice}</span>
+                )}
+                <span className="text-mono" style={{ ...MONO, fontSize: showPrices ? 10 : 13, letterSpacing: '0.12em', color: showPrices ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground))' }}>
+                  {showPrices ? `/ ${e.period}` : e.period}
+                </span>
+              </div>
+              <p className="mt-1.5 text-xs text-muted-foreground">
+                {e.desc}{showPrices && e.saving && <> <b className="text-foreground/90">{e.saving}</b></>}
+              </p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-5 flex flex-col sm:flex-row sm:items-center gap-3">
+          <a
+            href={TELEGRAM_LINKS.dm}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackClick('package_echo_gate')}
+            className="btn-primary inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium group"
+          >
+            {showPrices ? 'Оформить подписку' : 'Узнать стоимость'}
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </a>
+          <span className="text-xs text-muted-foreground">Перед оплатой можно посмотреть терминал: 7 дней пробного доступа по запросу. После оплаты возврата нет: подписка это аренда на срок.</span>
+        </div>
       </div>
 
       <div className="grid gap-3">
@@ -401,37 +438,9 @@ export default function PackageCards({
           </div>
         </div>
 
-        {/* Практикум + Trade OS Plus + VIP — лестница под Trade System.
-            На планшете по две в ряд, на телефоне в одну колонку. */}
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        {/* Практикум + VIP под Trade System. На телефоне в одну колонку. */}
+        <div className="grid gap-3 md:grid-cols-2">
           {PACKAGES.slice(1).map(stdCard)}
-        </div>
-      </div>
-
-      {/* ecosystem subscription — graduates only */}
-      <div className="mt-3 p-6 md:p-7" style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
-        <h3 className="text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>Подписка на экосистему</h3>
-        <div className="text-mono mt-1.5" style={{ ...MONO, letterSpacing: '0.16em', color: 'hsl(var(--cool))' }}>только выпускникам</div>
-        <p className="mt-3 text-sm md:text-base text-muted-foreground" style={{ maxWidth: '70ch' }}>
-          Подписка открывает <b className="text-foreground/90">ECHO-GATE INSIDE</b> — «Глаз системы» в личном кабинете: живые графики, допуски и отказы по системе в том виде, как их получают подписчики. С 6 месяцев к нему добавляются советники в аренду: <b className="text-foreground/90">Echo Gate</b> — допуск: присылает разрешённые входы, <b className="text-foreground/90">Hunter Bot</b> — исполняет одобренный вами приказ и сопровождает позицию, <b className="text-foreground/90">Risk Sentinel</b> — защита капитала. Решение всегда за вами.
-        </p>
-        <div className="mt-5 grid sm:grid-cols-3 gap-3">
-          {ECOSYSTEM.map((e) => (
-            <div key={e.period} className="p-4" style={{ border: `1px solid ${e.featured ? 'hsl(var(--accent) / 0.3)' : 'hsl(var(--rule-soft))'}` }}>
-              <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                {showPrices && <span style={{ ...SERIF, fontSize: 26, color: 'hsl(var(--foreground))' }}>{e.price}</span>}
-                {showPrices && e.oldPrice && (
-                  <span className="text-sm line-through" style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }}>{e.oldPrice}</span>
-                )}
-                <span className="text-mono" style={{ ...MONO, fontSize: showPrices ? 10 : 13, letterSpacing: '0.12em', color: showPrices ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground))' }}>
-                  {showPrices ? `/ ${e.period}` : e.period}
-                </span>
-              </div>
-              <p className="mt-1.5 text-xs text-muted-foreground">
-                {e.desc}{showPrices && e.saving && <> <b className="text-foreground/90">{e.saving}</b></>}
-              </p>
-            </div>
-          ))}
         </div>
       </div>
     </>

@@ -1,32 +1,33 @@
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import PackageCards from './PackageCards';
-import WhereYouAreNow from './WhereYouAreNow';
+import TwoPathsScheme from './TwoPathsScheme';
 
+/**
+ * «12 · Сотрудничество» — линейка «вход и два пути» (Сергей 07.10.2026).
+ * На лендинге цены только у курса ($349) и практикума ($499); цены подписки
+ * ECHO-GATE INSIDE и VIP — только на /access.
+ */
 const LevelsSection = () => {
   return (
     <section id="formats" className="section-animate py-12 md:py-20 bg-card/40 border-y border-border">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <span className="section-label">12 · Уровни и цены</span>
+          <span className="section-label">12 · Сотрудничество</span>
           <h2 className="text-foreground">
-            4 уровня. <em>Один алгоритм.</em>
+            Два пути. <em>Один алгоритм.</em>
           </h2>
-          <p className="mt-4 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '56ch' }}>
-            Алгоритм решает, какую сделку брать. Разница между уровнями в одном: сколько раз
-            я стою рядом, когда вы это решение принимаете.
+          <p className="mt-4 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '58ch' }}>
+            Можно торговать по системе, не изучая её целиком: рынок считает терминал, исполняет
+            советник, от вас 2 действия. А можно изучить систему, самому или вместе со мной.
           </p>
-          <p className="mt-5 text-base md:text-lg text-foreground">
-            Стоимость: <span style={{ color: 'hsl(var(--accent))', fontWeight: 500 }}>от&nbsp;$349</span>, в зависимости от уровня.
-          </p>
-        </div>
-
-        {/* навигация по состоянию: цены верхних двух уровней здесь не раскрываются */}
-        <div className="mt-8 md:mt-10">
-          <WhereYouAreNow showPrices={false} />
         </div>
 
         <div className="mt-8 md:mt-12">
-          {/* prices are hidden on the homepage — shown only on the private /access page */}
+          <TwoPathsScheme showPrices={false} />
+        </div>
+
+        <div className="mt-10 md:mt-14">
+          {/* цены подписки и VIP здесь не раскрываются — только на /access */}
           <PackageCards showPrices={false} />
         </div>
 
