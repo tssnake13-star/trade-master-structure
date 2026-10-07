@@ -56,22 +56,27 @@ export default function TwoPathsScheme({
   detailedEntry?: boolean;
   entryClickId?: string;
 }) {
-  const rows = (list: Row[], accent: string) => (
+  const rows = (list: Row[]) => (
     <div className="mt-5">
       {list.map((r) => {
         const price = r.price && (showPrices || r.publicPrice) ? r.price : null;
         return (
           <div
             key={r.name}
-            className="flex items-start justify-between gap-4 py-3"
+            className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 py-3"
             style={{ borderTop: '1px solid hsl(var(--rule-soft))' }}
           >
             <div>
               <div className="text-sm text-foreground font-medium">{r.name}</div>
               <div className="mt-0.5 text-xs text-muted-foreground">{r.note}</div>
             </div>
+            {/* 07.10.2026, его слово: цены мелкие, «покрупнее нельзя?» — тем же шрифтом, что цена VIP;
+                на узком экране строка с тремя ценами переносится под название */}
             {price && (
-              <div className="text-mono flex-shrink-0 text-right" style={{ ...MONO, letterSpacing: '0.1em', color: accent, marginTop: 2 }}>
+              <div
+                className="flex-shrink-0 text-right"
+                style={{ ...SERIF, fontSize: 'clamp(22px, 2.4vw, 28px)', lineHeight: 1.1, color: 'hsl(var(--foreground))', whiteSpace: 'nowrap' }}
+              >
                 {price}
               </div>
             )}
@@ -136,7 +141,7 @@ export default function TwoPathsScheme({
             Торговать <em>по системе</em>
           </h3>
           <p className="mt-1.5 text-sm text-muted-foreground">Не изучая её целиком</p>
-          {rows(PATH_TRADE, GOLD)}
+          {rows(PATH_TRADE)}
         </div>
 
         <div className="md:hidden"><Wire h={12} /></div>
@@ -147,7 +152,7 @@ export default function TwoPathsScheme({
             Изучить <em>систему</em>
           </h3>
           <p className="mt-1.5 text-sm text-muted-foreground">Самому или вместе со мной</p>
-          {rows(PATH_LEARN, GOLD)}
+          {rows(PATH_LEARN)}
         </div>
       </div>
 
