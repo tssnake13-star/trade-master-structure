@@ -45,6 +45,36 @@ const accessHtml = template
 fs.writeFileSync(path.join(distDir, 'access-prerendered.html'), accessHtml);
 console.log(`✓ pre-rendered /access → dist/access-prerendered.html (${accessApp.length} bytes of content)`);
 
+// Документы /privacy и /terms (07.10.2026) — тот же приём: роботы рекламных площадок,
+// которые проверяют ссылку на политику, и ИИ-читатели получают текст, а не оболочку.
+// Свои title, description, canonical и og:url; разметка FAQ с главной сюда не идёт.
+const LEGAL_PAGES = [
+  {
+    route: '/privacy',
+    file: 'privacy-prerendered.html',
+    title: 'Политика конфиденциальности — TRADELIKETYO',
+    description: 'Какие данные получает сайт TRADE LIKE TYO, личный кабинет и Telegram-бот школы, зачем, где они хранятся и как их удалить.',
+  },
+  {
+    route: '/terms',
+    file: 'terms-prerendered.html',
+    title: 'Пользовательское соглашение — TRADELIKETYO',
+    description: 'Правила пользования сайтом, личным кабинетом и терминалом ECHO-GATE INSIDE, условия оплаты, доступа и возврата.',
+  },
+];
+for (const page of LEGAL_PAGES) {
+  const app = render(page.route);
+  const html = template
+    .replace('<div id="root"></div>', () => `<div id="root">${app}</div>`)
+    .replace(/<title>[^<]*<\/title>/, () => `<title>${page.title}</title>`)
+    .replace(/<meta name="description" content="[^"]*"\s*\/?>/, () => `<meta name="description" content="${page.description}">`)
+    .replace(/<link rel="canonical" href="[^"]*"\s*\/?>/, () => `<link rel="canonical" href="${SITE}${page.route}" />`)
+    .replace(/<meta property="og:url" content="[^"]*"\s*\/?>/, () => `<meta property="og:url" content="${SITE}${page.route}" />`)
+    .replace(/<script type="application\/ld\+json">[\s\S]*?<\/script>\s*/g, '');
+  fs.writeFileSync(path.join(distDir, page.file), html);
+  console.log(`✓ pre-rendered ${page.route} → dist/${page.file} (${app.length} bytes of content)`);
+}
+
 // ---------- llms.txt / llms-full.txt ----------
 
 const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', mdash: '—', ndash: '–', laquo: '«', raquo: '»', hellip: '…', middot: '·', minus: '−', rarr: '→', larr: '←' };

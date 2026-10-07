@@ -10,17 +10,21 @@ import { rewrite, next } from '@vercel/edge';
 //     fetching the page with a plain HTTP client saw an empty 8 KB shell.
 //   · since 05.10.2026 the same for the pricing page /access (Сергей: «опять gpt не может
 //     прочитать страницу» — ChatGPT по ссылке на цены видел пустую оболочку).
+//   · since 07.10.2026 the same for the documents /privacy and /terms (ad platforms check
+//     the privacy policy link with their own robots).
 // Real browsers opening the page get the light client-side shell (index.html).
 // A real browser navigation is recognised by Fetch Metadata headers, which every
 // modern browser sends and plain HTTP clients don't. Both variants carry the same
 // scripts, so a human who lands on a pre-rendered file still gets the full working app.
 export const config = {
-  matcher: ['/', '/access'],
+  matcher: ['/', '/access', '/privacy', '/terms'],
 };
 
 const PRERENDERED: Record<string, string> = {
   '/': '/prerendered.html',
   '/access': '/access-prerendered.html',
+  '/privacy': '/privacy-prerendered.html',
+  '/terms': '/terms-prerendered.html',
 };
 
 const BOT_RE =

@@ -206,9 +206,13 @@ export default function SchoolAuth() {
           </button>
         </form>
 
+        {/* 07.10.2026: документы появились, ссылки открываются в новой вкладке, чтобы не терять заполненную форму */}
         {!isLogin && (
-          <p className="mt-3 text-center text-[10px] leading-snug px-2" style={{ color: '#555', fontFamily: "'Hanken Grotesk', sans-serif" }}>
-            Регистрируясь, вы соглашаетесь с обработкой персональных данных в соответствии с политикой конфиденциальности и принимаете пользовательское соглашение.
+          <p className="mt-3 text-center text-[11px] leading-snug px-2" style={{ color: '#77705f', fontFamily: "'Hanken Grotesk', sans-serif" }}>
+            Регистрируясь, вы соглашаетесь с обработкой персональных данных в соответствии с{' '}
+            <a href="/privacy" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-[#caa472] transition-colors">политикой конфиденциальности</a>
+            {' '}и принимаете{' '}
+            <a href="/terms" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-[#caa472] transition-colors">пользовательское соглашение</a>.
           </p>
         )}
 

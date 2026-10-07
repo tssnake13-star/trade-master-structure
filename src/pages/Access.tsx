@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import '@/styles/v3-skin.css';
 import { TELEGRAM_LINKS } from '@/lib/constants';
@@ -95,6 +96,14 @@ export default function Access() {
           <span style={{ fontFamily: "'Space Mono', monospace", fontSize: 10, letterSpacing: '0.2em', textTransform: 'uppercase', color: 'hsl(var(--muted-foreground) / 0.6)' }}>
             TRADELIKETYO · 2026
           </span>
+          {/* условия оплаты и возврата целиком — в соглашении (07.10.2026) */}
+          <div
+            className="mt-3 flex flex-wrap justify-center gap-x-6 gap-y-2"
+            style={{ fontFamily: "'Space Mono', monospace", fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'hsl(var(--muted-foreground) / 0.8)' }}
+          >
+            <Link to="/terms" className="hover:text-foreground transition-colors">Пользовательское соглашение</Link>
+            <Link to="/privacy" className="hover:text-foreground transition-colors">Политика конфиденциальности</Link>
+          </div>
         </footer>
       </main>
     </div>

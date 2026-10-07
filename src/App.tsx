@@ -20,6 +20,8 @@ import PreviewRedesign from "./pages/PreviewRedesign";
 import PreviewNext from "./pages/PreviewNext";
 import PreviewCandles from "./pages/PreviewCandles";
 import Access from "./pages/Access";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 import SchoolPreview from "./pages/SchoolPreview";
 import SchoolLadderPreview from "./pages/SchoolLadderPreview";
 import SchoolHomePreview from "./pages/SchoolHomePreview";
@@ -38,6 +40,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/access" element={<Access />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
             <Route path="/preview-redesign" element={<PreviewRedesign />} />
             <Route path="/preview-next" element={<PreviewNext />} />
             <Route path="/preview-candles" element={<PreviewCandles />} />

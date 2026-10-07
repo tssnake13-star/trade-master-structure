@@ -42,6 +42,14 @@ const Footer = () => {
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} TRADELIKETYO. Все права защищены.
           </p>
+          <div className="mt-3 flex flex-wrap justify-center gap-x-6 gap-y-2 text-xs text-muted-foreground/60">
+            <Link to="/privacy" className="hover:text-muted-foreground transition-colors">
+              Политика конфиденциальности
+            </Link>
+            <Link to="/terms" className="hover:text-muted-foreground transition-colors">
+              Пользовательское соглашение
+            </Link>
+          </div>
         </div>
 
         {/* Disclaimer */}

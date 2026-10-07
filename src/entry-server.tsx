@@ -1,3 +1,4 @@
+import type { ComponentType } from 'react';
 import { renderToString } from 'react-dom/server';
 import { StaticRouter } from 'react-router-dom/server';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
@@ -5,6 +6,16 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { AuthProvider } from '@/contexts/AuthContext';
 import Index from './pages/Index';
 import Access from './pages/Access';
+import Privacy from './pages/Privacy';
+import Terms from './pages/Terms';
+
+// /privacy и /terms (07.10.2026): документы должны читаться и без скриптов,
+// их открывают проверяющие роботы рекламных площадок и ИИ-читатели.
+const PAGES: Record<string, ComponentType> = {
+  '/access': Access,
+  '/privacy': Privacy,
+  '/terms': Terms,
+};
 
 /**
  * Build-time render of a page to static HTML: the landing ("/") and, since 05.10.2026,
@@ -18,12 +29,13 @@ import Access from './pages/Access';
  */
 export function render(url: string = '/'): string {
   const queryClient = new QueryClient();
+  const Page = PAGES[url] ?? Index;
   return renderToString(
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <StaticRouter location={url}>
           <AuthProvider>
-            {url === '/access' ? <Access /> : <Index />}
+            <Page />
           </AuthProvider>
         </StaticRouter>
       </TooltipProvider>
