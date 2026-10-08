@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect } from 'react';
@@ -19,7 +19,10 @@ function LogoBlock({ logo }: { logo: string }) {
 }
 
 export default function SchoolAuth() {
-  const [isLogin, setIsLogin] = useState(true);
+  // ?signup=1 открывает сразу регистрацию, а не вход: по этой ссылке приходят новые люди
+  // (короткий адрес tradeliketyo.com/terminal в vercel.json, эфиры с 11.10.2026)
+  const [searchParams] = useSearchParams();
+  const [isLogin, setIsLogin] = useState(() => searchParams.get('signup') !== '1');
   const [isForgot, setIsForgot] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
