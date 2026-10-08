@@ -1,6 +1,7 @@
 import { ArrowDown, ArrowRight } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
+import { nextStreamLabel } from '@/lib/practicum';
 
 /**
  * Верхний этаж блока цен (08.10.2026): на /access наверху страницы, на лендинге в «12 · Сотрудничество».
@@ -96,6 +97,7 @@ export default function RouteChooser({
   clickPrefix?: string;
 }) {
   const Title = heading;
+  const stream = nextStreamLabel();
   const Sub = heading === 'h1' ? 'h2' : 'h3';
   return (
     <div>
@@ -143,7 +145,9 @@ export default function RouteChooser({
               <span className="text-mono" style={{ ...MONO, color: r.tone }}>{r.tag}</span>
               <span className="mt-2 text-base text-foreground/90 leading-snug">{r.need}</span>
               <span className="mt-4 text-foreground" style={{ ...SERIF, fontSize: 22, lineHeight: 1.05, whiteSpace: 'nowrap' }}>{r.product}</span>
-              <span className="mt-1 text-sm text-muted-foreground leading-snug">{r.note}</span>
+              <span className="mt-1 text-sm text-muted-foreground leading-snug">
+                {r.anchor === 'pkg-practicum' && stream ? `Старт ${stream}, решения принимаем вместе` : r.note}
+              </span>
               <span className="flex-grow" />
               <span className="mt-5 flex items-baseline gap-2" style={{ minHeight: 34 }}>
                 {shown.price && <span style={{ ...SERIF, fontSize: 34, lineHeight: 1, color: 'hsl(var(--foreground))' }}>{shown.price}</span>}

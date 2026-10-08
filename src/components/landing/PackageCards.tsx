@@ -1,6 +1,7 @@
 import { ArrowRight, Check, ShieldCheck, X } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
+import { nextStreamLabel } from '@/lib/practicum';
 
 /**
  * PackageCards — shared package/pricing cards used on the homepage (without
@@ -111,9 +112,10 @@ const PACKAGES: Pkg[] = [
       'Обратная связь по каждому вашему решению',
       'Закрытая группа',
     ],
-    // Набор идёт потоками, мест немного. Дат и счётчиков на странице нет
-    // намеренно: они устаревают, а страница должна работать круглый год.
-    admission: 'Беру не всех и не в любой момент: набор идёт потоками, мест немного. Напишите — скажу дату ближайшего и подходит ли вам этот формат.',
+    // Набор идёт потоками. Счётчиков на странице нет. Дата ближайшего потока
+    // подставляется в stdCard из lib/practicum.ts и гаснет сама после старта.
+    // Условие «от 3 человек» видно до оплаты (ТЗ 4, 26.08.2026).
+    admission: 'Беру не всех и не в любой момент: набор идёт потоками, от 3 человек. Напишите, скажу дату ближайшего и подходит ли вам этот формат.',
     guarantee: [
       {
         title: 'Правило первого блока',
@@ -219,6 +221,13 @@ export default function PackageCards({
       </div>
     );
 
+  // у практикума, пока поток не стартовал, называем дату и условие набора
+  const stream = nextStreamLabel();
+  const admissionText = (p: Pkg) =>
+    p.clickId === 'practicum' && stream
+      ? `Ближайший поток стартует ${stream}. Беру не всех: поток идёт от 3 человек, а если наберётся меньше, предложу индивидуальный формат на те же 60 дней или перенос на следующий поток. Напишите, скажу, подходит ли вам этот формат.`
+      : p.admission;
+
   // стандартная вертикальная карточка — практикум / Trade OS Plus / VIP
   const stdCard = (p: Pkg) => (
     <div
@@ -248,7 +257,7 @@ export default function PackageCards({
       </div>
 
       {p.admission && (
-        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">{p.admission}</p>
+        <p className="mt-4 text-xs leading-relaxed text-muted-foreground">{admissionText(p)}</p>
       )}
 
       {guaranteeBlock(p)}
