@@ -110,11 +110,12 @@ function guideParts(r: MarketRow): { main: string; sub: ReactNode; color: string
   const leads = r.extra?.leads;
   if (leads) {
     const main = `главный в группе ${GEN[leads] || leads}`;
-    if (leads === 'DXY') return { main, sub: null, color: ACCENT };
     const rest = parts.slice(1).join(' · ');
-    const who = /индекс доллара/.test(rest) ? 'его поводырь — индекс доллара' : 'сторону даёт своя группа';
+    // ⛔ 08.10.2026, его слово: «сторону даёт своя группа без направления — непонятно… как индекс доллара — главный
+    // в группе доллара… этот комментарий удалить». У поводыря без своего поводыря (S&P 500, биткоин) — только «главный в группе»
+    if (leads === 'DXY' || !/индекс доллара/.test(rest)) return { main, sub: null, color: ACCENT };
     const st = stanceOf(rest, side);
-    return { main, sub: <>{who}{st ? <><br />{st}</> : null}</>, color: ACCENT };
+    return { main, sub: <>его поводырь — индекс доллара{st ? <><br />{st}</> : null}</>, color: ACCENT };
   }
   let main = parts[0];
   let rest = parts.slice(1).join(' · ');
