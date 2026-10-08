@@ -76,7 +76,9 @@ function device(): 'mobile' | 'desktop' {
  * статистику они не попадают, но видны отдельным блоком в дашборде.
  *
  * Браузер помечается двумя способами:
- *   1) автоматически — при входе в кабинет под админом;
+ *   1) автоматически — если в этом браузере выполнен вход в кабинет под админом:
+ *      метку ставит сама база в track_event по auth.uid() (с 08.10.2026; до этого
+ *      пункт был только в комментарии, кода не было, и заходы Сергея считались);
  *   2) вручную — открыть сайт с ?owner=1 (удобно для телефона, где в кабинет
  *      не заходили). Снять пометку: ?owner=0.
  */
@@ -98,8 +100,22 @@ function isLocalDev(): boolean {
   return /localhost|127\.0\.0\.1/.test(window.location.hostname);
 }
 
+/**
+ * Браузер под управлением программы (проверки сайта роботом, Playwright и подобные)
+ * в статистику не идёт: 08.10.2026 такие проверки дали по 2 просмотра политике
+ * и соглашению и несколько странице цен.
+ */
+function isAutomation(): boolean {
+  if (!isBrowser) return false;
+  try {
+    return navigator.webdriver === true;
+  } catch {
+    return false;
+  }
+}
+
 async function send(event_type: 'pageview' | 'scroll' | 'click' | 'alive', path: string, target?: string) {
-  if (!isBrowser || isLocalDev()) return;
+  if (!isBrowser || isLocalDev() || isAutomation()) return;
   try {
     await supabase.rpc('track_event', {
       _session_id: sessionId(),

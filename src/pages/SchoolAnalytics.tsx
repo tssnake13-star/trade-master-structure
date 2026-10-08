@@ -31,6 +31,8 @@ type Summary = {
   skipped?: number;
   /** визиты владельца — считаются отдельно, в основные цифры не входят */
   owner?: { visits: number; pageviews: number; clicks: number; last_at: string | null };
+  /** с какого момента идёт счёт после обнуления (site_settings.analytics_reset_at), null — вся история */
+  reset_at?: string | null;
   by_page?: { path: string; views: number; visits: number }[];
   by_day: { day: string; visits: number; views?: number }[];
   by_source: { source: string; visits: number }[];
@@ -170,6 +172,13 @@ const PERIODS = [
  * период: 7 дней — 7 столбиков, 90 — 90, дни без посетителей показываем нулём.
  * Иначе по графику не видно провалов и он врёт о равномерности.
  */
+/** «08.10.2026, 17:35» — момент обнуления в местном времени */
+function formatReset(iso: string) {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return d.toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
 function fillMissingDays(byDay: { day: string; visits: number }[], days: number) {
   const map = new Map(byDay.map(d => [d.day, d.visits]));
   const out: { day: string; visits: number; label: string }[] = [];
@@ -266,6 +275,26 @@ export default function SchoolAnalytics() {
     if (role === 'admin') void load(days);
   }, [role, days]);
 
+  // Обнуление (Сергей 08.10.2026) не удаляет события: ставит точку отсчёта
+  // в site_settings, и analytics_summary считает только после неё. Пустое значение = вся история.
+  const [resetting, setResetting] = useState(false);
+  const setResetPoint = async (value: string) => {
+    setResetting(true);
+    const { error: err } = await supabase
+      .from('site_settings')
+      .upsert({ key: 'analytics_reset_at', value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+    setResetting(false);
+    if (err) {
+      setError(err.message || 'Не удалось изменить точку отсчёта');
+      return;
+    }
+    await load(days);
+  };
+  const resetCounters = async () => {
+    if (!window.confirm('Обнулить счётчики? Счёт начнётся с этой минуты. Старые записи останутся в базе, их можно вернуть.')) return;
+    await setResetPoint(new Date().toISOString());
+  };
+
   const sources = data ? groupSources(data.by_source) : [];
   const totalVisits = data?.visits ?? 0;
   const heroVisits = data?.by_section.find(s => s.section === 'hero')?.visits ?? 0;
@@ -324,6 +353,32 @@ export default function SchoolAnalytics() {
               {p.label}
             </button>
           ))}
+        </div>
+
+        {/* Обнуление счётчиков: точка отсчёта, сырые события остаются в базе */}
+        <div
+          className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2"
+          style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#666' }}
+        >
+          {data?.reset_at && <span>Счёт с {formatReset(data.reset_at)}</span>}
+          <button
+            onClick={() => void resetCounters()}
+            disabled={resetting}
+            className="hover:opacity-70 transition disabled:opacity-40"
+            style={{ color: ACCENT, textTransform: 'uppercase', letterSpacing: '0.14em' }}
+          >
+            Обнулить счётчики
+          </button>
+          {data?.reset_at && (
+            <button
+              onClick={() => void setResetPoint('')}
+              disabled={resetting}
+              className="hover:opacity-70 transition disabled:opacity-40"
+              style={{ textTransform: 'uppercase', letterSpacing: '0.14em' }}
+            >
+              Вернуть всю историю
+            </button>
+          )}
         </div>
 
         {loading && (
