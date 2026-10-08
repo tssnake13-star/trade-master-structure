@@ -41,12 +41,15 @@ const LINE2: { t: string }[] = [
   { t: 'В' }, { t: 'будни' }, { t: 'только' }, { t: 'исполнение.' },
 ];
 
+// 08.10.2026 «бинокль впереди»: под заголовком главное обещание школы (оффер, раздел 8),
+// а главная кнопка зовёт в 7 дней терминала. Ведёт через бота (?start=trial): человек
+// остаётся в базе, бот присылает регистрацию.
 const OFFER: { t: string; cls?: 'gold' | 'mute' | 'uline' }[] = [
-  { t: 'Для тех, кто торгует рядом с ' },
-  { t: 'основной работой', cls: 'uline' },
-  { t: ' и не может сидеть у графика. Какую сделку брать, решает ' },
-  { t: 'алгоритм', cls: 'gold' },
-  { t: ', а не настроение в моменте.' },
+  { t: 'Торгуйте по моей системе, ' },
+  { t: 'не изучая её', cls: 'uline' },
+  { t: '. Терминал находит сделку, я даю вердикт, вы отмечаете точку входа и нажимаете ' },
+  { t: 'СТАРТ', cls: 'gold' },
+  { t: '. Дальше сделку ведёт советник.' },
 ];
 
 const MONO_SMALL: React.CSSProperties = { fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase' };
@@ -126,9 +129,9 @@ export default function HeroSectionV3() {
             ))}
           </p>
 
-          {/* распорядок: факты, а не обещание */}
+          {/* для кого: портрет клиента одной строкой */}
           <p className="v3h-mono mt-6" style={{ ...MONO_SMALL, opacity: 0.8 }}>
-            Через терминал: 2 действия на сделку · сами: разбор раз в неделю, 30–60 минут
+            Для тех, кто торгует рядом с основной работой
           </p>
 
           {/* фильтр: отсекает интрадей до лички */}
@@ -136,14 +139,14 @@ export default function HeroSectionV3() {
             className="mt-4 text-sm md:text-base"
             style={{ color: 'var(--v3-mut)', borderLeft: '2px solid var(--v3-gold-dim)', paddingLeft: 12, maxWidth: '46ch' }}
           >
-            Если вам нужен рынок каждый день и движение внутри часа — вам не сюда.
+            Если вам нужен рынок каждый день и движение внутри часа, вам не сюда.
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-4">
-            <a href={TELEGRAM_LINKS.bot} target="_blank" rel="noopener noreferrer" className="v3h-btn v3h-btn--solid" onClick={() => trackClick('hero_bot')}>
+            <a href={TELEGRAM_LINKS.trial} target="_blank" rel="noopener noreferrer" className="v3h-btn v3h-btn--solid" onClick={() => trackClick('hero_trial')}>
               {/* на телефоне полная надпись переносится на две строки — там короче */}
-              <span className="hidden sm:inline">Получить бесплатный протокол</span>
-              <span className="sm:hidden">Получить протокол</span>
+              <span className="hidden sm:inline">Попробовать терминал 7 дней</span>
+              <span className="sm:hidden">Попробовать 7 дней</span>
               <ArrowRight className="arr w-4 h-4" />
             </a>
             <a href="#verdict" className="v3h-btn v3h-btn--ghost" onClick={() => trackClick('hero_scroll_verdict')}>
@@ -153,7 +156,7 @@ export default function HeroSectionV3() {
 
           {/* что будет после клика */}
           <p className="v3h-mono mt-6" style={{ ...MONO_SMALL, opacity: 0.55 }}>
-            Бесплатно · Telegram-бот · 4 вопроса о вашей торговле · без звонков
+            Бесплатно · 7 дней · карта не нужна · через Telegram
           </p>
 
           {/* ранний сигнал доверия — факты из журнала, якорь к результатам */}

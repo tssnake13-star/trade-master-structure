@@ -349,7 +349,8 @@ export default function PackageCards({
           но ваш риск остаётся вашим решением.
         </p>
         <p className="mt-3 text-xs md:text-sm" style={{ maxWidth: '72ch', color: 'hsl(var(--accent-dim))' }}>
-          Честно: стопы никуда не делись, за 21 месяц у меня 3 убыточных месяца. Точку входа вы ставите сами,
+          Честно: торговли без убытков не бывает, и я её не обещаю. Убыточные сделки бывают и подряд, но риск
+          каждой ограничен ещё до входа, а из 21 месяца в минус закрылись 3. Точку входа вы ставите сами,
           поэтому ваш результат может отличаться от моего. Прошлый результат не гарантирует будущий.
         </p>
         <div className="mt-5 grid sm:grid-cols-3 gap-3">
@@ -381,9 +382,12 @@ export default function PackageCards({
             {showPrices ? 'Оформить подписку' : 'Узнать стоимость'}
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </a>
-          {/* 07.10.2026: пробный доступ на 7 дней открывается сам при регистрации в кабинете, с замками */}
+          {/* 07.10.2026: пробный доступ на 7 дней открывается сам при регистрации в кабинете, с замками.
+              08.10.2026: кнопка ведёт через бота, он присылает регистрацию и оставляет человека в базе */}
           <a
-            href="/school?signup=1"
+            href={TELEGRAM_LINKS.trial}
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={() => trackClick('package_echo_gate_trial')}
             className="btn-secondary inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium group"
           >

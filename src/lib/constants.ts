@@ -4,6 +4,9 @@ export const TELEGRAM_LINKS = {
   channel: 'https://t.me/+6utYXa4nAjMyNjNi',
   dm: 'https://t.me/tradeliketyo',
   razbor: 'https://tradeliketyo.com/razbor',
+  // 08.10.2026: главный вход «7 дней терминала» идёт через бота, а не сразу на регистрацию,
+  // чтобы человек остался в базе бота (Сергей). Бот на ?start=trial присылает кнопку регистрации.
+  trial: 'https://tradeliketyo.com/trial',
 } as const;
 
 // Navigation items

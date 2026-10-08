@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, Send } from 'lucide-react';
+import { Menu, X, ArrowRight } from 'lucide-react';
 import { NAV_ITEMS, TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
 import logoVideoFallback from '@/assets/logo-header.mp4';
@@ -71,14 +71,14 @@ const Header = () => {
             {/* CTA Button */}
             <div className="hidden md:block">
               <a
-                href={TELEGRAM_LINKS.bot}
+                href={TELEGRAM_LINKS.trial}
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => trackClick('header_bot')}
+                onClick={() => trackClick('header_trial')}
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-sm font-medium rounded-lg hover:bg-foreground/90 transition-all duration-200"
               >
-                <Send className="w-4 h-4" />
-                Получить протокол
+                Попробовать 7 дней
+                <ArrowRight className="w-4 h-4" />
               </a>
             </div>
 
@@ -126,14 +126,14 @@ const Header = () => {
           
           <div className="mt-auto pb-12">
             <a
-              href={TELEGRAM_LINKS.bot}
+              href={TELEGRAM_LINKS.trial}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => { trackClick('header_bot'); setIsMobileMenuOpen(false); }}
+              onClick={() => { trackClick('header_trial'); setIsMobileMenuOpen(false); }}
               className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background font-medium rounded-lg hover:bg-foreground/90 transition-all duration-200"
             >
-              <Send className="w-5 h-5" />
-              Получить бесплатный протокол
+              Попробовать терминал 7 дней
+              <ArrowRight className="w-5 h-5" />
             </a>
           </div>
         </div>

@@ -16,7 +16,8 @@
     { "source": "/telegram", "destination": "https://t.me/New_TradeLikeTYO_bot?start=telegram", "permanent": false },
     { "source": "/start", "destination": "https://t.me/New_TradeLikeTYO_bot", "permanent": false },
     { "source": "/viktor", "destination": "https://t.me/New_TradeLikeTYO_bot?start=viktor", "permanent": false },
-    { "source": "/terminal", "destination": "/school?signup=1&utm_source=terminal", "permanent": false },
+    { "source": "/terminal", "destination": "https://t.me/New_TradeLikeTYO_bot?start=terminal", "permanent": false },
+    { "source": "/trial", "destination": "https://t.me/New_TradeLikeTYO_bot?start=trial", "permanent": false },
     { "source": "/vk", "destination": "https://t.me/New_TradeLikeTYO_bot?start=vk", "permanent": false },
     { "source": "/([Ff][Aa][Cc][Ee][Bb][Oo][Oo][Kk])", "destination": "https://t.me/New_TradeLikeTYO_bot?start=facebook", "permanent": false },
 

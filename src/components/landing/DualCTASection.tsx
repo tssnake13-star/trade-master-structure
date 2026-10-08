@@ -11,22 +11,23 @@ const DualCTASection = () => {
         </h2>
 
         <div className="grid md:grid-cols-2 gap-4 md:gap-6 max-w-3xl mx-auto">
-          {/* Primary — Bot */}
+          {/* Primary — пробный доступ (08.10.2026: главный вход; через бота, чтобы человек остался в базе) */}
           <div className="p-6 md:p-8 bg-card border border-border rounded-xl text-center flex flex-col items-center">
             <p className="text-base md:text-lg text-foreground font-medium mb-2">
-              Хочу разобраться
+              Посмотреть самому
             </p>
             <p className="text-sm text-muted-foreground mb-6">
-              Бот задаст 4 вопроса о вашей торговле. Если профиль совпадёт — пришлёт протокол «Система допуска»
+              7 дней терминала ECHO-GATE INSIDE бесплатно. Бот в Telegram пришлёт регистрацию: сразу откроются
+              вводный курс и терминал, карту привязывать не нужно.
             </p>
             <a
-              href={TELEGRAM_LINKS.bot}
+              href={TELEGRAM_LINKS.trial}
               target="_blank"
               rel="noopener noreferrer"
-              onClick={() => trackClick('final_bot')}
+              onClick={() => trackClick('final_trial')}
               className="btn-primary group w-full justify-center"
             >
-              Получить протокол в Telegram
+              Попробовать 7 дней
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>
