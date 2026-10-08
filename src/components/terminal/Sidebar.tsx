@@ -364,6 +364,7 @@ export default function TerminalSidebar({
   selected,
   onOpen,
   wide,
+  trial = false,
 }: {
   rows: MarketRow[];
   list: MarketRow[];
@@ -372,6 +373,7 @@ export default function TerminalSidebar({
   selected: string | null;
   onOpen: (sym: string) => void;
   wide: boolean;
+  trial?: boolean;
 }) {
   const [mode, setMode] = useState<SideMode>(readMode);
   useEffect(() => {
@@ -404,8 +406,19 @@ export default function TerminalSidebar({
   const other: Market = market === 'fx' ? 'crypto' : 'fx';
   const searching = query.trim() !== '';
   const otherHits = searching ? list.length - listM.length : 0;
-  // кто кого ведёт — по всем строкам, показываем только свой рынок
-  const groupedList = useMemo(() => groupRows(rows, listM), [rows, listM]);
+  // кто кого ведёт — по всем строкам, показываем только свой рынок.
+  // 08.10.2026, его слово (кабинет глазами подписчика): «фунт-доллар почему-то дублируется… в пробном доступе убрать
+  // группу фунта и убрать группу золота… пускай три инструмента в группе доллара будут». Поводырь с долларом в имени
+  // стоит и в своей группе, и в группе доллара; в пробном доступе каждый инструмент — один раз: кто есть в группе
+  // доллара, стоит только там
+  const groupedList = useMemo(() => {
+    const g = groupRows(rows, listM);
+    if (!trial) return g;
+    const inDxy = new Set((g.find(([k]) => k === 'DXY')?.[1] || []).map((r) => r.symbol));
+    return g
+      .map(([k, rs]): [string, MarketRow[]] => [k, k === 'DXY' ? rs : rs.filter((r) => !inDxy.has(r.symbol))])
+      .filter(([, rs]) => rs.length > 0);
+  }, [rows, listM, trial]);
   const blocks = useMemo(() => scenarioRows(rowsM, listM), [rowsM, listM]);
   // 03.10.2026: на компьютере список листается внутри — выбранный инструмент держим в поле видимости списка
   // (двигается только сам список, страница стоит на месте)

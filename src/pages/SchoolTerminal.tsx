@@ -475,6 +475,7 @@ export default function SchoolTerminal() {
       selected={section === 'instrument' ? cur?.symbol || null : null}
       onOpen={openSymbol}
       wide={wide}
+      trial={trial}
     />
   );
 
