@@ -31,8 +31,10 @@ type Summary = {
   skipped?: number;
   /** визиты владельца — считаются отдельно, в основные цифры не входят */
   owner?: { visits: number; pageviews: number; clicks: number; last_at: string | null };
-  /** с какого момента идёт счёт после обнуления (site_settings.analytics_reset_at), null — вся история */
+  /** с какого момента идёт счёт после общего обнуления (site_settings.analytics_reset_at), null — вся история */
   reset_at?: string | null;
+  /** точки обнуления отдельных страниц: путь → момент (site_settings.analytics_page_resets) */
+  page_resets?: Record<string, string>;
   by_page?: { path: string; views: number; visits: number }[];
   by_day: { day: string; visits: number; views?: number }[];
   by_source: { source: string; visits: number }[];
@@ -172,6 +174,15 @@ const PERIODS = [
  * период: 7 дней — 7 столбиков, 90 — 90, дни без посетителей показываем нулём.
  * Иначе по графику не видно провалов и он врёт о равномерности.
  */
+/** Понятное имя страницы для списка «Страницы» и подтверждения обнуления */
+function pageName(path: string) {
+  if (path === '/') return 'Лендинг';
+  if (path === '/access') return 'Страница цен';
+  if (path === '/privacy') return 'Политика';
+  if (path === '/terms') return 'Соглашение';
+  return path;
+}
+
 /** «08.10.2026, 17:35» — момент обнуления в местном времени */
 function formatReset(iso: string) {
   const d = new Date(iso);
@@ -275,14 +286,17 @@ export default function SchoolAnalytics() {
     if (role === 'admin') void load(days);
   }, [role, days]);
 
-  // Обнуление (Сергей 08.10.2026) не удаляет события: ставит точку отсчёта
-  // в site_settings, и analytics_summary считает только после неё. Пустое значение = вся история.
+  // Обнуление (Сергей 08.10.2026) не удаляет события: ставит точку отсчёта в site_settings,
+  // и analytics_summary считает только после неё. Обнуляется отдельная страница
+  // («мне нужно только обнулять страницу цен. Посещение сайта обнулять не надо»):
+  // точка действует только на список «Страницы». Общая точка analytics_reset_at
+  // осталась от первого варианта, на экране её можно только снять.
   const [resetting, setResetting] = useState(false);
-  const setResetPoint = async (value: string) => {
+  const saveSetting = async (key: string, value: string) => {
     setResetting(true);
     const { error: err } = await supabase
       .from('site_settings')
-      .upsert({ key: 'analytics_reset_at', value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
+      .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: 'key' });
     setResetting(false);
     if (err) {
       setError(err.message || 'Не удалось изменить точку отсчёта');
@@ -290,9 +304,15 @@ export default function SchoolAnalytics() {
     }
     await load(days);
   };
-  const resetCounters = async () => {
-    if (!window.confirm('Обнулить счётчики? Счёт начнётся с этой минуты. Старые записи останутся в базе, их можно вернуть.')) return;
-    await setResetPoint(new Date().toISOString());
+  const resetPage = async (path: string, restore = false) => {
+    const resets = { ...(data?.page_resets ?? {}) };
+    if (restore) {
+      delete resets[path];
+    } else {
+      if (!window.confirm(`Обнулить счётчик страницы «${pageName(path)}»? Записи останутся в базе, их можно вернуть.`)) return;
+      resets[path] = new Date().toISOString();
+    }
+    await saveSetting('analytics_page_resets', JSON.stringify(resets));
   };
 
   const sources = data ? groupSources(data.by_source) : [];
@@ -355,31 +375,23 @@ export default function SchoolAnalytics() {
           ))}
         </div>
 
-        {/* Обнуление счётчиков: точка отсчёта, сырые события остаются в базе */}
-        <div
-          className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2"
-          style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#666' }}
-        >
-          {data?.reset_at && <span>Счёт с {formatReset(data.reset_at)}</span>}
-          <button
-            onClick={() => void resetCounters()}
-            disabled={resetting}
-            className="hover:opacity-70 transition disabled:opacity-40"
-            style={{ color: ACCENT, textTransform: 'uppercase', letterSpacing: '0.14em' }}
+        {/* Общее обнуление на экране не делается, только снимается, если оно стоит */}
+        {data?.reset_at && (
+          <div
+            className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2"
+            style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#666' }}
           >
-            Обнулить счётчики
-          </button>
-          {data?.reset_at && (
+            <span>Счёт с {formatReset(data.reset_at)}</span>
             <button
-              onClick={() => void setResetPoint('')}
+              onClick={() => void saveSetting('analytics_reset_at', '')}
               disabled={resetting}
               className="hover:opacity-70 transition disabled:opacity-40"
-              style={{ textTransform: 'uppercase', letterSpacing: '0.14em' }}
+              style={{ color: ACCENT, textTransform: 'uppercase', letterSpacing: '0.14em' }}
             >
               Вернуть всю историю
             </button>
-          )}
-        </div>
+          </div>
+        )}
 
         {loading && (
           <p className="mt-10" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#666' }}>
@@ -479,21 +491,63 @@ export default function SchoolAnalytics() {
               />
             </div>
 
-            {/* Страницы */}
-            {data.by_page && data.by_page.length > 0 && (
-              <div className="mt-3">
-                <Bars
-                  title="Страницы"
-                  rows={data.by_page.map(p => ({
-                    name: p.path === '/' ? 'Лендинг' : p.path === '/access' ? 'Страница цен' : p.path,
-                    value: p.visits,
-                    extra: `${p.views} просмотров`,
-                  }))}
-                  max={Math.max(1, ...data.by_page.map(p => p.visits))}
-                  empty="Пока нет данных."
-                />
-              </div>
-            )}
+            {/* Страницы. Обнулённая страница без новых просмотров остаётся в списке с нулём,
+                иначе её не вернуть и не видно, что счётчик обнулён */}
+            {(() => {
+              const resets = data.page_resets ?? {};
+              const pages = [
+                ...(data.by_page ?? []),
+                ...Object.keys(resets)
+                  .filter(path => !(data.by_page ?? []).some(p => p.path === path))
+                  .map(path => ({ path, views: 0, visits: 0 })),
+              ];
+              if (pages.length === 0) return null;
+              return (
+                <div className="mt-3">
+                  <Bars
+                    title="Страницы"
+                    rows={pages.map(p => ({
+                      name: resets[p.path] ? `${pageName(p.path)} · с ${formatReset(resets[p.path])}` : pageName(p.path),
+                      value: p.visits,
+                      extra: `${p.views} просмотров`,
+                    }))}
+                    max={Math.max(1, ...pages.map(p => p.visits))}
+                    empty="Пока нет данных."
+                  />
+                  <div
+                    className="mt-2 flex flex-wrap gap-x-5 gap-y-1"
+                    style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#666' }}
+                  >
+                    {pages.map(p => (
+                      <span key={p.path}>
+                        {pageName(p.path)}:{' '}
+                        <button
+                          onClick={() => void resetPage(p.path)}
+                          disabled={resetting}
+                          className="hover:opacity-70 transition disabled:opacity-40"
+                          style={{ color: ACCENT, textTransform: 'uppercase', letterSpacing: '0.12em' }}
+                        >
+                          обнулить
+                        </button>
+                        {resets[p.path] && (
+                          <>
+                            {' · '}
+                            <button
+                              onClick={() => void resetPage(p.path, true)}
+                              disabled={resetting}
+                              className="hover:opacity-70 transition disabled:opacity-40"
+                              style={{ textTransform: 'uppercase', letterSpacing: '0.12em' }}
+                            >
+                              вернуть
+                            </button>
+                          </>
+                        )}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Воронка внимания */}
             <div className="mt-3">
