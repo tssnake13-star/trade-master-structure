@@ -10,13 +10,15 @@ import TwoPathsScheme from '@/components/landing/TwoPathsScheme';
 import ProofStrip from '@/components/landing/ProofStrip';
 import FiveStagesSection from '@/components/landing/FiveStagesSection';
 import PurchaseFAQ from '@/components/landing/PurchaseFAQ';
+import RouteChooser from '@/components/landing/RouteChooser';
 
 /**
  * /access — private pricing page. NOT linked from anywhere on the site and not
  * in any navigation. Reachable only by direct URL (handed out via the Telegram
  * bot / video descriptions). Same v3 visual language as the landing.
  *
- * Порядок блоков задан Сергеем 06.09.2026: шапка → бесплатный вердикт →
+ * 08.10.2026: страница двухэтажная. Наверху RouteChooser (слоган, формула, четыре маршрута)
+ * и карточки, ниже схема, доказательства, этапы и вопросы. Прежний порядок 06.09.2026: шапка → бесплатный вердикт →
  * где вы сейчас → доказательства → пять этапов → карточки и экосистема →
  * вопросы перед оплатой → заявка. 07.10.2026 «где вы сейчас» заменено
  * схемой «вход и два пути» (TwoPathsScheme), здесь она со всеми ценами.
@@ -37,22 +39,27 @@ export default function Access() {
       <StructureField position="fixed" opacity={0.45} zIndex={0} mask="radial-gradient(150% 120% at 50% 32%, #000 45%, transparent 92%)" />
 
       <main className="relative" style={{ zIndex: 2 }}>
-        <section className="container-landing pt-20 md:pt-28 pb-12 md:pb-20">
-          <div className="max-w-3xl">
-            <span className="section-label" style={{ color: 'hsl(var(--accent))' }}>TLT · Доступ · цены и условия</span>
-            <h1 className="text-foreground" style={{ fontSize: 'clamp(44px, 7vw, 88px)', lineHeight: 0.98 }}>
+        <section className="container-landing pt-14 md:pt-20 pb-12 md:pb-20">
+          {/* Верхний этаж (08.10.2026): за 10 секунд понятно, что выбрать. Слоган с честной строкой,
+              формула ECHO-GATE с вердиктом и четыре маршрута, каждый ведёт к своей карточке. */}
+          <RouteChooser />
+
+          <div className="mt-12 md:mt-16">
+            <PackageCards showPrices={true} ctaHref={TELEGRAM_LINKS.dm} choiceNote="bottom" />
+          </div>
+
+          {/* Нижний этаж: доказательства и глубина для тех, кто хочет разобраться */}
+          <div className="mt-16 md:mt-24">
+            <span className="section-label" style={{ color: 'hsl(var(--accent))' }}>Для тех, кто хочет разобраться</span>
+            <h2 className="text-foreground" style={{ fontSize: 'clamp(30px, 4vw, 52px)', lineHeight: 1.02 }}>
               Два пути. <em>Один алгоритм.</em>
-            </h1>
-            <p className="mt-5 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '58ch' }}>
-              Можно торговать по системе, не изучая её целиком: рынок считает терминал, исполняет
-              советник, от вас 2 действия. А можно изучить систему, самому или вместе со мной.
-            </p>
+            </h2>
           </div>
 
           {/* Бесплатный вход — первый узел схемы, отдельной карточки вердикта
               больше нет (Сергей 07.10.2026: «убери одно»). Полный текст и три
               условия разбора живут внутри схемы (detailedEntry). */}
-          <div className="mt-10 md:mt-12">
+          <div className="mt-8 md:mt-10">
             <TwoPathsScheme showPrices={true} detailedEntry entryClickId="access_razbor" />
           </div>
 
@@ -64,11 +71,7 @@ export default function Access() {
             <FiveStagesSection showPrices={true} asSection={false} />
           </div>
 
-          <div className="mt-12 md:mt-16">
-            <PackageCards showPrices={true} ctaHref={TELEGRAM_LINKS.dm} />
-          </div>
-
-          {/* вопросы перед оплатой — после цен экосистемы */}
+          {/* вопросы перед оплатой */}
           <PurchaseFAQ />
 
           {/* CTA */}

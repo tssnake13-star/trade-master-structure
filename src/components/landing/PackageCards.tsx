@@ -184,7 +184,8 @@ const SERIF: React.CSSProperties = { fontFamily: "'Cormorant', serif", fontWeigh
 export default function PackageCards({
   showPrices,
   ctaHref = TELEGRAM_LINKS.bot,
-}: { showPrices: boolean; ctaHref?: string }) {
+  choiceNote = 'top',
+}: { showPrices: boolean; ctaHref?: string; choiceNote?: 'top' | 'bottom' }) {
   const ts = PACKAGES[0];
 
   // строка «что входит»
@@ -222,6 +223,7 @@ export default function PackageCards({
   const stdCard = (p: Pkg) => (
     <div
       key={p.name}
+      id={`pkg-${p.clickId}`}
       className="relative flex flex-col p-6 md:p-7"
       style={{
         background: p.featured
@@ -293,37 +295,44 @@ export default function PackageCards({
     </div>
   );
 
+  // «Как устроен выбор»: с 08.10.2026 и на /access, и на лендинге стоит под карточками (выбор наверху делает RouteChooser)
+  const choiceNoteBlock = (
+    <>
+    {/* Два пути (Сергей, 07.10.2026). Курс и практикум — разные ступени,
+        а не версии одного продукта: решение о ступени принимается на берегу.
+        Доплата работает наверх, в VIP. */}
+    <div className="mb-3 p-4 md:p-5" style={{ border: '1px solid hsl(var(--accent) / 0.28)', background: 'hsl(var(--accent) / 0.04)' }}>
+      <div className="text-mono" style={{ ...MONO, color: GOLD }}>Как устроен выбор</div>
+      <p className="mt-2 text-sm text-foreground/85 leading-relaxed" style={{ maxWidth: '78ch' }}>
+        Хотите торговать по системе, не изучая её целиком: для этого подписка ECHO-GATE INSIDE, обучение
+        для неё не нужно. Хотите изучить систему: курс или практикум. Это разные ступени: перейти из курса
+        в практикум доплатой нельзя, выбирайте сразу. Доплата работает наверх: в течение 30 дней после курса
+        и 67 дней после практикума оплаченное засчитывается в VIP полностью, ваши деньги не сгорают.
+        В течение 3 месяцев подписку можно перевести на год или в VIP, оплаченное тоже засчитывается.
+        После любого обучения подписка подключается сразу.
+      </p>
+    </div>
+    </>
+  );
+
   return (
     <>
-      {/* Два пути (Сергей, 07.10.2026). Курс и практикум — разные ступени,
-          а не версии одного продукта: решение о ступени принимается на берегу.
-          Доплата работает наверх, в VIP. */}
-      <div className="mb-3 p-4 md:p-5" style={{ border: '1px solid hsl(var(--accent) / 0.28)', background: 'hsl(var(--accent) / 0.04)' }}>
-        <div className="text-mono" style={{ ...MONO, color: GOLD }}>Как устроен выбор</div>
-        <p className="mt-2 text-sm text-foreground/85 leading-relaxed" style={{ maxWidth: '78ch' }}>
-          Хотите торговать по системе, не изучая её целиком, — подписка ECHO-GATE INSIDE, обучение для неё
-          не нужно. Хотите изучить систему — курс или практикум. Это разные ступени: перейти из курса
-          в практикум доплатой нельзя, выбирайте сразу. Доплата работает наверх: в течение 30 дней после курса
-          и 67 дней после практикума оплаченное засчитывается в VIP полностью, ваши деньги не сгорают.
-          В течение 3 месяцев подписку можно перевести на год или в VIP, оплаченное тоже засчитывается.
-          После любого обучения подписка подключается сразу.
-        </p>
-      </div>
+      {choiceNote === 'top' && choiceNoteBlock}
 
       {/* путь 01 — подписка для всех, главный продукт */}
-      <div className="mb-3 p-6 md:p-7" style={{ background: 'radial-gradient(120% 80% at 50% 0%, hsl(var(--accent) / 0.08), hsl(var(--card)) 60%)', border: '1px solid hsl(var(--accent) / 0.45)' }}>
+      <div id="echo-gate" className="mb-3 p-6 md:p-7" style={{ background: 'radial-gradient(120% 80% at 50% 0%, hsl(var(--accent) / 0.08), hsl(var(--card)) 60%)', border: '1px solid hsl(var(--accent) / 0.45)' }}>
         <div className="text-mono" style={{ ...MONO, color: GOLD }}>Путь 01 · подписка для всех</div>
         <h3 className="mt-2 text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>ECHO-GATE INSIDE</h3>
         <p className="mt-3 text-sm md:text-base text-muted-foreground" style={{ maxWidth: '72ch' }}>
           Для тех, кто хочет торговать по системе, не изучая её целиком. Терминал в личном кабинете считает рынок
-          по правилам алгоритма: направление, подтверждение, сценарий, допуски и отказы. По каждому допуску — мой
+          по правилам алгоритма: направление, подтверждение, сценарий, допуски и отказы. По каждому допуску я даю
           вердикт с причиной. Советники работают на вашем счёте: <b className="text-foreground/90">Echo Gate</b> присылает
           разрешённые входы, <b className="text-foreground/90">Hunter Bot</b> входит в сделку, ставит стоп и тейк
           и переводит в безубыток, <b className="text-foreground/90">Risk Sentinel</b> держит лимиты риска.
         </p>
         <p className="mt-3 text-sm md:text-base text-foreground/90" style={{ maxWidth: '72ch' }}>
-          От вас 2 действия: отметить точку входа и нажать СТАРТ. Один раз в начале — урок «Точка входа»
-          и настройка советников по пошаговой инструкции.
+          От вас 2 действия: отметить точку входа и нажать СТАРТ. Один раз в начале нужно пройти урок «Точка входа»
+          и настроить советников по пошаговой инструкции.
         </p>
         <p className="mt-3 text-sm text-muted-foreground" style={{ maxWidth: '72ch' }}>
           Что нужно для старта: MT4 или MT5 у любого брокера и VPS, удалённый сервер, чтобы советники работали
@@ -365,7 +374,7 @@ export default function PackageCards({
           </a>
           {/* 07.10.2026: пробный доступ на 7 дней открывается сам при регистрации в кабинете, с замками */}
           <a
-            href="/school"
+            href="/school?signup=1"
             onClick={() => trackClick('package_echo_gate_trial')}
             className="btn-secondary inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium group"
           >
@@ -381,7 +390,7 @@ export default function PackageCards({
 
       <div className="grid gap-3">
         {/* Trade System — во всю ширину, содержимое в 2 колонки (низкая широкая карточка) */}
-        <div className="relative p-6 md:p-7" style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
+        <div id="trade-system" className="relative p-6 md:p-7" style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
           <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1.5">
             <span className="text-mono" style={{ ...MONO, color: GOLD }}>{ts.tag}</span>
             <h3 className="text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>{ts.name}</h3>
@@ -458,6 +467,8 @@ export default function PackageCards({
           {PACKAGES.slice(1).map(stdCard)}
         </div>
       </div>
+
+      {choiceNote === 'bottom' && <div className="mt-3">{choiceNoteBlock}</div>}
     </>
   );
 }
