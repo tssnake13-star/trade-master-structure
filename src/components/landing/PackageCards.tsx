@@ -99,7 +99,7 @@ const PACKAGES: Pkg[] = [
   },
   {
     tag: 'Путь 02 · вместе со мной',
-    name: 'Trade System Practicum',
+    name: 'Trade Master Practicum',
     clickId: 'practicum',
     subtitle: '60 дней работы со мной',
     forWhom: 'Знать алгоритм мало. Всё начинается там, где решение надо принять самому, по своему графику, в понедельник утром. Шестьдесят дней мы принимаем эти решения вместе.',

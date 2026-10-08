@@ -44,7 +44,7 @@ export default function Terms() {
         <LegalList
           items={[
             'курс Trade System;',
-            'практикум Trade System Practicum;',
+            'практикум Trade Master Practicum;',
             'подписка ECHO-GATE INSIDE;',
             'VIP.',
           ]}
@@ -87,7 +87,7 @@ export default function Terms() {
 
       <LegalSection n={6} title="Возврат денег">
         <p>
-          <strong className="text-foreground font-medium">Практикум Trade System Practicum.</strong> Первый блок
+          <strong className="text-foreground font-medium">Практикум Trade Master Practicum.</strong> Первый блок
           вводный. Пройдите его целиком и решите. Если не ваше, верну деньги в полном объёме, объяснять причину
           не нужно. Если вы открыли второй блок, решение принято, и дальше возврата нет.
         </p>
