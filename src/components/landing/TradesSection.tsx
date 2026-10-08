@@ -62,7 +62,7 @@ const TradesSection = () => {
         <div className="max-w-4xl">
           <span className="section-label">06 · Сделки</span>
           <h2 className="text-foreground">
-            Как выглядит <em>сделка</em>, <span className="mute">когда есть система</span>
+            Каждая из этих сделок <em>сначала получила допуск</em>
           </h2>
           
           <p className="mt-4 text-base md:text-lg text-muted-foreground">

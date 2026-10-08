@@ -35,7 +35,7 @@ import StructureField from '@/components/landing/StructureField';
  * «В будни только исполнение.» = 11,03 em. Вторая строка на 18% мельче.
  */
 const LINE1: { t: string; em?: boolean }[] = [
-  { t: 'Решение' }, { t: '—' }, { t: 'в' }, { t: 'выходные.', em: true },
+  { t: 'Решение' }, { t: 'в' }, { t: 'выходные.', em: true },
 ];
 const LINE2: { t: string }[] = [
   { t: 'В' }, { t: 'будни' }, { t: 'только' }, { t: 'исполнение.' },

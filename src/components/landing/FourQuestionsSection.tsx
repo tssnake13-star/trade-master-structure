@@ -39,7 +39,7 @@ const FourQuestionsSection = () => {
         <div className="max-w-3xl">
           <span className="section-label">09 · Четыре вопроса</span>
           <h2 className="text-foreground">
-            Четыре вопроса — дальше <em>допуск</em> <span className="mute">или отказ</span>
+            Сделка проходит 4 вопроса. <em>Иначе её нет.</em>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
             Система отвечает на четыре вопроса любой сделки. Одинаково — в понедельник утром

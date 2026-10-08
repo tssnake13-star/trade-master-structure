@@ -53,7 +53,7 @@ const TransformationSection = () => {
         <div className="max-w-3xl">
           <span className="section-label">03 · Неделя по системе</span>
           <h2 className="text-foreground">
-            Как торговля помещается <em>рядом с работой</em>
+            Сделка живёт днями. <em>Следить за каждым движением не нужно.</em>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '58ch' }}>
             Свинг на неделе и дневке. Сделка живёт днями, и сидеть у графика ради неё не нужно.

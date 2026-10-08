@@ -7,7 +7,7 @@ const AuthorSection = () => {
         <div className="max-w-4xl">
           <span className="section-label">13 · Автор</span>
           <h2 className="text-foreground mb-8">
-            Кто <em>за этим</em> <span className="mute">стоит</span>
+            14 лет в рынке. <em>Торгую по той же системе,</em> <span className="mute">которой учу.</span>
           </h2>
           
           <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-start">

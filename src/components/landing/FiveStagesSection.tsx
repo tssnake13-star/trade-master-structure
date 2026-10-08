@@ -80,7 +80,7 @@ export default function FiveStagesSection({
         {!asSection && <div className="text-mono" style={{ ...MONO, color: GOLD }}>Путь из пяти этапов</div>}
         {asSection && (
           <h2 className="text-foreground">
-            Путь из <em>пяти этапов</em>
+            5 этапов <em>до реального рынка</em>
           </h2>
         )}
         <p className={asSection ? 'mt-4 text-base md:text-lg text-muted-foreground' : 'mt-3 text-sm text-muted-foreground'} style={{ maxWidth: '60ch' }}>

@@ -12,7 +12,7 @@ const CapitalProtectionSection = () => {
         <div className="max-w-3xl">
           <span className="section-label">10 · Защита капитала</span>
           <h2 className="text-foreground">
-            Плохую неделю <em>останавливает</em> лимит
+            Плохую неделю останавливает <em>лимит, а не сила воли</em>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
             Risk Sentinel следит за риском в реальном времени. Если потенциальные убытки по всем позициям превышают лимит — новые сделки блокируются автоматически.

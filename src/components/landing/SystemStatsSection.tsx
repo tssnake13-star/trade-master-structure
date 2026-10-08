@@ -15,7 +15,7 @@ const SystemStatsSection = () => {
         <div className="max-w-3xl">
           <span className="section-label">05 · Результаты системы</span>
           <h2 className="text-foreground">
-            Цифры, которые <em>не зависят</em> от настроения
+            Прибыльных сделок 23,5%. <em>Этого хватает.</em>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
             Статистика системы за 21 месяц — 387 сделок. Риск 0,25% на сделку, без компаундинга.

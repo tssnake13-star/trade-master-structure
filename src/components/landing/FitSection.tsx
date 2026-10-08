@@ -37,7 +37,7 @@ const FitSection = () => {
         <div className="max-w-4xl">
           <span className="section-label">02 · Для кого</span>
           <h2 className="text-foreground">
-            Кому это <em>подойдёт</em>, <span className="mute">а кому нет</span>
+            Для тех, кто уже торгует, <em>но не может сидеть у графика</em>
           </h2>
 
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
