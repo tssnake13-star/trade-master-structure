@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
-import { Bitcoin, Search } from 'lucide-react';
+import { Bitcoin, Moon, Search } from 'lucide-react';
 import { ACCENT, BORDER, CRYPTO, CRYPTO_TEXT, DIM, DOWN, FG, MONO, SANS, UP, card, label } from './theme';
 import { ALPHA_TIP, CritMarks, SymbolName, type MarketRow } from './parts';
 import { GEN } from './screenerParse';
@@ -433,7 +433,7 @@ export default function TerminalSidebar({
     if (r.top < b.top || r.bottom > b.bottom) box.scrollTop += r.top - b.top - b.height / 3;
   }, [selected, mode, wide, market]);
 
-  return (
+  const panel = (
     // 21.09.2026, его слово: на компьютере список — до низа, до дисклеймера, без ползунка.
     // ⛔ 03.10.2026, его слово: «мы добавили инструменты и список увеличился. Надо сделать прокрутку, как на планшете,
     // как на телефоне… чтобы список заканчивался вместе с графиком… если список не помещается, нужна прокрутка» —
@@ -507,6 +507,80 @@ export default function TerminalSidebar({
         ) : (
           <ScenarioList blocks={blocks} searching={searching} selected={selected} market={market} onOpen={onOpen} />
         )}
+      </div>
+      {wide ? <NightNote /> : null}
+    </div>
+  );
+  // 08.10.2026: на телефоне и планшете панель — окно 320 px с прокруткой, строка про ночь стоит сразу под ним,
+  // чтобы её не надо было искать; на компьютере — внизу самой панели, под списком
+  return wide ? (
+    panel
+  ) : (
+    <>
+      {panel}
+      <NightNote />
+    </>
+  );
+}
+
+/** 08.10.2026, его слово «Ставь, да»: рекомендация про ночь. На переходе дня спред у валютных пар раздувается в
+ *  10–70 раз — пятиминутки MT5 за две недели: с 23:40 до 01:00 по времени терминала, у части пар до 01:50; у золота,
+ *  индексов, нефти и крипты раздувания нет. Окно с запасом — 23:30–02:00 по терминалу. Время терминала у брокера —
+ *  нью-йоркское плюс 7 часов (00:00 терминала = 17:00 в Нью-Йорке, сейчас это UTC+3); местное время зрителя считает
+ *  браузер, переход на летнее и зимнее время учитывается сам. */
+const NIGHT_FROM = 23 * 60 + 30;
+const NIGHT_TO = 2 * 60;
+
+function tzOffsetMin(tz: string, d: Date): number {
+  const p = new Intl.DateTimeFormat('en-US', {
+    timeZone: tz,
+    hourCycle: 'h23',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).formatToParts(d);
+  const n = (t: string) => Number(p.find((x) => x.type === t)?.value);
+  return Math.round((Date.UTC(n('year'), n('month') - 1, n('day'), n('hour'), n('minute')) - d.getTime()) / 60000);
+}
+
+/** Окно ночи в местном времени зрителя, «01:30–04:00»; null — у зрителя время терминала или браузер не смог. */
+function nightLocal(now: Date = new Date()): string | null {
+  try {
+    const term = tzOffsetMin('America/New_York', now) + 7 * 60;
+    const loc = -now.getTimezoneOffset();
+    if (term === loc) return null;
+    const hm = (m: number) => {
+      const x = (((m - term + loc) % 1440) + 1440) % 1440;
+      return `${String(Math.floor(x / 60)).padStart(2, '0')}:${String(x % 60).padStart(2, '0')}`;
+    };
+    return `${hm(NIGHT_FROM)}–${hm(NIGHT_TO)}`;
+  } catch {
+    return null;
+  }
+}
+
+function NightNote() {
+  const local = useMemo(() => nightLocal(), []);
+  return (
+    <div
+      style={{
+        flex: 'none',
+        marginTop: 10,
+        padding: '10px 12px',
+        borderRadius: 10,
+        border: `1px solid ${ACCENT}66`,
+        backgroundColor: `${ACCENT}12`,
+        display: 'flex',
+        gap: 8,
+        alignItems: 'flex-start',
+      }}
+    >
+      <Moon size={15} color={ACCENT} style={{ flexShrink: 0, marginTop: 2 }} />
+      <div style={{ fontFamily: SANS, fontSize: 12, lineHeight: 1.55, color: FG }}>
+        С 23:30 до 02:00 по времени терминала{local ? ` (у вас ${local})` : ''} сделки по валютным парам не открываем: на
+        переходе дня спред раздувается в 10–70 раз. Золота, индексов, нефти и крипты это не касается.
       </div>
     </div>
   );
