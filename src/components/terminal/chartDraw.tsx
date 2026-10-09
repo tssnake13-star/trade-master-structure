@@ -123,6 +123,8 @@ export function shapeNode(s: Shape, key: number, sx: (x: number) => number, sy: 
       // 22.09.2026: точки реверса мелкие (у бота 2.4) — без обводки, как точки Reverse_3 в MT4
       if (s.m === 'o' && s.s < 3.5) return <circle key={key} cx={x} cy={y} r={Math.max(1.3, s.s * 0.6)} fill={s.c} fillOpacity={s.a} />;
       const r = Math.max(2.5, s.s * 0.62);
+      // 09.10.2026: полый кружок — предварительный выход из накопления (хвост за 27%), как у бота
+      if (s.m === 'o' && s.h) return <circle key={key} cx={x} cy={y} r={r} fill="none" stroke={s.e || s.c} strokeOpacity={s.a} strokeWidth={1.4} />;
       if (s.m === 'o') return <circle key={key} cx={x} cy={y} r={r} fill={s.c} fillOpacity={s.a} stroke={s.e} strokeWidth={1.2} />;
       // 22.09.2026: стрелки свинга и реверса — остриё и ствол, как у бота (grafik_cikla._arrow_paths)
       if (s.m === 'au' || s.m === 'ad') {
