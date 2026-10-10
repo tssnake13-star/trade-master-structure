@@ -297,7 +297,28 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen }: { 
             {newWeek ? <WeekHeader monday={wk} video={wv} onPlay={() => wv && play(wv.id)} /> : null}
             <div style={{ ...card, padding: 12 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
-                <span style={{ fontFamily: MONO, fontSize: 11, color: DIM }}>{fmtWhen(v.time)}</span>
+                {/* 10.10.2026, его слово: «дата и время сигнала в журнале — очень заметно, но не очень крупно» —
+                    плашка с золотой рамкой: подпись «сигнал» и фактическое время прихода сигнала (было 11px серым) */}
+                <span
+                  title="Фактическое время прихода сигнала (по вашему часовому поясу)"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'baseline',
+                    gap: 7,
+                    fontFamily: MONO,
+                    fontSize: 13,
+                    fontWeight: 700,
+                    color: FG,
+                    background: `${ACCENT}14`,
+                    border: `1px solid ${ACCENT}66`,
+                    borderRadius: 6,
+                    padding: '3px 9px',
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  <span style={{ fontSize: 10, fontWeight: 400, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT }}>сигнал</span>
+                  {fmtWhen(v.time)}
+                </span>
                 <span style={{ fontFamily: MONO, fontSize: 14, color: FG }}>{v.instrument}</span>
                 <span style={{ fontFamily: MONO, fontSize: 11, color: long ? UP : DOWN }}>{v.side}</span>
                 <span
