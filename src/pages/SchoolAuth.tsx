@@ -28,6 +28,8 @@ export default function SchoolAuth() {
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [inviteCode, setInviteCode] = useState('');
+  // 11.10.2026: поле кода спрятано — открытое «Инвайт-код (необязательно)» читалось как «без кода нельзя»
+  const [showInvite, setShowInvite] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -89,6 +91,12 @@ export default function SchoolAuth() {
         if (inviteCode.trim() && signUpData.user) {
           await supabase.rpc('use_invite_code', { _code: inviteCode, _user_id: signUpData.user.id });
         }
+
+        // Если база требует подтвердить почту, сессии ещё нет и переход в кабинет не случится:
+        // без этой строки человек видел ту же форму и не понимал, что дальше
+        if (!signUpData.session) {
+          setSuccess(`Письмо отправлено на ${email}. Подтвердите почту, и кабинет откроется.`);
+        }
       }
     } catch (err: any) {
       setError(err.message || 'Произошла ошибка');
@@ -148,11 +156,19 @@ export default function SchoolAuth() {
             Регис<em>трация</em>
           </h1>
         )}
-        {/* 07.10.2026: при регистрации сам открывается пробный доступ к терминалу (триггер в базе) */}
+        {/* 07.10.2026: при регистрации сам открывается пробный доступ к терминалу (триггер в базе).
+            11.10.2026: до формы человек видит, что именно получит (разбор плана GPT, п.19) */}
         {!isLogin && (
-          <p className="-mt-4 mb-6 text-center text-sm leading-relaxed px-2" style={{ color: '#a8a090' }}>
-            Регистрация открывает бесплатный вводный курс и 7 дней пробного доступа к терминалу ECHO-GATE INSIDE.
-          </p>
+          <div className="-mt-4 mb-6 text-sm leading-relaxed px-2" style={{ color: '#a8a090' }}>
+            <p className="text-center">Регистрация бесплатная, карта не нужна. Сразу откроются:</p>
+            <ul className="mt-2 grid gap-1">
+              <li>· вводный курс;</li>
+              <li>
+                · терминал ECHO-GATE INSIDE на 7 дней: журнал моих решений с задержкой в сутки
+                и несколько инструментов целиком.
+              </li>
+            </ul>
+          </div>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -167,10 +183,10 @@ export default function SchoolAuth() {
               style={{ backgroundColor: '#0a0a0a', borderColor: '#1f1f1f', color: '#e8e0d0', fontFamily: "'Hanken Grotesk', sans-serif" }}
             />
           )}
-          {!isLogin && (
+          {!isLogin && showInvite && (
             <input
               type="text"
-              placeholder="Инвайт-код (необязательно)"
+              placeholder="Инвайт-код"
               value={inviteCode}
               onChange={e => setInviteCode(e.target.value)}
               className="w-full px-4 py-3 rounded-lg border text-sm"
@@ -198,6 +214,7 @@ export default function SchoolAuth() {
           />
 
           {error && <p className="text-sm" style={{ color: '#e85d3a' }}>{error}</p>}
+          {!isLogin && success && <p className="text-sm" style={{ color: '#caa472' }}>{success}</p>}
 
           <button
             type="submit"
@@ -208,6 +225,19 @@ export default function SchoolAuth() {
             {loading ? '...' : isLogin ? 'Войти' : 'Создать аккаунт'}
           </button>
         </form>
+
+        {!isLogin && !showInvite && (
+          <p className="mt-3 text-center text-xs">
+            <button
+              type="button"
+              onClick={() => setShowInvite(true)}
+              className="underline underline-offset-2 hover:text-[#caa472] transition-colors"
+              style={{ color: '#77705f', fontFamily: "'Hanken Grotesk', sans-serif" }}
+            >
+              Есть инвайт-код?
+            </button>
+          </p>
+        )}
 
         {/* 07.10.2026: документы появились, ссылки открываются в новой вкладке, чтобы не терять заполненную форму */}
         {!isLogin && (

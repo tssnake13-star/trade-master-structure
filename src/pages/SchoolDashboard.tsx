@@ -240,6 +240,8 @@ export default function SchoolDashboard() {
   const [eyeState, setEyeState] = useState<'open' | 'expired' | 'locked' | null>(null);
   // 07.10.2026: пробный доступ на 7 дней при регистрации (is_trial) — подпись «пробный доступ»
   const [eyeTrial, setEyeTrial] = useState(false);
+  // 11.10.2026: конец пробного — в плитке видно, сколько дней осталось (раньше только в терминале)
+  const [eyeUntil, setEyeUntil] = useState<string | null>(null);
   useEffect(() => {
     if (!user) return;
     if (role === 'admin') { setEyeState('open'); return; }
@@ -254,6 +256,7 @@ export default function SchoolDashboard() {
         const until = row?.expires_at;
         if (!alive) return;
         setEyeTrial(!!row?.is_trial);
+        setEyeUntil(until ?? null);
         if (!until) setEyeState('locked');
         else setEyeState(new Date(until).getTime() > Date.now() ? 'open' : 'expired');
       });
@@ -654,9 +657,15 @@ export default function SchoolDashboard() {
                   {eyeState === 'expired' && (
                     <div style={{ fontFamily: MONO, fontSize: 9, color: '#8a7048', marginTop: 4 }}>{t('sidebar_locked_expired')}</div>
                   )}
-                  {eyeState === 'open' && eyeTrial && (
-                    <div style={{ fontFamily: MONO, fontSize: 9, color: ACCENT, marginTop: 4 }}>пробный доступ</div>
-                  )}
+                  {eyeState === 'open' && eyeTrial && (() => {
+                    const left = eyeUntil ? Math.max(1, Math.ceil((new Date(eyeUntil).getTime() - now.getTime()) / 86400000)) : 0;
+                    const word = left === 1 ? 'день' : left < 5 ? 'дня' : 'дней';
+                    return (
+                      <div style={{ fontFamily: MONO, fontSize: 9, color: left && left <= 2 ? '#e8a05a' : ACCENT, marginTop: 4 }}>
+                        {left ? `пробный доступ · ${left === 1 ? 'остался' : 'осталось'} ${left} ${word}` : 'пробный доступ'}
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
             </button>

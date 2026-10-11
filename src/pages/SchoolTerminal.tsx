@@ -638,13 +638,15 @@ export default function SchoolTerminal() {
         <div style={{ padding: '14px 14px 0' }}>
           <div style={{ ...card, padding: 14, border: `1px solid ${ACCENT}55` }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
-              <span style={{ ...label, color: ACCENT, whiteSpace: 'nowrap' }}>
-                пробный доступ · {trialDays} {trialDays === 1 ? 'день' : trialDays < 5 ? 'дня' : 'дней'}
+              {/* 11.10.2026: в последние 2 дня плашка говорит «осталось» и теплеет, чтобы конец не был сюрпризом */}
+              <span style={{ ...label, color: trialDays <= 2 ? '#e8a05a' : ACCENT, whiteSpace: 'nowrap' }}>
+                пробный доступ · {trialDays <= 2 ? (trialDays === 1 ? 'остался ' : 'осталось ') : ''}
+                {trialDays} {trialDays === 1 ? 'день' : trialDays < 5 ? 'дня' : 'дней'}
               </span>
               <span style={{ color: FG, fontSize: 13, lineHeight: 1.6, flex: '1 1 360px' }}>
                 Открыты журнал моих решений с задержкой в сутки, итоги решений
-                {rows.length ? ` и ${rows.map((r) => r.symbol).join(', ')} целиком` : ''}. Скринер, ТОП-лист, тренд
-                и остальные инструменты открываются в подписке.
+                {rows.length ? ` и ${rows.map((r) => r.symbol).join(', ')} целиком` : ''}. В подписке мой вердикт
+                приходит сразу, в терминал и в Telegram, и открываются скринер, ТОП-лист, тренд и остальные инструменты.
               </span>
               <a
                 href={TELEGRAM_LINKS.dm}
