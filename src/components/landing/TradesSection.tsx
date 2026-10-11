@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { TELEGRAM_LINKS } from '@/lib/constants';
+import { trackClick } from '@/lib/analytics';
 import gbpJpyImg from '@/assets/trades/gbp-jpy-14-07-2026.jpg';
 import eurJpyImg from '@/assets/trades/eur-jpy-20-07-2026.jpg';
 import usdJpyImg from '@/assets/trades/usd-jpy-20-07-2026.jpg';
@@ -68,6 +70,28 @@ const TradesSection = () => {
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
             Июль и август 2026. Ни одна из этих сделок не была обязательной.<br />
             Все они были разрешены системой.
+          </p>
+
+          {/* 11.10.2026, Сергей: сделки не убирать («это двигатель»), а пометить, что решение было
+              до движения. На каждом скрине два графика, «до движения» и «после»; с августа решение
+              по каждой сделке записывается в журнал терминала до движения (его слова: «во всяком
+              случае с августа»). Июль в журнал не попадает, поэтому «с августа», а не «все». */}
+          <p
+            className="mt-4 text-sm md:text-base text-muted-foreground"
+            style={{ borderLeft: '2px solid hsl(var(--accent) / 0.5)', paddingLeft: 12, maxWidth: '62ch' }}
+          >
+            На каждом скрине два графика: до движения и после. С августа решение по каждой сделке ещё и
+            записывается в журнал терминала до движения, у каждой записи стоит время сигнала. Журнал можно{' '}
+            <a
+              href={TELEGRAM_LINKS.trial}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => trackClick('trades_trial')}
+              className="underline underline-offset-2 hover:text-foreground transition-colors"
+            >
+              смотреть 7 дней бесплатно
+            </a>
+            .
           </p>
 
           {/* Mobile — horizontal scroll snap */}

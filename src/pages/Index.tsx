@@ -8,33 +8,26 @@ import SideNav from '@/components/landing/SideNav';
 import HeroSectionV3 from '@/components/landing/HeroSectionV3';
 import StructureField from '@/components/landing/StructureField';
 import InstrumentTicker from '@/components/landing/InstrumentTicker';
-import StatsCounter from '@/components/landing/StatsCounter';
 import CoreProblemSection from '@/components/landing/CoreProblemSection';
-import IncludedSection from '@/components/landing/IncludedSection';
 import FourQuestionsSection from '@/components/landing/FourQuestionsSection';
-import CapitalProtectionSection from '@/components/landing/CapitalProtectionSection';
 import SystemStatsSection from '@/components/landing/SystemStatsSection';
 import ProofSection from '@/components/landing/ProofSection';
 import TradesSection from '@/components/landing/TradesSection';
 import TransformationSection from '@/components/landing/TransformationSection';
-import FiveStagesSection from '@/components/landing/FiveStagesSection';
 import FitSection from '@/components/landing/FitSection';
 import ComparisonSection from '@/components/landing/ComparisonSection';
 import FAQSection from '@/components/landing/FAQSection';
-import AdmissionCheckSection from '@/components/landing/AdmissionCheckSection';
 import LevelsSection from '@/components/landing/LevelsSection';
 import AuthorSection from '@/components/landing/AuthorSection';
 import PrincipleSection from '@/components/landing/PrincipleSection';
 import DualCTASection from '@/components/landing/DualCTASection';
-import LogoSection from '@/components/landing/LogoSection';
 import Footer from '@/components/landing/Footer';
 import WordmarkKinetic from '@/components/preview-next/WordmarkKinetic';
 
 /** Блоки, по которым считаем, до чего люди доскролливают (воронка внимания). */
 const TRACKED_SECTIONS = [
   'hero', 'problem', 'filter', 'week', 'proof', 'stats', 'trades',
-  'difference', 'included', 'questions', 'protection', 'stages',
-  'verdict', 'formats', 'author', 'faq',
+  'difference', 'questions', 'formats', 'author', 'faq',
 ];
 
 const Index = () => {
@@ -69,7 +62,7 @@ const Index = () => {
         {/* Это для меня? */}
         <HeroSectionV3 />
         <InstrumentTicker />
-        <StatsCounter />
+        {/* Полоса цифр (StatsCounter) с 11.10.2026 в блоке «Автор»: повторяла первый экран и «Результаты» */}
 
         {/* Да, это про меня */}
         <CoreProblemSection />
@@ -95,18 +88,17 @@ const Index = () => {
             «Чему вы учитесь» («соберите свою систему») сняты: первый — приманка
             для коллекционера инструментов, второй продаёт свободу трактовки,
             а клиент хочет правило. Файлы оставлены. */}
-        <IncludedSection />
+        {/* 11.10.2026, сайт говорит одно: «Попробуйте мою систему, не изучая её». Сняты с главной
+            (Сергей: «в целом согласен, действуй»), файлы оставлены:
+            «08 · Что входит» повторял «Неделю по системе» (терминал, вердикт, 2 действия, советник);
+            «10 · Защита капитала» стал строкой в «Неделе»; «11 · Путь» (5 этапов обучения) живёт на /access;
+            «★ Вердикт» остался строкой в «Сотрудничестве» и вторым входом на /access. */}
         <FourQuestionsSection />
-        <CapitalProtectionSection />
-        <FiveStagesSection showPrices={false} label="11 · Путь" />
         {/* «Два этапа: школа, потом экосистема только выпускникам» снят 07.10.2026:
-            спорил с линейкой «два пути» в разделе 12. Файл оставлен. */}
+            спорил с линейкой «два пути». Файл оставлен. */}
 
         {/* Мысль-делитель */}
         <WordmarkKinetic text="Допуск, " emphasis="не сигнал" />
-
-        {/* Попробовать бесплатно на своей сделке — для тех, кто дочитал */}
-        <AdmissionCheckSection />
 
         {/* Сколько стоит и кто автор */}
         <LevelsSection />
@@ -117,7 +109,7 @@ const Index = () => {
         <FAQSection />
 
         <DualCTASection />
-        <LogoSection />
+        {/* видео с логотипом снято 11.10.2026: стояло после последней кнопки и много весило */}
       </main>
       <Footer />
     </div>

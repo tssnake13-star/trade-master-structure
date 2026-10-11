@@ -9,14 +9,10 @@ const sections = [
   { id: 'stats', num: '05', label: 'Результаты' },
   { id: 'trades', num: '06', label: 'Сделки' },
   { id: 'difference', num: '07', label: 'Отличие' },
-  { id: 'included', num: '08', label: 'Что входит' },
-  { id: 'questions', num: '09', label: 'Четыре вопроса' },
-  { id: 'protection', num: '10', label: 'Защита' },
-  { id: 'stages', num: '11', label: 'Путь' },
-  { id: 'verdict', num: '★', label: 'Вердикт' },
-  { id: 'formats', num: '12', label: 'Сотрудничество' },
-  { id: 'author', num: '13', label: 'Автор' },
-  { id: 'faq', num: '14', label: 'Вопросы' },
+  { id: 'questions', num: '08', label: 'Четыре вопроса' },
+  { id: 'formats', num: '09', label: 'Сотрудничество' },
+  { id: 'author', num: '10', label: 'Автор' },
+  { id: 'faq', num: '11', label: 'Вопросы' },
 ];
 
 const SideNav = () => {

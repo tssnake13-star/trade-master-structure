@@ -1,5 +1,5 @@
 /**
- * FourQuestionsSection — «09 · Четыре вопроса».
+ * FourQuestionsSection — «08 · Четыре вопроса».
  *
  * Суть метода одним экраном: любая сделка проходит четыре вопроса, и дальше
  * либо допуск, либо отказ. Раньше это лежало строкой внутри карточки Trade
@@ -37,7 +37,7 @@ const FourQuestionsSection = () => {
     <section id="questions" className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <span className="section-label">09 · Четыре вопроса</span>
+          <span className="section-label">08 · Четыре вопроса</span>
           <h2 className="text-foreground">
             Сделка проходит 4 вопроса. <em>Иначе её нет.</em>
           </h2>

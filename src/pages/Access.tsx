@@ -57,10 +57,11 @@ export default function Access() {
           </div>
 
           {/* Бесплатный вход — первый узел схемы, отдельной карточки вердикта
-              больше нет (Сергей 07.10.2026: «убери одно»). Полный текст и три
-              условия разбора живут внутри схемы (detailedEntry). */}
+              больше нет (Сергей 07.10.2026: «убери одно»). С 11.10.2026 вход в схеме —
+              7 дней терминала, вердикт вторым входом с полным текстом и тремя
+              условиями разбора (detailedEntry). */}
           <div className="mt-8 md:mt-10">
-            <TwoPathsScheme showPrices={true} detailedEntry entryClickId="access_razbor" />
+            <TwoPathsScheme showPrices={true} detailedEntry entryClickId="access_scheme_trial" verdictClickId="access_razbor" />
           </div>
 
           <div className="mt-10 md:mt-14">

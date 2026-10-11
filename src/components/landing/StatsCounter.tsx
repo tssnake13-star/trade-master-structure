@@ -29,11 +29,12 @@ const useCountUp = (end: number, duration = 1500, start = false, decimals = 0) =
   return count;
 };
 
-const StatItem = ({ value, suffix, label, animate, decimals = 0 }: { value: number; suffix: string; label: string; animate: boolean; decimals?: number }) => {
+const StatItem = ({ value, suffix, label, animate, decimals = 0, compact = false }: { value: number; suffix: string; label: string; animate: boolean; decimals?: number; compact?: boolean }) => {
   const count = useCountUp(value, 1500, animate, decimals);
   return (
-    <div className="text-center py-4 md:py-0">
-      <div className="stat-number text-foreground">
+    <div className={compact ? 'py-2 md:py-0' : 'text-center py-4 md:py-0'}>
+      {/* в блоке «Автор» колонки уже: цифра мельче, чтобы «1000+» не вылезала за колонку */}
+      <div className="stat-number text-foreground" style={compact ? { fontSize: 'clamp(36px, 4.2vw, 60px)' } : undefined}>
         {count.toFixed(decimals).replace('.', ',')}{suffix}
       </div>
       <div className="stat-label text-muted-foreground">{label}</div>
@@ -41,7 +42,12 @@ const StatItem = ({ value, suffix, label, animate, decimals = 0 }: { value: numb
   );
 };
 
-const StatsCounter = () => {
+/**
+ * 11.10.2026: полоса стояла под первым экраном и повторяла его и «Результаты».
+ * Сергей: «перемести их тогда в блок автор». embedded — вариант внутри блока «Автор»,
+ * без своей секции и рамки на всю ширину.
+ */
+const StatsCounter = ({ embedded = false }: { embedded?: boolean }) => {
   const ref = useRef<HTMLDivElement>(null);
   const [animate, setAnimate] = useState(false);
 
@@ -54,15 +60,25 @@ const StatsCounter = () => {
     return () => observer.disconnect();
   }, []);
 
+  const grid = (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
+      {stats.map((s, i) => (
+        <StatItem key={i} {...s} animate={animate} compact={embedded} />
+      ))}
+    </div>
+  );
+
+  if (embedded) {
+    return (
+      <div ref={ref} className="mt-10 md:mt-12 pt-8 border-t border-border">
+        {grid}
+      </div>
+    );
+  }
+
   return (
     <section ref={ref} className="py-8 md:py-12 border-y border-border bg-card/30">
-      <div className="container-landing">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
-          {stats.map((s, i) => (
-            <StatItem key={i} {...s} animate={animate} />
-          ))}
-        </div>
-      </div>
+      <div className="container-landing">{grid}</div>
     </section>
   );
 };

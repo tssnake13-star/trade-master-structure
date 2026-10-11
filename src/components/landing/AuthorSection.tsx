@@ -1,13 +1,15 @@
 import { TELEGRAM_LINKS } from '@/lib/constants';
+import StatsCounter from './StatsCounter';
 
 const AuthorSection = () => {
   return (
     <section id="author" className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-4xl">
-          <span className="section-label">13 · Автор</span>
+          <span className="section-label">10 · Автор</span>
+          {/* 11.10.2026: «которой учу» уводило в обучение; весь сайт говорит «попробуйте систему» */}
           <h2 className="text-foreground mb-8">
-            14 лет в рынке. <em>Торгую по той же системе,</em> <span className="mute">которой учу.</span>
+            14 лет в рынке. <em>Торгую по той же системе,</em> <span className="mute">которую даю вам попробовать.</span>
           </h2>
           
           <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-start">
@@ -46,18 +48,22 @@ const AuthorSection = () => {
                 </p>
               </div>
 
+              {/* «14 лет в рынке» отсюда убрано 11.10.2026: оно стоит в заголовке и в цифрах ниже */}
               <div className="flex flex-wrap gap-x-6 gap-y-2 mb-3">
-                {['14 лет в рынке', 'Практикующий трейдер', 'Не сигнальщик, не инфобизнесмен'].map((s) => (
+                {['Практикующий трейдер', 'Не сигнальщик, не инфобизнесмен'].map((s) => (
                   <span key={s} className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--accent))' }}>{s}</span>
                 ))}
               </div>
               <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-                Торгует свинг по той же системе, которой обучает: разбор рынка на выходных,
-                в будни короткая проверка.
+                Торгует свинг по той же системе, что работает в терминале ECHO-GATE INSIDE: разбор рынка
+                на выходных, в будни короткая проверка.
               </p>
 
             </div>
           </div>
+
+          {/* 11.10.2026: полоса цифр перенесена сюда из-под первого экрана */}
+          <StatsCounter embedded />
         </div>
       </div>
     </section>

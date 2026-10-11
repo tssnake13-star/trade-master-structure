@@ -4,8 +4,12 @@ import { trackClick } from '@/lib/analytics';
 
 /**
  * Схема линейки «вход и два пути» (решение Сергея 07.10.2026, ОФФЕР — ЕДИНАЯ
- * ВЕРСИЯ, раздел 2). Вердикт ведёт в два пути: торговать по системе
+ * ВЕРСИЯ, раздел 2). Вход ведёт в два пути: торговать по системе
  * (ECHO-GATE INSIDE) или изучить её (курс, практикум); оба ведут в VIP.
+ *
+ * 11.10.2026: вход в схеме — 7 дней терминала (главный вход с 08.10, через бота),
+ * а не вердикт: «весь сайт должен говорить об одном… попробуй мою систему, не изучая её».
+ * Вердикт остался вторым входом: на /access полным текстом с условиями под главным входом.
  *
  * ⚠️ На лендинге цены только у курса и практикума (showPrices=false).
  * Цены подписки и VIP живут на /access.
@@ -49,12 +53,14 @@ const Fork = ({ up }: { up?: boolean }) => (
 export default function TwoPathsScheme({
   showPrices,
   detailedEntry = false,
-  entryClickId = 'scheme_verdict',
+  entryClickId = 'scheme_trial',
+  verdictClickId = 'scheme_verdict',
 }: {
   showPrices: boolean;
-  /** на /access вход в схеме заменяет отдельную карточку вердикта: полный текст и три условия */
+  /** на /access под входом стоит второй вход, вердикт: полный текст и три условия */
   detailedEntry?: boolean;
   entryClickId?: string;
+  verdictClickId?: string;
 }) {
   const rows = (list: Row[]) => (
     <div className="mt-5">
@@ -88,41 +94,56 @@ export default function TwoPathsScheme({
 
   return (
     <div>
-      {/* вход: бесплатный вердикт. Лимит настоящий: 5 разборов в неделю —
-          столько Сергей реально успевает. Число не завышаем никогда. */}
+      {/* вход: 7 дней терминала бесплатно, через бота (?start=trial) — человек остаётся в базе */}
       <a
-        href={TELEGRAM_LINKS.razbor}
+        href={TELEGRAM_LINKS.trial}
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => trackClick(entryClickId)}
-        className={`mx-auto flex ${detailedEntry ? 'max-w-2xl items-start' : 'max-w-md items-center'} justify-between gap-4 p-4 md:p-5 group transition-colors`}
+        className={`mx-auto flex ${detailedEntry ? 'max-w-2xl' : 'max-w-md'} items-center justify-between gap-4 p-4 md:p-5 group transition-colors`}
         style={{ border: '1px solid hsl(var(--accent) / 0.35)', background: 'hsl(var(--accent) / 0.05)' }}
       >
         <div>
-          <div className="text-mono" style={{ ...MONO, color: GOLD }}>Вход · вердикт · бесплатно</div>
-          {detailedEntry ? (
-            <>
-              <div className="mt-2 text-foreground font-medium">Не готовы решать — пришлите одну свою сделку</div>
-              <p className="mt-1.5 text-sm text-muted-foreground">
-                Ту, где вы всё сделали правильно и всё равно получили убыток. Нужен скрин с компьютера,
-                где виден вход и стоп, и пара фраз, почему вы вошли. В течение 48 часов отвечу лично
-                голосовым: прошла бы эта сделка допуск или нет и на чём именно она сломалась. Случай
-                требует объяснений — запишу видеоразбор.
-              </p>
-              <p className="mt-2 text-sm text-foreground/80">
-                Скажу и то, какой путь вам нужен: торговать по системе или изучать её. И скажу, если не нужен никакой.
-              </p>
-              <p className="mt-2 text-xs text-muted-foreground">
-                Разбираю валютные пары, в основном мажорные, золото и металлы, нефть, биткоин и эфир. Другую крипту не смотрю.
-                Скрины с телефона и сделки без описания не разбираю. Беру 5 разборов в неделю.
-              </p>
-            </>
-          ) : (
-            <div className="mt-1.5 text-sm text-foreground">Пришлите одну свою сделку: скажу, какой путь ваш</div>
-          )}
+          <div className="text-mono" style={{ ...MONO, color: GOLD }}>Вход · 7 дней · бесплатно</div>
+          <div className="mt-1.5 text-sm text-foreground">Попробуйте систему, не изучая её</div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Журнал моих решений: что я взял, от чего отказался и чем всё закончилось. Через 7 дней скажу, какой путь ваш.
+          </p>
         </div>
-        <ArrowRight className={`w-4 h-4 flex-shrink-0 ${detailedEntry ? 'mt-1' : ''} group-hover:translate-x-1 transition-transform`} style={{ color: GOLD }} />
+        <ArrowRight className="w-4 h-4 flex-shrink-0 group-hover:translate-x-1 transition-transform" style={{ color: GOLD }} />
       </a>
+
+      {/* второй вход: бесплатный вердикт. Лимит настоящий: 5 разборов в неделю —
+          столько Сергей реально успевает. Число не завышаем никогда. */}
+      {detailedEntry && (
+        <a
+          href={TELEGRAM_LINKS.razbor}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => trackClick(verdictClickId)}
+          className="mx-auto mt-3 flex max-w-2xl items-start justify-between gap-4 p-4 md:p-5 group transition-colors"
+          style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}
+        >
+          <div>
+            <div className="text-mono" style={{ ...MONO, color: 'hsl(var(--muted-foreground))' }}>Второй вход · вердикт · бесплатно</div>
+            <div className="mt-2 text-foreground font-medium">Есть своя сделка? Проверьте систему на ней</div>
+            <p className="mt-1.5 text-sm text-muted-foreground">
+              Пришлите одну сделку: ту, где вы всё сделали правильно и всё равно получили убыток. Нужен скрин
+              с компьютера, где виден вход и стоп, и пара фраз, почему вы вошли. В течение 48 часов отвечу лично
+              голосовым: прошла бы эта сделка допуск или нет и на чём именно она сломалась. Случай требует
+              объяснений, запишу видеоразбор.
+            </p>
+            <p className="mt-2 text-sm text-foreground/80">
+              Скажу и то, какой путь вам нужен: торговать по системе или изучать её. И скажу, если не нужен никакой.
+            </p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Разбираю валютные пары, в основном мажорные, золото и металлы, нефть, биткоин и эфир. Другую крипту не смотрю.
+              Скрины с телефона и сделки без описания не разбираю. Беру 5 разборов в неделю.
+            </p>
+          </div>
+          <ArrowRight className="w-4 h-4 flex-shrink-0 mt-1 group-hover:translate-x-1 transition-transform" style={{ color: GOLD }} />
+        </a>
+      )}
 
       <div className="md:hidden"><Wire /></div>
       <Fork />

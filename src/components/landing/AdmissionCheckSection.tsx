@@ -26,11 +26,14 @@ export default function AdmissionCheckSection() {
       <div className="container-landing">
         <div className="max-w-3xl">
           <span className="section-label" style={{ color: 'hsl(var(--accent))' }}>Вердикт · бесплатно</span>
+          {/* 11.10.2026: весь сайт говорит «попробуйте систему». Вердикт — та же проба,
+              только на своей сделке: второй вход (оффер, раздел 2) */}
           <h2 className="text-foreground">
-            Одна ваша сделка покажет, <em>почему счёт не растёт</em>
+            Проверьте систему <em>на своей сделке</em>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '56ch' }}>
-            Личный разбор от практикующего трейдера, ответ в течение 48 часов. Бесплатно. Без обязательств.
+            Одна ваша сделка покажет, почему счёт не растёт. Личный разбор от практикующего трейдера,
+            ответ в течение 48 часов. Бесплатно. Без обязательств.
           </p>
         </div>
 

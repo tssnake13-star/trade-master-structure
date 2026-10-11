@@ -78,13 +78,16 @@ export default function FiveStagesSection({
       <div className="max-w-3xl">
         {asSection && <span className="section-label">{label}</span>}
         {!asSection && <div className="text-mono" style={{ ...MONO, color: GOLD }}>Путь из пяти этапов</div>}
+        {/* 11.10.2026, Сергей: сначала попробовать систему, «подскажет человеку, стоит вообще разбираться
+            глубже или нет». Этот блок для тех, кто захотел глубже, и заголовок говорит это прямо. */}
         {asSection && (
           <h2 className="text-foreground">
-            5 этапов <em>до реального рынка</em>
+            Захотите разобраться сами? <em>5 этапов до реального рынка</em>
           </h2>
         )}
         <p className={asSection ? 'mt-4 text-base md:text-lg text-muted-foreground' : 'mt-3 text-sm text-muted-foreground'} style={{ maxWidth: '60ch' }}>
-          Одинаковый для всех, кто учится со мной. Разница между курсом, практикумом и VIP в том, докуда вы по нему доходите.
+          Чтобы торговать по системе, учиться не нужно. Если захотите принимать решения сами, путь одинаковый
+          для всех, кто учится со мной: разница между курсом, практикумом и VIP в том, докуда вы по нему доходите.
         </p>
       </div>
 
