@@ -576,7 +576,9 @@ export default function SchoolDashboard() {
           </div>
         </div>
         <nav className="overflow-y-auto px-3 space-y-1 pb-4">
-          {courses.map(c => {
+          {/* 12.10.2026, его слово: курсы с доступом — сверху, закрытые с замком — снизу; внутри каждой части
+              прежний порядок курсов (сортировка устойчивая) */}
+          {[...courses].sort((a, b) => Number(hasAccess(b)) - Number(hasAccess(a))).map(c => {
             const accessible = hasAccess(c);
             const cp = progress[c.id] || { completed: 0, total: 0 };
             const cpct = cp.total > 0 ? Math.round((cp.completed / cp.total) * 100) : 0;

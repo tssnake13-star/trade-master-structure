@@ -47,8 +47,9 @@ export interface ScrTop {
   side: 'LONG' | 'SHORT';
   scenario: string | null;
   tags: string[];
-  week: { angle: string | null; passed: number | null; reserve: string | null };
-  day: { angle: string | null; passed: number | null; reserve: string | null };
+  // trans — какой по счёту переход угла ведёт цикл (12.10.2026, его вопрос «какой это переход»)
+  week: { angle: string | null; passed: number | null; reserve: string | null; trans: number | null };
+  day: { angle: string | null; passed: number | null; reserve: string | null; trans: number | null };
   range: string | null;
   acc: string | null;
   agree: boolean;
@@ -223,8 +224,8 @@ export function parseTop(text: string): { top: ScrTop[]; fresh: string[] } {
         side: h[3] as 'LONG' | 'SHORT',
         scenario: sc ? sc.replace(/^сценарий\s*/, '') : null,
         tags: tags.filter((t) => !/^сценарий/.test(t)),
-        week: { angle: null, passed: null, reserve: null },
-        day: { angle: null, passed: null, reserve: null },
+        week: { angle: null, passed: null, reserve: null, trans: null },
+        day: { angle: null, passed: null, reserve: null, trans: null },
         range: null,
         acc: null,
         agree: false,
@@ -239,6 +240,12 @@ export function parseTop(text: string): { top: ScrTop[]; fresh: string[] } {
     if (ang) {
       tf = ang[1] === 'W1' ? 'week' : 'day';
       cur[tf].angle = ang[2];
+      continue;
+    }
+    // 12.10.2026: под углом бот пишет «первый переход 05.10.2026 по … · цель …» (после третьего — числом)
+    const tr = line.match(/^(первый|второй|третий|\d+)\s+переход\s/);
+    if (tr && tf && cur[tf].trans == null) {
+      cur[tf].trans = ({ первый: 1, второй: 2, третий: 3 } as Record<string, number>)[tr[1]] ?? +tr[1];
       continue;
     }
     const p = line.match(/^пройдено\s+(\d+)%.*?запас\s+[^(]*\(([\d.,]+)\s*ATR\)/);

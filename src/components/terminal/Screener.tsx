@@ -136,7 +136,7 @@ function SoloCard({ s, symbols, onOpen }: { s: ScrSolo; symbols: Set<string>; on
   );
 }
 
-function Bar({ name, v }: { name: string; v: { passed: number | null; reserve: string | null } }) {
+function Bar({ name, v }: { name: string; v: { passed: number | null; reserve: string | null; trans: number | null } }) {
   if (v.passed == null) return null;
   return (
     <>
@@ -145,6 +145,8 @@ function Bar({ name, v }: { name: string; v: { passed: number | null; reserve: s
         <span style={{ display: 'block', width: `${Math.min(100, v.passed)}%`, height: 6, background: ACCENT }} />
       </span>
       <span style={{ fontFamily: MONO, fontSize: 11, color: FG, textAlign: 'right' }}>{v.passed}%</span>
+      {/* 12.10.2026, его вопрос «запас хода какого перехода — первого, второго, третьего?» */}
+      <span style={{ fontSize: 11, color: DIM, whiteSpace: 'nowrap' }}>{v.trans ? `${v.trans}-й переход` : ''}</span>
     </>
   );
 }
@@ -164,7 +166,7 @@ function TopCard({ t, symbols, onOpen }: { t: ScrTop; symbols: Set<string>; onOp
       </div>
       {t.leads ? <div style={{ color: ACCENT, fontSize: 12, marginTop: 4 }}>поводырь группы {t.leads}</div> : null}
       {t.tags.length ? <div style={{ color: DIM, fontSize: 12, marginTop: 4 }}>{t.tags.join(' · ')}</div> : null}
-      <div style={{ display: 'grid', gridTemplateColumns: '54px 1fr 38px', gap: '6px 8px', alignItems: 'center', marginTop: 8 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '54px 1fr 38px auto', gap: '6px 8px', alignItems: 'center', marginTop: 8 }}>
         <Bar name="неделя" v={t.week} />
         <Bar name="дневка" v={t.day} />
       </div>
@@ -223,6 +225,7 @@ export function ScreenerCards({ doc, symbols, onOpen, part = 'groups' }: { doc?:
         ) : null}
         <div style={{ color: DIM, fontSize: 11, lineHeight: 1.7, display: 'flex', flexWrap: 'wrap', gap: '2px 12px', alignItems: 'center' }}>
           <span>неделя и дневка — сколько цикла уже пройдено</span>
+          <span>переход — какой по счёту переход угла ведёт цикл; в ТОП-лист идут только первый и второй</span>
           <span>запас дневки — сколько хода осталось до цели дневного цикла</span>
           <span>рейндж — цена стоит, выхода нет (информация, не запрет)</span>
         </div>
