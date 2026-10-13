@@ -106,7 +106,9 @@ const SECTIONS: [Section, string][] = [
 // 25.09.2026, его слово: «историю направления видел только я, администратор… как выходы против недели… где-нибудь
 // отдельно, не с общими кнопками». Эти вкладки — отдельной строкой «администратор» под общими, ученик их не видит,
 // и их ленты ему не загружаются вовсе (ключ ленты совпадает с вкладкой)
-const ADMIN_ONLY: Section[] = ['falsex', 'history'];
+// 13.10.2026, его слово: «Тренд мы уберём из общего доступа… перенеси её во вкладку администратор. То есть только
+// администратор может видеть эту вкладку. Пока что… всё равно ей пока никто не пользуется»
+const ADMIN_ONLY: Section[] = ['trend', 'falsex', 'history'];
 // ленты, которые бот кладёт в базу сразу после его кнопки: вкладка → ключ ленты (24.09 журнал, 25.09 скринер)
 const LIVE_FEED: Partial<Record<Section, string>> = { verdicts: 'verdicts', screener: 'screener', top: 'screener' };
 
@@ -718,7 +720,7 @@ export default function SchoolTerminal() {
           {section === 'instrument' && instrument}
           {section === 'screener' && (trial ? <TrialLock what="Скринер" /> : <ScreenerCards doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />)}
           {section === 'top' && (trial ? <TrialLock what="ТОП-лист" /> : <ScreenerCards part="top" doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />)}
-          {section === 'trend' && (trial ? <TrialLock what="Тренд" /> : <TrendFeed doc={feeds.trend} symbols={symbols} onOpen={openSymbol} />)}
+          {section === 'trend' && isAdmin && <TrendFeed doc={feeds.trend} symbols={symbols} onOpen={openSymbol} />}
           {section === 'falsex' && isAdmin && <FalseExitFeed doc={feeds.falsex} symbols={symbols} onOpen={openSymbol} />}
           {section === 'verdicts' && trial && hiddenVerdicts.length ? (
             <div style={{ ...card, padding: 12, marginBottom: 14, color: DIM, fontSize: 13, lineHeight: 1.6, display: 'flex', gap: 8, alignItems: 'center' }}>
