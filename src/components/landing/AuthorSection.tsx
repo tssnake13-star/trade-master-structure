@@ -9,7 +9,7 @@ const AuthorSection = () => {
           <span className="section-label">10 · Автор</span>
           {/* 11.10.2026: «которой учу» уводило в обучение; весь сайт говорит «попробуйте систему» */}
           <h2 className="text-foreground mb-8">
-            14 лет в рынке. <em>Торгую по той же системе,</em> <span className="mute">которую даю вам попробовать.</span>
+            15 лет в рынке. <em>Торгую по той же системе,</em> <span className="mute">которую даю вам попробовать.</span>
           </h2>
           
           <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-start">

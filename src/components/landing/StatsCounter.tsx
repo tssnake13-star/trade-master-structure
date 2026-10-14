@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 // Win Rate и R:R — таблица «TLT_Statement_2025-2026» (январь 2025 — сентябрь 2026):
 // побед 23,5%, средний выигрыш +9,50 R против −1,00 R.
 const stats = [
-  { value: 14, suffix: '', label: 'лет в рынке' },
+  { value: 15, suffix: '', label: 'лет в рынке' },
   { value: 200, suffix: '+', label: 'учеников в системе' },
   { value: 1000, suffix: '+', label: 'эталонных сделок в архиве' },
   { value: 23.5, suffix: '%', label: 'Win Rate · среднее R:R 9,5:1', decimals: 1 },
