@@ -187,7 +187,7 @@ function Cell({ name, value, color, sub, small }: { name: ReactNode; value: stri
 
 /** 22.09.2026, его слово: «посередине прям потолще линию, чтобы разделять два таймфрейма…
  *  сверху крупными буквами — неделя и дневка… лучше по-русски». Слева неделя: направление,
- *  сценарий и её критерии; справа дневка: подтверждение, поводырь и её критерии. */
+ *  сценарий, критерии и поводырь; справа дневка: направление, подтверждение и запас хода (15.10.2026). */
 const TF_HEAD = {
   fontFamily: SANS,
   fontSize: 17,
@@ -210,7 +210,7 @@ function Half({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-function Crit({ tf, r }: { tf: 'W1' | 'D1'; r: MarketRow }) {
+function Crit({ tf, r, name = 'критерии' }: { tf: 'W1' | 'D1'; r: MarketRow; name?: string }) {
   const dir = tf === 'W1' ? r.w_dir : r.d_dir;
   const n = tf === 'W1' ? r.w_n : r.d_n;
   const votes = ((tf === 'W1' ? r.extra?.w_votes : legacyD1(r) ? [] : r.extra?.d_votes) || []) as Vote[];
@@ -227,9 +227,10 @@ function Crit({ tf, r }: { tf: 'W1' | 'D1'; r: MarketRow }) {
         : 'нет направления';
   return (
     // 22.09.2026: неделя и дневка теперь заголовками половин — здесь только «критерии»;
-    // клетка тянется до низа половины, чтобы половины кончались ровно
+    // клетка тянется до низа половины, чтобы половины кончались ровно.
+    // 15.10.2026, его слово: у дневки та же клетка называется «направление»
     <div style={{ backgroundColor: PANEL, padding: '12px 10px', flex: 1 }}>
-      <div style={cellLabel}>критерии</div>
+      <div style={cellLabel}>{name}</div>
       <div style={bigValue(s ? colorOf(s) : ACCENT)}>{value}</div>
       {votes.length ? (
         <>
@@ -241,8 +242,40 @@ function Crit({ tf, r }: { tf: 'W1' | 'D1'; r: MarketRow }) {
   );
 }
 
-/** Блок главного: слева НЕДЕЛЯ (направление, сценарий, критерии недели), справа ДНЕВКА
- *  (подтверждение, поводырь, критерии дневки), между ними толстая линия (22.09.2026).
+/** Запас хода — 15.10.2026, его правило перехая / перелоя: «когда цена доходит до этой точки, заходить уже
+ *  поздно… бинарно, допуск отказ». Экран ничего не считает: мост присылает extra.zapas — тот же фильтр, что
+ *  держит допуск бота (сначала поводырь группы). Есть — зелёным, нет — красным со словом «перехай» или
+ *  «перелой»; под ним — у кого смотрели и день точки начала отката, без цен. */
+function Zapas({ r }: { r: MarketRow }) {
+  const z = r.extra?.zapas;
+  const who = z?.lead && z.who ? <>у поводыря — {z.who}<br /></> : null;
+  let value = '—';
+  let color = DIM;
+  let sub: ReactNode = null;
+  if (z && z.ok) {
+    value = 'ЕСТЬ';
+    color = UP;
+    sub = z.none ? <>{who}отката от 3 ATR и двух недель не было</> : <>{who}до точки начала отката {z.a}</>;
+  } else if (z) {
+    value = `нет — ${z.word || 'перехай'}`;
+    color = DOWN;
+    sub = <>{who}цена дошла до точки начала отката {z.a}{z.touch ? ` (касание ${z.touch})` : ''}</>;
+  } else if (!sideOf(r.side)) {
+    sub = 'у инструмента нет направления';
+  }
+  return (
+    <div style={{ backgroundColor: PANEL, padding: '12px 10px', flex: 1 }}>
+      <div style={cellLabel}>запас хода</div>
+      <div style={bigValue(color)}>{value}</div>
+      {sub ? <div style={note}>{sub}</div> : null}
+    </div>
+  );
+}
+
+/** Блок главного: слева НЕДЕЛЯ, справа ДНЕВКА, между ними толстая линия (22.09.2026).
+ *  15.10.2026, его слово: «на неделе шаг 1 должны быть направление, сценарий, критерии, поводырь; на дневке
+ *  три — направление, подтверждение и запас хода». Поводырь переехал на неделю, у дневки клетка критериев
+ *  называется «направление», новая клетка — «запас хода».
  *  На узком экране половины идут друг под другом, линия — поперёк. */
 export function Decision({ r, narrow }: { r: MarketRow; narrow: boolean }) {
   const s = sideOf(r.side);
@@ -290,12 +323,25 @@ export function Decision({ r, narrow }: { r: MarketRow; narrow: boolean }) {
             }
           />
         </div>
-        <Crit tf="W1" r={r} />
+        {/* 15.10.2026: второй ряд недели — критерии и поводырь; ряд тянется до низа половины */}
+        <div style={{ ...pair, flex: 1 }}>
+          <Crit tf="W1" r={r} />
+          {/* 24.09.2026, его слово: ALPHA убрана — у индекса доллара и у пар, которые он ведёт, просто «поводырь» */}
+          <Cell
+            name="поводырь"
+            value={g.main}
+            color={g.color}
+            sub={g.sub}
+            small={g.main.length > 14}
+          />
+        </div>
       </Half>
       {/* 22.09.2026: толстая линия между неделей и дневкой */}
       <div style={{ backgroundColor: DIVIDER, ...(narrow ? { height: 4 } : { width: 4 }) }} />
       <Half title="дневка — шаг 2">
         <div style={pair}>
+          {/* 15.10.2026, его слово: у дневки — «направление» (свинг, свеча, накопления, 2 из 3) */}
+          <Crit tf="D1" r={r} name="направление" />
           {/* 21.09.2026 вечер, его определение: подтверждение — только на дневке: свинг, свеча,
               реверс; реверс обязателен. «Если его нет, сделку нельзя делать» */}
           <Cell
@@ -311,16 +357,8 @@ export function Decision({ r, narrow }: { r: MarketRow; narrow: boolean }) {
               ) : null
             }
           />
-          {/* 24.09.2026, его слово: ALPHA убрана — у индекса доллара и у пар, которые он ведёт, просто «поводырь» */}
-          <Cell
-            name="поводырь"
-            value={g.main}
-            color={g.color}
-            sub={g.sub}
-            small={g.main.length > 14}
-          />
         </div>
-        <Crit tf="D1" r={r} />
+        <Zapas r={r} />
       </Half>
     </div>
   );

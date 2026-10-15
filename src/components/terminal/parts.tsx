@@ -76,6 +76,21 @@ export interface MarketRow {
     w_anom?: string | null;
     // 27.09.2026: у сценария по контексту — что с неделей, словами бота («недельного цикла вверх нет»)
     itog_why?: string | null;
+    // 15.10.2026: запас хода (перехай / перелой) — тот же фильтр, что держит допуск бота (zapas_hoda.check),
+    // для стороны карточки. ok — запас есть; lead — смотрели поводыря (who, who_gen — кого); a — день точки
+    // начала отката, touch — день касания; none — отката от 3 ATR и двух недель не было. Стороны нет — null.
+    zapas?: {
+      ok: boolean;
+      none?: boolean;
+      lead?: boolean;
+      who?: string | null;
+      who_gen?: string | null;
+      side?: string | null;
+      word?: string | null;
+      a?: string | null;
+      touch?: string | null;
+      text?: string | null;
+    } | null;
   } | null;
   bars_at: string | null;
   updated_at: string | null;
