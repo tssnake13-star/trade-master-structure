@@ -90,6 +90,8 @@ export interface MarketRow {
       a?: string | null;
       touch?: string | null;
       text?: string | null;
+      // 16.10.2026: у поводыря запаса нет — смотрели индекс доллара над ним; ok сверху — уже итог по обоим
+      top?: { ok: boolean; none?: boolean; side?: string | null; a?: string | null; touch?: string | null } | null;
     } | null;
   } | null;
   bars_at: string | null;

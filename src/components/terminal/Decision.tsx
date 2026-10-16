@@ -254,7 +254,18 @@ function Zapas({ r }: { r: MarketRow }) {
   let value = '—';
   let color = DIM;
   let sub: ReactNode = null;
-  if (z && z.ok) {
+  // 16.10.2026, его слово «внедряй везде»: у поводыря запаса нет — смотрели индекс доллара над ним, хватает одного
+  const t = z?.top;
+  const tDown = t?.side === 'SHORT';
+  const mine = z ? <>{who}{down ? 'лоу' : 'хай'} {z.a} переписан{z.touch ? ` ${z.touch}` : ''}</> : null;
+  if (z && t) {
+    value = z.ok ? 'входить можно' : 'входить нельзя';
+    color = z.ok ? UP : DOWN;
+    const dxy = t.ok
+      ? (t.none ? 'большого отката не было' : <>запас до {tDown ? 'лоу' : 'хая'} {t.a}</>)
+      : <>{tDown ? 'лоу' : 'хай'} {t.a} переписан{t.touch ? ` ${t.touch}` : ''}</>;
+    sub = <>{mine}<br />у индекса доллара — {dxy}</>;
+  } else if (z && z.ok) {
     value = 'входить можно';
     color = UP;
     sub = z.none ? <>{who}большого отката не было</> : <>{who}запас до {down ? 'лоу' : 'хая'} {z.a}</>;
