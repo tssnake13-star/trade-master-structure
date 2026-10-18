@@ -27,7 +27,6 @@ const TABS: Record<Bot, [Tab, string, string][]> = {
   school: [['dec', 'Решения', '📋'], ['inst', 'Инструмент', '📈'], ['tm', 'Машина времени', '🕰'], ['tr', 'Тренажёр', '🎯']],
 };
 const SU = String(import.meta.env.VITE_SUPABASE_URL || '').replace(/\/$/, '');
-const WEB = 'https://www.tradeliketyo.com/school';
 
 interface TgData {
   ok: boolean;
@@ -159,11 +158,6 @@ export default function TgTerminal() {
     setTab('inst');
     window.scrollTo(0, 0);
   };
-  const openWeb = () => {
-    const tg = window.Telegram?.WebApp;
-    if (tg?.openLink) tg.openLink(WEB);
-    else window.open(WEB, '_blank');
-  };
 
   const shell = (body: React.ReactNode, withTabs = true) => (
     <div style={{ background: BG, color: FG, minHeight: '100vh', display: 'flex', flexDirection: 'column', fontFamily: "'Syne', system-ui, sans-serif", maxWidth: '100vw', overflowX: 'hidden' }}>
@@ -207,8 +201,9 @@ export default function TgTerminal() {
       <div>
         {bot === 'school' ? (
           <div style={{ color: DIM, fontSize: 13, marginBottom: 8, lineHeight: 1.5 }}>
-            Инструменты для примера: так система разбирает рынок — неделя, шаг 1; дневка, шаг 2. Все инструменты — в{' '}
-            <span onClick={openWeb} style={{ color: ACCENT, textDecoration: 'underline', cursor: 'pointer' }}>веб-версии терминала</span>.
+            {/* 18.10.2026, его слово: «все инструменты в веб-версии» — обман, там у нового человека та же проба; «лучше
+                написать: все инструменты после подписки» */}
+            Инструменты для примера: так система разбирает рынок — неделя, шаг 1; дневка, шаг 2. Все инструменты — после подписки.
           </div>
         ) : null}
         <Picker rows={list} cur={r} onPick={setSym} />
