@@ -153,7 +153,8 @@ export default function SchoolTerminal() {
   // ленты «только администратору» ученику не запрашиваются
   const feedQuery = useCallback(() => {
     const q = db.from('market_feed').select('key, data, updated_at');
-    return isAdmin ? q : q.not('key', 'in', `(${ADMIN_ONLY.join(',')})`);
+    // 18.10.2026: verdicts_crypto — его решения по крипте «только мне», ученику не запрашивается (и база не отдаёт)
+    return isAdmin ? q : q.not('key', 'in', `(${[...ADMIN_ONLY, 'verdicts_crypto'].join(',')})`);
   }, [isAdmin]);
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
@@ -756,7 +757,7 @@ export default function SchoolTerminal() {
               </span>
             </div>
           ) : null}
-          {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} outcomes={feeds.outcomes} videos={videos} symbols={symbols} onOpen={openSymbol} />}
+          {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} outcomes={feeds.outcomes} videos={videos} symbols={symbols} onOpen={openSymbol} privateCrypto={isAdmin ? feeds.verdicts_crypto || { items: [] } : undefined} />}
           {/* пробному лента timemachine базой не отдаётся (правило market_feed_select: ему только outcomes) — замок, а не пустая вкладка */}
           {section === 'timemachine' && (trial ? <TrialLock what="Машина времени" /> : <TimeMachine doc={feeds.timemachine} symbols={symbols} onOpen={openSymbol} />)}
           {section === 'trainer' && (trial ? <TrialLock what="Тренажёр" /> : <Trainer doc={feeds.timemachine} symbols={symbols} onOpen={openSymbol} />)}

@@ -33,6 +33,7 @@ interface TgData {
   ok: boolean;
   reason?: string;
   pub?: string | null;
+  admin?: boolean;
   rows?: MarketRow[];
   feeds?: FeedDocs & { timemachine?: { items?: TimeItem[] } };
   videos?: string | null;
@@ -228,7 +229,7 @@ export default function TgTerminal() {
   } else if (tab === 'top') {
     body = <ScreenerCards part="top" doc={d.feeds?.screener} symbols={symbols} onOpen={open} />;
   } else if (tab === 'dec') {
-    body = <VerdictsFeed doc={d.feeds?.verdicts} outcomes={d.feeds?.outcomes} videos={videos} symbols={symbols} onOpen={open} picUrl={(p) => pub(p)} />;
+    body = <VerdictsFeed doc={d.feeds?.verdicts} outcomes={d.feeds?.outcomes} videos={videos} symbols={symbols} onOpen={open} picUrl={(p) => pub(p)} privateCrypto={d.admin ? d.feeds?.verdicts_crypto || { items: [] } : undefined} />;
   } else if (tab === 'tm') {
     body = <TimeMachine doc={d.feeds?.timemachine} symbols={symbols} onOpen={open} />;
   } else if (tab === 'tr') {

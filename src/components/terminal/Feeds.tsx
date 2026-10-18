@@ -16,7 +16,10 @@ export interface FeedDocs {
   // at — время скринера с поясом (мост с 22.09.2026); time — строка бота по часам VPS
   screener?: { time?: string | null; at?: string | null; groups?: string | null; top?: string | null; leaders?: Record<string, string> | null };
   trend?: { lines?: string[] };
-  verdicts?: { items?: Verdict[] };
+  // 18.10.2026: crypto_private — крипта «только ему» (/crypto me): подписчику журнал крипты под замком;
+  // verdicts_crypto — его решения по крипте в этом режиме, лента только администратору
+  verdicts?: { items?: Verdict[]; crypto_private?: boolean };
+  verdicts_crypto?: { items?: Verdict[] };
   falsex?: { checked?: number; items?: FalseExit[] };
   // 25.09.2026: итоги решений из его субботнего разбора (таблица допусков) — кладутся раз в неделю
   outcomes?: { items?: Outcome[] };
@@ -61,12 +64,12 @@ export interface Verdict {
 type Open = (symbol: string) => void;
 
 /** 18.10.2026, его слово: «как отделить журнал по форексу и журнал крипты… давай с переключателем, делай везде». */
-export function MarketSwitch({ value, onChange, counts }: { value: MarketKey; onChange: (m: MarketKey) => void; counts: Record<MarketKey, number> }) {
+export function MarketSwitch({ value, onChange, counts, locked }: { value: MarketKey; onChange: (m: MarketKey) => void; counts: Record<MarketKey, number>; locked?: MarketKey }) {
   return (
     <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
       {(['fx', 'crypto'] as MarketKey[]).map((m) => (
         <button key={m} onClick={() => onChange(m)} style={pill(value === m)}>
-          {m === 'fx' ? 'Форекс' : 'Крипта'} · {counts[m]}
+          {m === 'fx' ? 'Форекс' : 'Крипта'} · {locked === m ? '🔒' : counts[m]}
         </button>
       ))}
     </div>
@@ -255,10 +258,13 @@ function OutcomeBlock({ o }: { o?: Outcome }) {
 }
 
 // 18.10.2026: picUrl — терминал в Телеграме берёт картинки из открытого ящика tgpub, а не по подписанной ссылке
-export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picUrl }: { doc?: FeedDocs['verdicts']; outcomes?: FeedDocs['outcomes']; videos?: JournalVideo[]; symbols: Set<string>; onOpen: Open; picUrl?: (path: string) => string }) {
-  const all = doc?.items || [];
+export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picUrl, privateCrypto }: { doc?: FeedDocs['verdicts']; outcomes?: FeedDocs['outcomes']; videos?: JournalVideo[]; symbols: Set<string>; onOpen: Open; picUrl?: (path: string) => string; privateCrypto?: FeedDocs['verdicts_crypto'] }) {
+  // 18.10.2026: администратору — и его решения по крипте «только мне» (privateCrypto); подписчику в этом режиме
+  // журнал крипты под замком
+  const all = [...(doc?.items || []), ...(privateCrypto?.items || [])].sort((a, b) => b.time.localeCompare(a.time));
+  const cryptoLocked = !!doc?.crypto_private && !privateCrypto;
   const [mk, setMk] = useState<MarketKey>('fx');
-  const items = all.filter((v) => marketOfSym(v.instrument) === mk);
+  const items = cryptoLocked && mk === 'crypto' ? [] : all.filter((v) => marketOfSym(v.instrument) === mk);
   const counts = { fx: all.filter((v) => marketOfSym(v.instrument) === 'fx').length, crypto: all.filter((v) => marketOfSym(v.instrument) === 'crypto').length };
   // 25.09.2026: серии «Допуск-отказ» — плеер сверху; «разбор этой недели» у карточек включает серию в нём
   const [vid, setVid] = useState<string | null>(null);
@@ -303,12 +309,14 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
   const oldest = items[items.length - 1]?.time;
   return (
     <div>
-      <MarketSwitch value={mk} onChange={setMk} counts={counts} />
+      <MarketSwitch value={mk} onChange={setMk} counts={counts} locked={cryptoLocked ? 'crypto' : undefined} />
       <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
         Допуски и отказы автора, которые получили подписчики{oldest ? `, с ${fmtWhen(oldest).slice(0, 10)}` : ''}. Свежие сверху, хранятся последние 90 дней. Время — по вашему часовому поясу. Под каждым решением — что было дальше: итог из еженедельного разбора и куда пошла цена после сигнала.
       </div>
       {videos.length ? <VideoReviews videos={videos} currentId={vid} onPick={setVid} boxRef={box} /> : null}
-      {!items.length ? <div style={{ color: DIM, fontSize: 13, marginBottom: 10 }}>{mk === 'crypto' ? 'Решений по крипте пока нет.' : 'Решений по форексу пока нет.'}</div> : null}
+      {cryptoLocked && mk === 'crypto' ? (
+        <div style={{ ...card, padding: 14, color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>🔒 Журнал по крипте закрыт: решения по крипте Сергей сейчас ведёт только для себя. Сигналы по крипте подписчикам не приходят.</div>
+      ) : !items.length ? <div style={{ color: DIM, fontSize: 13, marginBottom: 10 }}>{mk === 'crypto' ? 'Решений по крипте пока нет.' : 'Решений по форексу пока нет.'}</div> : null}
       <div style={{ display: 'grid', gap: 10 }}>
         {items.map((v, i) => {
           const ok = v.verdict === 'ДОПУСК';
