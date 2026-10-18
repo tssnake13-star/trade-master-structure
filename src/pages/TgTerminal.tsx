@@ -82,7 +82,10 @@ export default function TgTerminal() {
         'tg_terminal',
         { init_data: init, bot },
       );
-      if (alive) setD(error || !data ? { ok: false, reason: 'net' } : data);
+      // 18.10.2026: «no_init» с непустой подписью — база ещё не знает ключ этого бота (мост не прошёл круг), а не
+      // «открыто не из бота»: так и пишем
+      const res = error || !data ? { ok: false, reason: 'net' } : data;
+      if (alive) setD(res.reason === 'no_init' ? { ...res, reason: 'no_key' } : res);
     });
     return () => {
       alive = false;
@@ -126,7 +129,9 @@ export default function TgTerminal() {
     const msg =
       d.reason === 'no_init'
         ? 'Откройте терминал из бота: кнопка «Терминал» внизу чата.'
-        : d.reason === 'no_access'
+        : d.reason === 'no_key'
+          ? 'Терминал подключается. Откройте его снова через пару минут.'
+          : d.reason === 'no_access'
           ? 'Терминал в этом боте — для подписчиков сигналов. Подписка не найдена или закончилась. Продлить её можно у Сергея.'
           : 'Не удалось проверить вход. Закройте терминал и откройте его снова из бота.';
     return shell(<div style={{ color: FG, padding: 24, textAlign: 'center', lineHeight: 1.6 }}>{msg}</div>, false);
