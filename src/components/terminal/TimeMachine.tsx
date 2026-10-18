@@ -5,8 +5,15 @@ import { GEN } from './screenerParse';
 
 /** 18.10.2026, его слово «Нравится, внедряй в кабинет» (после макета): «Машина времени» и «Тренажёр «Допуск или
  *  отказ»» — на одних данных. Ленту timemachine кладёт субботний terminal_ishody.py: его решения с окончательным
- *  итогом, карточка того дня из таблицы допусков и дневки MT5 вокруг. Часть графика до решения — только закрытые
- *  дневки до дня сигнала (что было известно), правее — то, чего в момент решения не знал никто. */
+ *  итогом, карточка того дня и свечи MT5 вокруг.
+ *  18.10.2026, его слово: «надо сделать три графика: сначала H4, ниже D1 и в самом низу неделя… сразу будет видно до
+ *  и после» и «для каждого графика должны быть критерии, которые были на момент сигнала… и в тренажёре также».
+ *  ⛔ Левее золотой линии — только свечи, закрывшиеся к моменту сигнала; правее — то, чего тогда не знал никто. */
+type Bar = [string, number, number, number, number];
+interface Tf {
+  cut: number;
+  bars: Bar[];
+}
 export interface TimeItem {
   time: string;
   instrument: string;
@@ -19,8 +26,10 @@ export interface TimeItem {
   ctx?: string;
   result: string;
   text?: string;
-  cut: number;
-  bars: [string, number, number, number, number][];
+  tf?: { H4?: Tf; D1?: Tf; W1?: Tf };
+  // что бот записал в журнал сигналов в момент карточки — по таймфреймам
+  w1?: { acc?: string; range?: string };
+  d1?: { acc?: string; range?: string; scen?: string; conf?: string };
   pic?: string | null;
 }
 
@@ -43,12 +52,13 @@ function weekWords(s?: string) {
 }
 // «DXY BUY» → «группа доллара · рост»
 function ctxWords(s?: string) {
-  const t = (s || '').trim();
-  const m = t.match(/^([A-Z]+)\s+(BUY|SELL)/);
+  const m = (s || '').trim().match(/^([A-Z]+)\s+(BUY|SELL)/);
   if (!m) return '';
   const g = GEN[m[1]];
   return `${g ? 'группа ' + g : m[1]} · ${m[2] === 'BUY' ? 'рост' : 'падение'}`;
 }
+// «с 16.09.2026» → «с 16.09»: год и так понятен
+const short = (s?: string) => (s || '').replace(/(\d{2}\.\d{2})\.20\d{2}/g, '$1');
 function resultTone(r: string): 'take' | 'stop' | 'skip' {
   const u = r.toUpperCase();
   if (u.includes('ТЕЙК')) return 'take';
@@ -57,9 +67,9 @@ function resultTone(r: string): 'take' | 'stop' | 'skip' {
 }
 const keyOf = (x: TimeItem) => `${x.time}|${x.instrument}|${x.side}`;
 
-function Chart({ it, show }: { it: TimeItem; show: boolean }) {
-  const B = it.bars;
-  const W = 760, H = 380, pl = 8, pr = 64, pt = 14, pb = 26;
+function Chart({ tf, show, when }: { tf: Tf; show: boolean; when: string }) {
+  const B = tf.bars;
+  const W = 760, H = 250, pl = 8, pr = 64, pt = 12, pb = 22;
   let hi = -Infinity, lo = Infinity;
   B.forEach((b) => {
     hi = Math.max(hi, b[2]);
@@ -71,15 +81,16 @@ function Chart({ it, show }: { it: TimeItem; show: boolean }) {
   const step = (W - pl - pr) / B.length;
   const X = (i: number) => pl + (i + 0.5) * step;
   const Y = (p: number) => pt + ((hi - p) / (hi - lo)) * (H - pt - pb);
-  const w = step * 0.62;
-  const n = show ? B.length : it.cut;
-  const xc = X(it.cut) - step / 2;
+  const w = Math.max(1, step * 0.62);
+  const n = show ? B.length : tf.cut;
+  const xc = X(tf.cut) - step / 2;
   const dg = hi > 1000 ? 0 : hi > 100 ? 1 : hi > 10 ? 3 : 4;
   const day = (s: string) => `${s.slice(8, 10)}.${s.slice(5, 7)}`;
+  const every = Math.max(1, Math.round(B.length / 8));
   return (
     <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 'auto', display: 'block' }}>
-      {[0, 1, 2, 3, 4].map((k) => {
-        const p = lo + ((hi - lo) * k) / 4;
+      {[0, 1, 2, 3].map((k) => {
+        const p = lo + ((hi - lo) * k) / 3;
         return (
           <g key={k}>
             <line x1={pl} x2={W - pr} y1={Y(p)} y2={Y(p)} stroke="#1e1c19" />
@@ -87,11 +98,11 @@ function Chart({ it, show }: { it: TimeItem; show: boolean }) {
           </g>
         );
       })}
-      {B.map((b, i) => (i % 10 === 0 ? <text key={'d' + i} x={X(i)} y={H - 8} fill="#6f6a62" fontSize={11} textAnchor="middle" fontFamily={MONO}>{day(b[0])}</text> : null))}
+      {B.map((b, i) => (i % every === 0 ? <text key={'d' + i} x={X(i)} y={H - 6} fill="#6f6a62" fontSize={11} textAnchor="middle" fontFamily={MONO}>{day(b[0])}</text> : null))}
       {!show ? (
         <g>
           <rect x={xc} y={pt} width={W - pr - xc} height={H - pt - pb} fill="#0d0c0b" />
-          <text x={(xc + W - pr) / 2} y={H / 2} fill="#4a4640" fontSize={15} textAnchor="middle">будущее закрыто</text>
+          <text x={(xc + W - pr) / 2} y={H / 2} fill="#4a4640" fontSize={14} textAnchor="middle">будущее закрыто</text>
         </g>
       ) : null}
       {B.slice(0, n).map((b, i) => {
@@ -104,8 +115,8 @@ function Chart({ it, show }: { it: TimeItem; show: boolean }) {
         );
       })}
       <line x1={xc} x2={xc} y1={pt} y2={H - pb} stroke={ACCENT} strokeWidth={2} strokeDasharray="5 4" />
-      <rect x={xc - 60} y={pt} width={120} height={20} rx={4} fill={ACCENT} />
-      <text x={xc} y={pt + 14} fill="#0a0a0a" fontSize={12} fontWeight={700} textAnchor="middle">решение {fmtWhen(it.time).slice(0, 5)}</text>
+      <rect x={xc - 60} y={pt} width={120} height={19} rx={4} fill={ACCENT} />
+      <text x={xc} y={pt + 13} fill="#0a0a0a" fontSize={12} fontWeight={700} textAnchor="middle">решение {when}</text>
     </svg>
   );
 }
@@ -136,26 +147,39 @@ const btn = (col = ACCENT): CSSProperties => ({
   cursor: 'pointer',
 });
 
-function Rows({ it }: { it: TimeItem }) {
-  const rows: [string, string][] = [];
-  const wk = weekWords(it.week);
-  if (wk) rows.push(['Неделя', wk]);
-  const cr = critWords(it.crit);
-  if (cr) rows.push(['Критерии недели', cr]);
-  const cx = ctxWords(it.ctx);
-  if (cx) rows.push(['Контекст', cx]);
-  // как в журнале решений: «итог» — сценарий по контексту
-  if (it.scenario) rows.push(['Сценарий', it.scenario === 'итог' ? 'по контексту' : `сценарий ${it.scenario}`]);
+function Rows({ rows }: { rows: [string, string][] }) {
+  if (!rows.length) return null;
   return (
-    <div>
+    <div style={{ marginTop: 6 }}>
       {rows.map(([a, b]) => (
-        <div key={a} style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '7px 0', borderTop: `1px solid ${BORDER}`, fontSize: 13 }}>
-          <span style={{ color: DIM }}>{a}</span>
+        <div key={a} style={{ display: 'flex', justifyContent: 'space-between', gap: 10, padding: '6px 0', borderTop: `1px solid ${BORDER}`, fontSize: 13 }}>
+          <span style={{ color: DIM, whiteSpace: 'nowrap' }}>{a}</span>
           <span style={{ color: FG, textAlign: 'right' }}>{b}</span>
         </div>
       ))}
     </div>
   );
+}
+function weekRows(it: TimeItem): [string, string][] {
+  const r: [string, string][] = [];
+  const wk = weekWords(it.week);
+  if (wk) r.push(['Критерии недели', wk]);
+  const cr = critWords(it.crit);
+  if (cr) r.push(['Свинг, свеча, накопления', cr]);
+  if (it.w1?.acc) r.push(['Тренд по накоплениям', it.w1.acc]);
+  if (it.w1?.range) r.push(['Рейндж', short(it.w1.range)]);
+  return r;
+}
+function dayRows(it: TimeItem): [string, string][] {
+  const r: [string, string][] = [];
+  // в журнал попадают только допуски бота: направление и подтверждение дневки бот уже проверил
+  r.push(['Направление и подтверждение', 'прошли проверку бота']);
+  if (it.d1?.conf) r.push(['Подтверждение', it.d1.conf]);
+  if (it.d1?.acc) r.push(['Тренд по накоплениям', short(it.d1.acc)]);
+  if (it.d1?.range) r.push(['Рейндж', short(it.d1.range)]);
+  if (it.d1?.scen) r.push(['Сценарий', it.d1.scen]);
+  else if (it.scenario) r.push(['Сценарий', it.scenario === 'итог' ? 'по контексту' : `сценарий ${it.scenario}`]);
+  return r;
 }
 function Stamp({ it }: { it: TimeItem }) {
   const col = it.verdict === 'ДОПУСК' ? UP : DOWN;
@@ -179,6 +203,7 @@ function Result({ it }: { it: TimeItem }) {
     </div>
   );
 }
+/** Картинка H4, которую в момент решения получили подписчики (та же, что в журнале решений). */
 function Pic({ it }: { it: TimeItem }) {
   const [url, setUrl] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
@@ -196,22 +221,43 @@ function Pic({ it }: { it: TimeItem }) {
   }, [it.pic]);
   if (!url) return null;
   return open ? (
-    <img src={url} alt="" style={{ width: '100%', borderRadius: 8, marginTop: 10, border: `1px solid ${BORDER}` }} onClick={() => setOpen(false)} />
+    <img src={url} alt="" style={{ width: '100%', borderRadius: 8, marginTop: 8, border: `1px solid ${BORDER}`, cursor: 'zoom-out' }} onClick={() => setOpen(false)} />
   ) : (
-    <button style={{ ...btn(DIM), marginTop: 10, padding: 8, fontSize: 10 }} onClick={() => setOpen(true)}>картинка H4 в момент решения</button>
+    <button style={{ ...btn(DIM), marginTop: 8, padding: 8, fontSize: 10 }} onClick={() => setOpen(true)}>картинка H4, которую получили подписчики</button>
   );
 }
 
-function Layout({ it, show, side, onOpen, symbols }: { it: TimeItem; show: boolean; side: ReactNode; onOpen: Open; symbols: Set<string> }) {
-  const wide = typeof window === 'undefined' ? true : window.innerWidth >= 900;
+function TfBox({ title, tf, show, when, children }: { title: string; tf?: Tf; show: boolean; when: string; children?: ReactNode }) {
+  if (!tf || !tf.bars.length) return null;
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: wide ? 'minmax(0,1fr) 330px' : '1fr', gap: 12 }}>
-      <div style={{ ...card, padding: 12 }}>
-        <div style={{ ...label, marginBottom: 6 }}>{it.instrument} · дневка · {show ? 'что было дальше' : 'как было ' + fmtWhen(it.time).slice(0, 5)}</div>
-        <Chart it={it} show={show} />
-        <div style={{ color: DIM, fontSize: 12, marginTop: 8 }}>Справа от золотой линии — то, чего в момент решения ещё никто не знал.</div>
+    <div style={{ ...card, padding: 12 }}>
+      <div style={{ ...label, marginBottom: 6 }}>{title} · {show ? 'до и после' : 'как было ' + when}</div>
+      <Chart tf={tf} show={show} when={when} />
+      {children}
+    </div>
+  );
+}
+
+function Layout({ it, show, side, onOpen, symbols, hidePic }: { it: TimeItem; show: boolean; side: ReactNode; onOpen: Open; symbols: Set<string>; hidePic?: boolean }) {
+  const wide = typeof window === 'undefined' ? true : window.innerWidth >= 900;
+  const when = fmtWhen(it.time).slice(0, 5);
+  const ctx = ctxWords(it.ctx);
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: wide ? 'minmax(0,1fr) 330px' : '1fr', gap: 12, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gap: 12 }}>
+        <TfBox title={`${it.instrument} · H4`} tf={it.tf?.H4} show={show} when={when}>
+          <Rows rows={[['Сигнал', 'триггер на H4 — с него пришла карточка']]} />
+          {hidePic ? null : <Pic it={it} />}
+        </TfBox>
+        <TfBox title={`${it.instrument} · дневка`} tf={it.tf?.D1} show={show} when={when}>
+          <Rows rows={dayRows(it)} />
+        </TfBox>
+        <TfBox title={`${it.instrument} · неделя`} tf={it.tf?.W1} show={show} when={when}>
+          <Rows rows={weekRows(it)} />
+        </TfBox>
+        <div style={{ color: DIM, fontSize: 12 }}>Справа от золотой линии — то, чего в момент решения ещё никто не знал. Под каждым графиком — то, что бот видел в момент сигнала.</div>
       </div>
-      <div style={{ ...card, padding: 12 }}>
+      <div style={{ ...card, padding: 12, position: wide ? 'sticky' : undefined, top: 12 }}>
         <div style={{ ...label }}>Сигнал {fmtWhen(it.time)}</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4, marginBottom: 6 }}>
           {symbols.has(it.instrument) ? (
@@ -221,7 +267,7 @@ function Layout({ it, show, side, onOpen, symbols }: { it: TimeItem; show: boole
           )}
           <span style={sideTag(it.side)}>{it.side}</span>
         </div>
-        <Rows it={it} />
+        {ctx ? <Rows rows={[['Контекст', ctx]]} /> : null}
         {side}
       </div>
     </div>
@@ -233,7 +279,7 @@ const Empty = () => (
 );
 
 export function TimeMachine({ doc, symbols, onOpen }: { doc?: { items?: TimeItem[] }; symbols: Set<string>; onOpen: Open }) {
-  const items = useMemo(() => [...(doc?.items || [])].sort((a, b) => b.time.localeCompare(a.time)), [doc]);
+  const items = useMemo(() => [...(doc?.items || [])].filter((x) => x.tf?.D1).sort((a, b) => b.time.localeCompare(a.time)), [doc]);
   const [idx, setIdx] = useState(0);
   const [shown, setShown] = useState(false);
   if (!items.length) return <Empty />;
@@ -268,7 +314,6 @@ export function TimeMachine({ doc, symbols, onOpen }: { doc?: { items?: TimeItem
         side={
           <>
             <Stamp it={it} />
-            <Pic it={it} />
             {shown ? <Result it={it} /> : <button style={btn()} onClick={() => setShown(true)}>Что было дальше →</button>}
           </>
         }
@@ -295,11 +340,8 @@ function saveAns(a: Record<string, string>) {
 }
 
 export function Trainer({ doc, symbols, onOpen }: { doc?: { items?: TimeItem[] }; symbols: Set<string>; onOpen: Open }) {
-  const items = useMemo(() => {
-    const a = [...(doc?.items || [])];
-    // порядок перемешан (по свёртке ключа), но у всех один и тот же — свежие решения не идут подряд
-    return a.sort((x, y) => (hash(keyOf(x)) - hash(keyOf(y))));
-  }, [doc]);
+  // порядок перемешан (по свёртке ключа), но у всех один и тот же — свежие решения не идут подряд
+  const items = useMemo(() => [...(doc?.items || [])].filter((x) => x.tf?.D1).sort((x, y) => hash(keyOf(x)) - hash(keyOf(y))), [doc]);
   const [ans, setAns] = useState<Record<string, string>>(loadAns);
   const [idx, setIdx] = useState(() => {
     const a = loadAns();
