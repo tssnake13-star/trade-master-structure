@@ -332,8 +332,10 @@ function TfBox({ title, tf, show, when, live, loading, tools, h4, children }: { 
   const [fs, setFs] = useState(false);
   if (!live && !loading && (!tf || !tf.bars.length)) return null;
   const small = { ...btn(DIM), width: 'auto', marginTop: 0, padding: '5px 10px', fontSize: 10 };
-  // 18.10.2026, его уточнение: «про цифры на графике я говорил именно про график H4, остальные пускай как есть»
-  const shown = live && view.plain && h4 ? { ...live, panels: live.panels.map((p) => ({ ...p, labels: [] })) } : live;
+  // 18.10.2026, его слово (школьный бот, холодные): «всё-таки уберём все цифры и все пояснения… для холодного это вообще
+  // не нужно… раскрывает то, что не нужно» — в Телеграме без номеров и их списка все три графика (машина времени и
+  // тренажёр в Телеграме есть только у школьного бота); в кабинете номера остаются
+  const shown = live && view.plain ? { ...live, panels: live.panels.map((p) => ({ ...p, labels: [] })) } : live;
   const chart = shown ? <LiveChart scene={shown} hidden={NO_HIDDEN} noHead still={view.still} /> : null;
   return (
     <div style={{ ...card, padding: 12 }}>
