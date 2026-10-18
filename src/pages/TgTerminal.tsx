@@ -8,6 +8,9 @@ import { VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
 import { TimeMachine, Trainer, TmViewCtx, type TimeItem } from '@/components/terminal/TimeMachine';
 import { parseJournalVideos } from '@/lib/journalVideos';
+import { groupRows } from '@/components/terminal/sidebarRows';
+import { GEN } from '@/components/terminal/screenerParse';
+import { UP, DOWN } from '@/components/terminal/theme';
 
 /**
  * 18.10.2026, его слово «Все, давай внедряй»: терминал внутри Телеграма — кнопка «Терминал» в меню бота.
@@ -50,6 +53,52 @@ function loadTg(): Promise<void> {
     s.onerror = () => ok();
     document.head.appendChild(s);
   });
+}
+
+/** 18.10.2026, его слово: «листать ленту вправо… неудобно… давай твой вариант посмотрим по группам». Инструменты
+ *  плитками с переносом, по группам в порядке боковой панели кабинета (groupRows), сторона — цветом; список
+ *  сворачивается кнопкой с выбранным инструментом, чтобы на телефоне не занимал весь экран. */
+export function Picker({ rows, cur, onPick }: { rows: MarketRow[]; cur: MarketRow; onPick: (s: string) => void }) {
+  const few = rows.length <= 6;
+  const [open, setOpen] = useState(false);
+  const chip = (x: MarketRow) => {
+    const on = x.symbol === cur.symbol;
+    const col = x.side === 'LONG' ? UP : x.side === 'SHORT' ? DOWN : DIM;
+    return (
+      <button
+        key={x.symbol}
+        onClick={() => {
+          onPick(x.symbol);
+          setOpen(false);
+        }}
+        style={{ ...pill(on), display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 9px' }}
+      >
+        {x.symbol}
+        {x.side ? <span style={{ color: on ? '#0a0a0a' : col, fontSize: 9 }}>{x.side === 'LONG' ? '▲' : '▼'}</span> : null}
+      </button>
+    );
+  };
+  if (few) return <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', paddingBottom: 8 }}>{rows.map(chip)}</div>;
+  return (
+    <div style={{ marginBottom: 8 }}>
+      <button onClick={() => setOpen(!open)} style={{ ...pill(false), width: '100%', display: 'flex', justifyContent: 'space-between', padding: '10px 12px', color: FG }}>
+        <span>Инструменты · <b style={{ color: ACCENT }}>{cur.symbol}</b></span>
+        <span>{open ? '▴' : '▾'}</span>
+      </button>
+      {open ? (
+        <div style={{ border: `1px solid ${BORDER}`, borderTop: 'none', borderRadius: '0 0 8px 8px', padding: '6px 10px 10px' }}>
+          {groupRows(rows, rows).map(([g, rs]) => (
+            <div key={g} style={{ marginTop: 8 }}>
+              <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#6f6a62', marginBottom: 5 }}>
+                {g === 'NONE' ? 'без поводыря' : `группа ${GEN[g] || g}`}
+              </div>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>{rs.map(chip)}</div>
+            </div>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
 }
 
 const KINDS: [keyof MarketRow, string][] = [['chart_cycles', 'Сценарий'], ['chart_trend', 'Накопления'], ['chart_all', 'Все циклы']];
@@ -152,13 +201,7 @@ export default function TgTerminal() {
             <span onClick={openWeb} style={{ color: ACCENT, textDecoration: 'underline', cursor: 'pointer' }}>веб-версии терминала</span>.
           </div>
         ) : null}
-        <div style={{ display: 'flex', gap: 6, overflowX: 'auto', paddingBottom: 8 }}>
-          {list.map((x) => (
-            <button key={x.symbol} onClick={() => setSym(x.symbol)} style={{ ...pill(x.symbol === r.symbol), flex: '0 0 auto' }}>
-              {x.symbol}
-            </button>
-          ))}
-        </div>
+        <Picker rows={list} cur={r} onPick={setSym} />
         <div style={{ fontSize: 20, fontWeight: 700, margin: '6px 0' }}>{r.title || r.symbol}</div>
         <Decision r={r} narrow />
         <div style={{ display: 'flex', gap: 6, margin: '14px 0 8px', flexWrap: 'wrap' }}>
