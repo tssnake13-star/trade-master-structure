@@ -163,7 +163,11 @@ const KINDS: [keyof MarketRow, string][] = [['chart_cycles', 'Сценарий']
 export default function TgTerminal() {
   const bot: Bot = useParams().bot === 'school' ? 'school' : 'echo';
   const [d, setD] = useState<TgData | null>(null);
-  const [tab, setTab] = useState<Tab>(TABS[bot][0][0]);
+  // 18.10.2026: кнопки цепочки пробы школьного бота открывают нужную вкладку (&tab=dec|tm|tr)
+  const [tab, setTab] = useState<Tab>(() => {
+    const want = new URLSearchParams(window.location.search).get('tab');
+    return TABS[bot].some(([k]) => k === want) ? (want as Tab) : TABS[bot][0][0];
+  });
   const [sym, setSym] = useState<string | null>(null);
   const [kind, setKind] = useState<keyof MarketRow>('chart_cycles');
 
