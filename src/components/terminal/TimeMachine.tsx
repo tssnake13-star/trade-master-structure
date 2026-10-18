@@ -395,7 +395,8 @@ function Layout({ it, show, side, onOpen, symbols, hidePic }: { it: TimeItem; sh
           {it.d1?.restored ? ' Дневка и H4 восстановлены по истории: алгоритм бота пересчитан на свечах до момента сигнала, показаны только проверки, которые были в тот день.' : ''}
         </div>
       </div>
-      <div style={{ ...card, padding: 12, position: wide ? 'sticky' : undefined, top: 12 }}>
+      {/* 18.10.2026, его слово: карточка с кнопками «наверху лучше» — на телефоне она первой (order), на компьютере справа */}
+      <div style={{ ...card, padding: 12, position: wide ? 'sticky' : undefined, top: 12, order: wide ? 0 : -1 }}>
         <div style={{ ...label }}>Сигнал {fmtWhen(it.time)}</div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4, marginBottom: 6 }}>
           {symbols.has(it.instrument) ? (
