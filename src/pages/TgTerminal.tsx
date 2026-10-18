@@ -167,9 +167,11 @@ export default function TgTerminal() {
 
   const shell = (body: React.ReactNode, withTabs = true) => (
     <div style={{ background: BG, color: FG, minHeight: '100vh', display: 'flex', flexDirection: 'column', fontFamily: "'Syne', system-ui, sans-serif", maxWidth: '100vw', overflowX: 'hidden' }}>
-      <div style={{ flex: 1, padding: 12, minWidth: 0 }}>{body}</div>
+      {/* 18.10.2026, его слово: «менюшка внизу… чтобы она была всегда внизу, а прокрутка работала мимо неё» — меню
+          закреплено (fixed: sticky ломается от overflow-x: hidden у страницы), снизу у содержимого запас под него */}
+      <div style={{ flex: 1, padding: 12, minWidth: 0, paddingBottom: withTabs ? 'calc(78px + env(safe-area-inset-bottom))' : 12 }}>{body}</div>
       {withTabs ? (
-        <div style={{ position: 'sticky', bottom: 0, display: 'flex', background: '#0f0e0d', borderTop: `1px solid ${BORDER}` }}>
+        <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 50, display: 'flex', background: '#0f0e0d', borderTop: `1px solid ${BORDER}`, paddingBottom: 'env(safe-area-inset-bottom)' }}>
           {TABS[bot].map(([k, n, i]) => (
             <div key={k} onClick={() => { setTab(k); window.scrollTo(0, 0); }} style={{ flex: 1, textAlign: 'center', padding: '8px 2px 10px', fontSize: 10.5, color: tab === k ? ACCENT : DIM, cursor: 'pointer', fontFamily: MONO }}>
               <div style={{ fontSize: 17 }}>{i}</div>
