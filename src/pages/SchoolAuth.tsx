@@ -160,7 +160,7 @@ export default function SchoolAuth() {
             11.10.2026: до формы человек видит, что именно получит (разбор плана GPT, п.19) */}
         {!isLogin && (
           <div className="-mt-4 mb-6 text-sm leading-relaxed px-2" style={{ color: '#a8a090' }}>
-            <p className="text-center">Регистрация бесплатная, карта не нужна. Сразу откроются:</p>
+            <p className="text-center">Регистрация бесплатная. Сразу откроются:</p>
             <ul className="mt-2 grid gap-1">
               <li>· вводный курс;</li>
               <li>

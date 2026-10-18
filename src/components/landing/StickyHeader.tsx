@@ -32,10 +32,11 @@ const StickyHeader = () => {
         >
           {/* 08.10.2026 «бинокль впереди»: кнопка зовёт в 7 дней терминала. Ведёт через бота
               (?start=trial), чтобы человек остался в базе; бот присылает регистрацию.
-              Вторая строка снимает два страха до клика: платить и привязывать карту. */}
+              Вторая строка снимает страх платить до клика. Про карту не пишем нигде
+              (Сергей 18.10.2026: «больше не упоминай это выражение»). */}
           <span className="flex flex-col items-center leading-tight">
             <span>Попробовать терминал 7 дней</span>
-            <span className="text-xs font-normal opacity-75">бесплатно, карта не нужна</span>
+            <span className="text-xs font-normal opacity-75">бесплатно</span>
           </span>
           <ArrowRight className="w-5 h-5 flex-shrink-0" />
         </a>

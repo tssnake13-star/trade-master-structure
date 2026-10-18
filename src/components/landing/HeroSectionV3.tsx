@@ -165,7 +165,7 @@ export default function HeroSectionV3() {
 
           {/* что будет после клика */}
           <p className="v3h-mono mt-6" style={{ ...MONO_SMALL, opacity: 0.55 }}>
-            Бесплатно · 7 дней · карта не нужна · через Telegram
+            Бесплатно · 7 дней · через Telegram
           </p>
 
           {/* ранний сигнал доверия — факты из журнала, якорь к результатам */}
