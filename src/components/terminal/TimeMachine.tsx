@@ -29,7 +29,10 @@ export interface TimeItem {
   tf?: { H4?: Tf; D1?: Tf; W1?: Tf };
   // что бот записал в журнал сигналов в момент карточки — по таймфреймам
   w1?: { acc?: string; range?: string };
-  d1?: { acc?: string; range?: string; scen?: string; conf?: string };
+  d1?: { acc?: string; range?: string; scen?: string; conf?: string; rows?: [string, string][]; restored?: boolean };
+  // 18.10.2026, его выбор «Делай 1»: дневка и H4 — из карточки, восстановленной нынешним кодом бота на момент сигнала,
+  // только проверки, которые существовали в тот день
+  h4?: { rows?: [string, string][]; restored?: boolean };
   pic?: string | null;
 }
 
@@ -172,13 +175,16 @@ function weekRows(it: TimeItem): [string, string][] {
 }
 function dayRows(it: TimeItem): [string, string][] {
   const r: [string, string][] = [];
-  // в журнал попадают только допуски бота: направление и подтверждение дневки бот уже проверил
-  r.push(['Направление и подтверждение', 'прошли проверку бота']);
-  if (it.d1?.conf) r.push(['Подтверждение', it.d1.conf]);
+  if (it.d1?.rows?.length) r.push(...it.d1.rows);
+  else {
+    // в журнал попадают только допуски бота: направление и подтверждение дневки бот уже проверил
+    r.push(['Направление и подтверждение', 'прошли проверку бота']);
+    if (it.d1?.conf) r.push(['Подтверждение', it.d1.conf]);
+  }
   if (it.d1?.acc) r.push(['Тренд по накоплениям', short(it.d1.acc)]);
   if (it.d1?.range) r.push(['Рейндж', short(it.d1.range)]);
   if (it.d1?.scen) r.push(['Сценарий', it.d1.scen]);
-  else if (it.scenario) r.push(['Сценарий', it.scenario === 'итог' ? 'по контексту' : `сценарий ${it.scenario}`]);
+  else if (it.scenario && !it.d1?.rows?.length) r.push(['Сценарий', it.scenario === 'итог' ? 'по контексту' : `сценарий ${it.scenario}`]);
   return r;
 }
 function Stamp({ it }: { it: TimeItem }) {
@@ -246,7 +252,7 @@ function Layout({ it, show, side, onOpen, symbols, hidePic }: { it: TimeItem; sh
     <div style={{ display: 'grid', gridTemplateColumns: wide ? 'minmax(0,1fr) 330px' : '1fr', gap: 12, alignItems: 'start' }}>
       <div style={{ display: 'grid', gap: 12 }}>
         <TfBox title={`${it.instrument} · H4`} tf={it.tf?.H4} show={show} when={when}>
-          <Rows rows={[['Сигнал', 'триггер на H4 — с него пришла карточка']]} />
+          <Rows rows={[['Сигнал', 'триггер на H4 — с него пришла карточка'], ...(it.h4?.rows || [])]} />
           {hidePic ? null : <Pic it={it} />}
         </TfBox>
         <TfBox title={`${it.instrument} · дневка`} tf={it.tf?.D1} show={show} when={when}>
@@ -255,7 +261,10 @@ function Layout({ it, show, side, onOpen, symbols, hidePic }: { it: TimeItem; sh
         <TfBox title={`${it.instrument} · неделя`} tf={it.tf?.W1} show={show} when={when}>
           <Rows rows={weekRows(it)} />
         </TfBox>
-        <div style={{ color: DIM, fontSize: 12 }}>Справа от золотой линии — то, чего в момент решения ещё никто не знал. Под каждым графиком — то, что бот видел в момент сигнала.</div>
+        <div style={{ color: DIM, fontSize: 12, lineHeight: 1.55 }}>
+          Справа от золотой линии — то, чего в момент решения ещё никто не знал. Под каждым графиком — то, что бот видел в момент сигнала.
+          {it.d1?.restored ? ' Дневка и H4 восстановлены по истории: алгоритм бота пересчитан на свечах до момента сигнала, показаны только проверки, которые были в тот день.' : ''}
+        </div>
       </div>
       <div style={{ ...card, padding: 12, position: wide ? 'sticky' : undefined, top: 12 }}>
         <div style={{ ...label }}>Сигнал {fmtWhen(it.time)}</div>
