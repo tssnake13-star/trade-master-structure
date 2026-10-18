@@ -4,6 +4,7 @@ import { mondayOfSignal, type JournalVideo } from '@/lib/journalVideos';
 import { ACCENT, DIM, DOWN, FG, MONO, UP, BORDER, card, label, fmtWhen, fromBotTime } from './theme';
 import type { HistoryDoc } from './History';
 import { VideoReviews, WeekHeader } from './Reviews';
+import type { TimeItem } from './TimeMachine';
 
 /**
  * Ленты терминала: скринер, тренд по накоплениям, резонанс, решения владельца.
@@ -21,6 +22,8 @@ export interface FeedDocs {
   outcomes?: { items?: Outcome[] };
   // 25.09.2026: история направления — мост пишет каждый полный круг
   history?: HistoryDoc;
+  // 18.10.2026: «Машина времени» и «Тренажёр» — кладёт субботний terminal_ishody.py
+  timemachine?: { items?: TimeItem[] };
 }
 
 /** 25.09.2026, его слово: «Почему я решил и что случилось после моего решения?» — итог его решения

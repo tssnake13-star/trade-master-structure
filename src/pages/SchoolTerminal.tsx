@@ -9,6 +9,7 @@ import { ALPHA_TIP, CycleCard, Lines, type MarketRow } from '@/components/termin
 import TerminalSidebar from '@/components/terminal/Sidebar';
 import { Brand, Decision, TradingStyle } from '@/components/terminal/Decision';
 import { FalseExitFeed, TrendFeed, VerdictsFeed, type FeedDocs, type Verdict } from '@/components/terminal/Feeds';
+import { TimeMachine, Trainer } from '@/components/terminal/TimeMachine';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { ScreenerCards } from '@/components/terminal/Screener';
 import StatusStrip from '@/components/terminal/Status';
@@ -89,7 +90,7 @@ interface Meta {
 // 21.09.2026, его слово: вкладку «Резонанс» из «Глаза системы» убрать
 // 21.09.2026: ТОП циклов — своей вкладкой (на телефоне до него под группами было долго листать)
 // 27.09.2026, его слово: «переименуй топ циклов… или, наверное, просто топ. Оставь» — вкладка «ТОП»
-type Section = 'instrument' | 'screener' | 'top' | 'trend' | 'falsex' | 'verdicts' | 'history';
+type Section = 'instrument' | 'screener' | 'top' | 'trend' | 'falsex' | 'verdicts' | 'timemachine' | 'trainer' | 'history';
 const SECTIONS: [Section, string][] = [
   ['instrument', 'Инструмент'],
   ['screener', 'Скринер'],
@@ -100,6 +101,9 @@ const SECTIONS: [Section, string][] = [
   // 24.09.2026, его слово: «Журнал допусков» — чтобы студент не принял его решения за свои;
   // 25.09.2026, его слово: «переименовать в журнал решений… или даже журнал решений Сергея»
   ['verdicts', 'Журнал решений Сергея'],
+  // 18.10.2026, его слово «Нравится, внедряй в кабинет» (макет машины времени и тренажёра): обе — на ленте timemachine
+  ['timemachine', 'Машина времени'],
+  ['trainer', 'Тренажёр'],
   // 25.09.2026, его слово: «показывать не один день, а изменения… где ошибается система, где не ошибается»
   ['history', 'История направления'],
 ];
@@ -732,6 +736,8 @@ export default function SchoolTerminal() {
             </div>
           ) : null}
           {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} outcomes={feeds.outcomes} videos={videos} symbols={symbols} onOpen={openSymbol} />}
+          {section === 'timemachine' && <TimeMachine doc={feeds.timemachine} symbols={symbols} onOpen={openSymbol} />}
+          {section === 'trainer' && <Trainer doc={feeds.timemachine} symbols={symbols} onOpen={openSymbol} />}
           {section === 'history' && isAdmin && <HistoryView doc={feeds.history} order={rows.map((r) => r.symbol)} symbols={symbols} onOpen={openSymbol} />}
           <div style={{ ...label, marginTop: 'auto', paddingTop: 14, lineHeight: 1.7 }}>
             {DISCLAIMER}
