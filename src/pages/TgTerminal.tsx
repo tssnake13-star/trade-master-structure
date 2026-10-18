@@ -130,13 +130,15 @@ export default function TgTerminal() {
         /* старый клиент Телеграма */
       }
       const init = tg?.initData || '';
+      const pass = new URLSearchParams(window.location.search).get('p');
       if (!init) {
         if (alive) setD({ ok: false, reason: 'no_init' });
         return;
       }
       const { data, error } = await (supabase.rpc as unknown as (f: string, a: object) => Promise<{ data: TgData | null; error: unknown }>)(
         'tg_terminal',
-        { init_data: init, bot },
+        // 18.10.2026: у школьного бота в адресе кнопки — пропуск на его 7 дней (school_bot.terminal_url), база его сверяет
+        { init_data: init, bot, ...(pass ? { pass } : {}) },
       );
       // 18.10.2026: «no_init» с непустой подписью — база ещё не знает ключ этого бота (мост не прошёл круг), а не
       // «открыто не из бота»: так и пишем
@@ -184,6 +186,10 @@ export default function TgTerminal() {
         ? 'Откройте терминал из бота: кнопка «Терминал» внизу чата.'
         : d.reason === 'no_key'
           ? 'Терминал подключается. Откройте его снова через пару минут.'
+          : d.reason === 'school_expired'
+          ? '7 дней терминала в боте закончились. Полный терминал — после подписки.'
+          : d.reason === 'school_pass'
+          ? 'Откройте терминал кнопкой «Терминал» в меню бота. Он открыт 7 дней с первого входа в бота.'
           : d.reason === 'no_access'
           ? 'Терминал в этом боте — для подписчиков сигналов. Подписка не найдена или закончилась. Продлить её можно у Сергея.'
           : 'Не удалось проверить вход. Закройте терминал и откройте его снова из бота.';
