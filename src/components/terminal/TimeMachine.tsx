@@ -48,10 +48,15 @@ type TmPanel = ScenePanel & { after?: SBar[] };
  *  закрытого terminal по подписанной ссылке. В кабинете — как раньше (значения по умолчанию). */
 export interface TmView {
   still?: boolean;
+  // 18.10.2026, его слово про Телеграм: «цифры с графика убрать… пояснения… для мобильной версии надо что-то
+  // упрощённое, а если хочешь посмотреть, что что значит, заходи в веб-версию» — рисунок без номеров и их списка
+  plain?: boolean;
   scene?: (path: string) => string;
   pic?: (path: string) => string;
 }
-export const TmViewCtx = createContext<TmView>({});
+// 18.10.2026, его слово: «здесь живой график не нужен… в веб-версии тоже можно сделать статичную картинку» — и в кабинете
+// машина времени рисует статично
+export const TmViewCtx = createContext<TmView>({ still: true });
 
 type Open = (symbol: string) => void;
 
@@ -259,8 +264,10 @@ const NO_HIDDEN = new Set<Layer>();
 function useScene(path?: string | null) {
   const view = useContext(TmViewCtx);
   const [sc, setSc] = useState<{ panels: TmPanel[] } | null>(null);
+  const [state, setState] = useState<'loading' | 'ok' | 'none'>(path ? 'loading' : 'none');
   useEffect(() => {
     setSc(null);
+    setState(path ? 'loading' : 'none');
     if (!path) return;
     let alive = true;
     // путь в хранилище; адрес с «/» — локальная проверка без базы
@@ -268,24 +275,46 @@ function useScene(path?: string | null) {
       ? Promise.resolve({ data: { signedUrl: view.scene(path) } })
       : path.startsWith('/') ? Promise.resolve({ data: { signedUrl: path } }) : supabase.storage.from('terminal').createSignedUrl(path, 3600);
     signed.then(async ({ data }) => {
-      if (!alive || !data?.signedUrl) return;
+      if (!alive) return;
+      if (!data?.signedUrl) {
+        setState('none');
+        return;
+      }
       try {
         const j = await (await fetch(data.signedUrl)).json();
-        if (alive) setSc(j);
+        if (alive) {
+          setSc(j);
+          setState('ok');
+        }
       } catch {
-        /* нет рисунка — остаётся простой график */
+        if (alive) setState('none');   // нет рисунка — простой график
       }
     });
     return () => {
       alive = false;
     };
   }, [path]);
-  return sc;
+  return { sc, state };
+}
+
+// 18.10.2026, его слово про H4: «накопление, треугольники остаются… убираем свинги, точку PPR и реверс… будет чище…
+// кнопку «Показать все» на всякий случай оставь». Чисто: накопления (слой acc) и оба треугольника (голубой — по
+// накоплению H4, оранжевый — по свингам дневки) с их номерами; свинги, реверс, точки PPR, вертикаль триггера и
+// стрелки ожидаемого движения — под кнопкой.
+const TRI = new Set(['#00e5ff', '#ff8c1a']);
+const DROP_LABEL = new Set(['#4dff9a', '#ff5fc8', '#87ceeb', '#ffa07a', '#aab2bd']);
+function cleanH4(p: TmPanel): TmPanel {
+  return {
+    ...p,
+    shapes: p.shapes.filter((x) => x.L === 'acc' || (x.k === 'line' && TRI.has(String(x.c).toLowerCase()))),
+    labels: p.labels.filter((l) => !DROP_LABEL.has(String(l.c).toLowerCase())),
+  };
 }
 /** Панель рисунка бота на момент сигнала: до решения — свечи бота, после — ещё и свечи «что было дальше»;
  *  золотая черта — момент решения. Окно одно и то же в обоих видах, чтобы «после» не прыгало. */
-function scenePanel(sc: { panels: TmPanel[] } | null, tf: string, show: boolean): Scene | null {
-  const P = sc?.panels.find((x) => x.tf === tf);
+function scenePanel(sc: { panels: TmPanel[] } | null, tf: string, show: boolean, all = true): Scene | null {
+  const P0 = sc?.panels.find((x) => x.tf === tf);
+  const P = P0 && tf === 'H4' && !all ? cleanH4(P0) : P0;
   if (!P || !P.bars?.length) return null;
   const after = P.after || [];
   const n = P.bars.length;
@@ -298,14 +327,39 @@ function scenePanel(sc: { panels: TmPanel[] } | null, tf: string, show: boolean)
   return { v: 1, title: null, texts: [], panels: [{ ...P, bars, xlim: [P.xlim[0], x1], edge: x1, ylim: [lo, hi], shapes: [...P.shapes, line] }] };
 }
 
-function TfBox({ title, tf, show, when, live, children }: { title: string; tf?: Tf; show: boolean; when: string; live?: Scene | null; children?: ReactNode }) {
+function TfBox({ title, tf, show, when, live, loading, tools, children }: { title: string; tf?: Tf; show: boolean; when: string; live?: Scene | null; loading?: boolean; tools?: ReactNode; children?: ReactNode }) {
   const view = useContext(TmViewCtx);
-  if (!live && (!tf || !tf.bars.length)) return null;
+  const [fs, setFs] = useState(false);
+  if (!live && !loading && (!tf || !tf.bars.length)) return null;
+  const small = { ...btn(DIM), width: 'auto', marginTop: 0, padding: '5px 10px', fontSize: 10 };
+  const shown = live && view.plain ? { ...live, panels: live.panels.map((p) => ({ ...p, labels: [] })) } : live;
+  const chart = shown ? <LiveChart scene={shown} hidden={NO_HIDDEN} noHead still={view.still} /> : null;
   return (
     <div style={{ ...card, padding: 12 }}>
-      <div style={{ ...label, marginBottom: 6 }}>{title} · {show ? 'до и после' : 'как было ' + when}</div>
-      {live ? <LiveChart scene={live} hidden={NO_HIDDEN} noHead still={view.still} /> : tf ? <Chart tf={tf} show={show} when={when} /> : null}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
+        <div style={{ ...label }}>{title} · {show ? 'до и после' : 'как было ' + when}</div>
+        {live ? (
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+            {tools}
+            <button style={small} onClick={() => setFs(true)}>⤢ на весь экран</button>
+          </div>
+        ) : null}
+      </div>
+      {/* 18.10.2026: пока грузится рисунок бота, простые свечи не показываем — иначе график «меняется» на глазах */}
+      {live ? chart : loading ? <div style={{ color: DIM, fontSize: 13, padding: '40px 0', textAlign: 'center' }}>загружаю рисунок…</div> : tf ? <Chart tf={tf} show={show} when={when} /> : null}
       {children}
+      {fs && live ? (
+        <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: '#080808', overflow: 'auto', padding: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+            <div style={{ ...label }}>{title}</div>
+            <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
+              {tools}
+              <button style={small} onClick={() => setFs(false)}>✕ свернуть</button>
+            </div>
+          </div>
+          {chart}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -314,18 +368,25 @@ function Layout({ it, show, side, onOpen, symbols, hidePic }: { it: TimeItem; sh
   const wide = typeof window === 'undefined' ? true : window.innerWidth >= 900;
   const when = fmtWhen(it.time).slice(0, 5);
   const ctx = ctxWords(it.ctx);
-  const sc = useScene(it.scene);
+  const { sc, state } = useScene(it.scene);
+  const [all, setAll] = useState(false);
+  const loading = state === 'loading';
+  const allBtn = (
+    <button style={{ ...btn(all ? ACCENT : DIM), width: 'auto', marginTop: 0, padding: '5px 10px', fontSize: 10 }} onClick={() => setAll(!all)}>
+      {all ? 'только накопления и треугольники' : 'показать всё'}
+    </button>
+  );
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: wide ? 'minmax(0,1fr) 330px' : '1fr', gap: 12, alignItems: 'start' }}>
-      <div style={{ display: 'grid', gap: 12 }}>
-        <TfBox title={`${it.instrument} · H4`} tf={it.tf?.H4} show={show} when={when} live={scenePanel(sc, 'H4', show)}>
+    <div style={{ display: 'grid', gridTemplateColumns: wide ? 'minmax(0,1fr) 330px' : 'minmax(0,1fr)', gap: 12, alignItems: 'start' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr)', gap: 12, minWidth: 0 }}>
+        <TfBox title={`${it.instrument} · H4`} tf={it.tf?.H4} show={show} when={when} live={scenePanel(sc, 'H4', show, all)} loading={loading} tools={allBtn}>
           <Rows rows={[['Сигнал', 'триггер на H4 — с него пришла карточка'], ...(it.h4?.rows || [])]} />
           {hidePic ? null : <Pic it={it} />}
         </TfBox>
-        <TfBox title={`${it.instrument} · дневка`} tf={it.tf?.D1} show={show} when={when} live={scenePanel(sc, 'D1', show)}>
+        <TfBox title={`${it.instrument} · дневка`} tf={it.tf?.D1} show={show} when={when} live={scenePanel(sc, 'D1', show)} loading={loading}>
           <Rows rows={dayRows(it)} />
         </TfBox>
-        <TfBox title={`${it.instrument} · неделя`} tf={it.tf?.W1} show={show} when={when} live={scenePanel(sc, 'W1', show)}>
+        <TfBox title={`${it.instrument} · неделя`} tf={it.tf?.W1} show={show} when={when} live={scenePanel(sc, 'W1', show)} loading={loading}>
           <Rows rows={weekRows(it)} />
         </TfBox>
         <div style={{ color: DIM, fontSize: 12, lineHeight: 1.55 }}>

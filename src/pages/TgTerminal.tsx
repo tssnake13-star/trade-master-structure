@@ -151,7 +151,7 @@ export default function TgTerminal() {
   const rows = useMemo(() => d?.rows || [], [d]);
   const symbols = useMemo(() => new Set(rows.map((r) => r.symbol)), [rows]);
   const pub = (p: string) => `${SU}/storage/v1/object/public/tgpub/${d?.pub}/${p}`;
-  const view = useMemo(() => ({ still: true, scene: (p: string) => `${SU}/storage/v1/object/public/tgpub/${p}`, pic: (p: string) => `${SU}/storage/v1/object/public/tgpub/${d?.pub}/${p}` }), [d?.pub]);
+  const view = useMemo(() => ({ still: true, plain: true, scene: (p: string) => `${SU}/storage/v1/object/public/tgpub/${p}`, pic: (p: string) => `${SU}/storage/v1/object/public/tgpub/${d?.pub}/${p}` }), [d?.pub]);
   const open = (s: string) => {
     if (!symbols.has(s)) return;
     setSym(s);
