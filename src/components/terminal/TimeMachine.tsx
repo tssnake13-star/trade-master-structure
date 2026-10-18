@@ -327,12 +327,13 @@ function scenePanel(sc: { panels: TmPanel[] } | null, tf: string, show: boolean,
   return { v: 1, title: null, texts: [], panels: [{ ...P, bars, xlim: [P.xlim[0], x1], edge: x1, ylim: [lo, hi], shapes: [...P.shapes, line] }] };
 }
 
-function TfBox({ title, tf, show, when, live, loading, tools, children }: { title: string; tf?: Tf; show: boolean; when: string; live?: Scene | null; loading?: boolean; tools?: ReactNode; children?: ReactNode }) {
+function TfBox({ title, tf, show, when, live, loading, tools, h4, children }: { title: string; tf?: Tf; show: boolean; when: string; live?: Scene | null; loading?: boolean; tools?: ReactNode; h4?: boolean; children?: ReactNode }) {
   const view = useContext(TmViewCtx);
   const [fs, setFs] = useState(false);
   if (!live && !loading && (!tf || !tf.bars.length)) return null;
   const small = { ...btn(DIM), width: 'auto', marginTop: 0, padding: '5px 10px', fontSize: 10 };
-  const shown = live && view.plain ? { ...live, panels: live.panels.map((p) => ({ ...p, labels: [] })) } : live;
+  // 18.10.2026, его уточнение: «про цифры на графике я говорил именно про график H4, остальные пускай как есть»
+  const shown = live && view.plain && h4 ? { ...live, panels: live.panels.map((p) => ({ ...p, labels: [] })) } : live;
   const chart = shown ? <LiveChart scene={shown} hidden={NO_HIDDEN} noHead still={view.still} /> : null;
   return (
     <div style={{ ...card, padding: 12 }}>
@@ -379,7 +380,7 @@ function Layout({ it, show, side, onOpen, symbols, hidePic }: { it: TimeItem; sh
   return (
     <div style={{ display: 'grid', gridTemplateColumns: wide ? 'minmax(0,1fr) 330px' : 'minmax(0,1fr)', gap: 12, alignItems: 'start' }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr)', gap: 12, minWidth: 0 }}>
-        <TfBox title={`${it.instrument} · H4`} tf={it.tf?.H4} show={show} when={when} live={scenePanel(sc, 'H4', show, all)} loading={loading} tools={allBtn}>
+        <TfBox title={`${it.instrument} · H4`} tf={it.tf?.H4} show={show} when={when} live={scenePanel(sc, 'H4', show, all)} loading={loading} tools={allBtn} h4>
           <Rows rows={[['Сигнал', 'триггер на H4 — с него пришла карточка'], ...(it.h4?.rows || [])]} />
           {hidePic ? null : <Pic it={it} />}
         </TfBox>
