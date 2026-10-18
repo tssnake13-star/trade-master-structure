@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from
 import { supabase } from '@/integrations/supabase/client';
 import { ACCENT, BORDER, CARD, DIM, DOWN, FG, MONO, UP, card, label, fmtWhen } from './theme';
 import { GEN } from './screenerParse';
+import LiveChart from './LiveChart';
+import type { Layer, Scene, ScenePanel, SBar } from './scene';
 
 /** 18.10.2026, его слово «Нравится, внедряй в кабинет» (после макета): «Машина времени» и «Тренажёр «Допуск или
  *  отказ»» — на одних данных. Ленту timemachine кладёт субботний terminal_ishody.py: его решения с окончательным
@@ -34,7 +36,12 @@ export interface TimeItem {
   // только проверки, которые существовали в тот день
   h4?: { rows?: [string, string][]; restored?: boolean };
   pic?: string | null;
+  // 18.10.2026, его слово «почему они не выглядят как в терминале? Почему нет циклов… накоплений, свингов, реверса?»:
+  // рисунок бота на момент сигнала (H4 — draw_h4, дневка и неделя — draw_scenario) данными живого графика, файлом в
+  // хранилище terminal; у каждой панели after — свечи после сигнала
+  scene?: string | null;
 }
+type TmPanel = ScenePanel & { after?: SBar[] };
 
 type Open = (symbol: string) => void;
 
@@ -233,12 +240,51 @@ function Pic({ it }: { it: TimeItem }) {
   );
 }
 
-function TfBox({ title, tf, show, when, children }: { title: string; tf?: Tf; show: boolean; when: string; children?: ReactNode }) {
-  if (!tf || !tf.bars.length) return null;
+const NO_HIDDEN = new Set<Layer>();
+function useScene(path?: string | null) {
+  const [sc, setSc] = useState<{ panels: TmPanel[] } | null>(null);
+  useEffect(() => {
+    setSc(null);
+    if (!path) return;
+    let alive = true;
+    // путь в хранилище; адрес с «/» — локальная проверка без базы
+    const signed = path.startsWith('/') ? Promise.resolve({ data: { signedUrl: path } }) : supabase.storage.from('terminal').createSignedUrl(path, 3600);
+    signed.then(async ({ data }) => {
+      if (!alive || !data?.signedUrl) return;
+      try {
+        const j = await (await fetch(data.signedUrl)).json();
+        if (alive) setSc(j);
+      } catch {
+        /* нет рисунка — остаётся простой график */
+      }
+    });
+    return () => {
+      alive = false;
+    };
+  }, [path]);
+  return sc;
+}
+/** Панель рисунка бота на момент сигнала: до решения — свечи бота, после — ещё и свечи «что было дальше»;
+ *  золотая черта — момент решения. Окно одно и то же в обоих видах, чтобы «после» не прыгало. */
+function scenePanel(sc: { panels: TmPanel[] } | null, tf: string, show: boolean): Scene | null {
+  const P = sc?.panels.find((x) => x.tf === tf);
+  if (!P || !P.bars?.length) return null;
+  const after = P.after || [];
+  const n = P.bars.length;
+  const bars = show ? [...P.bars, ...after] : P.bars;
+  const x1 = Math.max(P.xlim[1], n - 0.5 + after.length + 1);
+  let lo = P.ylim[0], hi = P.ylim[1];
+  if (show) after.forEach((b) => { lo = Math.min(lo, b[3]); hi = Math.max(hi, b[2]); });
+  const line = { k: 'line' as const, p: [[n - 0.5, lo], [n - 0.5, hi]] as [number, number][], c: ACCENT, a: 1, w: 2, d: [4, 3], z: 9, L: 'other' as Layer };
+  return { v: 1, title: null, texts: [], panels: [{ ...P, bars, xlim: [P.xlim[0], x1], ylim: [lo, hi], shapes: [...P.shapes, line] }] };
+}
+
+function TfBox({ title, tf, show, when, live, children }: { title: string; tf?: Tf; show: boolean; when: string; live?: Scene | null; children?: ReactNode }) {
+  if (!live && (!tf || !tf.bars.length)) return null;
   return (
     <div style={{ ...card, padding: 12 }}>
       <div style={{ ...label, marginBottom: 6 }}>{title} · {show ? 'до и после' : 'как было ' + when}</div>
-      <Chart tf={tf} show={show} when={when} />
+      {live ? <LiveChart scene={live} hidden={NO_HIDDEN} noHead /> : tf ? <Chart tf={tf} show={show} when={when} /> : null}
       {children}
     </div>
   );
@@ -248,17 +294,18 @@ function Layout({ it, show, side, onOpen, symbols, hidePic }: { it: TimeItem; sh
   const wide = typeof window === 'undefined' ? true : window.innerWidth >= 900;
   const when = fmtWhen(it.time).slice(0, 5);
   const ctx = ctxWords(it.ctx);
+  const sc = useScene(it.scene);
   return (
     <div style={{ display: 'grid', gridTemplateColumns: wide ? 'minmax(0,1fr) 330px' : '1fr', gap: 12, alignItems: 'start' }}>
       <div style={{ display: 'grid', gap: 12 }}>
-        <TfBox title={`${it.instrument} · H4`} tf={it.tf?.H4} show={show} when={when}>
+        <TfBox title={`${it.instrument} · H4`} tf={it.tf?.H4} show={show} when={when} live={scenePanel(sc, 'H4', show)}>
           <Rows rows={[['Сигнал', 'триггер на H4 — с него пришла карточка'], ...(it.h4?.rows || [])]} />
           {hidePic ? null : <Pic it={it} />}
         </TfBox>
-        <TfBox title={`${it.instrument} · дневка`} tf={it.tf?.D1} show={show} when={when}>
+        <TfBox title={`${it.instrument} · дневка`} tf={it.tf?.D1} show={show} when={when} live={scenePanel(sc, 'D1', show)}>
           <Rows rows={dayRows(it)} />
         </TfBox>
-        <TfBox title={`${it.instrument} · неделя`} tf={it.tf?.W1} show={show} when={when}>
+        <TfBox title={`${it.instrument} · неделя`} tf={it.tf?.W1} show={show} when={when} live={scenePanel(sc, 'W1', show)}>
           <Rows rows={weekRows(it)} />
         </TfBox>
         <div style={{ color: DIM, fontSize: 12, lineHeight: 1.55 }}>

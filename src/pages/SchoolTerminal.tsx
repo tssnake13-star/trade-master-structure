@@ -113,6 +113,8 @@ const SECTIONS: [Section, string][] = [
 // 13.10.2026, его слово: «Тренд мы уберём из общего доступа… перенеси её во вкладку администратор. То есть только
 // администратор может видеть эту вкладку. Пока что… всё равно ей пока никто не пользуется»
 const ADMIN_ONLY: Section[] = ['trend', 'falsex', 'history'];
+// пробному под замком (TrialLock) — в строке вкладок идут последними
+const TRIAL_LOCKED: Section[] = ['screener', 'top', 'timemachine', 'trainer'];
 // ленты, которые бот кладёт в базу сразу после его кнопки: вкладка → ключ ленты (24.09 журнал, 25.09 скринер)
 const LIVE_FEED: Partial<Record<Section, string>> = { verdicts: 'verdicts', screener: 'screener', top: 'screener' };
 
@@ -209,7 +211,9 @@ export default function SchoolTerminal() {
   const [hidden, setHidden] = useState<Set<Layer>>(new Set());
 
   const selected = params.get('i');
-  const section = (sections.find(([s]) => s === params.get('s'))?.[0] || 'instrument') as Section;
+  // 18.10.2026, его слово про пробный режим: «первое это должны быть решения… мои… замки можно назад убрать» — пробному
+  // без ?s= открывается журнал решений
+  const section = (sections.find(([s]) => s === params.get('s'))?.[0] || (trial ? 'verdicts' : 'instrument')) as Section;
 
   // ⛔ 03.10.2026, его слово: боковая панель «привязана к нижней карточке графика… на других вкладках уменьшается,
   // увеличивается… надо её зафиксировать, как она есть на вкладке инструмент». Высота ряда на вкладке «Инструмент»
@@ -682,11 +686,28 @@ export default function SchoolTerminal() {
       </div>
 
       <nav className="tm-tabs" style={{ display: 'flex', gap: 6, padding: '12px 14px 0', overflowX: 'auto' }}>
-        {mainSections.map(([s, name]) => (
-          <button key={s} onClick={() => go(s)} style={pill(section === s)}>
-            {name}
-          </button>
-        ))}
+        {/* 18.10.2026, его слово: в пробном режиме как с курсами — сначала то, что открыто (журнал решений первым),
+            вкладки под замком — в конце и с замком */}
+        {(trial
+          ? [
+              ...mainSections.filter(([s]) => s === 'verdicts'),
+              ...mainSections.filter(([s]) => s !== 'verdicts' && !TRIAL_LOCKED.includes(s)),
+              ...mainSections.filter(([s]) => TRIAL_LOCKED.includes(s)),
+            ]
+          : mainSections
+        ).map(([s, name]) => {
+          const locked = trial && TRIAL_LOCKED.includes(s);
+          return (
+            <button
+              key={s}
+              onClick={() => go(s)}
+              style={{ ...pill(section === s), ...(locked && section !== s ? { opacity: 0.55, borderStyle: 'dashed' } : null), display: 'inline-flex', alignItems: 'center', gap: 5 }}
+            >
+              {locked ? <Lock size={10} /> : null}
+              {name}
+            </button>
+          );
+        })}
       </nav>
       {/* 25.09.2026, его слово: вкладки только для него — отдельно от общих кнопок, своей строкой */}
       {adminSections.length ? (
