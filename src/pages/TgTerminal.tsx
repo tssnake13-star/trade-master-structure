@@ -61,7 +61,8 @@ function loadTg(): Promise<void> {
 export function Picker({ rows, cur, onPick }: { rows: MarketRow[]; cur: MarketRow; onPick: (s: string) => void }) {
   const few = rows.length <= 6;
   const [open, setOpen] = useState(false);
-  const chip = (x: MarketRow) => {
+  // 18.10.2026, его слово: «выделить поводырей… а то они все сливаются в одно» — поводырь своей группы в золотой рамке
+  const chip = (x: MarketRow, lead = false) => {
     const on = x.symbol === cur.symbol;
     const col = x.side === 'LONG' ? UP : x.side === 'SHORT' ? DOWN : DIM;
     return (
@@ -71,14 +72,16 @@ export function Picker({ rows, cur, onPick }: { rows: MarketRow[]; cur: MarketRo
           onPick(x.symbol);
           setOpen(false);
         }}
-        style={{ ...pill(on), display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 9px' }}
+        style={{ ...pill(on), display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 9px',
+                 ...(lead ? { border: `1.5px solid ${ACCENT}`, color: on ? '#0a0a0a' : ACCENT, fontWeight: 700 } : null) }}
       >
+        {lead ? <span style={{ fontSize: 10 }}>★</span> : null}
         {x.symbol}
         {x.side ? <span style={{ color: on ? '#0a0a0a' : col, fontSize: 9 }}>{x.side === 'LONG' ? '▲' : '▼'}</span> : null}
       </button>
     );
   };
-  if (few) return <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', paddingBottom: 8 }}>{rows.map(chip)}</div>;
+  if (few) return <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', paddingBottom: 8 }}>{rows.map((x) => chip(x))}</div>;
   return (
     <div style={{ marginBottom: 8 }}>
       <button onClick={() => setOpen(!open)} style={{ ...pill(false), width: '100%', display: 'flex', justifyContent: 'space-between', padding: '10px 12px', color: FG }}>
@@ -87,14 +90,18 @@ export function Picker({ rows, cur, onPick }: { rows: MarketRow[]; cur: MarketRo
       </button>
       {open ? (
         <div style={{ border: `1px solid ${BORDER}`, borderTop: 'none', borderRadius: '0 0 8px 8px', padding: '6px 10px 10px' }}>
-          {groupRows(rows, rows).map(([g, rs]) => (
-            <div key={g} style={{ marginTop: 8 }}>
-              <div style={{ fontFamily: MONO, fontSize: 9, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#6f6a62', marginBottom: 5 }}>
-                {g === 'NONE' ? 'без поводыря' : `группа ${GEN[g] || g}`}
+          {groupRows(rows, rows).map(([g, rs]) => {
+            const lead = rs.find((x) => x.extra?.leads === g);
+            return (
+              <div key={g} style={{ marginTop: 12 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: FG, marginBottom: 6 }}>
+                  {g === 'NONE' ? 'Без поводыря' : `Группа ${GEN[g] || g}`}
+                  {lead ? <span style={{ color: ACCENT, fontWeight: 400, fontSize: 12 }}> · поводырь ★ {lead.symbol}</span> : null}
+                </div>
+                <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>{rs.map((x) => chip(x, x.extra?.leads === g))}</div>
               </div>
-              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>{rs.map(chip)}</div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : null}
     </div>
