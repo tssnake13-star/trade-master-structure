@@ -216,82 +216,43 @@ function priceWords(p: NonNullable<Outcome['price']>) {
   return `${head} · дальше всего: по сигналу ${num(p.fav)}, против ${num(p.adv)} дневного хода${at}`;
 }
 
-/** Итог сделки в размерах риска из его записи итога: «ТЕЙК 10,8 к 1» → +10,8 · «−5,3 R» → −5,3 · «СТОП» → −1 ·
- *  «БЕЗУБЫТОК», «≈ 0» → 0. Не входил, отменил, в работе — null: в итог месяца не идут. */
-export function rOfResult(r?: string): number | null {
-  if (!r || !/ВОШЁЛ/.test(r) || /В РАБОТЕ|ЖДЁТ/.test(r)) return null;
-  const n = (x: string) => parseFloat(x.replace(',', '.'));
-  const tp = r.match(/ТЕЙК\s+([\d,.]+)\s*к\s*1/);
-  if (tp) return n(tp[1]);
-  const rr = r.match(/([−-])\s*([\d,.]+)\s*R/);
-  if (rr) return -n(rr[2]);
-  if (/БЕЗУБЫТОК|≈\s*0/.test(r)) return 0;
-  const st = r.match(/(\d+)\s*СТОП/);
-  if (st) return -parseInt(st[1], 10);
-  if (/СТОП/.test(r)) return -1;
-  return null;
-}
-
 const plural = (n: number, one: string, few: string, many: string) => {
   const a = n % 10, b = n % 100;
   return a === 1 && b !== 11 ? one : a >= 2 && a <= 4 && (b < 12 || b > 14) ? few : many;
 };
-const MONTHS = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'];
-const fmtR = (x: number) => (x > 0 ? '+' : x < 0 ? '−' : '') + (Math.round(Math.abs(x) * 10) / 10).toString().replace('.', ',');
 
 /** 18.10.2026, его слово: «винрейт 23%… если человек начнёт проверять, он будет смотреть только стопы. Как это может
- *  продавать?» — над журналом итог по месяцам: сколько тейков, сколько в минус и сумма в размерах риска. Считается
- *  только из его записей итога (rOfResult); отказы — сколько было и после скольких цена ушла против сигнала. */
-function MonthTotals({ items, outOf }: { items: { time: string; instrument: string; side: string; verdict: string }[]; outOf: (v: { time: string; instrument: string; side: string }) => Outcome | undefined }) {
-  const by = new Map<string, { take: number; minus: number; sum: number; n: number; refuse: number; saved: number }>();
-  for (const v of items) {
-    const d = new Date(new Date(v.time).getTime() + 5 * 3600 * 1000);
-    const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth()).padStart(2, '0')}`;
-    const m = by.get(key) || { take: 0, minus: 0, sum: 0, n: 0, refuse: 0, saved: 0 };
-    const o = outOf(v);
-    const r = rOfResult(o?.result);
-    if (r != null) {
-      m.n += 1;
-      m.sum += r;
-      if (r > 0) m.take += 1;
-      if (r < 0) m.minus += 1;
-    }
-    if (v.verdict !== 'ДОПУСК') {
-      m.refuse += 1;
-      if (o?.price?.status === 'против') m.saved += 1;
-    }
-    by.set(key, m);
-  }
-  const rows = [...by.entries()].filter(([, m]) => m.n || m.refuse).sort((a, b) => b[0].localeCompare(a[0]));
-  if (!rows.length) return null;
+ *  продавать?» и следом «убери октябрь, потому что он ещё не закончен… июль, август и сентябрь… итоги трёх месяцев».
+ *  Источник — таблица счёта TLT_Statement_2025-2026, лист «Помесячно» (риск 0,25% на сделку): июль и август из копии
+ *  05.09 (закрытые месяцы, со срезом 04.10 сходятся: 87 побед, +136,0%), сентябрь — срез 04.10.2026. Риск = % / 0,25.
+ *  ⚠️ Когда закроется следующий месяц — взять его из таблицы и сдвинуть окно (три последних закрытых месяца). */
+const STATEMENT_MONTHS: { name: string; trades: number; wins: number; pct: number }[] = [
+  { name: 'Сентябрь 2026', trades: 10, wins: 3, pct: 7.48 },
+  { name: 'Август 2026', trades: 23, wins: 5, pct: 10.2 },
+  { name: 'Июль 2026', trades: 22, wins: 5, pct: 6.23 },
+];
+const fmtNum = (x: number, d = 1) => x.toFixed(d).replace('.', ',');
+
+function MonthTotals() {
   return (
     <div style={{ ...card, padding: 12, marginBottom: 12 }}>
-      <div style={{ ...label, marginBottom: 8 }}>Итог по месяцам</div>
-      {rows.map(([k, m]) => (
-        <div key={k} style={{ fontSize: 13, lineHeight: 1.6, color: FG, marginBottom: 6 }}>
-          <b style={{ textTransform: 'capitalize' }}>{MONTHS[parseInt(k.slice(5), 10)]}</b>
-          {m.n ? (
-            <>
-              {' · '}
-              <span style={{ color: UP }}>{m.take} {plural(m.take, 'тейк', 'тейка', 'тейков')}</span>
-              {', '}
-              <span style={{ color: DOWN }}>{m.minus} в минус</span>
-              {' · итог '}
-              <b style={{ color: m.sum > 0 ? UP : m.sum < 0 ? DOWN : DIM }}>{fmtR(m.sum)}</b>
-              {' риска'}
-            </>
-          ) : null}
-          {m.refuse ? (
-            <span style={{ color: DIM }}>
-              {' · '}
-              {m.refuse} {plural(m.refuse, 'отказ', 'отказа', 'отказов')}
-              {m.saved ? `, после ${m.saved} цена ушла против сигнала` : ''}
-            </span>
-          ) : null}
+      <div style={{ ...label, marginBottom: 8 }}>Мой счёт: итог последних трёх месяцев</div>
+      {STATEMENT_MONTHS.map((m) => (
+        <div key={m.name} style={{ fontSize: 13, lineHeight: 1.6, color: FG, marginBottom: 6 }}>
+          <b>{m.name}</b>
+          {' · '}
+          {m.trades} {plural(m.trades, 'сделка', 'сделки', 'сделок')}
+          {': '}
+          <span style={{ color: UP }}>{m.wins} {plural(m.wins, 'тейк', 'тейка', 'тейков')}</span>
+          {', '}
+          <span style={{ color: DOWN }}>{m.trades - m.wins} в минус</span>
+          {' · итог '}
+          <b style={{ color: UP }}>+{fmtNum(m.pct, 2)}%</b>
+          <span style={{ color: DIM }}> (+{fmtNum(m.pct / 0.25)} риска)</span>
         </div>
       ))}
       <div style={{ color: DIM, fontSize: 12, lineHeight: 1.5, marginTop: 4 }}>
-        Риск — то, что забирает один стоп: −1. Тейк в среднем приносит в 9,5 раза больше. Поэтому сделок в минус больше, а итог — в плюсе. Прошлый результат не гарантирует будущий.
+        Риск на сделку — 0,25% счёта: столько забирает один стоп. Тейк в среднем приносит в 9,5 раза больше. Поэтому сделок в минус больше, а месяц — в плюсе. Бывают и месяцы в минус: из 21 месяца так закрылись 3. Прошлый результат не гарантирует будущий.
       </div>
     </div>
   );
@@ -394,7 +355,7 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
       <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
         Допуски и отказы автора, которые получили подписчики{oldest ? `, с ${fmtWhen(oldest).slice(0, 10)}` : ''}. Свежие сверху, хранятся последние 90 дней. Время — по вашему часовому поясу. Под каждым решением — что было дальше: итог из еженедельного разбора и куда пошла цена после сигнала.
       </div>
-      <MonthTotals items={items} outOf={(v) => outOf.get(outKey(v.time, v.instrument, v.side))} />
+      <MonthTotals />
       {videos.length ? <VideoReviews videos={videos} currentId={vid} onPick={setVid} boxRef={box} /> : null}
       {cryptoLocked && mk === 'crypto' ? (
         <div style={{ ...card, padding: 14, color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>🔒 Журнал по крипте закрыт: решения по крипте Сергей сейчас ведёт только для себя. Сигналы по крипте подписчикам не приходят.</div>
