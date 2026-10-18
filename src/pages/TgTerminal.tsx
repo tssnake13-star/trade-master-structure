@@ -33,6 +33,8 @@ interface TgData {
   reason?: string;
   pub?: string | null;
   admin?: boolean;
+  // 18.10.2026 вечер: школьный бот после 7 дней — только журнал решений (база отдаёт limited)
+  limited?: boolean;
   rows?: MarketRow[];
   feeds?: FeedDocs & { timemachine?: { items?: TimeItem[] } };
   videos?: string | null;
@@ -218,7 +220,7 @@ export default function TgTerminal() {
         <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 50, display: 'flex', background: '#0f0e0d', borderTop: `1px solid ${BORDER}`, paddingBottom: 'env(safe-area-inset-bottom)' }}>
           {TABS[bot].map(([k, n, i]) => (
             <div key={k} onClick={() => { setTab(k); window.scrollTo(0, 0); }} style={{ flex: 1, textAlign: 'center', padding: '8px 2px 10px', fontSize: 10.5, color: tab === k ? ACCENT : DIM, cursor: 'pointer', fontFamily: MONO }}>
-              <div style={{ fontSize: 17 }}>{i}</div>
+              <div style={{ fontSize: 17 }}>{d?.limited && k !== 'dec' ? '🔒' : i}</div>
               {n}
             </div>
           ))}
@@ -235,9 +237,11 @@ export default function TgTerminal() {
         : d.reason === 'no_key'
           ? 'Терминал подключается. Откройте его снова через пару минут.'
           : d.reason === 'school_expired'
-          ? '7 дней терминала в боте закончились. Полный терминал — после подписки.'
+          ? '7 дней пробы закончились. Полный терминал — после подписки.'
           : d.reason === 'school_pass'
-          ? 'Откройте терминал кнопкой «Терминал» в меню бота. Он открыт 7 дней с первого входа в бота.'
+          ? // 18.10.2026 вечер, его слово: «нажимает на кнопку терминал… и вместо терминала написано „откройте терминал кнопкой“ — нелогично».
+            // Сюда попадает только старая общая кнопка: терминал в боте — у новых участников, полный — после подписки
+            'Терминал в этом боте открывается новым участникам. Полный терминал — после подписки.'
           : d.reason === 'no_access'
           ? 'Терминал в этом боте — для подписчиков сигналов. Подписка не найдена или закончилась. Продлить её можно у Сергея.'
           : 'Не удалось проверить вход. Закройте терминал и откройте его снова из бота.';
@@ -250,7 +254,17 @@ export default function TgTerminal() {
   const videos = parseJournalVideos(d.videos);
 
   let body: React.ReactNode = null;
-  if (tab === 'inst') {
+  if (d.limited && tab !== 'dec') {
+    // 18.10.2026 вечер, его «согласен»: после 7 дней пробы остаётся журнал решений, остальное — после подписки
+    body = (
+      <div style={{ color: FG, padding: '32px 16px', textAlign: 'center', lineHeight: 1.6 }}>
+        <div style={{ fontSize: 28, marginBottom: 8 }}>🔒</div>
+        7 дней пробы закончились. Журнал моих решений остаётся открытым — вкладка «Решения».
+        <br />
+        Инструменты, машина времени и тренажёр — после подписки.
+      </div>
+    );
+  } else if (tab === 'inst') {
     body = r ? (
       <div>
         {bot === 'school' ? (
