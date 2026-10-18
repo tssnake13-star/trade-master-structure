@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { ACCENT, BORDER, CARD, DIM, DOWN, FG, MONO, UP, card, label, fmtWhen } from './theme';
+import { ACCENT, BORDER, CARD, DIM, DOWN, FG, MONO, UP, card, label, fmtWhen, marketOfSym, type MarketKey } from './theme';
+import { MarketSwitch } from './Feeds';
 import { GEN } from './screenerParse';
 import LiveChart from './LiveChart';
 import type { Layer, Scene, ScenePanel, SBar } from './scene';
@@ -354,13 +355,30 @@ const Empty = () => (
 );
 
 export function TimeMachine({ doc, symbols, onOpen }: { doc?: { items?: TimeItem[] }; symbols: Set<string>; onOpen: Open }) {
-  const items = useMemo(() => [...(doc?.items || [])].filter((x) => x.tf?.D1).sort((a, b) => b.time.localeCompare(a.time)), [doc]);
+  // 18.10.2026: форекс и крипта — переключателем, как в журнале решений
+  const [mk, setMk] = useState<MarketKey>('fx');
+  const all = useMemo(() => [...(doc?.items || [])].filter((x) => x.tf?.D1).sort((a, b) => b.time.localeCompare(a.time)), [doc]);
+  const items = useMemo(() => all.filter((x) => marketOfSym(x.instrument) === mk), [all, mk]);
+  const counts = { fx: all.filter((x) => marketOfSym(x.instrument) === 'fx').length, crypto: all.filter((x) => marketOfSym(x.instrument) === 'crypto').length };
   const [idx, setIdx] = useState(0);
   const [shown, setShown] = useState(false);
-  if (!items.length) return <Empty />;
+  const pick = (m: MarketKey) => {
+    setMk(m);
+    setIdx(0);
+    setShown(false);
+  };
+  if (!all.length) return <Empty />;
+  if (!items.length)
+    return (
+      <div>
+        <MarketSwitch value={mk} onChange={pick} counts={counts} />
+        <div style={{ color: DIM, fontSize: 13 }}>{mk === 'crypto' ? 'Решений по крипте с итогом пока нет.' : 'Решений по форексу с итогом пока нет.'}</div>
+      </div>
+    );
   const it = items[Math.min(idx, items.length - 1)];
   return (
     <div>
+      <MarketSwitch value={mk} onChange={pick} counts={counts} />
       <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>
         Выбери решение — увидишь рынок таким, каким он был в момент решения. Решение записано в тот же день, задним числом его не поменять.
       </div>
@@ -416,14 +434,28 @@ function saveAns(a: Record<string, string>) {
 
 export function Trainer({ doc, symbols, onOpen }: { doc?: { items?: TimeItem[] }; symbols: Set<string>; onOpen: Open }) {
   // порядок перемешан (по свёртке ключа), но у всех один и тот же — свежие решения не идут подряд
-  const items = useMemo(() => [...(doc?.items || [])].filter((x) => x.tf?.D1).sort((x, y) => hash(keyOf(x)) - hash(keyOf(y))), [doc]);
+  const [mk, setMk] = useState<MarketKey>('fx');
+  const all = useMemo(() => [...(doc?.items || [])].filter((x) => x.tf?.D1).sort((x, y) => hash(keyOf(x)) - hash(keyOf(y))), [doc]);
+  const items = useMemo(() => all.filter((x) => marketOfSym(x.instrument) === mk), [all, mk]);
+  const counts = { fx: all.filter((x) => marketOfSym(x.instrument) === 'fx').length, crypto: all.filter((x) => marketOfSym(x.instrument) === 'crypto').length };
   const [ans, setAns] = useState<Record<string, string>>(loadAns);
-  const [idx, setIdx] = useState(() => {
-    const a = loadAns();
-    const k = items.findIndex((x) => !a[keyOf(x)]);
+  const firstOpen = (list: TimeItem[], a: Record<string, string>) => {
+    const k = list.findIndex((x) => !a[keyOf(x)]);
     return k < 0 ? 0 : k;
-  });
-  if (!items.length) return <Empty />;
+  };
+  const [idx, setIdx] = useState(() => firstOpen(items, loadAns()));
+  const pick = (m: MarketKey) => {
+    setMk(m);
+    setIdx(firstOpen(all.filter((x) => marketOfSym(x.instrument) === m), ans));
+  };
+  if (!all.length) return <Empty />;
+  if (!items.length)
+    return (
+      <div>
+        <MarketSwitch value={mk} onChange={pick} counts={counts} />
+        <div style={{ color: DIM, fontSize: 13 }}>{mk === 'crypto' ? 'Решений по крипте с итогом пока нет.' : 'Решений по форексу с итогом пока нет.'}</div>
+      </div>
+    );
   const it = items[Math.min(idx, items.length - 1)];
   const done = items.filter((x) => ans[keyOf(x)]);
   const hit = done.filter((x) => ans[keyOf(x)] === x.verdict).length;
@@ -436,6 +468,7 @@ export function Trainer({ doc, symbols, onOpen }: { doc?: { items?: TimeItem[] }
   const next = () => setIdx((i) => (i + 1) % items.length);
   return (
     <div>
+      <MarketSwitch value={mk} onChange={pick} counts={counts} />
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, flexWrap: 'wrap', marginBottom: 10 }}>
         <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6 }}>Карточка из прошлого. Реши сам: допуск или отказ? Потом увидишь решение Сергея и что было дальше.</div>
         <div style={{ marginLeft: 'auto', fontFamily: MONO, fontSize: 12, color: DIM, whiteSpace: 'nowrap' }}>

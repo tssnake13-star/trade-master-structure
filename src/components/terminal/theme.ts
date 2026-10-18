@@ -18,6 +18,12 @@ export const CRYPTO_TEXT = '#AFA9EC';
 export const MONO = "'Space Mono', ui-monospace, monospace";
 export const SANS = "'Syne', system-ui, sans-serif";
 
+// 18.10.2026, его слово «давай с переключателем, делай везде»: журнал решений, машина времени и тренажёр — отдельно
+// форекс и крипта. Крипта — монеты в работе (в журнале бот пишет BTCUSD без «T», в терминале — BTCUSDT)
+export const CRYPTO_SYM = /^(BTC|ETH|SOL|XRP|DOGE|BNB|ADA|TRX|LINK|AVAX|DOT|LTC|TON|NEAR|ATOM|APT|ARB|OPT|ENA)USDT?$/i;
+export type MarketKey = 'fx' | 'crypto';
+export const marketOfSym = (s: string): MarketKey => (CRYPTO_SYM.test(String(s || '')) ? 'crypto' : 'fx');
+
 export const DISCLAIMER = 'Не является инвестиционной рекомендацией — решение всегда за вами.';
 
 export const label: CSSProperties = {

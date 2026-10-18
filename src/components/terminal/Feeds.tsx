@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { mondayOfSignal, type JournalVideo } from '@/lib/journalVideos';
-import { ACCENT, DIM, DOWN, FG, MONO, UP, BORDER, card, label, fmtWhen, fromBotTime } from './theme';
+import { ACCENT, DIM, DOWN, FG, MONO, UP, BORDER, card, label, fmtWhen, fromBotTime, pill, marketOfSym, type MarketKey } from './theme';
 import type { HistoryDoc } from './History';
 import { VideoReviews, WeekHeader } from './Reviews';
 import type { TimeItem } from './TimeMachine';
@@ -59,6 +59,19 @@ export interface Verdict {
 }
 
 type Open = (symbol: string) => void;
+
+/** 18.10.2026, его слово: «как отделить журнал по форексу и журнал крипты… давай с переключателем, делай везде». */
+export function MarketSwitch({ value, onChange, counts }: { value: MarketKey; onChange: (m: MarketKey) => void; counts: Record<MarketKey, number> }) {
+  return (
+    <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
+      {(['fx', 'crypto'] as MarketKey[]).map((m) => (
+        <button key={m} onClick={() => onChange(m)} style={pill(value === m)}>
+          {m === 'fx' ? 'Форекс' : 'Крипта'} · {counts[m]}
+        </button>
+      ))}
+    </div>
+  );
+}
 
 /** Текст бота, где каждый знакомый инструмент — кнопка. Слова вроде W1, D1,
  *  LONG не трогаем: нажимается только то, что есть в списке терминала. */
@@ -243,7 +256,10 @@ function OutcomeBlock({ o }: { o?: Outcome }) {
 
 // 18.10.2026: picUrl — терминал в Телеграме берёт картинки из открытого ящика tgpub, а не по подписанной ссылке
 export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picUrl }: { doc?: FeedDocs['verdicts']; outcomes?: FeedDocs['outcomes']; videos?: JournalVideo[]; symbols: Set<string>; onOpen: Open; picUrl?: (path: string) => string }) {
-  const items = doc?.items || [];
+  const all = doc?.items || [];
+  const [mk, setMk] = useState<MarketKey>('fx');
+  const items = all.filter((v) => marketOfSym(v.instrument) === mk);
+  const counts = { fx: all.filter((v) => marketOfSym(v.instrument) === 'fx').length, crypto: all.filter((v) => marketOfSym(v.instrument) === 'crypto').length };
   // 25.09.2026: серии «Допуск-отказ» — плеер сверху; «разбор этой недели» у карточек включает серию в нём
   const [vid, setVid] = useState<string | null>(null);
   const box = useRef<HTMLDivElement>(null);
@@ -283,14 +299,16 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
       alive = false;
     };
   }, [picKey]);
-  if (!items.length) return <Empty what="Записей в журнале решений" />;
+  if (!all.length) return <Empty what="Записей в журнале решений" />;
   const oldest = items[items.length - 1]?.time;
   return (
     <div>
+      <MarketSwitch value={mk} onChange={setMk} counts={counts} />
       <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
         Допуски и отказы автора, которые получили подписчики{oldest ? `, с ${fmtWhen(oldest).slice(0, 10)}` : ''}. Свежие сверху, хранятся последние 90 дней. Время — по вашему часовому поясу. Под каждым решением — что было дальше: итог из еженедельного разбора и куда пошла цена после сигнала.
       </div>
       {videos.length ? <VideoReviews videos={videos} currentId={vid} onPick={setVid} boxRef={box} /> : null}
+      {!items.length ? <div style={{ color: DIM, fontSize: 13, marginBottom: 10 }}>{mk === 'crypto' ? 'Решений по крипте пока нет.' : 'Решений по форексу пока нет.'}</div> : null}
       <div style={{ display: 'grid', gap: 10 }}>
         {items.map((v, i) => {
           const ok = v.verdict === 'ДОПУСК';
