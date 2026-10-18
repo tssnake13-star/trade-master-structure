@@ -3,7 +3,7 @@ import { Bitcoin, Moon, Search } from 'lucide-react';
 import { ACCENT, BORDER, CRYPTO, CRYPTO_TEXT, DIM, DOWN, FG, MONO, SANS, UP, card, label } from './theme';
 import { ALPHA_TIP, CritMarks, SymbolName, type MarketRow } from './parts';
 import { GEN } from './screenerParse';
-import { groupRows, scenarioRows, type ScenBlock, type ScenKey } from './sidebarRows';
+import { SCEN_META, groupRows, scenarioRows, type ScenBlock } from './sidebarRows';
 
 /**
  * Боковая панель терминала: список инструментов в двух видах.
@@ -15,13 +15,6 @@ import { groupRows, scenarioRows, type ScenBlock, type ScenKey } from './sidebar
  * и подтверждение приходят готовыми в строке инструмента.
  */
 
-// слова разделов — те же, что в главном блоке инструмента (Decision)
-const SCEN_META: Record<ScenKey, { title: string; note?: string }> = {
-  '1': { title: 'Первый сценарий', note: 'идём по недельному циклу' },
-  '2': { title: 'Второй сценарий', note: 'недельный цикл пройден, идём против него' },
-  ctx: { title: 'По контексту', note: 'сценария 1 и 2 нет, но поводырь, дневка и подтверждение за' },
-  none: { title: 'Сценария нет' },
-};
 
 const PLATE = '#191613';
 const sideColor = (s: MarketRow['side']) => (s === 'LONG' ? UP : s === 'SHORT' ? DOWN : BORDER);

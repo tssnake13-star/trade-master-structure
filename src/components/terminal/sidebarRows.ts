@@ -67,6 +67,14 @@ export function groupRows(rows: MarketRow[], list: MarketRow[]): [string, Market
 // ─────────────────────────── вид «сценарии» ───────────────────────────
 
 export type ScenKey = '1' | '2' | 'ctx' | 'none';
+
+// слова разделов — те же, что в главном блоке инструмента (Decision); берут кабинет и терминал в Телеграме
+export const SCEN_META: Record<ScenKey, { title: string; note?: string }> = {
+  '1': { title: 'Первый сценарий', note: 'идём по недельному циклу' },
+  '2': { title: 'Второй сценарий', note: 'недельный цикл пройден, идём против него' },
+  ctx: { title: 'По контексту', note: 'сценария 1 и 2 нет, но поводырь, дневка и подтверждение за' },
+  none: { title: 'Сценария нет' },
+};
 export interface ScenBlock {
   key: ScenKey;
   total: number; // сколько инструментов в разделе всего — без оглядки на поиск

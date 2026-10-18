@@ -8,7 +8,7 @@ import { VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
 import { TimeMachine, Trainer, TmViewCtx, type TimeItem } from '@/components/terminal/TimeMachine';
 import { parseJournalVideos } from '@/lib/journalVideos';
-import { groupRows } from '@/components/terminal/sidebarRows';
+import { SCEN_META, groupRows, scenarioRows } from '@/components/terminal/sidebarRows';
 import { GEN } from '@/components/terminal/screenerParse';
 import { UP, DOWN } from '@/components/terminal/theme';
 
@@ -58,9 +58,29 @@ function loadTg(): Promise<void> {
 /** 18.10.2026, его слово: «листать ленту вправо… неудобно… давай твой вариант посмотрим по группам». Инструменты
  *  плитками с переносом, по группам в порядке боковой панели кабинета (groupRows), сторона — цветом; список
  *  сворачивается кнопкой с выбранным инструментом, чтобы на телефоне не занимал весь экран. */
+const PICK_MODE = 'tg_pick_mode';
+
 export function Picker({ rows, cur, onPick }: { rows: MarketRow[]; cur: MarketRow; onPick: (s: string) => void }) {
   const few = rows.length <= 6;
   const [open, setOpen] = useState(false);
+  // 18.10.2026, его слово: «в терминале Телеграма, где вкладка инструменты… нету кнопок группы и сценарии. Можешь
+  // сделать сортировку по группам и по сценариям?» — те же два вида, что в кабинете; выбор запоминается
+  const [mode, setModeState] = useState<'groups' | 'scen'>(() => {
+    try {
+      return window.localStorage.getItem(PICK_MODE) === 'scen' ? 'scen' : 'groups';
+    } catch {
+      return 'groups';
+    }
+  });
+  const setMode = (m: 'groups' | 'scen') => {
+    setModeState(m);
+    try {
+      window.localStorage.setItem(PICK_MODE, m);
+    } catch {
+      /* без памяти браузера — просто не запомним */
+    }
+  };
+  const cap = (t: string) => <div style={{ fontSize: 11, color: DIM, margin: '8px 0 5px', fontFamily: MONO, letterSpacing: '0.06em' }}>{t}</div>;
   // 18.10.2026, его слово: «выделить поводырей… а то они все сливаются в одно» — поводырь своей группы в золотой рамке
   const chip = (x: MarketRow, lead = false) => {
     const on = x.symbol === cur.symbol;
@@ -89,8 +109,36 @@ export function Picker({ rows, cur, onPick }: { rows: MarketRow[]; cur: MarketRo
         <span>{open ? '▴' : '▾'}</span>
       </button>
       {open ? (
-        <div style={{ border: `1px solid ${BORDER}`, borderTop: 'none', borderRadius: '0 0 8px 8px', padding: '6px 10px 10px' }}>
-          {groupRows(rows, rows).map(([g, rs]) => {
+        <div style={{ border: `1px solid ${BORDER}`, borderTop: 'none', borderRadius: '0 0 8px 8px', padding: '10px 10px 10px' }}>
+          <div style={{ display: 'flex', gap: 6 }}>
+            {([['groups', 'Группы'], ['scen', 'Сценарии']] as const).map(([k, n]) => (
+              <button key={k} onClick={() => setMode(k)} style={{ ...pill(mode === k), flex: 1, padding: '8px 6px' }}>
+                {n}
+              </button>
+            ))}
+          </div>
+          {mode === 'scen'
+            ? scenarioRows(rows, rows)
+                .filter((b) => b.rows.length)
+                .map((b) => {
+                  const numbered = b.key === '1' || b.key === '2';
+                  const yes = numbered ? b.rows.filter((x) => x.confirmation) : b.rows;
+                  const no = numbered ? b.rows.filter((x) => !x.confirmation) : [];
+                  return (
+                    <div key={b.key} style={{ marginTop: 14 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: FG }}>
+                        {SCEN_META[b.key].title}
+                        <span style={{ color: ACCENT, fontWeight: 400, fontSize: 12 }}> · {b.total}</span>
+                      </div>
+                      {SCEN_META[b.key].note ? <div style={{ fontSize: 12, color: DIM, lineHeight: 1.35, marginTop: 2 }}>{SCEN_META[b.key].note}</div> : null}
+                      {numbered && yes.length ? cap(`с подтверждением · ${yes.length}`) : null}
+                      {yes.length ? <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: numbered ? 0 : 6 }}>{yes.map((x) => chip(x))}</div> : null}
+                      {no.length ? cap(`без подтверждения · ${no.length}`) : null}
+                      {no.length ? <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>{no.map((x) => chip(x))}</div> : null}
+                    </div>
+                  );
+                })
+            : groupRows(rows, rows).map(([g, rs]) => {
             const lead = rs.find((x) => x.extra?.leads === g);
             return (
               <div key={g} style={{ marginTop: 12 }}>
