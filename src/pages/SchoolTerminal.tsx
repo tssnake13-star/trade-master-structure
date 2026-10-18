@@ -736,8 +736,9 @@ export default function SchoolTerminal() {
             </div>
           ) : null}
           {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} outcomes={feeds.outcomes} videos={videos} symbols={symbols} onOpen={openSymbol} />}
-          {section === 'timemachine' && <TimeMachine doc={feeds.timemachine} symbols={symbols} onOpen={openSymbol} />}
-          {section === 'trainer' && <Trainer doc={feeds.timemachine} symbols={symbols} onOpen={openSymbol} />}
+          {/* пробному лента timemachine базой не отдаётся (правило market_feed_select: ему только outcomes) — замок, а не пустая вкладка */}
+          {section === 'timemachine' && (trial ? <TrialLock what="Машина времени" /> : <TimeMachine doc={feeds.timemachine} symbols={symbols} onOpen={openSymbol} />)}
+          {section === 'trainer' && (trial ? <TrialLock what="Тренажёр" /> : <Trainer doc={feeds.timemachine} symbols={symbols} onOpen={openSymbol} />)}
           {section === 'history' && isAdmin && <HistoryView doc={feeds.history} order={rows.map((r) => r.symbol)} symbols={symbols} onOpen={openSymbol} />}
           <div style={{ ...label, marginTop: 'auto', paddingTop: 14, lineHeight: 1.7 }}>
             {DISCLAIMER}
