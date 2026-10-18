@@ -327,7 +327,7 @@ function scenePanel(sc: { panels: TmPanel[] } | null, tf: string, show: boolean,
   return { v: 1, title: null, texts: [], panels: [{ ...P, bars, xlim: [P.xlim[0], x1], edge: x1, ylim: [lo, hi], shapes: [...P.shapes, line] }] };
 }
 
-function TfBox({ title, tf, show, when, live, loading, tools, h4, children }: { title: string; tf?: Tf; show: boolean; when: string; live?: Scene | null; loading?: boolean; tools?: ReactNode; h4?: boolean; children?: ReactNode }) {
+function TfBox({ title, tf, show, when, live, loading, tools, notes = false, children }: { title: string; tf?: Tf; show: boolean; when: string; live?: Scene | null; loading?: boolean; tools?: ReactNode; notes?: boolean; children?: ReactNode }) {
   const view = useContext(TmViewCtx);
   const [fs, setFs] = useState(false);
   if (!live && !loading && (!tf || !tf.bars.length)) return null;
@@ -335,7 +335,9 @@ function TfBox({ title, tf, show, when, live, loading, tools, h4, children }: { 
   // 18.10.2026, его слово (школьный бот, холодные): «всё-таки уберём все цифры и все пояснения… для холодного это вообще
   // не нужно… раскрывает то, что не нужно» — в Телеграме без номеров и их списка все три графика (машина времени и
   // тренажёр в Телеграме есть только у школьного бота); в кабинете номера остаются
-  const shown = live && view.plain ? { ...live, panels: live.panels.map((p) => ({ ...p, labels: [] })) } : live;
+  // 18.10.2026, его слово про веб-версию: «пояснения тоже мешают… отключить… кнопку: выключить и включить пояснения» —
+  // в кабинете по умолчанию без номеров и их списка, кнопкой «показать пояснения» — с ними; в Телеграме — всегда без
+  const shown = live && (view.plain || !notes) ? { ...live, panels: live.panels.map((p) => ({ ...p, labels: [] })) } : live;
   const chart = shown ? <LiveChart scene={shown} hidden={NO_HIDDEN} noHead still={view.still} /> : null;
   return (
     <div style={{ ...card, padding: 12 }}>
@@ -372,6 +374,8 @@ function Layout({ it, show, side, onOpen, symbols, hidePic }: { it: TimeItem; sh
   const when = fmtWhen(it.time).slice(0, 5);
   const ctx = ctxWords(it.ctx);
   const { sc, state } = useScene(it.scene);
+  const [notes, setNotes] = useState(false);
+  const view = useContext(TmViewCtx);
   const [all, setAll] = useState(false);
   const loading = state === 'loading';
   const allBtn = (
@@ -382,14 +386,21 @@ function Layout({ it, show, side, onOpen, symbols, hidePic }: { it: TimeItem; sh
   return (
     <div style={{ display: 'grid', gridTemplateColumns: wide ? 'minmax(0,1fr) 330px' : 'minmax(0,1fr)', gap: 12, alignItems: 'start' }}>
       <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1fr)', gap: 12, minWidth: 0 }}>
-        <TfBox title={`${it.instrument} · H4`} tf={it.tf?.H4} show={show} when={when} live={scenePanel(sc, 'H4', show, all)} loading={loading} tools={allBtn} h4>
+        {!view.plain && sc ? (
+          <div>
+            <button style={{ ...btn(notes ? ACCENT : DIM), width: 'auto', marginTop: 0, padding: '6px 12px', fontSize: 10 }} onClick={() => setNotes(!notes)}>
+              {notes ? 'скрыть пояснения' : 'показать пояснения'}
+            </button>
+          </div>
+        ) : null}
+        <TfBox title={`${it.instrument} · H4`} tf={it.tf?.H4} show={show} when={when} live={scenePanel(sc, 'H4', show, all)} loading={loading} tools={allBtn} notes={notes}>
           <Rows rows={[['Сигнал', 'триггер на H4 — с него пришла карточка'], ...(it.h4?.rows || [])]} />
           {hidePic ? null : <Pic it={it} />}
         </TfBox>
-        <TfBox title={`${it.instrument} · дневка`} tf={it.tf?.D1} show={show} when={when} live={scenePanel(sc, 'D1', show)} loading={loading}>
+        <TfBox title={`${it.instrument} · дневка`} tf={it.tf?.D1} show={show} when={when} live={scenePanel(sc, 'D1', show)} loading={loading} notes={notes}>
           <Rows rows={dayRows(it)} />
         </TfBox>
-        <TfBox title={`${it.instrument} · неделя`} tf={it.tf?.W1} show={show} when={when} live={scenePanel(sc, 'W1', show)} loading={loading}>
+        <TfBox title={`${it.instrument} · неделя`} tf={it.tf?.W1} show={show} when={when} live={scenePanel(sc, 'W1', show)} loading={loading} notes={notes}>
           <Rows rows={weekRows(it)} />
         </TfBox>
         <div style={{ color: DIM, fontSize: 12, lineHeight: 1.55 }}>
