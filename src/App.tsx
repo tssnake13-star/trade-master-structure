@@ -15,6 +15,7 @@ import SchoolStudentDetail from "./pages/SchoolStudentDetail";
 import SchoolResetPassword from "./pages/SchoolResetPassword";
 import SchoolProfile from "./pages/SchoolProfile";
 import SchoolTerminal from "./pages/SchoolTerminal";
+import TgTerminal from "./pages/TgTerminal";
 import SchoolAnalytics from "./pages/SchoolAnalytics";
 import PreviewRedesign from "./pages/PreviewRedesign";
 import PreviewNext from "./pages/PreviewNext";
@@ -39,6 +40,8 @@ const App = () => (
         <AuthProvider>
           <Routes>
             <Route path="/" element={<Index />} />
+            {/* 18.10.2026: терминал внутри Телеграма — кнопка «Терминал» в меню ботов */}
+            <Route path="/tg/:bot" element={<TgTerminal />} />
             <Route path="/access" element={<Access />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />

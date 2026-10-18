@@ -241,7 +241,8 @@ function OutcomeBlock({ o }: { o?: Outcome }) {
   );
 }
 
-export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen }: { doc?: FeedDocs['verdicts']; outcomes?: FeedDocs['outcomes']; videos?: JournalVideo[]; symbols: Set<string>; onOpen: Open }) {
+// 18.10.2026: picUrl — терминал в Телеграме берёт картинки из открытого ящика tgpub, а не по подписанной ссылке
+export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picUrl }: { doc?: FeedDocs['verdicts']; outcomes?: FeedDocs['outcomes']; videos?: JournalVideo[]; symbols: Set<string>; onOpen: Open; picUrl?: (path: string) => string }) {
   const items = doc?.items || [];
   // 25.09.2026: серии «Допуск-отказ» — плеер сверху; «разбор этой недели» у карточек включает серию в нём
   const [vid, setVid] = useState<string | null>(null);
@@ -262,6 +263,10 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen }: { 
   useEffect(() => {
     const paths = picKey.split('|').filter(Boolean);
     if (!paths.length) return;
+    if (picUrl) {
+      setUrls(Object.fromEntries(paths.map((p) => [p, picUrl(p)])));
+      return;
+    }
     let alive = true;
     supabase.storage
       .from('terminal')

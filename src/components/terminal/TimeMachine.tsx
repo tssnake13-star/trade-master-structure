@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ACCENT, BORDER, CARD, DIM, DOWN, FG, MONO, UP, card, label, fmtWhen } from './theme';
 import { GEN } from './screenerParse';
@@ -42,6 +42,15 @@ export interface TimeItem {
   scene?: string | null;
 }
 type TmPanel = ScenePanel & { after?: SBar[] };
+
+/** 18.10.2026: терминал в Телеграме — графики статичные («как в боте»), файлы из открытого ящика tgpub, а не из
+ *  закрытого terminal по подписанной ссылке. В кабинете — как раньше (значения по умолчанию). */
+export interface TmView {
+  still?: boolean;
+  scene?: (path: string) => string;
+  pic?: (path: string) => string;
+}
+export const TmViewCtx = createContext<TmView>({});
 
 type Open = (symbol: string) => void;
 
@@ -218,6 +227,7 @@ function Result({ it }: { it: TimeItem }) {
 }
 /** Картинка H4, которую в момент решения получили подписчики (та же, что в журнале решений). */
 function Pic({ it }: { it: TimeItem }) {
+  const view = useContext(TmViewCtx);
   const [url, setUrl] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   useEffect(() => {
@@ -225,6 +235,10 @@ function Pic({ it }: { it: TimeItem }) {
     setOpen(false);
     if (!it.pic) return;
     let alive = true;
+    if (view.pic) {
+      setUrl(view.pic(it.pic));
+      return;
+    }
     supabase.storage.from('terminal').createSignedUrl(it.pic, 3600).then(({ data }) => {
       if (alive && data?.signedUrl) setUrl(data.signedUrl);
     });
@@ -242,13 +256,16 @@ function Pic({ it }: { it: TimeItem }) {
 
 const NO_HIDDEN = new Set<Layer>();
 function useScene(path?: string | null) {
+  const view = useContext(TmViewCtx);
   const [sc, setSc] = useState<{ panels: TmPanel[] } | null>(null);
   useEffect(() => {
     setSc(null);
     if (!path) return;
     let alive = true;
     // путь в хранилище; адрес с «/» — локальная проверка без базы
-    const signed = path.startsWith('/') ? Promise.resolve({ data: { signedUrl: path } }) : supabase.storage.from('terminal').createSignedUrl(path, 3600);
+    const signed = view.scene
+      ? Promise.resolve({ data: { signedUrl: view.scene(path) } })
+      : path.startsWith('/') ? Promise.resolve({ data: { signedUrl: path } }) : supabase.storage.from('terminal').createSignedUrl(path, 3600);
     signed.then(async ({ data }) => {
       if (!alive || !data?.signedUrl) return;
       try {
@@ -276,15 +293,17 @@ function scenePanel(sc: { panels: TmPanel[] } | null, tf: string, show: boolean)
   let lo = P.ylim[0], hi = P.ylim[1];
   if (show) after.forEach((b) => { lo = Math.min(lo, b[3]); hi = Math.max(hi, b[2]); });
   const line = { k: 'line' as const, p: [[n - 0.5, lo], [n - 0.5, hi]] as [number, number][], c: ACCENT, a: 1, w: 2, d: [4, 3], z: 9, L: 'other' as Layer };
-  return { v: 1, title: null, texts: [], panels: [{ ...P, bars, xlim: [P.xlim[0], x1], ylim: [lo, hi], shapes: [...P.shapes, line] }] };
+  // окно одно в обоих видах: до правого края, куда дойдут свечи «после» (edge задаёт окно по умолчанию)
+  return { v: 1, title: null, texts: [], panels: [{ ...P, bars, xlim: [P.xlim[0], x1], edge: x1, ylim: [lo, hi], shapes: [...P.shapes, line] }] };
 }
 
 function TfBox({ title, tf, show, when, live, children }: { title: string; tf?: Tf; show: boolean; when: string; live?: Scene | null; children?: ReactNode }) {
+  const view = useContext(TmViewCtx);
   if (!live && (!tf || !tf.bars.length)) return null;
   return (
     <div style={{ ...card, padding: 12 }}>
       <div style={{ ...label, marginBottom: 6 }}>{title} · {show ? 'до и после' : 'как было ' + when}</div>
-      {live ? <LiveChart scene={live} hidden={NO_HIDDEN} noHead /> : tf ? <Chart tf={tf} show={show} when={when} /> : null}
+      {live ? <LiveChart scene={live} hidden={NO_HIDDEN} noHead still={view.still} /> : tf ? <Chart tf={tf} show={show} when={when} /> : null}
       {children}
     </div>
   );

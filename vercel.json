@@ -27,6 +27,7 @@
     { "source": "/([Ii][Gg])-([Ss][Tt][Oo][Rr][Ii][Ee][Ss])", "destination": "/?utm_source=ig_stories", "permanent": false }
   ],
   "headers": [
+    { "source": "/tg/:path*", "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }] },
     {
       "source": "/school",
       "headers": [{ "key": "X-Robots-Tag", "value": "noindex, nofollow" }]

@@ -20,7 +20,9 @@ const TECH = /^\d{2}\.\d{2}\.\d{4}\s+\d{2}:\d{2}|\bcsv\s+\d|\bmt5\s+\d/i;
 // «неделя … · дневка … — идём по недельному циклу» повторяют верхний блок инструмента.
 const DUP = /^[A-Za-z_]{3,10}\s+·\s|^неделя\s.+·\s*дневка\s.+\s—\s/;
 
-export default function LiveChart({ scene, hidden, noHead = false }: { scene: Scene; hidden: Set<Layer>; noHead?: boolean }) {
+// 18.10.2026, его слово про терминал в Телеграме: «графики должны быть статичные, как в боте» — still: тот же рисунок
+// без кнопок, масштаба, сдвига и перекрестия
+export default function LiveChart({ scene, hidden, noHead = false, still = false }: { scene: Scene; hidden: Set<Layer>; noHead?: boolean; still?: boolean }) {
   const texts = scene.texts.filter((t) => !TECH.test(t.t) && !(noHead && DUP.test(t.t)));
   const title = noHead ? null : scene.title;
   return (
@@ -36,13 +38,13 @@ export default function LiveChart({ scene, hidden, noHead = false }: { scene: Sc
         </div>
       ) : null}
       {scene.panels.map((p, i) => (
-        <PanelChart key={i} p={p} hidden={hidden} />
+        <PanelChart key={i} p={p} hidden={hidden} still={still} />
       ))}
     </div>
   );
 }
 
-function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
+function PanelChart({ p, hidden, still = false }: { p: ScenePanel; hidden: Set<Layer>; still?: boolean }) {
   const boxRef = useRef<HTMLDivElement>(null);
   const svgRef = useRef<SVGSVGElement>(null);
   const [fs, setFs] = useState(false);
@@ -122,7 +124,7 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
   // колесо: только с Ctrl, иначе страница перестаёт листаться, когда мышь над графиком
   useEffect(() => {
     const el = svgRef.current;
-    if (!el) return;
+    if (!el || still) return;
     const onWheel = (e: WheelEvent) => {
       if (!e.ctrlKey && !e.metaKey) return;
       e.preventDefault();
@@ -335,7 +337,7 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
           {h.t}
         </div>
       ))}
-      <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', margin: '10px 0 8px' }}>
+      <div style={{ display: still ? 'none' : 'flex', gap: 6, alignItems: 'center', flexWrap: 'wrap', margin: '10px 0 8px' }}>
         <button onClick={() => zoomAt(0.7)} style={btn} aria-label="приблизить">
           +
         </button>
@@ -361,13 +363,13 @@ function PanelChart({ p, hidden }: { p: ScenePanel; hidden: Set<Layer> }) {
           ref={svgRef}
           width={w}
           height={H}
-          style={{ display: 'block', touchAction: 'pan-y', userSelect: 'none', cursor: 'crosshair' }}
-          onPointerDown={onDown}
-          onPointerMove={onMove}
-          onPointerUp={onUp}
-          onPointerCancel={onUp}
+          style={{ display: 'block', touchAction: still ? 'auto' : 'pan-y', userSelect: 'none', cursor: still ? 'default' : 'crosshair', marginTop: still ? 8 : 0 }}
+          onPointerDown={still ? undefined : onDown}
+          onPointerMove={still ? undefined : onMove}
+          onPointerUp={still ? undefined : onUp}
+          onPointerCancel={still ? undefined : onUp}
           onPointerLeave={(e) => e.pointerType === 'mouse' && setCross(null)}
-          onDoubleClick={() => setView(full)}
+          onDoubleClick={still ? undefined : () => setView(full)}
         >
           <defs>
             <clipPath id={cid}>
