@@ -216,6 +216,87 @@ function priceWords(p: NonNullable<Outcome['price']>) {
   return `${head} · дальше всего: по сигналу ${num(p.fav)}, против ${num(p.adv)} дневного хода${at}`;
 }
 
+/** Итог сделки в размерах риска из его записи итога: «ТЕЙК 10,8 к 1» → +10,8 · «−5,3 R» → −5,3 · «СТОП» → −1 ·
+ *  «БЕЗУБЫТОК», «≈ 0» → 0. Не входил, отменил, в работе — null: в итог месяца не идут. */
+export function rOfResult(r?: string): number | null {
+  if (!r || !/ВОШЁЛ/.test(r) || /В РАБОТЕ|ЖДЁТ/.test(r)) return null;
+  const n = (x: string) => parseFloat(x.replace(',', '.'));
+  const tp = r.match(/ТЕЙК\s+([\d,.]+)\s*к\s*1/);
+  if (tp) return n(tp[1]);
+  const rr = r.match(/([−-])\s*([\d,.]+)\s*R/);
+  if (rr) return -n(rr[2]);
+  if (/БЕЗУБЫТОК|≈\s*0/.test(r)) return 0;
+  const st = r.match(/(\d+)\s*СТОП/);
+  if (st) return -parseInt(st[1], 10);
+  if (/СТОП/.test(r)) return -1;
+  return null;
+}
+
+const plural = (n: number, one: string, few: string, many: string) => {
+  const a = n % 10, b = n % 100;
+  return a === 1 && b !== 11 ? one : a >= 2 && a <= 4 && (b < 12 || b > 14) ? few : many;
+};
+const MONTHS = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'];
+const fmtR = (x: number) => (x > 0 ? '+' : x < 0 ? '−' : '') + (Math.round(Math.abs(x) * 10) / 10).toString().replace('.', ',');
+
+/** 18.10.2026, его слово: «винрейт 23%… если человек начнёт проверять, он будет смотреть только стопы. Как это может
+ *  продавать?» — над журналом итог по месяцам: сколько тейков, сколько в минус и сумма в размерах риска. Считается
+ *  только из его записей итога (rOfResult); отказы — сколько было и после скольких цена ушла против сигнала. */
+function MonthTotals({ items, outOf }: { items: { time: string; instrument: string; side: string; verdict: string }[]; outOf: (v: { time: string; instrument: string; side: string }) => Outcome | undefined }) {
+  const by = new Map<string, { take: number; minus: number; sum: number; n: number; refuse: number; saved: number }>();
+  for (const v of items) {
+    const d = new Date(new Date(v.time).getTime() + 5 * 3600 * 1000);
+    const key = `${d.getUTCFullYear()}-${String(d.getUTCMonth()).padStart(2, '0')}`;
+    const m = by.get(key) || { take: 0, minus: 0, sum: 0, n: 0, refuse: 0, saved: 0 };
+    const o = outOf(v);
+    const r = rOfResult(o?.result);
+    if (r != null) {
+      m.n += 1;
+      m.sum += r;
+      if (r > 0) m.take += 1;
+      if (r < 0) m.minus += 1;
+    }
+    if (v.verdict !== 'ДОПУСК') {
+      m.refuse += 1;
+      if (o?.price?.status === 'против') m.saved += 1;
+    }
+    by.set(key, m);
+  }
+  const rows = [...by.entries()].filter(([, m]) => m.n || m.refuse).sort((a, b) => b[0].localeCompare(a[0]));
+  if (!rows.length) return null;
+  return (
+    <div style={{ ...card, padding: 12, marginBottom: 12 }}>
+      <div style={{ ...label, marginBottom: 8 }}>Итог по месяцам</div>
+      {rows.map(([k, m]) => (
+        <div key={k} style={{ fontSize: 13, lineHeight: 1.6, color: FG, marginBottom: 6 }}>
+          <b style={{ textTransform: 'capitalize' }}>{MONTHS[parseInt(k.slice(5), 10)]}</b>
+          {m.n ? (
+            <>
+              {' · '}
+              <span style={{ color: UP }}>{m.take} {plural(m.take, 'тейк', 'тейка', 'тейков')}</span>
+              {', '}
+              <span style={{ color: DOWN }}>{m.minus} в минус</span>
+              {' · итог '}
+              <b style={{ color: m.sum > 0 ? UP : m.sum < 0 ? DOWN : DIM }}>{fmtR(m.sum)}</b>
+              {' риска'}
+            </>
+          ) : null}
+          {m.refuse ? (
+            <span style={{ color: DIM }}>
+              {' · '}
+              {m.refuse} {plural(m.refuse, 'отказ', 'отказа', 'отказов')}
+              {m.saved ? `, после ${m.saved} цена ушла против сигнала` : ''}
+            </span>
+          ) : null}
+        </div>
+      ))}
+      <div style={{ color: DIM, fontSize: 12, lineHeight: 1.5, marginTop: 4 }}>
+        Риск — то, что забирает один стоп: −1. Тейк в среднем приносит в 9,5 раза больше. Поэтому сделок в минус больше, а итог — в плюсе. Прошлый результат не гарантирует будущий.
+      </div>
+    </div>
+  );
+}
+
 function OutcomeBlock({ o }: { o?: Outcome }) {
   return (
     <div style={{ marginTop: 10, paddingTop: 10, borderTop: `1px solid ${BORDER}` }}>
@@ -313,6 +394,7 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
       <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
         Допуски и отказы автора, которые получили подписчики{oldest ? `, с ${fmtWhen(oldest).slice(0, 10)}` : ''}. Свежие сверху, хранятся последние 90 дней. Время — по вашему часовому поясу. Под каждым решением — что было дальше: итог из еженедельного разбора и куда пошла цена после сигнала.
       </div>
+      <MonthTotals items={items} outOf={(v) => outOf.get(outKey(v.time, v.instrument, v.side))} />
       {videos.length ? <VideoReviews videos={videos} currentId={vid} onPick={setVid} boxRef={box} /> : null}
       {cryptoLocked && mk === 'crypto' ? (
         <div style={{ ...card, padding: 14, color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>🔒 Журнал по крипте закрыт: решения по крипте Сергей сейчас ведёт только для себя. Сигналы по крипте подписчикам не приходят.</div>
@@ -393,6 +475,10 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
                   <div style={{ ...label, marginBottom: 4 }}>{ok ? 'Почему беру?' : 'Почему не беру?'}</div>
                   <div style={{ color: FG, fontSize: 13, lineHeight: 1.6 }}>{v.reason}</div>
                 </div>
+              ) : null}
+              {!ok && outOf.get(outKey(v.time, v.instrument, v.side))?.price?.status === 'против' ? (
+                // 18.10.2026, его «давай все четыре»: отказ, после которого цена ушла против сигнала, — отсечённая сделка
+                <div style={{ marginTop: 10, color: UP, fontSize: 13, fontWeight: 700 }}>🛡 Отказ сберёг: цена ушла против сигнала</div>
               ) : null}
               <OutcomeBlock o={outOf.get(outKey(v.time, v.instrument, v.side))} />
             </div>
