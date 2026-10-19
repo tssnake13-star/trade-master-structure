@@ -49,7 +49,7 @@ html { scrollbar-color: rgba(225,168,77,0.55) ${BG}; }
  * 07.10.2026, его слово: при регистрации человек сам получает пробный доступ
  * на 7 дней (terminal_access.is_trial). Замки тоже стоят в базе: пробному
  * отдаются только открытые инструменты, итоги решений и журнал решений
- * с задержкой в сутки (функция terminal_trial_verdicts). Скринер, ТОП-лист
+ * с задержкой в 3 дня (функция terminal_trial_verdicts; было сутки, 19.10.2026 его слово «задержку надо сделать в три дня»). Скринер, ТОП-лист
  * и тренд он видит закрытыми. Выдача через админку снимает is_trial — открыто всё.
  */
 
@@ -62,7 +62,7 @@ function TrialLock({ what }: { what: string }) {
       </div>
       <div style={{ fontSize: 16, marginTop: 10, color: FG }}>{what} открывается в подписке</div>
       <p style={{ color: DIM, fontSize: 13, lineHeight: 1.6, maxWidth: 480, margin: '8px auto 0' }}>
-        В пробном доступе открыты журнал моих решений с задержкой в сутки, итоги решений и несколько
+        В пробном доступе открыты журнал моих решений с задержкой в 3 дня, итоги решений и несколько
         инструментов целиком. {what} показывает, куда смотреть на этой неделе, и работает у подписчиков.
       </p>
       <a
@@ -295,7 +295,7 @@ export default function SchoolTerminal() {
       feedAt.current[f.key] = f.updated_at || null;
     }
     if (isTrial) {
-      // журнал решений пробному — только решения старше суток; список закрытых инструментов — одни названия
+      // журнал решений пробному — только решения старше 3 дней; список закрытых инструментов — одни названия
       const [vRes, cRes] = await Promise.all([db.rpc('terminal_trial_verdicts'), db.rpc('terminal_trial_catalog')]);
       const v = vRes.data as { items?: Verdict[]; hidden?: (string | null)[] } | null;
       docs.verdicts = { items: v?.items || [] };
@@ -655,7 +655,7 @@ export default function SchoolTerminal() {
                 {trialDays} {trialDays === 1 ? 'день' : trialDays < 5 ? 'дня' : 'дней'}
               </span>
               <span style={{ color: FG, fontSize: 13, lineHeight: 1.6, flex: '1 1 360px' }}>
-                Открыты журнал моих решений с задержкой в сутки, итоги решений
+                Открыты журнал моих решений с задержкой в 3 дня, итоги решений
                 {rows.length ? ` и ${rows.map((r) => r.symbol).join(', ')} целиком` : ''}. В подписке мой вердикт
                 приходит сразу, в терминал и в Telegram, и открываются скринер, ТОП-лист, тренд и остальные инструменты.
               </span>
@@ -752,7 +752,7 @@ export default function SchoolTerminal() {
             <div style={{ ...card, padding: 12, marginBottom: 14, color: DIM, fontSize: 13, lineHeight: 1.6, display: 'flex', gap: 8, alignItems: 'center' }}>
               <Lock size={13} color={ACCENT} style={{ flexShrink: 0 }} />
               <span>
-                Решений за последние сутки: {hiddenVerdicts.length}. В пробном доступе они открываются через сутки
+                Решений за последние 3 дня: {hiddenVerdicts.length}. В пробном доступе они открываются через 3 дня
                 после публикации, у подписчиков приходят сразу.
               </span>
             </div>

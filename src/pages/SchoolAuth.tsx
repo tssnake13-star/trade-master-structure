@@ -164,7 +164,7 @@ export default function SchoolAuth() {
             <ul className="mt-2 grid gap-1">
               <li>· вводный курс;</li>
               <li>
-                · терминал ECHO-GATE INSIDE на 7 дней: журнал моих решений с задержкой в сутки
+                · терминал ECHO-GATE INSIDE на 7 дней: журнал моих решений с задержкой в 3 дня
                 и несколько инструментов целиком.
               </li>
             </ul>

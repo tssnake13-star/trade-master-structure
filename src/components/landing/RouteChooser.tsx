@@ -28,7 +28,7 @@ const COOL = 'hsl(var(--cool))';
 const MONO: React.CSSProperties = { fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase' };
 const SERIF: React.CSSProperties = { fontFamily: "'Cormorant', serif", fontWeight: 500 };
 
-// Что получает подписчик: вердикт сразу — главная разница с пробным доступом, где журнал идёт с задержкой в сутки
+// Что получает подписчик: вердикт сразу — главная разница с пробным доступом, где журнал идёт с задержкой в 3 дня
 const ECHO_POINTS = [
   'Терминал находит сделку, мой вердикт приходит сразу: в терминал и в Telegram',
   'От вас 2 действия: точка входа и кнопка СТАРТ',
