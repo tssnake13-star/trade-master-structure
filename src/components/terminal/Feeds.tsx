@@ -257,7 +257,7 @@ function MonthTotals() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
               <b style={{ fontSize: 13, color: FG }}>{m.name}</b>
               <span style={{ fontFamily: MONO, fontSize: 12, color: UP }}>
-                +{fmtNum(m.pct, 2)}% · ×{fmtNum(R)}
+                +{fmtNum(m.pct, 2)}% к депозиту · ×{fmtNum(R)}
               </span>
             </div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'flex-end' }}>
@@ -357,7 +357,7 @@ function MonthGrid({ ym, by, onPick, big }: { ym: string; by: Map<string, DayMar
       <div style={{ textAlign: 'center', marginBottom: 8 }}>
         <b style={{ fontSize: 15, color: FG }}>{MONTH_NAMES[m - 1]} {y}</b>
         <div style={{ fontFamily: MONO, fontSize: 12.5, fontWeight: 700, color: sum > 0 ? UP : sum < 0 ? DOWN : DIM }}>
-          {plus || minus ? `итог ${R(sum)}` : 'итогов пока нет'}
+          {plus || minus ? `итог ${R(sum)} · ${sum >= 0 ? '+' : '−'}${fmtNum(Math.abs(sum) * 0.25, 2)}% к депозиту` : 'итогов пока нет'}
         </div>
         <div style={{ fontFamily: MONO, fontSize: 11.5, color: DIM, marginTop: 2 }}>
           {plus || minus ? (
