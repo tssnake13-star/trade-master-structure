@@ -233,28 +233,159 @@ const STATEMENT_MONTHS: { name: string; trades: number; wins: number; pct: numbe
 ];
 const fmtNum = (x: number, d = 1) => x.toFixed(d).replace('.', ',');
 
+/** 19.10.2026, его выбор «вариант Б… под ним вариант В»: квадрат — сделка, площадь — результат. Стоп — маленький
+ *  красный (1), тейк — большой зелёный: средний тейк месяца = (итог месяца в стопах + число стопов) / число тейков —
+ *  у таблицы счёта нет размера каждой сделки. Красных много, но вся красная полоса меньше одного зелёного. */
 function MonthTotals() {
+  const U = 9;
   return (
     <div style={{ ...card, padding: 12, marginBottom: 12 }}>
       <div style={{ ...label, marginBottom: 8 }}>Мой счёт: итог последних трёх месяцев</div>
-      {STATEMENT_MONTHS.map((m) => (
-        <div key={m.name} style={{ fontSize: 13, lineHeight: 1.6, color: FG, marginBottom: 6 }}>
-          <b>{m.name}</b>
-          {' · '}
-          {m.trades} {plural(m.trades, 'сделка', 'сделки', 'сделок')}
-          {': '}
-          <span style={{ color: UP }}>{m.wins} {plural(m.wins, 'тейк', 'тейка', 'тейков')}</span>
-          {', '}
-          <span style={{ color: DOWN }}>{m.trades - m.wins} в минус</span>
-          {' · итог '}
-          <b style={{ color: UP }}>+{fmtNum(m.pct, 2)}%</b>
-          {/* 18.10.2026, его слово: «ребёнку непонятно, что такое риска… лучше иксы» */}
-          <span style={{ color: DIM }}> · ×{fmtNum(m.pct / 0.25)}</span>
-        </div>
-      ))}
-      <div style={{ color: DIM, fontSize: 12, lineHeight: 1.5, marginTop: 4 }}>
-        Один стоп забирает 0,25% счёта. ×29,9 значит: за месяц заработано в 29,9 раза больше, чем забирает один стоп. Тейк в среднем приносит в 9,5 раза больше стопа. Поэтому сделок в минус больше, а месяц — в плюсе. Бывают и месяцы в минус: из 21 месяца так закрылись 3. Прошлый результат не гарантирует будущий.
+      <div style={{ fontSize: 13, lineHeight: 1.55, color: FG, marginBottom: 12, padding: '8px 10px', borderLeft: `3px solid ${ACCENT}`, background: `${ACCENT}10`, borderRadius: 6 }}>
+        Прибыльных сделок у меня около 1 из 4. Зато прибыльная в среднем в 9,5 раза больше убыточной, поэтому месяц закрывается в плюсе.
       </div>
+      {STATEMENT_MONTHS.map((m) => {
+        const R = m.pct / 0.25;
+        const loss = m.trades - m.wins;
+        const avg = (R + loss) / m.wins;
+        const side = Math.round(Math.sqrt(avg) * U);
+        return (
+          <div key={m.name} style={{ marginBottom: 12 }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, marginBottom: 6, flexWrap: 'wrap' }}>
+              <b style={{ fontSize: 13, color: FG }}>{m.name}</b>
+              <span style={{ fontFamily: MONO, fontSize: 12, color: UP }}>
+                +{fmtNum(m.pct, 2)}% · ×{fmtNum(R)}
+              </span>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 3, alignItems: 'flex-end' }}>
+              {Array.from({ length: m.wins }, (_, i) => (
+                <span key={'g' + i} style={{ width: side, height: side, borderRadius: 4, background: UP }} />
+              ))}
+              {Array.from({ length: loss }, (_, i) => (
+                <span key={'r' + i} style={{ width: U, height: U, borderRadius: 2, background: DOWN }} />
+              ))}
+            </div>
+            <div style={{ color: DIM, fontSize: 11.5, marginTop: 4 }}>
+              {loss} {plural(loss, 'стоп', 'стопа', 'стопов')} по 1 · {m.wins} {plural(m.wins, 'тейк', 'тейка', 'тейков')}, в среднем по {fmtNum(avg)}
+            </div>
+          </div>
+        );
+      })}
+      <div style={{ color: DIM, fontSize: 12, lineHeight: 1.5, marginTop: 2 }}>
+        Квадрат — сделка, его площадь — результат: стоп забирает 0,25% счёта, тейк приносит в разы больше. ×29,9 значит: за месяц заработано в 29,9 раза больше, чем забирает один стоп. Бывают и месяцы в минус: из 21 месяца так закрылись 3. Прошлый результат не гарантирует будущий.
+      </div>
+    </div>
+  );
+}
+
+/** Итог сделки в стопах из его записи итога: «ТЕЙК 10,8 к 1» → +10,8 · «−5,3 R» → −5,3 · «СТОП» → −1 ·
+ *  «БЕЗУБЫТОК», «≈ 0» → 0. Не входил, отменил, в работе — null. */
+function rOfResult(r?: string): number | null {
+  if (!r || !/ВОШЁЛ/.test(r) || /В РАБОТЕ|ЖДЁТ/.test(r)) return null;
+  const n = (x: string) => parseFloat(x.replace(',', '.'));
+  const tp = r.match(/ТЕЙК\s+([\d,.]+)\s*к\s*1/);
+  if (tp) return n(tp[1]);
+  const rr = r.match(/([−-])\s*([\d,.]+)\s*R/);
+  if (rr) return -n(rr[2]);
+  if (/БЕЗУБЫТОК|≈\s*0/.test(r)) return 0;
+  const st = r.match(/(\d+)\s*СТОП/);
+  if (st) return -parseInt(st[1], 10);
+  if (/СТОП/.test(r)) return -1;
+  return null;
+}
+
+// день решения по его времени (UTC+5), как неделя в журнале
+const dayOf = (time: string) => new Date(new Date(time).getTime() + 5 * 3600e3).toISOString().slice(0, 10);
+const MONTH_NAMES = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+const JOURNAL_FROM = '2026-09'; // журнал нажатий его кнопок начинается 09.09.2026; раньше решения не публиковались
+
+/** 19.10.2026, его слово: «календарь текущего месяца… чтобы можно было пролистать… с сентября… нажать на квадратик
+ *  сделки и сразу перейти к решению в списке». День окрашен по итогу его решений: тейк — зелёный, стоп — красный,
+ *  безубыток — серый, решения без входа или ещё без итога — рамкой. Нажатие — к первому решению дня в списке. */
+function JournalCalendar({ items, outOf, onPick }: { items: Verdict[]; outOf: (v: Verdict) => Outcome | undefined; onPick: (day: string) => void }) {
+  const now = dayOf(new Date().toISOString()).slice(0, 7);
+  const [ym, setYm] = useState(now);
+  const shift = (k: number) => {
+    const [y, m] = ym.split('-').map(Number);
+    const d = new Date(Date.UTC(y, m - 1 + k, 1));
+    const next = d.toISOString().slice(0, 7);
+    if (next >= JOURNAL_FROM && next <= now) setYm(next);
+  };
+  const by = new Map<string, { r: number | null; n: number }>();
+  for (const v of items) {
+    const d = dayOf(v.time);
+    if (!d.startsWith(ym)) continue;
+    const cur = by.get(d) || { r: null, n: 0 };
+    const r = rOfResult(outOf(v)?.result);
+    cur.n += 1;
+    if (r != null) cur.r = (cur.r ?? 0) + r;
+    by.set(d, cur);
+  }
+  const [y, m] = ym.split('-').map(Number);
+  const days = new Date(Date.UTC(y, m, 0)).getUTCDate();
+  const off = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7;
+  let sum = 0, take = 0, stop = 0;
+  for (const x of by.values()) if (x.r != null) { sum += x.r; if (x.r > 0) take += 1; else if (x.r < 0) stop += 1; }
+  const arrow = (k: number, dis: boolean) => (
+    <button onClick={() => shift(k)} disabled={dis} style={{ ...pill(false), padding: '4px 12px', opacity: dis ? 0.3 : 1, cursor: dis ? 'default' : 'pointer' }}>
+      {k < 0 ? '←' : '→'}
+    </button>
+  );
+  return (
+    <div style={{ ...card, padding: 12, marginBottom: 12 }}>
+      <div style={{ ...label, marginBottom: 8 }}>Календарь решений</div>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
+        {arrow(-1, ym <= JOURNAL_FROM)}
+        <div style={{ textAlign: 'center' }}>
+          <b style={{ fontSize: 14, color: FG }}>{MONTH_NAMES[m - 1]} {y}</b>
+          <div style={{ fontFamily: MONO, fontSize: 11, color: sum > 0 ? UP : sum < 0 ? DOWN : DIM }}>
+            {take || stop ? `${sum > 0 ? '+' : sum < 0 ? '−' : ''}${fmtNum(Math.abs(sum))} · тейков ${take}, стопов ${stop}` : 'итогов пока нет'}
+          </div>
+        </div>
+        {arrow(1, ym >= now)}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', gap: 4 }}>
+        {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map((d) => (
+          <div key={d} style={{ fontFamily: MONO, fontSize: 10, color: DIM, textAlign: 'center' }}>{d}</div>
+        ))}
+        {Array.from({ length: off }, (_, i) => <div key={'e' + i} />)}
+        {Array.from({ length: days }, (_, i) => {
+          const key = `${ym}-${String(i + 1).padStart(2, '0')}`;
+          const x = by.get(key);
+          const bg = !x ? '#1a1815' : x.r == null ? '#1a1815' : x.r > 0 ? UP : x.r < 0 ? DOWN : '#4a453e';
+          const fg = x && x.r != null && x.r !== 0 ? '#0a0a0a' : x ? FG : '#5d574e';
+          const lab = x && x.r != null ? `${x.r > 0 ? '+' : x.r < 0 ? '−' : ''}${Number.isInteger(x.r) ? Math.abs(x.r) : fmtNum(Math.abs(x.r))}` : '';
+          return (
+            <button
+              key={key}
+              disabled={!x}
+              onClick={() => x && onPick(key)}
+              title={x ? `${x.n} ${plural(x.n, 'решение', 'решения', 'решений')} — открыть в списке` : undefined}
+              style={{
+                aspectRatio: '1', borderRadius: 6, border: 'none', background: bg, color: fg, position: 'relative', padding: 3,
+                textAlign: 'left', fontSize: 10, cursor: x ? 'pointer' : 'default',
+                boxShadow: x && x.r == null ? 'inset 0 0 0 2px #5b544a' : undefined,
+              }}
+            >
+              <span style={{ position: 'absolute', top: 3, left: 4 }}>{i + 1}</span>
+              {lab ? <span style={{ position: 'absolute', bottom: 3, right: 4, fontFamily: MONO, fontWeight: 700, fontSize: 11 }}>{lab}</span> : null}
+            </button>
+          );
+        })}
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, fontSize: 11.5, color: DIM, marginTop: 8 }}>
+        {[[UP, 'тейк'], [DOWN, 'стоп'], ['#4a453e', 'безубыток']].map(([c, n]) => (
+          <span key={n} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+            <i style={{ width: 11, height: 11, borderRadius: 3, background: c, display: 'inline-block' }} />
+            {n}
+          </span>
+        ))}
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+          <i style={{ width: 11, height: 11, borderRadius: 3, boxShadow: 'inset 0 0 0 2px #5b544a', display: 'inline-block' }} />
+          без входа или итог позже
+        </span>
+      </div>
+      <div style={{ color: DIM, fontSize: 11.5, marginTop: 6 }}>Число в клетке — итог дня в стопах. Нажмите на день — откроются решения этого дня в списке.</div>
     </div>
   );
 }
@@ -311,6 +442,8 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
   const counts = { fx: all.filter((v) => marketOfSym(v.instrument) === 'fx').length, crypto: all.filter((v) => marketOfSym(v.instrument) === 'crypto').length };
   // 25.09.2026: серии «Допуск-отказ» — плеер сверху; «разбор этой недели» у карточек включает серию в нём
   const [vid, setVid] = useState<string | null>(null);
+  // 19.10.2026: день, выбранный в календаре, — его решения в списке подсвечены пару секунд
+  const [flash, setFlash] = useState<string | null>(null);
   const box = useRef<HTMLDivElement>(null);
   const videoOf = new Map(videos.map((x) => [x.week, x]));
   const play = (id: string) => {
@@ -357,6 +490,16 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
         Допуски и отказы автора, которые получили подписчики{oldest ? `, с ${fmtWhen(oldest).slice(0, 10)}` : ''}. Свежие сверху, хранятся последние 90 дней. Время — по вашему часовому поясу. Под каждым решением — что было дальше: итог из еженедельного разбора и куда пошла цена после сигнала.
       </div>
       <MonthTotals />
+      <JournalCalendar
+        items={items}
+        outOf={(v) => outOf.get(outKey(v.time, v.instrument, v.side))}
+        onPick={(day) => {
+          const el = document.querySelector(`[data-day="${day}"]`);
+          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          setFlash(day);
+          window.setTimeout(() => setFlash((f) => (f === day ? null : f)), 2600);
+        }}
+      />
       {videos.length ? <VideoReviews videos={videos} currentId={vid} onPick={setVid} boxRef={box} /> : null}
       {cryptoLocked && mk === 'crypto' ? (
         <div style={{ ...card, padding: 14, color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>🔒 Журнал по крипте закрыт: решения по крипте Сергей сейчас ведёт только для себя. Сигналы по крипте подписчикам не приходят.</div>
@@ -373,7 +516,10 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
           return (
             <Fragment key={`${v.time}-${v.instrument}-${i}`}>
             {newWeek ? <WeekHeader monday={wk} video={wv} onPlay={() => wv && play(wv.id)} /> : null}
-            <div style={{ ...card, padding: 12 }}>
+            <div
+              data-day={i === 0 || dayOf(items[i - 1].time) !== dayOf(v.time) ? dayOf(v.time) : undefined}
+              style={{ ...card, padding: 12, scrollMarginTop: 12, transition: 'box-shadow .3s', ...(flash === dayOf(v.time) ? { boxShadow: `0 0 0 2px ${ACCENT}` } : null) }}
+            >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                 {/* 10.10.2026, его слово: «дата и время сигнала в журнале — очень заметно, но не очень крупно» —
                     плашка с золотой рамкой: подпись «сигнал» и фактическое время прихода сигнала (было 11px серым) */}
