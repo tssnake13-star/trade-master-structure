@@ -269,7 +269,8 @@ function MonthTotals() {
               ))}
             </div>
             <div style={{ color: DIM, fontSize: 11.5, marginTop: 4 }}>
-              {loss} {plural(loss, 'стоп', 'стопа', 'стопов')} по 1 · {m.wins} {plural(m.wins, 'тейк', 'тейка', 'тейков')}, в среднем по {fmtNum(avg)}
+              {/* 19.10.2026, его слово: «не хватает информации о винрейте… и в календарях в итогах тоже» */}
+              винрейт <b style={{ color: FG }}>{Math.round((m.wins / m.trades) * 100)}%</b> ({m.wins} из {m.trades}) · {loss} {plural(loss, 'стоп', 'стопа', 'стопов')} по 1 · {m.wins} {plural(m.wins, 'тейк', 'тейка', 'тейков')}, в среднем по {fmtNum(avg)}
             </div>
           </div>
         );
@@ -336,9 +337,16 @@ function MonthGrid({ ym, by, onPick, big }: { ym: string; by: Map<string, DayMar
   const off = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7;
   // 19.10.2026, его слово: «плюс три девять чего… хотя бы R добавь… стопов не 4, стопов получается 9,3» — суммы
   // по сделкам в R, а не число дней: 8 октября четыре ордера в минус −5,3 R — это не один стоп
-  let plus = 0, minus = 0;
-  for (const [k, x] of by) if (k.startsWith(ym)) for (const t of x.trades) { if (t > 0) plus += t; else minus -= t; }
+  let plus = 0, minus = 0, wins = 0, losses = 0;
+  for (const [k, x] of by)
+    if (k.startsWith(ym))
+      for (const t of x.trades) {
+        if (t > 0) { plus += t; wins += 1; } else if (t < 0) { minus -= t; losses += 1; }
+      }
   const sum = plus - minus;
+  const wr = wins + losses ? Math.round((wins / (wins + losses)) * 100) : null;
+  const avgWin = wins ? plus / wins : 0;
+  const avgLoss = losses ? minus / losses : 0;
   const R = (v: number) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${fmtNum(Math.abs(v))} R`;
   return (
     <div style={{ minWidth: 0 }}>
@@ -354,6 +362,12 @@ function MonthGrid({ ym, by, onPick, big }: { ym: string; by: Map<string, DayMar
             </>
           ) : null}
         </div>
+        {wr != null ? (
+          <div style={{ fontFamily: MONO, fontSize: 11.5, color: DIM, marginTop: 2 }}>
+            винрейт <span style={{ color: FG, fontWeight: 700 }}>{wr}%</span> ({wins} из {wins + losses})
+            {wins && losses ? <> · тейк в среднем в {fmtNum(avgWin / avgLoss)} раза больше стопа</> : null}
+          </div>
+        ) : null}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', gap: 4 }}>
         {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map((d) => (
