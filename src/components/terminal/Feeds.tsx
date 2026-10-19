@@ -243,7 +243,7 @@ function MonthTotals() {
   const U = 9;
   return (
     <div style={{ ...card, padding: 12, marginBottom: 12 }}>
-      <div style={{ ...label, marginBottom: 8 }}>Мой счёт: итог последних трёх месяцев</div>
+      <div style={{ ...label, marginBottom: 8 }}>Мой счёт: итог последних трёх месяцев · по таблице счёта</div>
       <div style={{ fontSize: 13, lineHeight: 1.55, color: FG, marginBottom: 12, padding: '8px 10px', borderLeft: `3px solid ${ACCENT}`, background: `${ACCENT}10`, borderRadius: 6 }}>
         Прибыльных сделок у меня около 1 из 4. Зато прибыльная в среднем в 9,5 раза больше убыточной, поэтому месяц закрывается в плюсе.
       </div>
@@ -463,7 +463,7 @@ function JournalCalendar({ items, outOf, onPick }: { items: Verdict[]; outOf: (v
       {/* стрелки — в строке над календарём: сбоку они съедали ширину клеток на телефоне */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 10 }}>
         {arrow(-1, canBack)}
-        <div style={{ ...label }}>Календарь решений</div>
+        <div style={{ ...label }}>Календарь решений · по журналу</div>
         {arrow(1, canFwd)}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${months.length}, minmax(0, 1fr))`, gap: 22 }}>
@@ -482,6 +482,13 @@ function JournalCalendar({ items, outOf, onPick }: { items: Verdict[]; outOf: (v
         </span>
       </div>
       <div style={{ color: DIM, fontSize: 12.5, marginTop: 6 }}>Число — результат сделки в R: 1 R — это один стоп. Несколько сделок за день — отдельными квадратиками. Нажмите на день — откроются решения этого дня в списке.</div>
+      {/* 19.10.2026, его вопрос: «в сентябре наверху винрейт 30% (3 из 10), а в календаре 38% (3 из 8) — нестыковка».
+          Два разных источника: блок выше — таблица счёта (по дню закрытия, все сделки счёта), календарь — журнал решений
+          (по дню решения, только записанные здесь итоги). Сводить их в одно число нельзя — подписываем разницу. */}
+      <div style={{ color: DIM, fontSize: 12.5, marginTop: 6 }}>
+        Календарь считает сделки по моим решениям в этом журнале, по дню решения. Блок «Мой счёт» выше считает по счёту: по
+        дню закрытия сделки и все сделки счёта. Поэтому числа за месяц в них немного отличаются.
+      </div>
     </div>
   );
 }
