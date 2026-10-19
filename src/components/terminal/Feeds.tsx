@@ -281,26 +281,33 @@ function MonthTotals() {
   );
 }
 
-/** Итог сделки в стопах из его записи итога: «ТЕЙК 10,8 к 1» → +10,8 · «−5,3 R» → −5,3 · «СТОП» → −1 ·
- *  «БЕЗУБЫТОК», «≈ 0» → 0. Не входил, отменил, в работе — null. */
-function rOfResult(r?: string): number | null {
-  if (!r || !/ВОШЁЛ/.test(r) || /В РАБОТЕ|ЖДЁТ/.test(r)) return null;
+/** Сделки решения в R из его записи итога — каждая отдельно (19.10.2026, его слово «надо было их разделить… в одном
+ *  квадратике два тейка показать»): «ТЕЙК 10,8 к 1» → [+10,8] · «2 СТОПА · −2 R» → [−1, −1] · «СТОП · ПЕРЕЗАХОД · ТЕЙК 9,5 к 1»
+ *  → [−1, +9,5] · «−5,3 R (4 ордера)» → [−5,3] · «БЕЗУБЫТОК», «≈ 0» → [0]. Не входил, отменил, в работе, итог не записан — []. */
+function tradesOfResult(r?: string): number[] {
+  if (!r || !/ВОШЁЛ/.test(r) || /В РАБОТЕ|ЖДЁТ/.test(r)) return [];
   const n = (x: string) => parseFloat(x.replace(',', '.'));
-  const tp = r.match(/ТЕЙК\s+([\d,.]+)\s*к\s*1/);
-  if (tp) return n(tp[1]);
-  const rr = r.match(/([−-])\s*([\d,.]+)\s*R/);
-  if (rr) return -n(rr[2]);
-  if (/БЕЗУБЫТОК|≈\s*0/.test(r)) return 0;
-  const st = r.match(/(\d+)\s*СТОП/);
-  if (st) return -parseInt(st[1], 10);
-  if (/СТОП/.test(r)) return -1;
-  return null;
+  const out: number[] = [];
+  for (const m of r.matchAll(/ТЕЙК\s+([\d,.]+)\s*к\s*1/g)) out.push(n(m[1]));
+  const cnt = r.match(/(\d+)\s*СТОП/);
+  const rr = r.match(/[−-]\s*([\d,.]+)\s*R/);
+  if (cnt) {
+    const k = parseInt(cnt[1], 10);
+    const each = rr ? -n(rr[1]) / k : -1;
+    for (let i = 0; i < k; i++) out.push(each);
+  } else if (rr) out.push(-n(rr[1]));
+  else if (/СТОП/.test(r)) out.push(-1);
+  if (!out.length && /БЕЗУБЫТОК|≈\s*0/.test(r)) out.push(0);
+  return out;
 }
+
+const fmtR1 = (v: number) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${Number.isInteger(v) ? Math.abs(v) : fmtNum(Math.abs(v))}`;
+const colorOfR = (v: number) => (v > 0 ? UP : v < 0 ? DOWN : '#4a453e');
 
 // день решения по его времени (UTC+5), как неделя в журнале
 const dayOf = (time: string) => new Date(new Date(time).getTime() + 5 * 3600e3).toISOString().slice(0, 10);
 const MONTH_NAMES = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
-const JOURNAL_FROM = '2026-09'; // 19.10.2026: август снят его словом; 01–08.09 — из таблицы решений, с 09.09 — нажатия кнопок в боте
+const JOURNAL_FROM = '2026-08'; // 19.10.2026: с августа — его решения из таблицы решений (до 09.09), дальше — нажатия кнопок в боте
 
 /** 19.10.2026, его слово: «календарь текущего месяца… чтобы можно было пролистать… с сентября… нажать на квадратик
  *  сделки и сразу перейти к решению в списке». День окрашен по итогу его решений: тейк — зелёный, стоп — красный,
@@ -321,7 +328,7 @@ function useWide(px = 900) {
   return wide;
 }
 
-type DayMark = { r: number | null; n: number; plus: number; minus: number };
+type DayMark = { trades: number[]; n: number };
 
 function MonthGrid({ ym, by, onPick, big }: { ym: string; by: Map<string, DayMark>; onPick: (day: string) => void; big: boolean }) {
   const [y, m] = ym.split('-').map(Number);
@@ -329,8 +336,9 @@ function MonthGrid({ ym, by, onPick, big }: { ym: string; by: Map<string, DayMar
   const off = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7;
   // 19.10.2026, его слово: «плюс три девять чего… хотя бы R добавь… стопов не 4, стопов получается 9,3» — суммы
   // по сделкам в R, а не число дней: 8 октября четыре ордера в минус −5,3 R — это не один стоп
-  let sum = 0, plus = 0, minus = 0;
-  for (const [k, x] of by) if (k.startsWith(ym) && x.r != null) { sum += x.r; plus += x.plus; minus += x.minus; }
+  let plus = 0, minus = 0;
+  for (const [k, x] of by) if (k.startsWith(ym)) for (const t of x.trades) { if (t > 0) plus += t; else minus -= t; }
+  const sum = plus - minus;
   const R = (v: number) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${fmtNum(Math.abs(v))} R`;
   return (
     <div style={{ minWidth: 0 }}>
@@ -355,9 +363,11 @@ function MonthGrid({ ym, by, onPick, big }: { ym: string; by: Map<string, DayMar
         {Array.from({ length: days }, (_, i) => {
           const key = `${ym}-${String(i + 1).padStart(2, '0')}`;
           const x = by.get(key);
-          const bg = !x || x.r == null ? '#1a1815' : x.r > 0 ? UP : x.r < 0 ? DOWN : '#4a453e';
-          const fg = x && x.r != null && x.r !== 0 ? '#0a0a0a' : x ? FG : '#5d574e';
-          const lab = x && x.r != null ? `${x.r > 0 ? '+' : x.r < 0 ? '−' : ''}${Number.isInteger(x.r) ? Math.abs(x.r) : fmtNum(Math.abs(x.r))}` : '';
+          const tr = x ? x.trades : [];
+          // одна сделка — клетка её цвета; несколько — каждая своим квадратиком внутри клетки
+          const one = tr.length === 1 ? tr[0] : null;
+          const bg = one != null ? colorOfR(one) : '#1a1815';
+          const fg = one != null && one !== 0 ? '#0a0a0a' : x ? FG : '#5d574e';
           return (
             <button
               key={key}
@@ -367,11 +377,27 @@ function MonthGrid({ ym, by, onPick, big }: { ym: string; by: Map<string, DayMar
               style={{
                 minHeight: 46, borderRadius: 7, border: 'none', background: bg, color: fg, padding: '3px 4px',
                 display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'stretch',
-                cursor: x ? 'pointer' : 'default', boxShadow: x && x.r == null ? 'inset 0 0 0 2px #6a6256' : undefined,
+                cursor: x ? 'pointer' : 'default', boxShadow: x && !tr.length ? 'inset 0 0 0 2px #6a6256' : undefined,
               }}
             >
               <span style={{ fontSize: 11, textAlign: 'left', opacity: 0.85 }}>{i + 1}</span>
-              <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: big ? 15 : 12.5, textAlign: 'center', lineHeight: 1.1, whiteSpace: 'nowrap', letterSpacing: big ? 0 : '-0.03em' }}>{lab}</span>
+              {one != null ? (
+                <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: big ? 15 : 12.5, textAlign: 'center', lineHeight: 1.1, whiteSpace: 'nowrap', letterSpacing: big ? 0 : '-0.03em' }}>{fmtR1(one)}</span>
+              ) : tr.length > 1 ? (
+                <span style={{ display: 'flex', flexWrap: 'wrap', gap: 2, justifyContent: 'center', marginTop: 2 }}>
+                  {tr.map((t, j) => (
+                    <span
+                      key={j}
+                      style={{
+                        background: colorOfR(t), color: t !== 0 ? '#0a0a0a' : FG, borderRadius: 3, padding: '0 3px',
+                        fontFamily: MONO, fontWeight: 700, fontSize: big ? 11.5 : 9.5, lineHeight: '15px', whiteSpace: 'nowrap',
+                      }}
+                    >
+                      {fmtR1(t)}
+                    </span>
+                  ))}
+                </span>
+              ) : null}
             </button>
           );
         })}
@@ -397,14 +423,9 @@ function JournalCalendar({ items, outOf, onPick }: { items: Verdict[]; outOf: (v
   const by = new Map<string, DayMark>();
   for (const v of items) {
     const d = dayOf(v.time);
-    const cur = by.get(d) || { r: null, n: 0, plus: 0, minus: 0 };
-    const r = rOfResult(outOf(v)?.result);
+    const cur = by.get(d) || { trades: [], n: 0 };
     cur.n += 1;
-    if (r != null) {
-      cur.r = (cur.r ?? 0) + r;
-      if (r > 0) cur.plus += r;
-      if (r < 0) cur.minus += -r;
-    }
+    cur.trades.push(...tradesOfResult(outOf(v)?.result));
     by.set(d, cur);
   }
   const arrow = (k: number, ok: boolean) => (
@@ -444,7 +465,7 @@ function JournalCalendar({ items, outOf, onPick }: { items: Verdict[]; outOf: (v
           без входа или итог позже
         </span>
       </div>
-      <div style={{ color: DIM, fontSize: 12.5, marginTop: 6 }}>Число в клетке — итог дня в R: 1 R — это один стоп. Нажмите на день — откроются решения этого дня в списке.</div>
+      <div style={{ color: DIM, fontSize: 12.5, marginTop: 6 }}>Число — результат сделки в R: 1 R — это один стоп. Несколько сделок за день — отдельными квадратиками. Нажмите на день — откроются решения этого дня в списке.</div>
     </div>
   );
 }
