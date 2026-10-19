@@ -17,8 +17,8 @@ const DualCTASection = () => {
               Посмотреть самому
             </p>
             <p className="text-sm text-muted-foreground mb-6">
-              7 дней терминала ECHO-GATE INSIDE бесплатно. Бот в Telegram пришлёт регистрацию: сразу откроются
-              вводный курс и терминал, карту привязывать не нужно.
+              7 дней терминала ECHO-GATE INSIDE бесплатно. Сначала бот в Telegram задаст 4 коротких вопроса:
+              так я пойму, подходит ли вам система. Если подходит, терминал откроется прямо в Telegram.
             </p>
             <a
               href={TELEGRAM_LINKS.trial}

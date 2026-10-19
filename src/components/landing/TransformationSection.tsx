@@ -64,7 +64,7 @@ const TransformationSection = () => {
           <p className="mt-4 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '58ch' }}>
             Свинг на неделе и дневке: сделка живёт днями, и сидеть у графика ради неё не нужно.
             Так устроена неделя на подписке ECHO-GATE INSIDE. Первые 7 дней терминал можно смотреть
-            бесплатно.
+            бесплатно: сначала 4 коротких вопроса в Telegram-боте.
           </p>
         </div>
 

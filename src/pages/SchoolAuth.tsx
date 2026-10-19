@@ -160,14 +160,15 @@ export default function SchoolAuth() {
             11.10.2026: до формы человек видит, что именно получит (разбор плана GPT, п.19) */}
         {!isLogin && (
           <div className="-mt-4 mb-6 text-sm leading-relaxed px-2" style={{ color: '#a8a090' }}>
-            <p className="text-center">Регистрация бесплатная. Сразу откроются:</p>
-            <ul className="mt-2 grid gap-1">
-              <li>· вводный курс;</li>
-              <li>
-                · терминал ECHO-GATE INSIDE на 7 дней: журнал моих решений с задержкой в 3 дня
-                и несколько инструментов целиком.
-              </li>
-            </ul>
+            {/* 19.10.2026, его «все 7 пунктов согласен»: проба терминала — только через бота после 4 вопросов */}
+            <p className="text-center">Регистрация бесплатная. Сразу откроется вводный курс.</p>
+            <p className="mt-2 text-center">
+              Терминал ECHO-GATE INSIDE на 7 дней открывает{' '}
+              <a href="https://tradeliketyo.com/trial" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
+                бот в Telegram
+              </a>{' '}
+              после 4 коротких вопросов.
+            </p>
           </div>
         )}
 

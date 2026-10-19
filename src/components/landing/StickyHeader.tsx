@@ -36,7 +36,7 @@ const StickyHeader = () => {
               (Сергей 18.10.2026: «больше не упоминай это выражение»). */}
           <span className="flex flex-col items-center leading-tight">
             <span>Попробовать терминал 7 дней</span>
-            <span className="text-xs font-normal opacity-75">бесплатно</span>
+            <span className="text-xs font-normal opacity-75">после 4 вопросов, бесплатно</span>
           </span>
           <ArrowRight className="w-5 h-5 flex-shrink-0" />
         </a>

@@ -107,7 +107,7 @@ export default function TwoPathsScheme({
           <div className="text-mono" style={{ ...MONO, color: GOLD }}>Вход · 7 дней · бесплатно</div>
           <div className="mt-1.5 text-sm text-foreground">Попробуйте систему, не изучая её</div>
           <p className="mt-1 text-xs text-muted-foreground">
-            Журнал моих решений: что я взял, от чего отказался и чем всё закончилось. Через 7 дней скажу, какой путь ваш.
+            Сначала 4 коротких вопроса в боте. Дальше журнал моих решений: что я взял, от чего отказался и чем всё закончилось. Через 7 дней скажу, какой путь ваш.
           </p>
         </div>
         <ArrowRight className="w-4 h-4 flex-shrink-0 group-hover:translate-x-1 transition-transform" style={{ color: GOLD }} />

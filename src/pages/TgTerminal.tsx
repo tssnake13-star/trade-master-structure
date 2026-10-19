@@ -42,8 +42,30 @@ interface TgData {
 
 declare global {
   interface Window {
-    Telegram?: { WebApp?: { initData: string; ready: () => void; expand: () => void; openLink?: (u: string) => void; setHeaderColor?: (c: string) => void; setBackgroundColor?: (c: string) => void } };
+    Telegram?: { WebApp?: { initData: string; ready: () => void; expand: () => void; openLink?: (u: string) => void; openTelegramLink?: (u: string) => void; setHeaderColor?: (c: string) => void; setBackgroundColor?: (c: string) => void } };
   }
+}
+
+// 19.10.2026: куда ведёт кнопка с экрана, где дальше идти некуда
+const BOT_URL = 'https://t.me/New_TradeLikeTYO_bot';
+const SERGEY_URL = 'https://t.me/tradeliketyo';
+
+function go(url: string) {
+  const w = window.Telegram?.WebApp;
+  if (url.startsWith('https://t.me/') && w?.openTelegramLink) w.openTelegramLink(url);
+  else if (w?.openLink) w.openLink(url);
+  else window.open(url, '_blank');
+}
+
+function NextBtn({ label, url }: { label: string; url: string }) {
+  return (
+    <button
+      onClick={() => go(url)}
+      style={{ background: ACCENT, color: '#0a0a0a', border: 'none', borderRadius: 10, padding: '11px 18px', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}
+    >
+      {label}
+    </button>
+  );
 }
 
 function loadTg(): Promise<void> {
@@ -247,9 +269,24 @@ export default function TgTerminal() {
             // Сюда попадает только старая общая кнопка: терминал в боте — у новых участников, полный — после подписки
             'Терминал обновился. Закройте его и откройте снова кнопкой «Терминал» внизу чата.'
           : d.reason === 'no_access'
-          ? 'Терминал в этом боте — для подписчиков сигналов. Подписка не найдена или закончилась. Продлить её можно у Сергея.'
+          ? 'Терминал в этом боте — для подписчиков ECHO-GATE INSIDE. Подписка не найдена или закончилась. Продлить её можно у Сергея.'
           : 'Не удалось проверить вход. Закройте терминал и откройте его снова из бота.';
-    return shell(<div style={{ color: FG, padding: 24, textAlign: 'center', lineHeight: 1.6 }}>{msg}</div>, false);
+    // 19.10.2026, его «все 7 пунктов согласен»: ни один экран не оставляет человека без следующего шага
+    const cta: [string, string] =
+      d.reason === 'no_init'
+        ? ['Открыть бота', BOT_URL]
+        : d.reason === 'school_pass'
+          ? ['Ответить на 4 вопроса в боте', BOT_URL]
+          : ['Написать Сергею', SERGEY_URL];
+    return shell(
+      <div style={{ color: FG, padding: 24, textAlign: 'center', lineHeight: 1.6 }}>
+        {msg}
+        <div style={{ marginTop: 18 }}>
+          <NextBtn label={cta[0]} url={cta[1]} />
+        </div>
+      </div>,
+      false,
+    );
   }
 
   const list = rows;
@@ -267,6 +304,9 @@ export default function TgTerminal() {
         Журнал моих решений открыт всем — вкладка «Решения».
         <br />
         Инструменты, машина времени и тренажёр — доступ после подписки.
+        <div style={{ marginTop: 18 }}>
+          <NextBtn label="Доступ после подписки — написать Сергею" url={SERGEY_URL} />
+        </div>
       </div>
     );
   } else if (tab === 'inst') {
@@ -276,7 +316,8 @@ export default function TgTerminal() {
           <div style={{ color: DIM, fontSize: 13, marginBottom: 8, lineHeight: 1.5 }}>
             {/* 18.10.2026, его слово: «все инструменты в веб-версии» — обман, там у нового человека та же проба; «лучше
                 написать: все инструменты после подписки» */}
-            Инструменты для примера: так система разбирает рынок — неделя, шаг 1; дневка, шаг 2. Все инструменты — после подписки.
+            Инструменты для примера: так система разбирает рынок — неделя, шаг 1; дневка, шаг 2. Все инструменты — после подписки.{' '}
+            <span onClick={() => go(SERGEY_URL)} style={{ color: ACCENT, cursor: 'pointer', textDecoration: 'underline' }}>Написать Сергею</span>
           </div>
         ) : null}
         <Picker rows={list} cur={r} onPick={setSym} />
@@ -299,7 +340,17 @@ export default function TgTerminal() {
   } else if (tab === 'top') {
     body = <ScreenerCards part="top" doc={d.feeds?.screener} symbols={symbols} onOpen={open} />;
   } else if (tab === 'dec') {
-    body = <VerdictsFeed doc={d.feeds?.verdicts} outcomes={d.feeds?.outcomes} videos={videos} symbols={symbols} onOpen={open} picUrl={(p) => pub(p)} privateCrypto={d.admin ? d.feeds?.verdicts_crypto || { items: [] } : undefined} />;
+    body = (
+      <>
+        {bot === 'school' ? (
+          <div style={{ color: DIM, fontSize: 12.5, marginBottom: 10, lineHeight: 1.5 }}>
+            {/* 19.10.2026: в школьном боте решения старше 3 дней (tg_terminal) — человек должен знать, почему нет свежих */}
+            Здесь мои решения старше 3 дней. Подписчики получают их сразу, в момент решения.
+          </div>
+        ) : null}
+        <VerdictsFeed doc={d.feeds?.verdicts} outcomes={d.feeds?.outcomes} videos={videos} symbols={symbols} onOpen={open} picUrl={(p) => pub(p)} privateCrypto={d.admin ? d.feeds?.verdicts_crypto || { items: [] } : undefined} />
+      </>
+    );
   } else if (tab === 'tm') {
     body = <TimeMachine doc={d.feeds?.timemachine} symbols={symbols} onOpen={open} />;
   } else if (tab === 'tr') {

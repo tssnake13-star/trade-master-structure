@@ -83,6 +83,23 @@ const CLICK_NAMES: Record<string, string> = {
   where_you_are_verdict: 'Где вы сейчас → вердикт',
   header_bot: 'Шапка сайта → бот',
   sticky_bot: 'Нижняя кнопка на телефоне → бот',
+  // 19.10.2026: кнопки «7 дней» (?start=trial)
+  hero_trial: 'Главный экран → 7 дней',
+  header_trial: 'Шапка сайта → 7 дней',
+  sticky_trial: 'Нижняя кнопка на телефоне → 7 дней',
+  final_trial: 'Финальный блок → 7 дней',
+  trades_trial: 'Сделки → 7 дней',
+  package_echo_gate_trial: 'Тариф ECHO-GATE INSIDE → 7 дней',
+  package_echo_gate: 'Тариф ECHO-GATE INSIDE',
+  landing_route_trial: 'Выбор пути (главная) → 7 дней',
+  access_route_trial: 'Выбор пути (цены) → 7 дней',
+  landing_route_echo_gate: 'Выбор пути (главная) → ECHO-GATE INSIDE',
+  access_route_echo_gate: 'Выбор пути (цены) → ECHO-GATE INSIDE',
+  landing_chooser_razbor: 'Выбор пути (главная) → разбор',
+  access_chooser_razbor: 'Выбор пути (цены) → разбор',
+  scheme_trial: 'Схема → 7 дней',
+  access_scheme_trial: 'Схема (цены) → 7 дней',
+  hero_scroll_week: 'Главный экран → как устроено',
 };
 
 const SOURCE_NAMES: Record<string, string> = {
