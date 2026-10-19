@@ -59,6 +59,9 @@ export interface Verdict {
   both_layers?: boolean;
   reason?: string;
   pic?: string | null; // 24.09.2026: картинка H4 решения в закрытом ящике terminal (verdicts/…webp)
+  // 19.10.2026: решения до кнопок в боте (до 09.09.2026) — из его таблицы решений; no_time — записан только день
+  archive?: boolean;
+  no_time?: boolean;
 }
 
 type Open = (symbol: string) => void;
@@ -297,7 +300,7 @@ function rOfResult(r?: string): number | null {
 // день решения по его времени (UTC+5), как неделя в журнале
 const dayOf = (time: string) => new Date(new Date(time).getTime() + 5 * 3600e3).toISOString().slice(0, 10);
 const MONTH_NAMES = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
-const JOURNAL_FROM = '2026-09'; // журнал нажатий его кнопок начинается 09.09.2026; раньше решения не публиковались
+const JOURNAL_FROM = '2026-08'; // 19.10.2026: с августа — его решения из таблицы (архив), с 09.09 — нажатия кнопок в боте
 
 /** 19.10.2026, его слово: «календарь текущего месяца… чтобы можно было пролистать… с сентября… нажать на квадратик
  *  сделки и сразу перейти к решению в списке». День окрашен по итогу его решений: тейк — зелёный, стоп — красный,
@@ -554,7 +557,7 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
     <div>
       <MarketSwitch value={mk} onChange={setMk} counts={counts} locked={cryptoLocked ? 'crypto' : undefined} />
       <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
-        Допуски и отказы автора, которые получили подписчики{oldest ? `, с ${fmtWhen(oldest).slice(0, 10)}` : ''}. Свежие сверху, хранятся последние 90 дней. Время — по вашему часовому поясу. Под каждым решением — что было дальше: итог из еженедельного разбора и куда пошла цена после сигнала.
+        Мои допуски и отказы{oldest ? `, с ${fmtWhen(oldest).slice(0, 10)}` : ''}. До 09.09.2026 — из моей таблицы решений, с 09.09 — то, что получили подписчики в боте. Свежие сверху, хранятся последние 90 дней. Время — по вашему часовому поясу. Под каждым решением — что было дальше: итог из еженедельного разбора и куда пошла цена после сигнала.
       </div>
       <MonthTotals />
       <div ref={calRef} style={{ scrollMarginTop: 12 }}>
@@ -623,8 +626,13 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
                   }}
                 >
                   <span style={{ fontSize: 10, fontWeight: 400, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT }}>сигнал</span>
-                  {fmtWhen(v.time)}
+                  {v.no_time ? dayOf(v.time).split('-').reverse().join('.') : fmtWhen(v.time)}
                 </span>
+                {v.archive ? (
+                  <span title="Решение до кнопок в боте — из моей таблицы решений" style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.1em', color: DIM, border: `1px dashed ${BORDER}`, borderRadius: 6, padding: '2px 7px' }}>
+                    из таблицы решений
+                  </span>
+                ) : null}
                 <span style={{ fontFamily: MONO, fontSize: 14, color: FG }}>{v.instrument}</span>
                 <span style={{ fontFamily: MONO, fontSize: 11, color: long ? UP : DOWN }}>{v.side}</span>
                 <span
