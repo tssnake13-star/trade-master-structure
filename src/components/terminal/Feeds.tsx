@@ -318,20 +318,30 @@ function useWide(px = 900) {
   return wide;
 }
 
-type DayMark = { r: number | null; n: number };
+type DayMark = { r: number | null; n: number; plus: number; minus: number };
 
 function MonthGrid({ ym, by, onPick, big }: { ym: string; by: Map<string, DayMark>; onPick: (day: string) => void; big: boolean }) {
   const [y, m] = ym.split('-').map(Number);
   const days = new Date(Date.UTC(y, m, 0)).getUTCDate();
   const off = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7;
-  let sum = 0, take = 0, stop = 0;
-  for (const [k, x] of by) if (k.startsWith(ym) && x.r != null) { sum += x.r; if (x.r > 0) take += 1; else if (x.r < 0) stop += 1; }
+  // 19.10.2026, его слово: «плюс три девять чего… хотя бы R добавь… стопов не 4, стопов получается 9,3» — суммы
+  // по сделкам в R, а не число дней: 8 октября четыре ордера в минус −5,3 R — это не один стоп
+  let sum = 0, plus = 0, minus = 0;
+  for (const [k, x] of by) if (k.startsWith(ym) && x.r != null) { sum += x.r; plus += x.plus; minus += x.minus; }
+  const R = (v: number) => `${v > 0 ? '+' : v < 0 ? '−' : ''}${fmtNum(Math.abs(v))} R`;
   return (
     <div style={{ minWidth: 0 }}>
       <div style={{ textAlign: 'center', marginBottom: 8 }}>
         <b style={{ fontSize: 15, color: FG }}>{MONTH_NAMES[m - 1]} {y}</b>
         <div style={{ fontFamily: MONO, fontSize: 12.5, fontWeight: 700, color: sum > 0 ? UP : sum < 0 ? DOWN : DIM }}>
-          {take || stop ? `${sum > 0 ? '+' : sum < 0 ? '−' : ''}${fmtNum(Math.abs(sum))} · тейков ${take}, стопов ${stop}` : 'итогов пока нет'}
+          {plus || minus ? `итог ${R(sum)}` : 'итогов пока нет'}
+        </div>
+        <div style={{ fontFamily: MONO, fontSize: 11.5, color: DIM, marginTop: 2 }}>
+          {plus || minus ? (
+            <>
+              тейки <span style={{ color: UP }}>{R(plus)}</span> · стопы <span style={{ color: DOWN }}>{R(-minus)}</span>
+            </>
+          ) : null}
         </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', gap: 4 }}>
@@ -384,10 +394,14 @@ function JournalCalendar({ items, outOf, onPick }: { items: Verdict[]; outOf: (v
   const by = new Map<string, DayMark>();
   for (const v of items) {
     const d = dayOf(v.time);
-    const cur = by.get(d) || { r: null, n: 0 };
+    const cur = by.get(d) || { r: null, n: 0, plus: 0, minus: 0 };
     const r = rOfResult(outOf(v)?.result);
     cur.n += 1;
-    if (r != null) cur.r = (cur.r ?? 0) + r;
+    if (r != null) {
+      cur.r = (cur.r ?? 0) + r;
+      if (r > 0) cur.plus += r;
+      if (r < 0) cur.minus += -r;
+    }
     by.set(d, cur);
   }
   const arrow = (k: number, ok: boolean) => (
@@ -427,7 +441,7 @@ function JournalCalendar({ items, outOf, onPick }: { items: Verdict[]; outOf: (v
           без входа или итог позже
         </span>
       </div>
-      <div style={{ color: DIM, fontSize: 12.5, marginTop: 6 }}>Число в клетке — итог дня в стопах. Нажмите на день — откроются решения этого дня в списке.</div>
+      <div style={{ color: DIM, fontSize: 12.5, marginTop: 6 }}>Число в клетке — итог дня в R: 1 R — это один стоп. Нажмите на день — откроются решения этого дня в списке.</div>
     </div>
   );
 }
