@@ -302,57 +302,47 @@ const JOURNAL_FROM = '2026-09'; // журнал нажатий его кнопо
 /** 19.10.2026, его слово: «календарь текущего месяца… чтобы можно было пролистать… с сентября… нажать на квадратик
  *  сделки и сразу перейти к решению в списке». День окрашен по итогу его решений: тейк — зелёный, стоп — красный,
  *  безубыток — серый, решения без входа или ещё без итога — рамкой. Нажатие — к первому решению дня в списке. */
-function JournalCalendar({ items, outOf, onPick }: { items: Verdict[]; outOf: (v: Verdict) => Outcome | undefined; onPick: (day: string) => void }) {
-  const now = dayOf(new Date().toISOString()).slice(0, 7);
-  const [ym, setYm] = useState(now);
-  const shift = (k: number) => {
-    const [y, m] = ym.split('-').map(Number);
-    const d = new Date(Date.UTC(y, m - 1 + k, 1));
-    const next = d.toISOString().slice(0, 7);
-    if (next >= JOURNAL_FROM && next <= now) setYm(next);
-  };
-  const by = new Map<string, { r: number | null; n: number }>();
-  for (const v of items) {
-    const d = dayOf(v.time);
-    if (!d.startsWith(ym)) continue;
-    const cur = by.get(d) || { r: null, n: 0 };
-    const r = rOfResult(outOf(v)?.result);
-    cur.n += 1;
-    if (r != null) cur.r = (cur.r ?? 0) + r;
-    by.set(d, cur);
-  }
+const ymShift = (ym: string, k: number) => {
+  const [y, m] = ym.split('-').map(Number);
+  return new Date(Date.UTC(y, m - 1 + k, 1)).toISOString().slice(0, 7);
+};
+
+// 19.10.2026, его слово: «в веб-версии календарь огромный… сделать три календаря в ряд» — от 900 px три месяца
+function useWide(px = 900) {
+  const [wide, setWide] = useState(() => typeof window !== 'undefined' && window.innerWidth >= px);
+  useEffect(() => {
+    const on = () => setWide(window.innerWidth >= px);
+    window.addEventListener('resize', on);
+    return () => window.removeEventListener('resize', on);
+  }, [px]);
+  return wide;
+}
+
+type DayMark = { r: number | null; n: number };
+
+function MonthGrid({ ym, by, onPick, big }: { ym: string; by: Map<string, DayMark>; onPick: (day: string) => void; big: boolean }) {
   const [y, m] = ym.split('-').map(Number);
   const days = new Date(Date.UTC(y, m, 0)).getUTCDate();
   const off = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7;
   let sum = 0, take = 0, stop = 0;
-  for (const x of by.values()) if (x.r != null) { sum += x.r; if (x.r > 0) take += 1; else if (x.r < 0) stop += 1; }
-  const arrow = (k: number, dis: boolean) => (
-    <button onClick={() => shift(k)} disabled={dis} style={{ ...pill(false), padding: '4px 12px', opacity: dis ? 0.3 : 1, cursor: dis ? 'default' : 'pointer' }}>
-      {k < 0 ? '←' : '→'}
-    </button>
-  );
+  for (const [k, x] of by) if (k.startsWith(ym) && x.r != null) { sum += x.r; if (x.r > 0) take += 1; else if (x.r < 0) stop += 1; }
   return (
-    <div style={{ ...card, padding: 12, marginBottom: 12 }}>
-      <div style={{ ...label, marginBottom: 8 }}>Календарь решений</div>
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 8, marginBottom: 8 }}>
-        {arrow(-1, ym <= JOURNAL_FROM)}
-        <div style={{ textAlign: 'center' }}>
-          <b style={{ fontSize: 14, color: FG }}>{MONTH_NAMES[m - 1]} {y}</b>
-          <div style={{ fontFamily: MONO, fontSize: 11, color: sum > 0 ? UP : sum < 0 ? DOWN : DIM }}>
-            {take || stop ? `${sum > 0 ? '+' : sum < 0 ? '−' : ''}${fmtNum(Math.abs(sum))} · тейков ${take}, стопов ${stop}` : 'итогов пока нет'}
-          </div>
+    <div style={{ minWidth: 0 }}>
+      <div style={{ textAlign: 'center', marginBottom: 8 }}>
+        <b style={{ fontSize: 15, color: FG }}>{MONTH_NAMES[m - 1]} {y}</b>
+        <div style={{ fontFamily: MONO, fontSize: 12.5, fontWeight: 700, color: sum > 0 ? UP : sum < 0 ? DOWN : DIM }}>
+          {take || stop ? `${sum > 0 ? '+' : sum < 0 ? '−' : ''}${fmtNum(Math.abs(sum))} · тейков ${take}, стопов ${stop}` : 'итогов пока нет'}
         </div>
-        {arrow(1, ym >= now)}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', gap: 4 }}>
         {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map((d) => (
-          <div key={d} style={{ fontFamily: MONO, fontSize: 10, color: DIM, textAlign: 'center' }}>{d}</div>
+          <div key={d} style={{ fontFamily: MONO, fontSize: 11, color: DIM, textAlign: 'center' }}>{d}</div>
         ))}
         {Array.from({ length: off }, (_, i) => <div key={'e' + i} />)}
         {Array.from({ length: days }, (_, i) => {
           const key = `${ym}-${String(i + 1).padStart(2, '0')}`;
           const x = by.get(key);
-          const bg = !x ? '#1a1815' : x.r == null ? '#1a1815' : x.r > 0 ? UP : x.r < 0 ? DOWN : '#4a453e';
+          const bg = !x || x.r == null ? '#1a1815' : x.r > 0 ? UP : x.r < 0 ? DOWN : '#4a453e';
           const fg = x && x.r != null && x.r !== 0 ? '#0a0a0a' : x ? FG : '#5d574e';
           const lab = x && x.r != null ? `${x.r > 0 ? '+' : x.r < 0 ? '−' : ''}${Number.isInteger(x.r) ? Math.abs(x.r) : fmtNum(Math.abs(x.r))}` : '';
           return (
@@ -362,30 +352,82 @@ function JournalCalendar({ items, outOf, onPick }: { items: Verdict[]; outOf: (v
               onClick={() => x && onPick(key)}
               title={x ? `${x.n} ${plural(x.n, 'решение', 'решения', 'решений')} — открыть в списке` : undefined}
               style={{
-                aspectRatio: '1', borderRadius: 6, border: 'none', background: bg, color: fg, position: 'relative', padding: 3,
-                textAlign: 'left', fontSize: 10, cursor: x ? 'pointer' : 'default',
-                boxShadow: x && x.r == null ? 'inset 0 0 0 2px #5b544a' : undefined,
+                minHeight: 46, borderRadius: 7, border: 'none', background: bg, color: fg, padding: '3px 4px',
+                display: 'flex', flexDirection: 'column', justifyContent: 'space-between', alignItems: 'stretch',
+                cursor: x ? 'pointer' : 'default', boxShadow: x && x.r == null ? 'inset 0 0 0 2px #6a6256' : undefined,
               }}
             >
-              <span style={{ position: 'absolute', top: 3, left: 4 }}>{i + 1}</span>
-              {lab ? <span style={{ position: 'absolute', bottom: 3, right: 4, fontFamily: MONO, fontWeight: 700, fontSize: 11 }}>{lab}</span> : null}
+              <span style={{ fontSize: 11, textAlign: 'left', opacity: 0.85 }}>{i + 1}</span>
+              <span style={{ fontFamily: MONO, fontWeight: 700, fontSize: big ? 15 : 12.5, textAlign: 'center', lineHeight: 1.1, whiteSpace: 'nowrap', letterSpacing: big ? 0 : '-0.03em' }}>{lab}</span>
             </button>
           );
         })}
       </div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, fontSize: 11.5, color: DIM, marginTop: 8 }}>
+    </div>
+  );
+}
+
+/** 19.10.2026, его слово: «календарь текущего месяца… чтобы можно было пролистать… с сентября… нажать на квадратик
+ *  сделки и сразу перейти к решению в списке». День окрашен по итогу его решений: тейк — зелёный, стоп — красный,
+ *  безубыток — серый, решения без входа или ещё без итога — рамкой. Нажатие — к первому решению дня в списке.
+ *  В тот же день: «в веб-версии огромный… три календаря в ряд… цифры намного больше… кнопки вперёд-назад еле
+ *  заметные» — на широком экране три месяца, на телефоне один; цифры крупнее, стрелки золотые. */
+function JournalCalendar({ items, outOf, onPick }: { items: Verdict[]; outOf: (v: Verdict) => Outcome | undefined; onPick: (day: string) => void }) {
+  const wide = useWide();
+  const now = dayOf(new Date().toISOString()).slice(0, 7);
+  const [end, setEnd] = useState(now);
+  const count = wide ? 3 : 1;
+  const months = Array.from({ length: count }, (_, i) => ymShift(end, i - count + 1)).filter((x) => x >= JOURNAL_FROM);
+  const first = months[0] || end;
+  const canBack = first > JOURNAL_FROM;
+  const canFwd = end < now;
+  const by = new Map<string, DayMark>();
+  for (const v of items) {
+    const d = dayOf(v.time);
+    const cur = by.get(d) || { r: null, n: 0 };
+    const r = rOfResult(outOf(v)?.result);
+    cur.n += 1;
+    if (r != null) cur.r = (cur.r ?? 0) + r;
+    by.set(d, cur);
+  }
+  const arrow = (k: number, ok: boolean) => (
+    <button
+      onClick={() => ok && setEnd(ymShift(end, k))}
+      disabled={!ok}
+      aria-label={k < 0 ? 'Предыдущий месяц' : 'Следующий месяц'}
+      style={{
+        flex: 'none', width: 44, height: 44, borderRadius: 10, fontSize: 22, fontWeight: 700, lineHeight: 1,
+        border: `1.5px solid ${ok ? ACCENT : BORDER}`, background: ok ? `${ACCENT}22` : 'transparent',
+        color: ok ? ACCENT : '#4a453e', cursor: ok ? 'pointer' : 'default',
+      }}
+    >
+      {k < 0 ? '←' : '→'}
+    </button>
+  );
+  return (
+    <div style={{ ...card, padding: 12, marginBottom: 12 }}>
+      {/* стрелки — в строке над календарём: сбоку они съедали ширину клеток на телефоне */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 10 }}>
+        {arrow(-1, canBack)}
+        <div style={{ ...label }}>Календарь решений</div>
+        {arrow(1, canFwd)}
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: `repeat(${months.length}, minmax(0, 1fr))`, gap: 22 }}>
+        {months.map((ym) => <MonthGrid key={ym} ym={ym} by={by} onPick={onPick} big={wide} />)}
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, fontSize: 12.5, color: DIM, marginTop: 10 }}>
         {[[UP, 'тейк'], [DOWN, 'стоп'], ['#4a453e', 'безубыток']].map(([c, n]) => (
-          <span key={n} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-            <i style={{ width: 11, height: 11, borderRadius: 3, background: c, display: 'inline-block' }} />
+          <span key={n} style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <i style={{ width: 13, height: 13, borderRadius: 3, background: c, display: 'inline-block' }} />
             {n}
           </span>
         ))}
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-          <i style={{ width: 11, height: 11, borderRadius: 3, boxShadow: 'inset 0 0 0 2px #5b544a', display: 'inline-block' }} />
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          <i style={{ width: 13, height: 13, borderRadius: 3, boxShadow: 'inset 0 0 0 2px #6a6256', display: 'inline-block' }} />
           без входа или итог позже
         </span>
       </div>
-      <div style={{ color: DIM, fontSize: 11.5, marginTop: 6 }}>Число в клетке — итог дня в стопах. Нажмите на день — откроются решения этого дня в списке.</div>
+      <div style={{ color: DIM, fontSize: 12.5, marginTop: 6 }}>Число в клетке — итог дня в стопах. Нажмите на день — откроются решения этого дня в списке.</div>
     </div>
   );
 }
@@ -444,6 +486,17 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
   const [vid, setVid] = useState<string | null>(null);
   // 19.10.2026: день, выбранный в календаре, — его решения в списке подсвечены пару секунд
   const [flash, setFlash] = useState<string | null>(null);
+  // 19.10.2026, его слово: «перешёл к решению в списке… чтобы вернуться к календарю, приходится листать долго» —
+  // плавающая кнопка «к календарю», пока календарь ушёл вверх за экран
+  const calRef = useRef<HTMLDivElement>(null);
+  const [calAbove, setCalAbove] = useState(false);
+  useEffect(() => {
+    const el = calRef.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(([e]) => setCalAbove(!e.isIntersecting && e.boundingClientRect.top < 0));
+    io.observe(el);
+    return () => io.disconnect();
+  });
   const box = useRef<HTMLDivElement>(null);
   const videoOf = new Map(videos.map((x) => [x.week, x]));
   const play = (id: string) => {
@@ -490,6 +543,7 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
         Допуски и отказы автора, которые получили подписчики{oldest ? `, с ${fmtWhen(oldest).slice(0, 10)}` : ''}. Свежие сверху, хранятся последние 90 дней. Время — по вашему часовому поясу. Под каждым решением — что было дальше: итог из еженедельного разбора и куда пошла цена после сигнала.
       </div>
       <MonthTotals />
+      <div ref={calRef} style={{ scrollMarginTop: 12 }}>
       <JournalCalendar
         items={items}
         outOf={(v) => outOf.get(outKey(v.time, v.instrument, v.side))}
@@ -500,6 +554,20 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
           window.setTimeout(() => setFlash((f) => (f === day ? null : f)), 2600);
         }}
       />
+      </div>
+      {calAbove ? (
+        <button
+          onClick={() => calRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+          style={{
+            position: 'fixed', right: 14, bottom: 'calc(92px + env(safe-area-inset-bottom))', zIndex: 55,
+            padding: '11px 16px', borderRadius: 999, border: `1.5px solid ${ACCENT}`, background: '#16130e',
+            color: ACCENT, fontFamily: MONO, fontSize: 13, fontWeight: 700, letterSpacing: '0.04em',
+            boxShadow: '0 8px 24px rgba(0,0,0,.55)', cursor: 'pointer',
+          }}
+        >
+          ↑ К календарю
+        </button>
+      ) : null}
       {videos.length ? <VideoReviews videos={videos} currentId={vid} onPick={setVid} boxRef={box} /> : null}
       {cryptoLocked && mk === 'crypto' ? (
         <div style={{ ...card, padding: 14, color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>🔒 Журнал по крипте закрыт: решения по крипте Сергей сейчас ведёт только для себя. Сигналы по крипте подписчикам не приходят.</div>
