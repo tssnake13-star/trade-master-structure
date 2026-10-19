@@ -299,7 +299,9 @@ function tradesOfResult(r?: string): number[] {
   } else if (rr) out.push(-n(rr[1]));
   const pr = r.match(/\+\s*([\d,.]+)\s*R/); // «+1,4 R» — закрыт в плюс не по тейку (CADCHF 27.07)
   if (pr) out.push(n(pr[1]));
-  else if (/СТОП/.test(r)) out.push(-1);
+  // 19.10.2026, его «почему сентябрь опять 27%… убери один стоп 8-го»: «2 СТОПА · −2 R» давало три стопа — голый «СТОП»
+  // считается одним стопом, только если число стопов и «−X R» не записаны
+  if (!cnt && !rr && /СТОП/.test(r)) out.push(-1);
   if (!out.length && /БЕЗУБЫТОК|≈\s*0/.test(r)) out.push(0);
   return out;
 }
