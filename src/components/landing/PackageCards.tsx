@@ -2,10 +2,12 @@ import { ArrowRight, Check, ShieldCheck, X } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
 import { nextStreamLabel } from '@/lib/practicum';
+import { ECOSYSTEM, STUDY_PRICES } from '@/lib/prices';
 
 /**
- * PackageCards — shared package/pricing cards used on the homepage (without
- * prices) and on the hidden /access page (with prices).
+ * PackageCards — shared package/pricing cards used on the homepage and on the /access page.
+ * 20.10.2026, Сергей: на главной цены курса, практикума и подписки, у VIP цены нет;
+ * на /access видно всё (её Сергей присылает лично).
  *
  * Линейка «вход и два пути» (Сергей 07.10.2026): первым идёт путь 01 —
  * подписка ECHO-GATE INSIDE для всех; дальше путь 02 — Trade System одной
@@ -92,8 +94,8 @@ const PACKAGES: Pkg[] = [
       },
     ],
     outcome: 'Для тех, кто уже торговал, умеет работать самостоятельно и ищет систему, а не мотивацию со стороны.',
-    price: '$349',
-    period: '365 дней',
+    price: STUDY_PRICES.tradeSystem.price,
+    period: STUDY_PRICES.tradeSystem.period,
     ctaText: 'Начать самостоятельно',
     ctaHref: TELEGRAM_LINKS.dm,
     showPriceAlways: true,
@@ -125,8 +127,8 @@ const PACKAGES: Pkg[] = [
     upsell: 'В течение 67 дней (60 дней потока плюс неделя после) оплаченные $499 засчитываются в VIP полностью. Доплата $2491. После практикума подписка ECHO-GATE INSIDE подключается сразу.',
     upsellPublic: 'В течение 67 дней (60 дней потока плюс неделя после) оплаченное засчитывается в VIP полностью. После практикума подписка ECHO-GATE INSIDE подключается сразу.',
     outcome: 'Шестьдесят дней мы принимаем решения вместе. Реалистично вы доходите до четвёртого этапа, и я говорю об этом сразу.',
-    price: '$499',
-    period: '60 дней',
+    price: STUDY_PRICES.practicum.price,
+    period: STUDY_PRICES.practicum.period,
     ctaText: 'Узнать про ближайший поток',
     ctaHref: TELEGRAM_LINKS.dm,
     showPriceAlways: true,
@@ -151,42 +153,17 @@ const PACKAGES: Pkg[] = [
       },
     ],
     outcome: 'Собирать инфраструктуру самому не нужно: она уже собрана и работает. Система работает, решения за вами.',
-    oldPrice: '$3499',
-    price: '$2990',
-    // 20.10.2026, его «цену открываем: в боте и на сайте»: цена VIP видна и на лендинге
-    showPriceAlways: true,
-    period: '365 дней + инструменты',
+    // 20.10.2026, его «хотя бы VIP убери»: на главной цена VIP не видна, на /access и в терминале бота видна
+    oldPrice: STUDY_PRICES.vip.oldPrice,
+    price: STUDY_PRICES.vip.price,
+    period: STUDY_PRICES.vip.period,
     ctaText: 'Получить полный доступ',
     ctaHref: TELEGRAM_LINKS.dm,
   },
 ];
 
-/**
- * Подписка на экосистему. Подарочных месяцев НЕТ (Сергей 18.09.2026): полгода —
- * ровно 6 месяцев, год — ровно 12, «в подарок» обещало месяцы, которых подписчик
- * не получит. Выгода длинного срока зашита в цену и считается от 3 месяцев:
- * $447 / 3 = $149 в месяц. Зачёркнутая цена — тот же срок по $149:
- * 6 × 149 = $894, 12 × 149 = $1788. Цену 3 месяцев не трогать.
- * Цены, зачёркнутые цены и расчёт стоят на /access. С 20.10.2026 цена открыта
- * (его «цену открываем: в боте и на сайте»): на лендинге кнопка «Посмотреть цены»
- * ведёт на /access, а не в личку.
- *
- * ⚠️ С 07.10.2026 подписка открыта всем, не только выпускникам, и советники
- * Echo Gate, Hunter Bot и Risk Sentinel входят во все сроки (решение Сергея:
- * без советника нет кнопки, а на ней держится обещание «2 действия»).
- * Правило 29.09 «советники только с 6 месяцев» отменено.
- *
- * ⚠️ 20.10.2026, решение Сергея: первый месяц $199, один раз на человека, те же терминал
- * и советники. Продлил на 3 месяца в течение этого месяца — $199 засчитываются, доплата $248,
- * 3 месяца считаются с первого дня (то же «ваши деньги не сгорают», что и мост в год).
- * Помесячной подписки по-прежнему нет: после первого месяца только 3, 6 или 12 месяцев.
- */
-const ECOSYSTEM: { price: string; oldPrice?: string; period: string; desc: string; saving?: string; featured: boolean }[] = [
-  { price: '$199', period: 'первый месяц', desc: 'Один раз на человека: ECHO-GATE INSIDE и те же советники Echo Gate, Hunter Bot и Risk Sentinel на месяц.', saving: 'Продлите на 3 месяца в течение этого месяца: $199 засчитаются, доплата $248.', featured: false },
-  { price: '$447', period: '3 месяца', desc: 'ECHO-GATE INSIDE и советники Echo Gate, Hunter Bot и Risk Sentinel в аренду на 3 месяца.', featured: false },
-  { price: '$840', oldPrice: '$894', period: '6 месяцев', desc: 'ECHO-GATE INSIDE и советники Echo Gate, Hunter Bot и Risk Sentinel в аренду на полгода.', saving: '$140 в месяц вместо $149, экономия $54.', featured: false },
-  { price: '$1490', oldPrice: '$1788', period: '12 месяцев', desc: 'ECHO-GATE INSIDE и советники Echo Gate, Hunter Bot и Risk Sentinel в аренду на год.', saving: 'Около $124 в месяц вместо $149, экономия $298.', featured: true },
-];
+// Подписка на экосистему: сроки и цены в lib/prices.ts (ECOSYSTEM), там же правила зачёта и «подарочных месяцев».
+// 20.10.2026, его «делай по плану»: цены подписки видны и на главной, прямо на карточке.
 
 const GOLD = 'hsl(var(--accent))';
 const MONO: React.CSSProperties = { fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase' };
@@ -366,30 +343,32 @@ export default function PackageCards({
         <div className="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {ECOSYSTEM.map((e) => (
             <div key={e.period} className="p-4" style={{ border: `1px solid ${e.featured ? 'hsl(var(--accent) / 0.3)' : 'hsl(var(--rule-soft))'}` }}>
+              {/* 20.10.2026, его «делай по плану»: цены подписки видны и на главной, как на /access */}
               <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                {showPrices && <span style={{ ...SERIF, fontSize: 26, color: 'hsl(var(--foreground))' }}>{e.price}</span>}
-                {showPrices && e.oldPrice && (
+                <span style={{ ...SERIF, fontSize: 26, color: 'hsl(var(--foreground))' }}>{e.price}</span>
+                {e.oldPrice && (
                   <span className="text-sm line-through" style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }}>{e.oldPrice}</span>
                 )}
-                <span className="text-mono" style={{ ...MONO, fontSize: showPrices ? 10 : 13, letterSpacing: '0.12em', color: showPrices ? 'hsl(var(--muted-foreground))' : 'hsl(var(--foreground))' }}>
-                  {showPrices ? `/ ${e.period}` : e.period}
+                <span className="text-mono" style={{ ...MONO, fontSize: 10, letterSpacing: '0.12em', color: 'hsl(var(--muted-foreground))' }}>
+                  / {e.period}
                 </span>
               </div>
               <p className="mt-1.5 text-xs text-muted-foreground">
-                {e.desc}{showPrices && e.saving && <> <b className="text-foreground/90">{e.saving}</b></>}
+                {e.desc}{e.saving && <> <b className="text-foreground/90">{e.saving}</b></>}
               </p>
             </div>
           ))}
         </div>
         <div className="mt-5 flex flex-col sm:flex-row sm:items-center gap-3">
-          {/* 20.10.2026: на лендинге цена больше не прячется за личкой — кнопка ведёт на страницу цен */}
+          {/* 20.10.2026: цены стоят на карточке и на главной, поэтому кнопка везде одна — оформить подписку в личке */}
           <a
-            href={showPrices ? TELEGRAM_LINKS.dm : '/access'}
-            {...(showPrices ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-            onClick={() => trackClick(showPrices ? 'package_echo_gate' : 'package_echo_gate_prices')}
+            href={TELEGRAM_LINKS.dm}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackClick('package_echo_gate')}
             className="btn-primary inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium group"
           >
-            {showPrices ? 'Оформить подписку' : 'Посмотреть цены'}
+            Оформить подписку
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </a>
           {/* 07.10.2026: пробный доступ на 7 дней открывается сам при регистрации в кабинете, с замками.

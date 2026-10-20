@@ -2,6 +2,7 @@ import { ArrowDown, ArrowRight } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
 import { nextStreamLabel } from '@/lib/practicum';
+import { STUDY_PRICES } from '@/lib/prices';
 
 /**
  * Верхний этаж блока цен (08.10.2026): на /access наверху страницы, на лендинге в «12 · Сотрудничество».
@@ -19,8 +20,8 @@ import { nextStreamLabel } from '@/lib/practicum';
  *   слов «сигнал» и «триггер» нет: Сергей не сигнальщик.
  * Каждый путь и каждая ступень обучения ведут к своей карточке ниже (id в PackageCards).
  *
- * ⚠️ showPrices=false (лендинг): у подписки вместо цены пробные 7 дней, цены подписки на /access.
- * 20.10.2026, его «цену открываем: в боте и на сайте»: VIP больше не «стоимость скажу лично», цена видна.
+ * ⚠️ showPrices=false (лендинг): у подписки здесь пробные 7 дней (цены подписки на её карточке ниже),
+ * у VIP «стоимость скажу лично» (Сергей 20.10.2026: «хотя бы VIP убери»). Цены из lib/prices.ts.
  */
 
 const GOLD = 'hsl(var(--accent))';
@@ -46,13 +47,14 @@ type Study = {
 };
 
 const STUDY: Study[] = [
-  { product: 'Trade System', who: 'сам, в своём темпе', price: '$349', per: '365 дней', anchor: 'trade-system', clickId: 'route_trade_system' },
-  { product: 'Практикум', who: 'вместе со мной, решения принимаем вместе', price: '$499', per: '60 дней', anchor: 'pkg-practicum', clickId: 'route_practicum' },
+  { product: 'Trade System', who: 'сам, в своём темпе', price: STUDY_PRICES.tradeSystem.price, per: STUDY_PRICES.tradeSystem.period, anchor: 'trade-system', clickId: 'route_trade_system' },
+  { product: 'Практикум', who: 'вместе со мной, решения принимаем вместе', price: STUDY_PRICES.practicum.price, per: STUDY_PRICES.practicum.period, anchor: 'pkg-practicum', clickId: 'route_practicum' },
   {
     product: 'VIP',
     who: 'всё сразу и инструменты навсегда',
-    price: '$2990',
+    price: STUDY_PRICES.vip.price,
     per: '365 дней',
+    publicPrice: { price: '', per: 'стоимость скажу лично' },
     anchor: 'pkg-trade_os_plus',
     clickId: 'route_vip',
   },
