@@ -20,6 +20,7 @@
     { "source": "/trial", "destination": "https://t.me/New_TradeLikeTYO_bot?start=trial", "permanent": false },
     { "source": "/vk", "destination": "https://t.me/New_TradeLikeTYO_bot?start=vk", "permanent": false },
     { "source": "/([Ff][Aa][Cc][Ee][Bb][Oo][Oo][Kk])", "destination": "https://t.me/New_TradeLikeTYO_bot?start=facebook", "permanent": false },
+    { "source": "/([Ii][Nn][Ss])_([Kk][Aa][Nn][Aa][Ll])", "destination": "https://t.me/tradeliketyoshkola", "permanent": false },
 
     { "source": "/([Ii][Gg])", "destination": "/?utm_source=instagram", "permanent": false },
     { "source": "/([Ii][Gg])-([Bb][Ii][Oo])", "destination": "/?utm_source=ig_bio", "permanent": false },
