@@ -11,26 +11,21 @@ import { parseJournalVideos } from '@/lib/journalVideos';
 import { SCEN_META, groupRows, scenarioRows } from '@/components/terminal/sidebarRows';
 import { GEN } from '@/components/terminal/screenerParse';
 import { UP, DOWN } from '@/components/terminal/theme';
-import { ECOSYSTEM, STUDY_PRICES } from '@/lib/prices';
 
 /**
  * 18.10.2026, его слово «Все, давай внедряй»: терминал внутри Телеграма — кнопка «Терминал» в меню бота.
  *  /tg/echo   — бот Echo-Gate, подписчики: Инструмент · Скринер · ТОП-лист · Решения;
- *  /tg/school — школьный бот, холодные: Решения · Инструмент (инструменты пробы) · Машина времени · Тренажёр · Цены
- *  (20.10.2026: цены подписки и обучения, не выходя из Телеграма; открыты всем).
+ *  /tg/school — школьный бот, холодные: Решения · Инструмент (инструменты пробы) · Машина времени · Тренажёр.
  * Его слово: «графики должны быть статичные, как в боте» — картинки бота, в машине времени рисунок бота без
  * масштаба и сдвига. Кто открыл, проверяет база (tg_terminal) по подписи Телеграма; без подписки — экран-объяснение.
  */
 
 type Bot = 'echo' | 'school';
-type Tab = 'inst' | 'scr' | 'top' | 'dec' | 'tm' | 'tr' | 'price';
+type Tab = 'inst' | 'scr' | 'top' | 'dec' | 'tm' | 'tr';
 const TABS: Record<Bot, [Tab, string, string][]> = {
   echo: [['inst', 'Инструмент', '📈'], ['scr', 'Скринер', '🔎'], ['top', 'ТОП-лист', '🏆'], ['dec', 'Решения', '📋']],
-  // 20.10.2026, его «вкладка «Цены» в терминале школьного бота, кнопки «Все цены» ведут в неё» (&tab=price)
-  school: [['dec', 'Решения', '📋'], ['inst', 'Инструмент', '📈'], ['tm', 'Машина времени', '🕰'], ['tr', 'Тренажёр', '🎯'], ['price', 'Цены', '🏷']],
+  school: [['dec', 'Решения', '📋'], ['inst', 'Инструмент', '📈'], ['tm', 'Машина времени', '🕰'], ['tr', 'Тренажёр', '🎯']],
 };
-// вкладки, открытые и после пробы, и до вопросов: журнал решений и цены
-const ALWAYS_OPEN: Tab[] = ['dec', 'price'];
 const SU = String(import.meta.env.VITE_SUPABASE_URL || '').replace(/\/$/, '');
 
 interface TgData {
@@ -184,59 +179,6 @@ export function Picker({ rows, cur, onPick }: { rows: MarketRow[]; cur: MarketRo
           })}
         </div>
       ) : null}
-    </div>
-  );
-}
-
-/** 20.10.2026, его «вкладка «Цены» в терминале школьного бота»: подписка и обучение, не выходя из Телеграма.
- *  Цены из lib/prices, те же, что на сайте. VIP здесь с ценой (его «в терминале VIP можно с ценой сделать»).
- *  Оплата у Сергея в личке, туда и кнопка. */
-function PricesTab() {
-  const head = (t: string) => (
-    <div style={{ fontSize: 11, color: ACCENT, fontFamily: MONO, letterSpacing: '0.12em', textTransform: 'uppercase', margin: '16px 0 8px' }}>{t}</div>
-  );
-  const card = (featured = false): React.CSSProperties => ({ border: `1px solid ${featured ? ACCENT : BORDER}`, borderRadius: 10, padding: '10px 12px', marginBottom: 8 });
-  const price = (p: string, old?: string, per?: string) => (
-    <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
-      <span style={{ fontSize: 22, fontWeight: 700, color: FG }}>{p}</span>
-      {old ? <span style={{ fontSize: 13, color: DIM, textDecoration: 'line-through' }}>{old}</span> : null}
-      {per ? <span style={{ fontSize: 12, color: DIM, fontFamily: MONO }}>{per}</span> : null}
-    </div>
-  );
-  const study: [string, string, { price: string; oldPrice?: string; period: string }][] = [
-    ['Trade System', 'Курс TRADE SYSTEM 2.0 и полный алгоритм системы. Проходите сами, в своём темпе.', STUDY_PRICES.tradeSystem],
-    ['Практикум', 'Живое занятие раз в неделю, разбор ваших сделок и обратная связь по каждому решению. Набор потоками, от 3 человек.', STUDY_PRICES.practicum],
-    ['VIP', 'Все пять этапов обучения и год сопровождения, ECHO-GATE INSIDE на год, индикаторы, скрипты и таблицы системы. Hunter Bot и Risk Sentinel остаются у вас навсегда.', STUDY_PRICES.vip],
-  ];
-  return (
-    <div style={{ lineHeight: 1.5 }}>
-      {head('Подписка ECHO-GATE INSIDE')}
-      <div style={{ fontSize: 13.5, color: FG, marginBottom: 10 }}>
-        Терминал находит сделку, по каждому допуску я даю вердикт. Вы отмечаете точку входа и нажимаете СТАРТ, дальше сделку ведёт советник.
-      </div>
-      {ECOSYSTEM.map((e) => (
-        <div key={e.period} style={card(e.featured)}>
-          {price(e.price, e.oldPrice, e.period)}
-          {e.tgNote || e.saving ? <div style={{ fontSize: 12.5, color: DIM, marginTop: 4 }}>{[e.tgNote, e.saving].filter(Boolean).join(' ')}</div> : null}
-        </div>
-      ))}
-      <div style={{ fontSize: 12.5, color: DIM, margin: '4px 0 6px' }}>
-        Для старта нужны MT4 или MT5 у любого брокера и VPS. После оплаты возврата нет: подписка работает как аренда на срок.
-      </div>
-      <div style={{ fontSize: 12.5, color: ACCENT }}>
-        Торговли без убытков не бывает, и я её не обещаю. Убыточные сделки бывают и подряд, зато риск каждой известен до входа.
-      </div>
-      {head('Обучение')}
-      {study.map(([name, what, p]) => (
-        <div key={name} style={card()}>
-          <div style={{ fontSize: 15, fontWeight: 700, color: FG, marginBottom: 2 }}>{name}</div>
-          {price(p.price, p.oldPrice, p.period)}
-          <div style={{ fontSize: 12.5, color: DIM, marginTop: 4 }}>{what}</div>
-        </div>
-      ))}
-      <div style={{ marginTop: 16, textAlign: 'center' }}>
-        <NextBtn label="Подключиться: написать Сергею" url={SERGEY_URL} />
-      </div>
     </div>
   );
 }
