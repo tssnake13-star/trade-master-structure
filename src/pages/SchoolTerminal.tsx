@@ -451,8 +451,9 @@ export default function SchoolTerminal() {
           </div>
           <h1 style={{ fontSize: 22, margin: '14px 0 10px' }}>{expired ? 'Срок доступа закончился' : 'Доступ пока не открыт'}</h1>
           <p style={{ color: DIM, fontSize: 14, lineHeight: 1.6 }}>
-            ECHO-GATE INSIDE открывается подпиской. Чтобы узнать стоимость и подключиться, напишите Сергею.
-            Если подписка у вас есть, а экран пустой, тоже напишите: откроем.
+            {/* 20.10.2026, его «цену открываем: в боте и на сайте» */}
+            ECHO-GATE INSIDE открывается подпиской, первый месяц стоит $199. Все цены на странице цен,
+            а подключиться можно, написав Сергею. Если подписка у вас есть, а экран пустой, тоже напишите: откроем.
           </p>
           <div style={{ display: 'flex', gap: 10, justifyContent: 'center', flexWrap: 'wrap', marginTop: 18 }}>
             <a
@@ -463,6 +464,9 @@ export default function SchoolTerminal() {
             >
               написать Сергею
             </a>
+            <button onClick={() => navigate('/access')} style={{ ...pill(false), padding: '11px 18px' }}>
+              цены
+            </button>
             <button onClick={() => navigate('/school/dashboard')} style={{ ...pill(false), padding: '11px 18px' }}>
               в кабинет
             </button>

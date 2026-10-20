@@ -153,6 +153,8 @@ const PACKAGES: Pkg[] = [
     outcome: 'Собирать инфраструктуру самому не нужно: она уже собрана и работает. Система работает, решения за вами.',
     oldPrice: '$3499',
     price: '$2990',
+    // 20.10.2026, его «цену открываем: в боте и на сайте»: цена VIP видна и на лендинге
+    showPriceAlways: true,
     period: '365 дней + инструменты',
     ctaText: 'Получить полный доступ',
     ctaHref: TELEGRAM_LINKS.dm,
@@ -165,8 +167,9 @@ const PACKAGES: Pkg[] = [
  * не получит. Выгода длинного срока зашита в цену и считается от 3 месяцев:
  * $447 / 3 = $149 в месяц. Зачёркнутая цена — тот же срок по $149:
  * 6 × 149 = $894, 12 × 149 = $1788. Цену 3 месяцев не трогать.
- * Цены, зачёркнутые цены и расчёт видны только на /access: на лендинге
- * цены подписки не раскрываются.
+ * Цены, зачёркнутые цены и расчёт стоят на /access. С 20.10.2026 цена открыта
+ * (его «цену открываем: в боте и на сайте»): на лендинге кнопка «Посмотреть цены»
+ * ведёт на /access, а не в личку.
  *
  * ⚠️ С 07.10.2026 подписка открыта всем, не только выпускникам, и советники
  * Echo Gate, Hunter Bot и Risk Sentinel входят во все сроки (решение Сергея:
@@ -379,14 +382,14 @@ export default function PackageCards({
           ))}
         </div>
         <div className="mt-5 flex flex-col sm:flex-row sm:items-center gap-3">
+          {/* 20.10.2026: на лендинге цена больше не прячется за личкой — кнопка ведёт на страницу цен */}
           <a
-            href={TELEGRAM_LINKS.dm}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackClick('package_echo_gate')}
+            href={showPrices ? TELEGRAM_LINKS.dm : '/access'}
+            {...(showPrices ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+            onClick={() => trackClick(showPrices ? 'package_echo_gate' : 'package_echo_gate_prices')}
             className="btn-primary inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium group"
           >
-            {showPrices ? 'Оформить подписку' : 'Узнать стоимость'}
+            {showPrices ? 'Оформить подписку' : 'Посмотреть цены'}
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </a>
           {/* 07.10.2026: пробный доступ на 7 дней открывается сам при регистрации в кабинете, с замками.

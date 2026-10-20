@@ -49,6 +49,9 @@ declare global {
 // 19.10.2026: куда ведёт кнопка с экрана, где дальше идти некуда
 const BOT_URL = 'https://t.me/New_TradeLikeTYO_bot';
 const SERGEY_URL = 'https://t.me/tradeliketyo';
+// 20.10.2026, разбор воронки, пункт 5: бот ставит метку n=1 тому, кто ещё не ответил на 4 вопроса. Ему открыт журнал,
+// остальное откроется после вопросов. Метка только для текста, доступ решает база по пропуску
+const AFTER_QUIZ = 'Проверка сделки, инструменты, машина времени и тренажёр откроются на 7 дней после 4 коротких вопросов в боте.';
 
 function go(url: string) {
   const w = window.Telegram?.WebApp;
@@ -192,6 +195,7 @@ export default function TgTerminal() {
   });
   const [sym, setSym] = useState<string | null>(null);
   const [kind, setKind] = useState<keyof MarketRow>('chart_cycles');
+  const fresh = useMemo(() => bot === 'school' && new URLSearchParams(window.location.search).get('n') === '1', [bot]);
 
   useEffect(() => {
     let alive = true;
@@ -263,7 +267,9 @@ export default function TgTerminal() {
         : d.reason === 'no_key'
           ? 'Терминал подключается. Откройте его снова через пару минут.'
           : d.reason === 'school_expired'
-          ? 'Журнал решений открыт всем. Полный терминал — доступ после подписки.'
+          ? fresh
+            ? `Журнал решений открыт всем. ${AFTER_QUIZ}`
+            : 'Журнал решений открыт всем. Полный терминал — доступ после подписки.'
           : d.reason === 'school_pass'
           ? // 18.10.2026 вечер, его слово: «нажимает на кнопку терминал… и вместо терминала написано „откройте терминал кнопкой“ — нелогично».
             // Сюда попадает только старая общая кнопка: терминал в боте — у новых участников, полный — после подписки
@@ -275,7 +281,7 @@ export default function TgTerminal() {
     const cta: [string, string] =
       d.reason === 'no_init'
         ? ['Открыть бота', BOT_URL]
-        : d.reason === 'school_pass'
+        : d.reason === 'school_pass' || (d.reason === 'school_expired' && fresh)
           ? ['Ответить на 4 вопроса в боте', BOT_URL]
           : ['Написать Сергею', SERGEY_URL];
     return shell(
@@ -301,11 +307,15 @@ export default function TgTerminal() {
       <div style={{ color: FG, padding: '32px 16px', textAlign: 'center', lineHeight: 1.6 }}>
         <div style={{ fontSize: 28, marginBottom: 8 }}>🔒</div>
         {/* 18.10.2026 вечер, его слово: «мои решения пускай будут для всех… доступ после подписки — вот так лучше написать» */}
-        Журнал моих решений открыт всем — вкладка «Решения».
+        {fresh ? 'Журнал решений открыт всем.' : 'Журнал моих решений открыт всем — вкладка «Решения».'}
         <br />
-        Инструменты, машина времени и тренажёр — доступ после подписки.
+        {fresh ? AFTER_QUIZ : 'Инструменты, машина времени и тренажёр — доступ после подписки.'}
         <div style={{ marginTop: 18 }}>
-          <NextBtn label="Доступ после подписки — написать Сергею" url={SERGEY_URL} />
+          {fresh ? (
+            <NextBtn label="Ответить на 4 вопроса в боте" url={BOT_URL} />
+          ) : (
+            <NextBtn label="Доступ после подписки — написать Сергею" url={SERGEY_URL} />
+          )}
         </div>
       </div>
     );
@@ -346,6 +356,13 @@ export default function TgTerminal() {
           <div style={{ color: DIM, fontSize: 12.5, marginBottom: 10, lineHeight: 1.5 }}>
             {/* 19.10.2026: в школьном боте решения старше 3 дней (tg_terminal) — человек должен знать, почему нет свежих */}
             Здесь мои решения старше 3 дней. Подписчики получают их сразу, в момент решения.
+            {/* 20.10.2026, его «да» (пункт Б): человек попадает сразу сюда и вкладки с замком может не открыть */}
+            {fresh && d.limited ? (
+              <div style={{ color: FG, marginTop: 6 }}>
+                {AFTER_QUIZ}{' '}
+                <span onClick={() => go(BOT_URL)} style={{ color: ACCENT, cursor: 'pointer', textDecoration: 'underline' }}>Ответить на вопросы</span>
+              </div>
+            ) : null}
           </div>
         ) : null}
         <VerdictsFeed doc={d.feeds?.verdicts} outcomes={d.feeds?.outcomes} videos={videos} symbols={symbols} onOpen={open} picUrl={(p) => pub(p)} privateCrypto={d.admin ? d.feeds?.verdicts_crypto || { items: [] } : undefined} />
