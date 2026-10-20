@@ -1,13 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { User } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import rustamImg from '@/assets/testimonials/rustam.jpg';
-import lesyaImg from '@/assets/testimonials/lesya.jpg';
-import elenaImg from '@/assets/testimonials/elena.jpg';
-import lesiaImg from '@/assets/testimonials/lesia.jpg';
-import nikolayImg from '@/assets/testimonials/nikolay.jpg';
-import elenaNewImg from '@/assets/testimonials/elena-new.jpg';
-import pavelImg from '@/assets/testimonials/pavel.jpg';
+import { STUDENT_CASES } from '@/lib/testimonials';
 
 /**
  * ProofSection — «04 · Отзывы».
@@ -25,50 +19,9 @@ import pavelImg from '@/assets/testimonials/pavel.jpg';
  * других школ с разрозненными знаниями.
  */
 
-const cases = [
-  {
-    name: 'Елена М.',
-    before: 'Несколько других школ. Растерянность при открытии сделок.',
-    quote: 'Вы уверены в своих сделках. Если нет, Сергей рядом и направит. Вы спокойны, т.к. есть опора.',
-    image: elenaNewImg,
-  },
-  {
-    name: 'Николай',
-    before: 'Прошёл две школы у двух разных преподавателей.',
-    quote: 'Они дали мне базовые разрозненные знания, а школа Сергея Тё объединила и структурировала эти знания в целостную теорию.',
-    image: nikolayImg,
-  },
-  {
-    name: 'Pavel',
-    before: 'Совершал новостные и интуитивные сделки, совершенно не понимая, куда идёт цена.',
-    quote: 'Всё обучение разложено по полочкам, довольно понятно и просто, всё как я люблю.',
-    image: pavelImg,
-  },
-  {
-    name: 'Рустам',
-    before: 'Проходил обучение пару лет назад.',
-    quote: 'Хоть и знаешь, как надо, но делать как надо — это разные вещи.',
-    image: rustamImg,
-  },
-  {
-    name: 'Елена',
-    before: 'Торгует основные пары и металлы.',
-    quote: 'Вход в сделку очень прост, без суеты и внутреннего беспокойства, просто как сделать какую-то обыденную вещь.',
-    image: elenaImg,
-  },
-  {
-    name: 'Lesia',
-    before: 'Путь длинный: курсы, годовые программы, практика, много-много практики.',
-    quote: 'Крайние 6 месяцев закрылись в «плюс».',
-    image: lesiaImg,
-  },
-  {
-    name: 'Сергей',
-    before: 'С 2017 года торговал по горизонтальным уровням.',
-    quote: 'Всё, чему Вы учите, прекрасно работает!',
-    image: lesyaImg,
-  },
-];
+// 20.10.2026: список — в lib/testimonials.ts (его же показывает вкладка «Цены» терминала школьного бота)
+const cases = STUDENT_CASES;
+
 
 const TelegramIcon = () => (
   <svg viewBox="0 0 24 24" fill="#2AABEE" className="w-4 h-4">

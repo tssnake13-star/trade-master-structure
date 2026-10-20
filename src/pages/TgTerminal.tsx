@@ -12,6 +12,9 @@ import { SCEN_META, groupRows, scenarioRows } from '@/components/terminal/sideba
 import { GEN } from '@/components/terminal/screenerParse';
 import { UP, DOWN } from '@/components/terminal/theme';
 import { ECOSYSTEM, STUDY_PRICES } from '@/lib/prices';
+import { AUTHOR_STATS } from '@/lib/authorStats';
+import { STUDENT_CASES } from '@/lib/testimonials';
+import { PURCHASE_FAQ } from '@/lib/purchaseFaq';
 
 /**
  * 18.10.2026, его слово «Все, давай внедряй»: терминал внутри Телеграма — кнопка «Терминал» в меню бота.
@@ -55,6 +58,7 @@ declare global {
 // 19.10.2026: куда ведёт кнопка с экрана, где дальше идти некуда
 const BOT_URL = 'https://t.me/New_TradeLikeTYO_bot';
 const SERGEY_URL = 'https://t.me/tradeliketyo';
+const SITE_URL = 'https://www.tradeliketyo.com/';
 // 20.10.2026, разбор воронки, пункт 5: бот ставит метку n=1 тому, кто ещё не ответил на 4 вопроса. Ему открыт журнал,
 // остальное откроется после вопросов. Метка только для текста, доступ решает база по пропуску
 const AFTER_QUIZ = 'Проверка сделки, инструменты и машина времени откроются на 7 дней после 4 коротких вопросов в боте.';
@@ -191,8 +195,14 @@ export function Picker({ rows, cur, onPick }: { rows: MarketRow[]; cur: MarketRo
 
 /** 20.10.2026, его «вкладка «Цены» в терминале школьного бота»: подписка и обучение, не выходя из Телеграма.
  *  Цены из lib/prices, те же, что на сайте. VIP здесь с ценой (его «в терминале VIP можно с ценой сделать»).
- *  Оплата у Сергея в личке, туда и кнопка. */
+ *  Оплата у Сергея в личке, туда и кнопка.
+ *  20.10.2026 вечер, его «Да, делай так, покажи сначала»: лендинг целиком сюда не ставим (его кнопки ведут в этого же
+ *  бота, длинная страница в Телеграме грузится долго), а берём три блока сайта теми же словами: над ценами — автор
+ *  (AuthorSection, цифры lib/authorStats) и отзывы учеников (lib/testimonials, с оговоркой), после цен — вопросы перед
+ *  оплатой (lib/purchaseFaq, его порядок); внизу ссылка на полный сайт — откроется в браузере. */
 function PricesTab() {
+  const [orig, setOrig] = useState<string | null>(null);        // оригинал отзыва из Телеграма — на весь экран
+  const [faqOpen, setFaqOpen] = useState<number | null>(null);
   const head = (t: string) => (
     <div style={{ fontSize: 11, color: ACCENT, fontFamily: MONO, letterSpacing: '0.12em', textTransform: 'uppercase', margin: '16px 0 8px' }}>{t}</div>
   );
@@ -211,6 +221,71 @@ function PricesTab() {
   ];
   return (
     <div style={{ lineHeight: 1.5 }}>
+      {/* автор — блок «Автор» сайта, теми же словами, коротко */}
+      {head('Автор')}
+      <div style={card()}>
+        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+          <img src="/author-sergey-te.jpg" alt="Сергей Тё" style={{ width: 60, height: 60, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+          <div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: FG }}>Сергей Тё</div>
+            <div style={{ fontSize: 12.5, color: DIM }}>Архитектор торговых систем</div>
+          </div>
+        </div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: FG, marginTop: 10 }}>
+          15 лет в рынке. Торгую по той же системе, которую даю вам попробовать.
+        </div>
+        <div style={{ fontSize: 13.5, color: FG, marginTop: 8 }}>
+          Мои лучшие сделки — те, которые я <span style={{ color: ACCENT }}>не совершил</span>
+        </div>
+        <div style={{ fontSize: 13, color: DIM }}>Поэтому я не учу угадывать входы</div>
+        <div style={{ fontSize: 13.5, color: FG }}>Я выстраиваю систему, которая принимает решение</div>
+        <div style={{ fontSize: 13, color: DIM }}>Где вы перестаёте действовать на ощущениях</div>
+        <div style={{ fontSize: 10, color: ACCENT, fontFamily: MONO, letterSpacing: '0.14em', textTransform: 'uppercase', marginTop: 8 }}>
+          Практикующий трейдер · не сигнальщик, не инфобизнесмен
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 12px', marginTop: 10, paddingTop: 10, borderTop: `1px solid ${BORDER}` }}>
+          {AUTHOR_STATS.map((s) => (
+            <div key={s.label}>
+              <div style={{ fontSize: 20, fontWeight: 700, color: FG }}>{s.value.toFixed(s.decimals || 0).replace('.', ',')}{s.suffix}</div>
+              <div style={{ fontSize: 11.5, color: DIM }}>{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* отзывы — те же выдержки, что на сайте («04 · Отзывы»), по нажатию оригинал из Телеграма */}
+      {head('Отзывы учеников')}
+      <div style={{ fontSize: 15, fontWeight: 700, color: FG }}>Знания у них уже были. Не хватало системы.</div>
+      <div style={{ fontSize: 12.5, color: DIM, marginTop: 4 }}>
+        Отзывы без редактуры: в карточке выдержка, по нажатию открывается оригинал из Telegram.
+      </div>
+      <div style={{ fontSize: 12.5, color: ACCENT, margin: '4px 0 8px' }}>
+        Это результаты учеников, а не обещание: у кого-то получается и так, всё зависит от человека.
+      </div>
+      <div style={{ display: 'flex', gap: 10, overflowX: 'auto', scrollSnapType: 'x mandatory', margin: '0 -12px', padding: '0 12px 6px' }}>
+        {STUDENT_CASES.map((c) => (
+          <div
+            key={c.image}
+            onClick={() => setOrig(c.image)}
+            style={{ ...card(), marginBottom: 0, flex: '0 0 80%', scrollSnapAlign: 'center', cursor: 'pointer', display: 'flex', flexDirection: 'column' }}
+          >
+            <div style={{ fontSize: 13.5, fontWeight: 700, color: FG }}>{c.name}</div>
+            <div style={{ fontSize: 12, color: DIM, margin: '4px 0 6px' }}>{c.before}</div>
+            <div style={{ fontSize: 13.5, color: FG, flex: 1 }}>«{c.quote}»</div>
+            <div style={{ fontSize: 12, color: '#2AABEE', marginTop: 8, textAlign: 'right' }}>оригинал →</div>
+          </div>
+        ))}
+      </div>
+      {orig ? (
+        <div
+          onClick={() => setOrig(null)}
+          style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.9)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 16 }}
+        >
+          <img src={orig} alt="Оригинал отзыва" style={{ maxWidth: '100%', maxHeight: '82vh', borderRadius: 8 }} />
+          <div style={{ color: DIM, fontSize: 12.5, marginTop: 10 }}>Нажмите, чтобы закрыть</div>
+        </div>
+      ) : null}
+
       {head('Подписка ECHO-GATE INSIDE')}
       <div style={{ fontSize: 13.5, color: FG, marginBottom: 10 }}>
         Терминал находит сделку, по каждому допуску я даю вердикт. Вы отмечаете точку входа и нажимаете СТАРТ, дальше сделку ведёт советник.
@@ -237,6 +312,32 @@ function PricesTab() {
       ))}
       <div style={{ marginTop: 16, textAlign: 'center' }}>
         <NextBtn label="Подключиться: написать Сергею" url={SERGEY_URL} />
+      </div>
+
+      {/* вопросы перед оплатой — тот же список и порядок, что на странице цен сайта */}
+      {head('Перед оплатой')}
+      <div style={{ fontSize: 15, fontWeight: 700, color: FG, marginBottom: 2 }}>Вопросы, которые стоит задать</div>
+      {PURCHASE_FAQ.map((it, i) => (
+        <div key={it.q} style={{ borderBottom: `1px solid ${BORDER}` }}>
+          <div
+            onClick={() => setFaqOpen(faqOpen === i ? null : i)}
+            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, padding: '11px 0', cursor: 'pointer' }}
+          >
+            <span style={{ fontSize: 13.5, color: FG }}>{it.q}</span>
+            <span style={{ color: ACCENT, fontSize: 18, lineHeight: 1, flexShrink: 0, transform: faqOpen === i ? 'rotate(45deg)' : 'none', transition: 'transform .2s' }}>+</span>
+          </div>
+          {faqOpen === i ? <div style={{ fontSize: 13, color: DIM, paddingBottom: 12 }}>{it.a}</div> : null}
+        </div>
+      ))}
+      <div style={{ fontSize: 13, color: DIM, marginTop: 12 }}>
+        Остался вопрос?{' '}
+        <span onClick={() => go(SERGEY_URL)} style={{ color: ACCENT, textDecoration: 'underline', cursor: 'pointer' }}>Напишите Сергею</span>
+        {' '}— без звонков, всё в Telegram.
+      </div>
+      <div style={{ marginTop: 18, textAlign: 'center' }}>
+        <span onClick={() => go(SITE_URL)} style={{ fontSize: 13, color: DIM, textDecoration: 'underline', cursor: 'pointer' }}>
+          Полная страница сайта ↗
+        </span>
       </div>
     </div>
   );

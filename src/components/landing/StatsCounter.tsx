@@ -1,13 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
+import { AUTHOR_STATS } from '@/lib/authorStats';
 
-// Win Rate и R:R — таблица «TLT_Statement_2025-2026» (январь 2025 — сентябрь 2026):
-// побед 23,5%, средний выигрыш +9,50 R против −1,00 R.
-const stats = [
-  { value: 15, suffix: '', label: 'лет в рынке' },
-  { value: 200, suffix: '+', label: 'учеников в системе' },
-  { value: 1000, suffix: '+', label: 'эталонных сделок в архиве' },
-  { value: 23.5, suffix: '%', label: 'Win Rate · среднее R:R 9,5:1', decimals: 1 },
-];
+// 20.10.2026: список — в lib/authorStats.ts (Win Rate и R:R — таблица счёта, см. там)
+const stats = AUTHOR_STATS;
+
 
 // Начальное значение — итоговое число, а не 0: версию для роботов и ИИ сайт рендерит
 // на сервере, анимация там не запускается, и до 04.10.2026 они читали «0 лет в рынке»,
