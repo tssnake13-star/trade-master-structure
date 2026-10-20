@@ -73,7 +73,8 @@ export default function RouteChooser({
   const Title = heading;
   const stream = nextStreamLabel();
   const Sub = heading === 'h1' ? 'h2' : 'h3';
-  const echoPrice = showPrices ? { price: 'от $447', per: 'за 3 месяца' } : { price: '7 дней', per: 'бесплатно, после 4 вопросов' };
+  // 20.10.2026: подписку можно начать с первого месяца за $199 (решение Сергея), с зачётом в 3 месяца
+  const echoPrice = showPrices ? { price: 'от $199', per: 'первый месяц' } : { price: '7 дней', per: 'бесплатно, после 4 вопросов' };
   return (
     <div>
       <span className="section-label" style={{ color: GOLD }}>{kicker}</span>

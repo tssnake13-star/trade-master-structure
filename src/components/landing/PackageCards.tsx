@@ -172,8 +172,14 @@ const PACKAGES: Pkg[] = [
  * Echo Gate, Hunter Bot и Risk Sentinel входят во все сроки (решение Сергея:
  * без советника нет кнопки, а на ней держится обещание «2 действия»).
  * Правило 29.09 «советники только с 6 месяцев» отменено.
+ *
+ * ⚠️ 20.10.2026, решение Сергея: первый месяц $199, один раз на человека, те же терминал
+ * и советники. Продлил на 3 месяца в течение этого месяца — $199 засчитываются, доплата $248,
+ * 3 месяца считаются с первого дня (то же «ваши деньги не сгорают», что и мост в год).
+ * Помесячной подписки по-прежнему нет: после первого месяца только 3, 6 или 12 месяцев.
  */
 const ECOSYSTEM: { price: string; oldPrice?: string; period: string; desc: string; saving?: string; featured: boolean }[] = [
+  { price: '$199', period: 'первый месяц', desc: 'Один раз на человека: ECHO-GATE INSIDE и те же советники Echo Gate, Hunter Bot и Risk Sentinel на месяц.', saving: 'Продлите на 3 месяца в течение этого месяца: $199 засчитаются, доплата $248.', featured: false },
   { price: '$447', period: '3 месяца', desc: 'ECHO-GATE INSIDE и советники Echo Gate, Hunter Bot и Risk Sentinel в аренду на 3 месяца.', featured: false },
   { price: '$840', oldPrice: '$894', period: '6 месяцев', desc: 'ECHO-GATE INSIDE и советники Echo Gate, Hunter Bot и Risk Sentinel в аренду на полгода.', saving: '$140 в месяц вместо $149, экономия $54.', featured: false },
   { price: '$1490', oldPrice: '$1788', period: '12 месяцев', desc: 'ECHO-GATE INSIDE и советники Echo Gate, Hunter Bot и Risk Sentinel в аренду на год.', saving: 'Около $124 в месяц вместо $149, экономия $298.', featured: true },
@@ -318,7 +324,8 @@ export default function PackageCards({
         в практикум доплатой нельзя, выбирайте сразу. Доплата работает наверх: в течение 30 дней после курса
         и 67 дней после практикума оплаченное засчитывается в VIP полностью, ваши деньги не сгорают.
         В течение 3 месяцев подписку можно перевести на год или в VIP, оплаченное тоже засчитывается.
-        После любого обучения подписка подключается сразу.
+        Подписку можно начать с первого месяца: продлите на 3 месяца в течение этого месяца, и оплаченное
+        засчитается. После любого обучения подписка подключается сразу.
       </p>
     </div>
     </>
@@ -353,7 +360,7 @@ export default function PackageCards({
           каждой ограничен ещё до входа, а из 21 месяца в минус закрылись 3. Точку входа вы ставите сами,
           поэтому ваш результат может отличаться от моего. Прошлый результат не гарантирует будущий.
         </p>
-        <div className="mt-5 grid sm:grid-cols-3 gap-3">
+        <div className="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {ECOSYSTEM.map((e) => (
             <div key={e.period} className="p-4" style={{ border: `1px solid ${e.featured ? 'hsl(var(--accent) / 0.3)' : 'hsl(var(--rule-soft))'}` }}>
               <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
