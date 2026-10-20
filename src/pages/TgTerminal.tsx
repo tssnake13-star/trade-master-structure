@@ -6,7 +6,7 @@ import { Decision } from '@/components/terminal/Decision';
 import type { MarketRow } from '@/components/terminal/parts';
 import { VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
-import { TimeMachine, Trainer, TmViewCtx, type TimeItem } from '@/components/terminal/TimeMachine';
+import { TimeMachine, TmViewCtx, type TimeItem } from '@/components/terminal/TimeMachine';
 import { parseJournalVideos } from '@/lib/journalVideos';
 import { SCEN_META, groupRows, scenarioRows } from '@/components/terminal/sidebarRows';
 import { GEN } from '@/components/terminal/screenerParse';
@@ -16,18 +16,19 @@ import { ECOSYSTEM, STUDY_PRICES } from '@/lib/prices';
 /**
  * 18.10.2026, его слово «Все, давай внедряй»: терминал внутри Телеграма — кнопка «Терминал» в меню бота.
  *  /tg/echo   — бот Echo-Gate, подписчики: Инструмент · Скринер · ТОП-лист · Решения;
- *  /tg/school — школьный бот, холодные: Решения · Инструмент (инструменты пробы) · Машина времени · Тренажёр · Цены
- *  (20.10.2026: цены подписки и обучения, не выходя из Телеграма; открыты всем).
+ *  /tg/school — школьный бот, холодные: Решения · Инструмент (инструменты пробы) · Машина времени · Цены
+ *  (20.10.2026: цены подписки и обучения, не выходя из Телеграма; открыты всем). ⛔ 20.10.2026 вечер, его слово «Убери
+ *  из школьного бота в терминале тренажёр» — вкладки «Тренажёр» нет (из веб-кабинета она ушла в тот же день, раньше).
  * Его слово: «графики должны быть статичные, как в боте» — картинки бота, в машине времени рисунок бота без
  * масштаба и сдвига. Кто открыл, проверяет база (tg_terminal) по подписи Телеграма; без подписки — экран-объяснение.
  */
 
 type Bot = 'echo' | 'school';
-type Tab = 'inst' | 'scr' | 'top' | 'dec' | 'tm' | 'tr' | 'price';
+type Tab = 'inst' | 'scr' | 'top' | 'dec' | 'tm' | 'price';
 const TABS: Record<Bot, [Tab, string, string][]> = {
   echo: [['inst', 'Инструмент', '📈'], ['scr', 'Скринер', '🔎'], ['top', 'ТОП-лист', '🏆'], ['dec', 'Решения', '📋']],
   // 20.10.2026, его «вкладка «Цены» в терминале школьного бота, кнопки «Все цены» ведут в неё» (&tab=price)
-  school: [['dec', 'Решения', '📋'], ['inst', 'Инструмент', '📈'], ['tm', 'Машина времени', '🕰'], ['tr', 'Тренажёр', '🎯'], ['price', 'Цены', '🏷']],
+  school: [['dec', 'Решения', '📋'], ['inst', 'Инструмент', '📈'], ['tm', 'Машина времени', '🕰'], ['price', 'Цены', '🏷']],
 };
 // вкладки, открытые и после пробы, и до вопросов: журнал решений и цены
 const ALWAYS_OPEN: Tab[] = ['dec', 'price'];
@@ -56,7 +57,7 @@ const BOT_URL = 'https://t.me/New_TradeLikeTYO_bot';
 const SERGEY_URL = 'https://t.me/tradeliketyo';
 // 20.10.2026, разбор воронки, пункт 5: бот ставит метку n=1 тому, кто ещё не ответил на 4 вопроса. Ему открыт журнал,
 // остальное откроется после вопросов. Метка только для текста, доступ решает база по пропуску
-const AFTER_QUIZ = 'Проверка сделки, инструменты, машина времени и тренажёр откроются на 7 дней после 4 коротких вопросов в боте.';
+const AFTER_QUIZ = 'Проверка сделки, инструменты и машина времени откроются на 7 дней после 4 коротких вопросов в боте.';
 
 function go(url: string) {
   const w = window.Telegram?.WebApp;
@@ -254,11 +255,12 @@ export default function TgTerminal() {
   const [sym, setSym] = useState<string | null>(null);
   const [kind, setKind] = useState<keyof MarketRow>('chart_cycles');
   const fresh = useMemo(() => bot === 'school' && new URLSearchParams(window.location.search).get('n') === '1', [bot]);
-  // ⛔ 20.10.2026, его слово: машина времени и тренажёр есть только в пробе школьного бота — из веб-кабинета убраны
-  // («Они там не нужны»), в боте экосистемы их нет, в подписку они не входят. Проба кончилась — этих вкладок нет и
-  // «доступ после подписки» им не обещаем; до 4 вопросов (fresh) они видны с замком: откроются на 7 дней
+  // ⛔ 20.10.2026, его слово: машина времени есть только в пробе школьного бота — из веб-кабинета убрана
+  // («Они там не нужны»), в боте экосистемы её нет, в подписку она не входит. Проба кончилась — вкладки нет и
+  // «доступ после подписки» ей не обещаем; до 4 вопросов (fresh) она видна с замком: откроется на 7 дней.
+  // Тренажёра нет совсем (его слово вечером 20.10.2026)
   const tabs = useMemo(
-    () => TABS[bot].filter(([k]) => !(d?.limited && !fresh && (k === 'tm' || k === 'tr'))),
+    () => TABS[bot].filter(([k]) => !(d?.limited && !fresh && k === 'tm')),
     [bot, d?.limited, fresh],
   );
   useEffect(() => {
@@ -438,8 +440,6 @@ export default function TgTerminal() {
     );
   } else if (tab === 'tm') {
     body = <TimeMachine doc={d.feeds?.timemachine} symbols={symbols} onOpen={open} />;
-  } else if (tab === 'tr') {
-    body = <Trainer doc={d.feeds?.timemachine} symbols={symbols} onOpen={open} />;
   } else if (tab === 'price') {
     body = <PricesTab />;
   }
