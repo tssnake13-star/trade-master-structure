@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ACCENT, BORDER, CARD, DIM, DOWN, FG, MONO, UP, card, label, fmtWhen, marketOfSym, type MarketKey } from './theme';
-import { MarketSwitch } from './Feeds';
+import { JournalCalendar, MarketSwitch } from './Feeds';
 import { GEN } from './screenerParse';
 import LiveChart from './LiveChart';
 import type { Layer, Scene, ScenePanel, SBar } from './scene';
@@ -430,6 +430,13 @@ const Empty = () => (
   <div style={{ ...card, padding: 16, color: DIM, fontSize: 13 }}>Решения с итогом появятся после субботнего разбора недели.</div>
 );
 
+// день решения по его времени (UTC+5) — так же, как календарь журнала (Feeds.tsx, dayOf)
+const dayOfTm = (time: string) => new Date(new Date(time).getTime() + 5 * 3600e3).toISOString().slice(0, 10);
+
+/** ⛔ 21.10.2026, его слово: «Верни машину времени в веб-версию… переименуй в сделки до и после» — вкладка называется
+ *  «Сделки до и после» (имя компонента и ленты timemachine прежние). «В машину времени добавь календарь, по которому
+ *  легче выбирать допуск/отказ из журнала» — календарь журнала решений (JournalCalendar) без итогов месяца: нажатие на
+ *  день открывает решение этого дня. */
 export function TimeMachine({ doc, symbols, onOpen }: { doc?: { items?: TimeItem[] }; symbols: Set<string>; onOpen: Open }) {
   // 18.10.2026: форекс и крипта — переключателем, как в журнале решений
   const [mk, setMk] = useState<MarketKey>('fx');
@@ -458,9 +465,26 @@ export function TimeMachine({ doc, symbols, onOpen }: { doc?: { items?: TimeItem
       <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>
         Выбери решение — увидишь рынок таким, каким он был в момент решения. Решение записано в тот же день, задним числом его не поменять.
       </div>
-      <div style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 8, marginBottom: 6 }}>
+      <JournalCalendar
+        items={items}
+        resultOf={(x) => x.result}
+        stats={false}
+        hint="Число — результат сделки в R: 1 R — это один стоп. Рамкой — решение без входа. Нажмите на день — откроется решение этого дня."
+        onPick={(day) => {
+          const i = items.findIndex((x) => dayOfTm(x.time) === day);
+          if (i < 0) return;
+          setIdx(i);
+          setShown(false);
+          window.setTimeout(() => {
+            document.getElementById('tm-pick-' + i)?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            document.getElementById('tm-picks')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 0);
+        }}
+      />
+      <div id="tm-picks" style={{ display: 'flex', gap: 8, overflowX: 'auto', paddingBottom: 8, marginBottom: 6, scrollMarginTop: 8 }}>
         {items.map((x, i) => (
           <button
+            id={'tm-pick-' + i}
             key={keyOf(x)}
             onClick={() => {
               setIdx(i);

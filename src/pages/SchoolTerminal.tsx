@@ -9,6 +9,7 @@ import { ALPHA_TIP, CycleCard, Lines, type MarketRow } from '@/components/termin
 import TerminalSidebar from '@/components/terminal/Sidebar';
 import { Brand, Decision, TradingStyle } from '@/components/terminal/Decision';
 import { FalseExitFeed, TrendFeed, VerdictsFeed, type FeedDocs, type Verdict } from '@/components/terminal/Feeds';
+import { TimeMachine, type TimeItem } from '@/components/terminal/TimeMachine';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { ScreenerCards } from '@/components/terminal/Screener';
 import StatusStrip from '@/components/terminal/Status';
@@ -89,7 +90,7 @@ interface Meta {
 // 21.09.2026, его слово: вкладку «Резонанс» из «Глаза системы» убрать
 // 21.09.2026: ТОП циклов — своей вкладкой (на телефоне до него под группами было долго листать)
 // 27.09.2026, его слово: «переименуй топ циклов… или, наверное, просто топ. Оставь» — вкладка «ТОП»
-type Section = 'instrument' | 'screener' | 'top' | 'trend' | 'falsex' | 'verdicts' | 'history';
+type Section = 'instrument' | 'screener' | 'top' | 'trend' | 'falsex' | 'verdicts' | 'timemachine' | 'history';
 const SECTIONS: [Section, string][] = [
   ['instrument', 'Инструмент'],
   ['screener', 'Скринер'],
@@ -102,6 +103,9 @@ const SECTIONS: [Section, string][] = [
   ['verdicts', 'Журнал решений Сергея'],
   // ⛔ 20.10.2026, его слово: «Машину времени и тренажер лучше убрать из веб-версии. Они там не нужны» — вкладки
   // (были с 18.10.2026) остались только в терминале школьного бота (/tg/school, TgTerminal)
+  // ⛔ 21.10.2026, его слово: «Верни машину времени в веб-версию. Но только машину времени… переименуй в сделки до и
+  // после» — вкладка вернулась под новым именем, с календарём (TimeMachine); тренажёра нет
+  ['timemachine', 'Сделки до и после'],
   // 25.09.2026, его слово: «показывать не один день, а изменения… где ошибается система, где не ошибается»
   ['history', 'История направления'],
 ];
@@ -112,7 +116,7 @@ const SECTIONS: [Section, string][] = [
 // администратор может видеть эту вкладку. Пока что… всё равно ей пока никто не пользуется»
 const ADMIN_ONLY: Section[] = ['trend', 'falsex', 'history'];
 // пробному под замком (TrialLock) — в строке вкладок идут последними
-const TRIAL_LOCKED: Section[] = ['screener', 'top'];
+const TRIAL_LOCKED: Section[] = ['screener', 'top', 'timemachine'];
 // ленты, которые бот кладёт в базу сразу после его кнопки: вкладка → ключ ленты (24.09 журнал, 25.09 скринер)
 const LIVE_FEED: Partial<Record<Section, string>> = { verdicts: 'verdicts', screener: 'screener', top: 'screener' };
 
@@ -152,7 +156,8 @@ export default function SchoolTerminal() {
   const feedQuery = useCallback(() => {
     const q = db.from('market_feed').select('key, data, updated_at');
     // 18.10.2026: verdicts_crypto — его решения по крипте «только мне», ученику не запрашивается (и база не отдаёт)
-    // 20.10.2026: лента timemachine (машина времени и тренажёр) веб-кабинету больше не нужна — не грузим никому
+    // 20.10.2026: лента timemachine большая — в общую загрузку не входит; с 21.10.2026 её грузит вкладка «Сделки до и
+    // после», когда её открыли (tmDoc)
     const skip = isAdmin ? ['timemachine'] : [...ADMIN_ONLY, 'verdicts_crypto', 'timemachine'];
     return q.not('key', 'in', `(${skip.join(',')})`);
   }, [isAdmin]);
@@ -215,6 +220,20 @@ export default function SchoolTerminal() {
   // 18.10.2026, его слово про пробный режим: «первое это должны быть решения… мои… замки можно назад убрать» — пробному
   // без ?s= открывается журнал решений
   const section = (sections.find(([s]) => s === params.get('s'))?.[0] || (trial ? 'verdicts' : 'instrument')) as Section;
+
+  // 21.10.2026: «Сделки до и после» — лента timemachine большая, в общую загрузку не входит (feedQuery её пропускает):
+  // грузим, когда открыта вкладка, один раз за посещение. Пробному база её не отдаёт — у него замок
+  const [tmDoc, setTmDoc] = useState<{ items?: TimeItem[] } | null>(null);
+  useEffect(() => {
+    if (!user || trial || section !== 'timemachine' || tmDoc) return;
+    let alive = true;
+    db.from('market_feed').select('data').eq('key', 'timemachine').maybeSingle().then(({ data }) => {
+      if (alive) setTmDoc((data as { data?: { items?: TimeItem[] } } | null)?.data || { items: [] });
+    });
+    return () => {
+      alive = false;
+    };
+  }, [user, trial, section, tmDoc]);
 
   // ⛔ 03.10.2026, его слово: боковая панель «привязана к нижней карточке графика… на других вкладках уменьшается,
   // увеличивается… надо её зафиксировать, как она есть на вкладке инструмент». Высота ряда на вкладке «Инструмент»
@@ -762,6 +781,15 @@ export default function SchoolTerminal() {
             </div>
           ) : null}
           {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} outcomes={feeds.outcomes} videos={videos} symbols={symbols} onOpen={openSymbol} privateCrypto={isAdmin ? feeds.verdicts_crypto || { items: [] } : undefined} />}
+          {/* пробному лента timemachine базой не отдаётся (правило market_feed_select) — замок, а не пустая вкладка */}
+          {section === 'timemachine' &&
+            (trial ? (
+              <TrialLock what="Сделки до и после" />
+            ) : tmDoc ? (
+              <TimeMachine doc={tmDoc} symbols={symbols} onOpen={openSymbol} />
+            ) : (
+              <div style={{ ...card, padding: 16, color: DIM, fontSize: 13 }}>Загружаю сделки до и после…</div>
+            ))}
           {section === 'history' && isAdmin && <HistoryView doc={feeds.history} order={rows.map((r) => r.symbol)} symbols={symbols} onOpen={openSymbol} />}
           <div style={{ ...label, marginTop: 'auto', paddingTop: 14, lineHeight: 1.7 }}>
             {DISCLAIMER}

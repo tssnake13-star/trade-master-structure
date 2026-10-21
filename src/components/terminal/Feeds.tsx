@@ -335,7 +335,7 @@ function useWide(px = 900) {
 
 type DayMark = { trades: number[]; n: number };
 
-function MonthGrid({ ym, by, onPick, big }: { ym: string; by: Map<string, DayMark>; onPick: (day: string) => void; big: boolean }) {
+function MonthGrid({ ym, by, onPick, big, stats = true }: { ym: string; by: Map<string, DayMark>; onPick: (day: string) => void; big: boolean; stats?: boolean }) {
   const [y, m] = ym.split('-').map(Number);
   const days = new Date(Date.UTC(y, m, 0)).getUTCDate();
   const off = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7;
@@ -356,6 +356,8 @@ function MonthGrid({ ym, by, onPick, big }: { ym: string; by: Map<string, DayMar
     <div style={{ minWidth: 0 }}>
       <div style={{ textAlign: 'center', marginBottom: 8 }}>
         <b style={{ fontSize: 15, color: FG }}>{MONTH_NAMES[m - 1]} {y}</b>
+        {stats ? (
+        <>
         <div style={{ fontFamily: MONO, fontSize: 12.5, fontWeight: 700, color: sum > 0 ? UP : sum < 0 ? DOWN : DIM }}>
           {plus || minus ? `итог ${R(sum)} · ${sum >= 0 ? '+' : '−'}${fmtNum(Math.abs(sum) * 0.25, 2)}% к депозиту` : 'итогов пока нет'}
         </div>
@@ -371,6 +373,8 @@ function MonthGrid({ ym, by, onPick, big }: { ym: string; by: Map<string, DayMar
             винрейт <span style={{ color: FG, fontWeight: 700 }}>{wr}%</span> ({wins} из {wins + losses})
             {wins && losses ? <> · тейк в среднем в {fmtNum(avgWin / avgLoss)} раза больше стопа</> : null}
           </div>
+        ) : null}
+        </>
         ) : null}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', gap: 4 }}>
@@ -429,7 +433,9 @@ function MonthGrid({ ym, by, onPick, big }: { ym: string; by: Map<string, DayMar
  *  безубыток — серый, решения без входа или ещё без итога — рамкой. Нажатие — к первому решению дня в списке.
  *  В тот же день: «в веб-версии огромный… три календаря в ряд… цифры намного больше… кнопки вперёд-назад еле
  *  заметные» — на широком экране три месяца, на телефоне один; цифры крупнее, стрелки золотые. */
-function JournalCalendar({ items, outOf, onPick }: { items: Verdict[]; outOf: (v: Verdict) => Outcome | undefined; onPick: (day: string) => void }) {
+// 21.10.2026, его слово: «в машину времени добавь календарь, по которому легче выбирать допуск/отказ из журнала» — тот же
+// календарь и в «Сделках до и после» (TimeMachine): итог решения берёт resultOf, итоги месяца там скрыты (stats=false)
+export function JournalCalendar<T extends { time: string }>({ items, resultOf, onPick, hint, stats = true }: { items: T[]; resultOf: (x: T) => string | undefined; onPick: (day: string) => void; hint?: string; stats?: boolean }) {
   const wide = useWide();
   const now = dayOf(new Date().toISOString()).slice(0, 7);
   const [end, setEnd] = useState(now);
@@ -443,7 +449,7 @@ function JournalCalendar({ items, outOf, onPick }: { items: Verdict[]; outOf: (v
     const d = dayOf(v.time);
     const cur = by.get(d) || { trades: [], n: 0 };
     cur.n += 1;
-    cur.trades.push(...tradesOfResult(outOf(v)?.result));
+    cur.trades.push(...tradesOfResult(resultOf(v)));
     by.set(d, cur);
   }
   const arrow = (k: number, ok: boolean) => (
@@ -469,7 +475,7 @@ function JournalCalendar({ items, outOf, onPick }: { items: Verdict[]; outOf: (v
         {arrow(1, canFwd)}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${months.length}, minmax(0, 1fr))`, gap: 22 }}>
-        {months.map((ym) => <MonthGrid key={ym} ym={ym} by={by} onPick={onPick} big={wide} />)}
+        {months.map((ym) => <MonthGrid key={ym} ym={ym} by={by} onPick={onPick} big={wide} stats={stats} />)}
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, fontSize: 12.5, color: DIM, marginTop: 10 }}>
         {[[UP, 'тейк'], [DOWN, 'стоп'], ['#4a453e', 'безубыток']].map(([c, n]) => (
@@ -483,7 +489,7 @@ function JournalCalendar({ items, outOf, onPick }: { items: Verdict[]; outOf: (v
           без входа или итог позже
         </span>
       </div>
-      <div style={{ color: DIM, fontSize: 12.5, marginTop: 6 }}>Число — результат сделки в R: 1 R — это один стоп. Несколько сделок за день — отдельными квадратиками. Нажмите на день — откроются решения этого дня в списке.</div>
+      <div style={{ color: DIM, fontSize: 12.5, marginTop: 6 }}>{hint || 'Число — результат сделки в R: 1 R — это один стоп. Несколько сделок за день — отдельными квадратиками. Нажмите на день — откроются решения этого дня в списке.'}</div>
     </div>
   );
 }
@@ -604,7 +610,7 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
           решения — и валюты, и крипту (биткоин 08.09, 2 стопа), а не только открытую вкладку */}
       <JournalCalendar
         items={all}
-        outOf={(v) => outOf.get(outKey(v.time, v.instrument, v.side))}
+        resultOf={(v) => outOf.get(outKey(v.time, v.instrument, v.side))?.result}
         onPick={(day) => {
           const other = all.find((v) => dayOf(v.time) === day && marketOfSym(v.instrument) !== mk);
           const here = all.some((v) => dayOf(v.time) === day && marketOfSym(v.instrument) === mk);
