@@ -177,6 +177,24 @@
   .v3h-split-center { justify-content: center; }
 }
 
+/* 21.10.2026: закреплённый первый экран — сцена HeroDeskScene оживает при прокрутке.
+   Класс is-pinned ставит HeroSectionV3, только если текст помещается в окно. */
+.v3h-track.is-pinned { height: 230vh; }
+.v3h-track.is-pinned > #hero { position: sticky; top: 0; height: 100vh; height: 100svh; min-height: 0; }
+/* сцена в правой половине; затемнение прячет края вписанной картинки */
+.v3h-scene { position: relative; }
+.v3h-scene::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: linear-gradient(90deg, var(--v3-bg) 0%, transparent 12%),
+              linear-gradient(0deg, var(--v3-bg) 4%, transparent 30%),
+              linear-gradient(180deg, var(--v3-bg) 4%, transparent 22%);
+}
+/* Заголовок остаётся прежнего размера (колонка 56%), остальной текст уже — 44%,
+   чтобы не заходить на мониторы сцены. */
+@media (min-width: 1024px) and (min-aspect-ratio: 1/1) {
+  .v3h-split-text > *:not(.v3h-h1) { max-width: 78.5%; }
+}
+
 /* author photo flush to the right edge, fading into the background */
 .v3h-photo { position: relative; }
 .v3h-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 12%; }
