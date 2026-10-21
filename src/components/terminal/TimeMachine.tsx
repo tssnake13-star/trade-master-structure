@@ -117,15 +117,21 @@ function keepAfter(after: Bar[], tf: string, exit?: string, h4?: Tf): number {
   }
   return Math.max(1, k);
 }
-const EXIT_WORD: Record<string, string> = { 'тейк': 'тейк', 'стоп': 'стоп', 'безубыток': 'безубыток', 'закрыта': 'закрытие' };
-// «тейк 30.09» и цвет линии выхода: тейк зелёная, стоп красная, безубыток и закрытие светлая
-function exitLook(it: TimeItem): { tag: string; col: string; word: string } | null {
-  if (!it.exit) return null;
-  const k = it.exit_kind || '';
-  const tag = `${EXIT_WORD[k] || 'выход'} ${it.exit.slice(8, 10)}.${it.exit.slice(5, 7)}`;
-  if (k === 'тейк') return { tag, col: UP, word: 'Зелёная' };
-  if (k === 'стоп') return { tag, col: DOWN, word: 'Красная' };
-  return { tag, col: '#cfc8bb', word: 'Светлая' };
+/** ⛔ 21.10.2026, его слово: «показывать до тейка… Стопы показывать не обязательно. На графике. Можно просто показать,
+ *  куда пошла цена, и так понятно, что стоп». До какого дня «после»: выход из ВЫХОДЫ_СДЕЛОК.json; у сделки с входом без
+ *  записанного выхода (стопы и безубытки) — неделя: день решения и 5 торговых дней (у всех 13 стопов и безубытков, где
+ *  день выхода известен, сделка закрылась в эту неделю). Решения без входа — «после» целиком, как было. */
+function cutOf(it: TimeItem): string | undefined {
+  if (it.exit) return it.exit;
+  if (!it.result.toUpperCase().startsWith('ВОШЁЛ')) return undefined;
+  const d1 = it.tf?.D1;
+  const aft = d1 ? d1.bars.slice(d1.cut) : [];
+  return aft.length ? aft[Math.min(5, aft.length - 1)][0].slice(0, 10) : undefined;
+}
+// линия и подпись «тейк 30.09» — только у тейка; стоп и так виден по тому, куда пошла цена
+function exitLook(it: TimeItem): { tag: string; col: string } | null {
+  if (!it.exit || it.exit_kind !== 'тейк') return null;
+  return { tag: `тейк ${it.exit.slice(8, 10)}.${it.exit.slice(5, 7)}`, col: UP };
 }
 
 function Chart({ tf, show, when, keep, exitCol }: { tf: Tf; show: boolean; when: string; keep: number; exitCol?: string }) {
@@ -351,13 +357,13 @@ function cleanH4(p: TmPanel): TmPanel {
   };
 }
 /** Панель рисунка бота на момент сигнала: до решения — свечи бота, после — ещё и свечи «что было дальше» до свечи
- *  выхода; золотая черта — момент решения, цветная — выход из сделки. Окно одно и то же в обоих видах, чтобы «после»
+ *  выхода; золотая черта — момент решения, зелёная — тейк. Окно одно и то же в обоих видах, чтобы «после»
  *  не прыгало. */
 function scenePanel(sc: { panels: TmPanel[] } | null, tf: string, show: boolean, all = true, it?: TimeItem): Scene | null {
   const P0 = sc?.panels.find((x) => x.tf === tf);
   const P = P0 && tf === 'H4' && !all ? cleanH4(P0) : P0;
   if (!P || !P.bars?.length) return null;
-  const after = (P.after || []).slice(0, keepAfter(P.after || [], tf, it?.exit, it?.tf?.H4));
+  const after = (P.after || []).slice(0, keepAfter(P.after || [], tf, it ? cutOf(it) : undefined, it?.tf?.H4));
   const n = P.bars.length;
   const bars = show ? [...P.bars, ...after] : P.bars;
   const x1 = Math.max(P.xlim[1], n - 0.5 + after.length + 1);
@@ -365,7 +371,7 @@ function scenePanel(sc: { panels: TmPanel[] } | null, tf: string, show: boolean,
   if (show) after.forEach((b) => { lo = Math.min(lo, b[3]); hi = Math.max(hi, b[2]); });
   const line = { k: 'line' as const, p: [[n - 0.5, lo], [n - 0.5, hi]] as [number, number][], c: ACCENT, a: 1, w: 2, d: [4, 3], z: 9, L: 'other' as Layer };
   const ex = it ? exitLook(it) : null;
-  // линия выхода — по правому краю свечи выхода: «после» идёт между золотой и цветной
+  // линия выхода — по правому краю свечи выхода: «после» идёт между золотой и зелёной
   const out = show && ex && after.length ? [{ ...line, p: [[n - 0.5 + after.length, lo], [n - 0.5 + after.length, hi]] as [number, number][], c: ex.col, d: null }] : [];
   // окно одно в обоих видах: до правого края, куда дойдут свечи «после» (edge задаёт окно по умолчанию)
   return { v: 1, title: null, texts: [], panels: [{ ...P, bars, xlim: [P.xlim[0], x1], edge: x1, ylim: [lo, hi], shapes: [...P.shapes, line, ...out] }] };
@@ -396,7 +402,7 @@ function TfBox({ title, k, it, tf, show, when, live, loading, tools, notes = fal
         ) : null}
       </div>
       {/* 18.10.2026: пока грузится рисунок бота, простые свечи не показываем — иначе график «меняется» на глазах */}
-      {live ? chart : loading ? <div style={{ color: DIM, fontSize: 13, padding: '40px 0', textAlign: 'center' }}>загружаю рисунок…</div> : tf ? <Chart tf={tf} show={show} when={when} keep={keepAfter(tf.bars.slice(tf.cut), k, it.exit, it.tf?.H4)} exitCol={ex?.col} /> : null}
+      {live ? chart : loading ? <div style={{ color: DIM, fontSize: 13, padding: '40px 0', textAlign: 'center' }}>загружаю рисунок…</div> : tf ? <Chart tf={tf} show={show} when={when} keep={keepAfter(tf.bars.slice(tf.cut), k, cutOf(it), it.tf?.H4)} exitCol={ex?.col} /> : null}
       {children}
       {fs && live ? (
         <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: '#080808', overflow: 'auto', padding: 12 }}>
@@ -451,8 +457,7 @@ function Layout({ it, show, side, onOpen, symbols, hidePic }: { it: TimeItem; sh
         </TfBox>
         <div style={{ color: DIM, fontSize: 12, lineHeight: 1.55 }}>
           Справа от золотой линии — то, чего в момент решения ещё никто не знал. Под каждым графиком — то, что бот видел в момент сигнала.
-          {show && ex ? ` ${ex.word} линия — ${ex.tag}: здесь сделка закрылась, дальше график не показан.` : ''}
-          {show && !ex && it.result.toUpperCase().startsWith('ВОШЁЛ') ? ' День выхода из этой сделки не записан, поэтому «после» показано целиком.' : ''}
+          {show && ex ? ` Зелёная линия — ${ex.tag}: здесь сделка закрылась, дальше график не показан.` : ''}
           {it.d1?.restored ? ' Дневка и H4 восстановлены по истории: алгоритм бота пересчитан на свечах до момента сигнала, показаны только проверки, которые были в тот день.' : ''}
         </div>
       </div>
