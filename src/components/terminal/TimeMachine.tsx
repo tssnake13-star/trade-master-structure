@@ -41,6 +41,11 @@ export interface TimeItem {
   // рисунок бота на момент сигнала (H4 — draw_h4, дневка и неделя — draw_scenario) данными живого графика, файлом в
   // хранилище terminal; у каждой панели after — свечи после сигнала
   scene?: string | null;
+  // ⛔ 21.10.2026, его слово: «что было дальше… не по текущий момент, а по тому моменту, когда был взят тейк… и линию
+  // поставить» — свеча выхода из сделки (H4 по часам сервера, «2026-09-30T04:00») или только день («2026-10-06») и чем
+  // закрылась: тейк / стоп / безубыток / закрыта (ВЫХОДЫ_СДЕЛОК.json → субботний terminal_ishody.py)
+  exit?: string;
+  exit_kind?: string;
 }
 type TmPanel = ScenePanel & { after?: SBar[] };
 
@@ -92,18 +97,52 @@ function resultTone(r: string): 'take' | 'stop' | 'skip' {
 }
 const keyOf = (x: TimeItem) => `${x.time}|${x.instrument}|${x.side}`;
 
-function Chart({ tf, show, when }: { tf: Tf; show: boolean; when: string }) {
-  const B = tf.bars;
+/** Сколько свечей «после» показывать: до свечи выхода включительно. Дневка, неделя и выход без часа — свечи, начавшиеся
+ *  не позже дня выхода; H4 — до свечи выхода. У свечей H4 рисунка бота только даты: дни до выхода целиком, в день
+ *  выхода — столько свечей, сколько их в ленте до свечи выхода (там время полное). Нет выхода — все свечи «после». */
+function keepAfter(after: Bar[], tf: string, exit?: string, h4?: Tf): number {
+  if (!exit || !after.length) return after.length;
+  const day = exit.slice(0, 10);
+  let k = 0;
+  if (tf !== 'H4' || exit.length <= 10) {
+    while (k < after.length && after[k][0].slice(0, 10) <= day) k++;
+  } else if (after[0][0].length > 10) {
+    while (k < after.length && after[k][0] <= exit) k++;
+  } else {
+    const full = h4 ? h4.bars.slice(h4.cut) : [];
+    const reach = full.length > 0 && full[full.length - 1][0].slice(0, 10) >= day;
+    const inDay = reach ? full.filter((b) => b[0].slice(0, 10) === day && b[0] <= exit).length : Math.floor(+exit.slice(11, 13) / 4) + 1;
+    while (k < after.length && after[k][0].slice(0, 10) < day) k++;
+    for (let j = 0; j < inDay && k < after.length && after[k][0].slice(0, 10) === day; j++) k++;
+  }
+  return Math.max(1, k);
+}
+const EXIT_WORD: Record<string, string> = { 'тейк': 'тейк', 'стоп': 'стоп', 'безубыток': 'безубыток', 'закрыта': 'закрытие' };
+// «тейк 30.09» и цвет линии выхода: тейк зелёная, стоп красная, безубыток и закрытие светлая
+function exitLook(it: TimeItem): { tag: string; col: string; word: string } | null {
+  if (!it.exit) return null;
+  const k = it.exit_kind || '';
+  const tag = `${EXIT_WORD[k] || 'выход'} ${it.exit.slice(8, 10)}.${it.exit.slice(5, 7)}`;
+  if (k === 'тейк') return { tag, col: UP, word: 'Зелёная' };
+  if (k === 'стоп') return { tag, col: DOWN, word: 'Красная' };
+  return { tag, col: '#cfc8bb', word: 'Светлая' };
+}
+
+function Chart({ tf, show, when, keep, exitCol }: { tf: Tf; show: boolean; when: string; keep: number; exitCol?: string }) {
+  // ⛔ 21.10.2026: окно — свечи до решения и «после» до свечи выхода, одно в обоих видах; шкала цены «как было» — только
+  // по свечам до решения, иначе по пустому месту видно, куда цена пойдёт
+  const B = tf.bars.slice(0, tf.cut + keep);
   const W = 760, H = 250, pl = 8, pr = 64, pt = 12, pb = 22;
   let hi = -Infinity, lo = Infinity;
-  B.forEach((b) => {
+  B.slice(0, show ? B.length : tf.cut).forEach((b) => {
     hi = Math.max(hi, b[2]);
     lo = Math.min(lo, b[3]);
   });
   const pad = (hi - lo) * 0.06;
   hi += pad;
   lo -= pad;
-  const step = (W - pl - pr) / B.length;
+  // у линии выхода справа три пустых места — иначе она сливается с краем графика
+  const step = (W - pl - pr) / (B.length + (exitCol ? 3 : 0));
   const X = (i: number) => pl + (i + 0.5) * step;
   const Y = (p: number) => pt + ((hi - p) / (hi - lo)) * (H - pt - pb);
   const w = Math.max(1, step * 0.62);
@@ -139,6 +178,7 @@ function Chart({ tf, show, when }: { tf: Tf; show: boolean; when: string }) {
           </g>
         );
       })}
+      {show && exitCol && keep > 0 ? <line x1={X(B.length - 1) + step / 2} x2={X(B.length - 1) + step / 2} y1={pt} y2={H - pb} stroke={exitCol} strokeWidth={2} /> : null}
       <line x1={xc} x2={xc} y1={pt} y2={H - pb} stroke={ACCENT} strokeWidth={2} strokeDasharray="5 4" />
       <rect x={xc - 60} y={pt} width={120} height={19} rx={4} fill={ACCENT} />
       <text x={xc} y={pt + 13} fill="#0a0a0a" fontSize={12} fontWeight={700} textAnchor="middle">решение {when}</text>
@@ -310,27 +350,32 @@ function cleanH4(p: TmPanel): TmPanel {
     labels: p.labels.filter((l) => !DROP_LABEL.has(String(l.c).toLowerCase())),
   };
 }
-/** Панель рисунка бота на момент сигнала: до решения — свечи бота, после — ещё и свечи «что было дальше»;
- *  золотая черта — момент решения. Окно одно и то же в обоих видах, чтобы «после» не прыгало. */
-function scenePanel(sc: { panels: TmPanel[] } | null, tf: string, show: boolean, all = true): Scene | null {
+/** Панель рисунка бота на момент сигнала: до решения — свечи бота, после — ещё и свечи «что было дальше» до свечи
+ *  выхода; золотая черта — момент решения, цветная — выход из сделки. Окно одно и то же в обоих видах, чтобы «после»
+ *  не прыгало. */
+function scenePanel(sc: { panels: TmPanel[] } | null, tf: string, show: boolean, all = true, it?: TimeItem): Scene | null {
   const P0 = sc?.panels.find((x) => x.tf === tf);
   const P = P0 && tf === 'H4' && !all ? cleanH4(P0) : P0;
   if (!P || !P.bars?.length) return null;
-  const after = P.after || [];
+  const after = (P.after || []).slice(0, keepAfter(P.after || [], tf, it?.exit, it?.tf?.H4));
   const n = P.bars.length;
   const bars = show ? [...P.bars, ...after] : P.bars;
   const x1 = Math.max(P.xlim[1], n - 0.5 + after.length + 1);
   let lo = P.ylim[0], hi = P.ylim[1];
   if (show) after.forEach((b) => { lo = Math.min(lo, b[3]); hi = Math.max(hi, b[2]); });
   const line = { k: 'line' as const, p: [[n - 0.5, lo], [n - 0.5, hi]] as [number, number][], c: ACCENT, a: 1, w: 2, d: [4, 3], z: 9, L: 'other' as Layer };
+  const ex = it ? exitLook(it) : null;
+  // линия выхода — по правому краю свечи выхода: «после» идёт между золотой и цветной
+  const out = show && ex && after.length ? [{ ...line, p: [[n - 0.5 + after.length, lo], [n - 0.5 + after.length, hi]] as [number, number][], c: ex.col, d: null }] : [];
   // окно одно в обоих видах: до правого края, куда дойдут свечи «после» (edge задаёт окно по умолчанию)
-  return { v: 1, title: null, texts: [], panels: [{ ...P, bars, xlim: [P.xlim[0], x1], edge: x1, ylim: [lo, hi], shapes: [...P.shapes, line] }] };
+  return { v: 1, title: null, texts: [], panels: [{ ...P, bars, xlim: [P.xlim[0], x1], edge: x1, ylim: [lo, hi], shapes: [...P.shapes, line, ...out] }] };
 }
 
-function TfBox({ title, tf, show, when, live, loading, tools, notes = false, children }: { title: string; tf?: Tf; show: boolean; when: string; live?: Scene | null; loading?: boolean; tools?: ReactNode; notes?: boolean; children?: ReactNode }) {
+function TfBox({ title, k, it, tf, show, when, live, loading, tools, notes = false, children }: { title: string; k: string; it: TimeItem; tf?: Tf; show: boolean; when: string; live?: Scene | null; loading?: boolean; tools?: ReactNode; notes?: boolean; children?: ReactNode }) {
   const view = useContext(TmViewCtx);
   const [fs, setFs] = useState(false);
   if (!live && !loading && (!tf || !tf.bars.length)) return null;
+  const ex = exitLook(it);
   const small = { ...btn(DIM), width: 'auto', marginTop: 0, padding: '5px 10px', fontSize: 10 };
   // 18.10.2026, его слово (школьный бот, холодные): «всё-таки уберём все цифры и все пояснения… для холодного это вообще
   // не нужно… раскрывает то, что не нужно» — в Телеграме без номеров и их списка все три графика (машина времени и
@@ -342,7 +387,7 @@ function TfBox({ title, tf, show, when, live, loading, tools, notes = false, chi
   return (
     <div style={{ ...card, padding: 12 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap', marginBottom: 6 }}>
-        <div style={{ ...label }}>{title} · {show ? 'до и после' : 'как было ' + when}</div>
+        <div style={{ ...label }}>{title} · {show ? 'до и после' + (ex ? ' · ' + ex.tag : '') : 'как было ' + when}</div>
         {live ? (
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 6 }}>
             {tools}
@@ -351,7 +396,7 @@ function TfBox({ title, tf, show, when, live, loading, tools, notes = false, chi
         ) : null}
       </div>
       {/* 18.10.2026: пока грузится рисунок бота, простые свечи не показываем — иначе график «меняется» на глазах */}
-      {live ? chart : loading ? <div style={{ color: DIM, fontSize: 13, padding: '40px 0', textAlign: 'center' }}>загружаю рисунок…</div> : tf ? <Chart tf={tf} show={show} when={when} /> : null}
+      {live ? chart : loading ? <div style={{ color: DIM, fontSize: 13, padding: '40px 0', textAlign: 'center' }}>загружаю рисунок…</div> : tf ? <Chart tf={tf} show={show} when={when} keep={keepAfter(tf.bars.slice(tf.cut), k, it.exit, it.tf?.H4)} exitCol={ex?.col} /> : null}
       {children}
       {fs && live ? (
         <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: '#080808', overflow: 'auto', padding: 12 }}>
@@ -372,6 +417,7 @@ function TfBox({ title, tf, show, when, live, loading, tools, notes = false, chi
 function Layout({ it, show, side, onOpen, symbols, hidePic }: { it: TimeItem; show: boolean; side: ReactNode; onOpen: Open; symbols: Set<string>; hidePic?: boolean }) {
   const wide = typeof window === 'undefined' ? true : window.innerWidth >= 900;
   const when = fmtWhen(it.time).slice(0, 5);
+  const ex = exitLook(it);
   const ctx = ctxWords(it.ctx);
   const { sc, state } = useScene(it.scene);
   const [notes, setNotes] = useState(false);
@@ -393,18 +439,20 @@ function Layout({ it, show, side, onOpen, symbols, hidePic }: { it: TimeItem; sh
             </button>
           </div>
         ) : null}
-        <TfBox title={`${it.instrument} · H4`} tf={it.tf?.H4} show={show} when={when} live={scenePanel(sc, 'H4', show, all)} loading={loading} tools={allBtn} notes={notes}>
+        <TfBox title={`${it.instrument} · H4`} k="H4" it={it} tf={it.tf?.H4} show={show} when={when} live={scenePanel(sc, 'H4', show, all, it)} loading={loading} tools={allBtn} notes={notes}>
           <Rows rows={[['Сигнал', 'триггер на H4 — с него пришла карточка'], ...(it.h4?.rows || [])]} />
           {hidePic ? null : <Pic it={it} />}
         </TfBox>
-        <TfBox title={`${it.instrument} · дневка`} tf={it.tf?.D1} show={show} when={when} live={scenePanel(sc, 'D1', show)} loading={loading} notes={notes}>
+        <TfBox title={`${it.instrument} · дневка`} k="D1" it={it} tf={it.tf?.D1} show={show} when={when} live={scenePanel(sc, 'D1', show, true, it)} loading={loading} notes={notes}>
           <Rows rows={dayRows(it)} />
         </TfBox>
-        <TfBox title={`${it.instrument} · неделя`} tf={it.tf?.W1} show={show} when={when} live={scenePanel(sc, 'W1', show)} loading={loading} notes={notes}>
+        <TfBox title={`${it.instrument} · неделя`} k="W1" it={it} tf={it.tf?.W1} show={show} when={when} live={scenePanel(sc, 'W1', show, true, it)} loading={loading} notes={notes}>
           <Rows rows={weekRows(it)} />
         </TfBox>
         <div style={{ color: DIM, fontSize: 12, lineHeight: 1.55 }}>
           Справа от золотой линии — то, чего в момент решения ещё никто не знал. Под каждым графиком — то, что бот видел в момент сигнала.
+          {show && ex ? ` ${ex.word} линия — ${ex.tag}: здесь сделка закрылась, дальше график не показан.` : ''}
+          {show && !ex && it.result.toUpperCase().startsWith('ВОШЁЛ') ? ' День выхода из этой сделки не записан, поэтому «после» показано целиком.' : ''}
           {it.d1?.restored ? ' Дневка и H4 восстановлены по истории: алгоритм бота пересчитан на свечах до момента сигнала, показаны только проверки, которые были в тот день.' : ''}
         </div>
       </div>
