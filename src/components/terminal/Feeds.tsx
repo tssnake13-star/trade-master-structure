@@ -333,9 +333,13 @@ function useWide(px = 900) {
   return wide;
 }
 
-type DayMark = { trades: number[]; n: number };
+// ⛔ 21.10.2026, его слово: «нажимаю на 19 августа… плюс 14,8… открывается золото… за 19 августа у меня была доллар Канада…
+// много таких ошибок… исправляй все» — нажатие открывало первое решение дня в списке (а список — от новых к старым).
+// who — чьё решение дало каждый квадратик сделки (номер в items), first — самое раннее решение дня, firstTrade — самое
+// раннее решение дня со сделкой: нажатие на день открывает сделку, на квадратик — его сделку
+type DayMark = { trades: number[]; who: number[]; first: number; firstTrade: number | null; n: number };
 
-function MonthGrid({ ym, by, onPick, big, stats = true }: { ym: string; by: Map<string, DayMark>; onPick: (day: string) => void; big: boolean; stats?: boolean }) {
+function MonthGrid({ ym, by, onPick, big, stats = true }: { ym: string; by: Map<string, DayMark>; onPick: (day: string, idx?: number) => void; big: boolean; stats?: boolean }) {
   const [y, m] = ym.split('-').map(Number);
   const days = new Date(Date.UTC(y, m, 0)).getUTCDate();
   const off = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7;
@@ -394,7 +398,7 @@ function MonthGrid({ ym, by, onPick, big, stats = true }: { ym: string; by: Map<
             <button
               key={key}
               disabled={!x}
-              onClick={() => x && onPick(key)}
+              onClick={() => x && onPick(key, x.firstTrade ?? x.first)}
               title={x ? `${x.n} ${plural(x.n, 'решение', 'решения', 'решений')} — открыть в списке` : undefined}
               style={{
                 minHeight: 46, borderRadius: 7, border: 'none', background: bg, color: fg, padding: '3px 4px',
@@ -410,6 +414,10 @@ function MonthGrid({ ym, by, onPick, big, stats = true }: { ym: string; by: Map<
                   {tr.map((t, j) => (
                     <span
                       key={j}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (x) onPick(key, x.who[j]);
+                      }}
                       style={{
                         background: colorOfR(t), color: t !== 0 ? '#0a0a0a' : FG, borderRadius: 3, padding: '0 3px',
                         fontFamily: MONO, fontWeight: 700, fontSize: big ? 11.5 : 9.5, lineHeight: '15px', whiteSpace: 'nowrap',
@@ -435,7 +443,7 @@ function MonthGrid({ ym, by, onPick, big, stats = true }: { ym: string; by: Map<
  *  заметные» — на широком экране три месяца, на телефоне один; цифры крупнее, стрелки золотые. */
 // 21.10.2026, его слово: «в машину времени добавь календарь, по которому легче выбирать допуск/отказ из журнала» — тот же
 // календарь и в «Сделках до и после» (TimeMachine): итог решения берёт resultOf, итоги месяца там скрыты (stats=false)
-export function JournalCalendar<T extends { time: string }>({ items, resultOf, onPick, hint, stats = true }: { items: T[]; resultOf: (x: T) => string | undefined; onPick: (day: string) => void; hint?: string; stats?: boolean }) {
+export function JournalCalendar<T extends { time: string }>({ items, resultOf, onPick, hint, stats = true }: { items: T[]; resultOf: (x: T) => string | undefined; onPick: (day: string, item?: T) => void; hint?: string; stats?: boolean }) {
   const wide = useWide();
   const now = dayOf(new Date().toISOString()).slice(0, 7);
   const [end, setEnd] = useState(now);
@@ -445,13 +453,18 @@ export function JournalCalendar<T extends { time: string }>({ items, resultOf, o
   const canBack = first > JOURNAL_FROM;
   const canFwd = end < now;
   const by = new Map<string, DayMark>();
-  for (const v of items) {
+  const at = (i: number) => new Date(items[i].time).getTime();
+  items.forEach((v, i) => {
     const d = dayOf(v.time);
-    const cur = by.get(d) || { trades: [], n: 0 };
+    const cur = by.get(d) || { trades: [], who: [], first: i, firstTrade: null, n: 0 };
     cur.n += 1;
-    cur.trades.push(...tradesOfResult(resultOf(v)));
+    const tr = tradesOfResult(resultOf(v));
+    cur.trades.push(...tr);
+    cur.who.push(...tr.map(() => i));
+    if (at(i) < at(cur.first)) cur.first = i;
+    if (tr.length && (cur.firstTrade == null || at(i) < at(cur.firstTrade))) cur.firstTrade = i;
     by.set(d, cur);
-  }
+  });
   const arrow = (k: number, ok: boolean) => (
     <button
       onClick={() => ok && setEnd(ymShift(end, k))}
@@ -475,7 +488,7 @@ export function JournalCalendar<T extends { time: string }>({ items, resultOf, o
         {arrow(1, canFwd)}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${months.length}, minmax(0, 1fr))`, gap: 22 }}>
-        {months.map((ym) => <MonthGrid key={ym} ym={ym} by={by} onPick={onPick} big={wide} stats={stats} />)}
+        {months.map((ym) => <MonthGrid key={ym} ym={ym} by={by} onPick={(day, i) => onPick(day, i == null ? undefined : items[i])} big={wide} stats={stats} />)}
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, fontSize: 12.5, color: DIM, marginTop: 10 }}>
         {[[UP, 'тейк'], [DOWN, 'стоп'], ['#4a453e', 'безубыток']].map(([c, n]) => (

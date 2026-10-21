@@ -522,9 +522,10 @@ export function TimeMachine({ doc, symbols, onOpen }: { doc?: { items?: TimeItem
         items={items}
         resultOf={(x) => x.result}
         stats={false}
-        hint="Число — результат сделки в R: 1 R — это один стоп. Рамкой — решение без входа. Нажмите на день — откроется решение этого дня."
-        onPick={(day) => {
-          const i = items.findIndex((x) => dayOfTm(x.time) === day);
+        hint="Число — результат сделки в R: 1 R — это один стоп. Рамкой — решение без входа. Нажмите на число — откроется эта сделка; на день без сделки — первое решение дня. Другие решения того же дня — в ленте ниже, в пунктирной рамке."
+        onPick={(day, x) => {
+          // ⛔ 21.10.2026: открываем то решение, на которое нажали (квадратик сделки или сделку дня), а не первое в ленте
+          const i = x ? items.indexOf(x) : items.findIndex((y) => dayOfTm(y.time) === day);
           if (i < 0) return;
           setIdx(i);
           setShown(false);
@@ -543,7 +544,8 @@ export function TimeMachine({ doc, symbols, onOpen }: { doc?: { items?: TimeItem
               setIdx(i);
               setShown(false);
             }}
-            style={{ flex: '0 0 auto', textAlign: 'left', background: CARD, border: `1px solid ${i === idx ? ACCENT : BORDER}`, borderRadius: 8, padding: '7px 10px', cursor: 'pointer', color: FG }}
+            // другие решения того же дня, что и открытое, — в пунктирной рамке: видно, что в этот день их было несколько
+            style={{ flex: '0 0 auto', textAlign: 'left', background: CARD, border: i === idx ? `1px solid ${ACCENT}` : dayOfTm(x.time) === dayOfTm(it.time) ? `1px dashed ${ACCENT}99` : `1px solid ${BORDER}`, borderRadius: 8, padding: '7px 10px', cursor: 'pointer', color: FG }}
           >
             <div style={{ fontFamily: MONO, fontSize: 10, color: DIM }}>{fmtWhen(x.time)}</div>
             <div style={{ fontSize: 13, marginTop: 2 }}>
