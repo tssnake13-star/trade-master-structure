@@ -66,13 +66,13 @@ export function groupRows(rows: MarketRow[], list: MarketRow[]): [string, Market
 
 // ─────────────────────────── вид «сценарии» ───────────────────────────
 
-export type ScenKey = '1' | '2' | 'ctx' | 'none';
+// ⛔ 21.10.2026, его слово: сценарий по контексту убран везде — раздела «По контексту» больше нет
+export type ScenKey = '1' | '2' | 'none';
 
 // слова разделов — те же, что в главном блоке инструмента (Decision); берут кабинет и терминал в Телеграме
 export const SCEN_META: Record<ScenKey, { title: string; note?: string }> = {
   '1': { title: 'Первый сценарий', note: 'идём по недельному циклу' },
   '2': { title: 'Второй сценарий', note: 'недельный цикл пройден, идём против него' },
-  ctx: { title: 'По контексту', note: 'сценария 1 и 2 нет, но поводырь, дневка и подтверждение за' },
   none: { title: 'Сценария нет' },
 };
 export interface ScenBlock {
@@ -84,13 +84,13 @@ export interface ScenBlock {
 }
 
 const scenOf = (r: MarketRow): ScenKey =>
-  r.scenario === '1' || r.scenario === '2' ? r.scenario : r.scenario === 'итог' ? 'ctx' : 'none';
+  r.scenario === '1' || r.scenario === '2' ? r.scenario : 'none';
 
 /** Инструменты по сценариям. Его порядок: из первого и второго сценария выше тот, где инструментов
- *  меньше; «по контексту» и «сценария нет» — после них. Порядок разделов считается по всем строкам,
+ *  меньше; «сценария нет» — после них. Порядок разделов считается по всем строкам,
  *  чтобы разделы не прыгали, пока набираешь поиск. */
 export function scenarioRows(rows: MarketRow[], list: MarketRow[]): ScenBlock[] {
-  const zero = (): Record<ScenKey, number> => ({ '1': 0, '2': 0, ctx: 0, none: 0 });
+  const zero = (): Record<ScenKey, number> => ({ '1': 0, '2': 0, none: 0 });
   const total = zero();
   const long = zero();
   const short = zero();
@@ -100,11 +100,11 @@ export function scenarioRows(rows: MarketRow[], list: MarketRow[]): ScenBlock[] 
     if (r.side === 'LONG') long[k] += 1;
     else if (r.side === 'SHORT') short[k] += 1;
   }
-  const shown: Record<ScenKey, MarketRow[]> = { '1': [], '2': [], ctx: [], none: [] };
+  const shown: Record<ScenKey, MarketRow[]> = { '1': [], '2': [], none: [] };
   for (const r of list) shown[scenOf(r)].push(r);
   const sideAt = (r: MarketRow) => (r.side === 'LONG' ? 0 : r.side === 'SHORT' ? 1 : 2);
   const numbered: ScenKey[] = total['2'] < total['1'] ? ['2', '1'] : ['1', '2'];
-  return [...numbered, 'ctx' as const, 'none' as const].map((key) => ({
+  return [...numbered, 'none' as const].map((key) => ({
     key,
     total: total[key],
     long: long[key],

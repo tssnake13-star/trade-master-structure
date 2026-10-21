@@ -299,7 +299,7 @@ function ScenarioList({ blocks, searching, selected, market, onOpen }: { blocks:
     <>
       {blocks.map((b) => {
         const numbered = b.key === '1' || b.key === '2';
-        // пока идёт поиск, пустые разделы не показываем; «по контексту» и «сценария нет» — только когда в них кто-то есть
+        // пока идёт поиск, пустые разделы не показываем; «сценария нет» — только когда в нём кто-то есть
         if (!b.rows.length && (searching || !numbered)) return null;
         const yes = b.rows.filter((r) => r.confirmation);
         const no = b.rows.filter((r) => !r.confirmation);
@@ -309,7 +309,7 @@ function ScenarioList({ blocks, searching, selected, market, onOpen }: { blocks:
               <ScenPlate b={b} market={market} />
             ) : (
               <div style={{ padding: '14px 8px 2px' }}>
-                <div style={{ ...label, color: b.key === 'ctx' ? LOOK[market].text : DIM, display: 'flex', justifyContent: 'space-between' }}>
+                <div style={{ ...label, color: DIM, display: 'flex', justifyContent: 'space-between' }}>
                   <span>{SCEN_META[b.key].title}</span>
                   <span>{b.total}</span>
                 </div>

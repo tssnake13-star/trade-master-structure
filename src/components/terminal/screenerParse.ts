@@ -11,9 +11,6 @@ export interface ScrInstrument {
   // сколько из трёх критериев недели за сторону пары (2 или 3). 21.09.2026: вместо значка
   // режима рынка — режим убран его решением, третий критерий теперь накопления
   score: number | null;
-  // 27.09.2026, его правило: неделя пары против группы, но поводырь, дневка и подтверждение за —
-  // пара в списке группы с пометкой «по контексту» вместо счёта недели
-  note?: string | null;
 }
 
 export interface ScrGroup {
@@ -108,8 +105,7 @@ export function parseGroups(text: string): ScrGroup[] {
     if (g) {
       const w = line.match(/·\s*W1\s*([↑↓~—])\s*(?:\[([^\]]*)\])?/u);
       const d = line.match(/·\s*D1\s*([↑↓~—])\s*(?:\[([^\]]*)\])?/u);
-      // 27.09.2026: + «сценарий по контексту» — сторону группе дал поводырь по своему поводырю (индексу доллара)
-      const n = line.match(/·\s*(сценарий\s*\d+|сценарий по контексту|по дневке)/u);
+      const n = line.match(/·\s*(сценарий\s*\d+|по дневке)/u);
       const label = g[2].trim();
       const code = (label.match(/\(([A-Z]+)\)\s*$/) || [])[1] || label.replace(/[^A-Z]/g, '') || label;
       cur = {
@@ -157,7 +153,6 @@ export function parseGroups(text: string): ScrGroup[] {
             symbol: m[1].toUpperCase(),
             side: m[2] as 'LONG' | 'SHORT',
             score: sc ? +sc[1] : null,
-            note: /по контексту/u.test(part) ? 'по контексту' : null,
           });
         }
       }
