@@ -1,16 +1,23 @@
 import { ArrowRight, MessageCircle } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
+import FinalRing from './FinalRing';
 
 const DualCTASection = () => {
   return (
-    <section className="py-12 md:py-20">
-      <div className="container-landing">
-        <h2 className="text-foreground text-center mb-8 md:mb-12">
-          Первый шаг <em>бесплатный</em>
-        </h2>
+    // 22.10.2026: последний экран по образцу Сергея — заголовок внутри светящегося кольца (FinalRing),
+    // карточки заходят на низ кольца. Тексты и кнопки прежние.
+    <section className="final-cta relative overflow-hidden py-12 md:py-20">
+      <FinalRing />
+      <div className="container-landing relative" style={{ zIndex: 1 }}>
+        <div data-ring-center className="final-cta__center">
+          <h2 className="text-foreground text-center">
+            {/* в две строки: целиком внутри кольца и на компьютере */}
+            Первый шаг<br /><em>бесплатный</em>
+          </h2>
+        </div>
 
-        <div className="grid md:grid-cols-2 gap-4 md:gap-6 max-w-3xl mx-auto">
+        <div className="grid md:grid-cols-2 gap-4 md:gap-6 max-w-3xl mx-auto final-cta__cards">
           {/* Primary — пробный доступ (08.10.2026: главный вход; через бота, чтобы человек остался в базе) */}
           <div className="p-6 md:p-8 bg-card border border-border rounded-xl text-center flex flex-col items-center">
             <p className="text-base md:text-lg text-foreground font-medium mb-2">
@@ -25,7 +32,7 @@ const DualCTASection = () => {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackClick('final_trial')}
-              className="btn-primary group w-full justify-center"
+              className="btn-primary cta-shine group w-full justify-center"
             >
               Попробовать 7 дней
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />

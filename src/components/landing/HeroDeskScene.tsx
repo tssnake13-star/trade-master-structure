@@ -157,15 +157,15 @@ export default function HeroDeskScene({ variant, className }: Props) {
     const ro = new ResizeObserver(layout);
     ro.observe(el);
 
-    // кольцо видно только за мониторами: экраны и стол его закрывают
+    // кольцо видно только выше верхнего края мониторов (вместе с рамкой): ниже оно «за ними».
+    // Одна фигура без дыр — прежняя маска из перекрывающихся фигур (evenodd) пропускала кольцо
+    // там, где фигуры накладывались: под левым монитором и в щели между мониторами
+    // (Сергей 22.10.2026, на планшете: «задевает край монитора… наезжает на монитор»).
     const behind = new Path2D();
-    behind.rect(-400, -400, 2500, 1800);
-    // контуры мониторов вместе с рамкой: нижняя серебристая полоса правого монитора доходит
-    // до y≈560 у правого края (Сергей 22.10.2026: «кольцо… наезжает на монитор»)
-    behind.moveTo(682, 196); behind.lineTo(1176, 191); behind.lineTo(1178, 494); behind.lineTo(684, 490); behind.closePath();
-    behind.moveTo(1176, 191); behind.lineTo(1648, 152); behind.lineTo(1648, 568); behind.lineTo(1176, 496); behind.closePath();
-    behind.rect(-400, 545, 2500, 900);
-    behind.rect(1035, 470, 150, 75);
+    // слева и справа от мониторов — стена, там свечению можно опускаться ниже
+    behind.moveTo(-400, -400); behind.lineTo(2100, -400); behind.lineTo(2100, 600); behind.lineTo(1652, 600);
+    behind.lineTo(1652, 150); behind.lineTo(1176, 189); behind.lineTo(682, 194); behind.lineTo(678, 600); behind.lineTo(-400, 600);
+    behind.closePath();
 
     // карточка терминала: одна за раз, не чаще раза в 6 с
     let cardN = 0;
@@ -212,7 +212,7 @@ export default function HeroDeskScene({ variant, className }: Props) {
       if (ringOn > 0) {
         fx.save();
         fx.translate(-ox, -oy);
-        fx.clip(behind, 'evenodd');
+        fx.clip(behind);
         fx.translate(ox, oy);
         const box = (RING.r + ringPad) * 2;
         fx.globalAlpha = ringOn * (0.8 + 0.2 * Math.sin(t * 0.7));
