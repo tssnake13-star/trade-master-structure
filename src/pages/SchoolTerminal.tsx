@@ -483,7 +483,7 @@ export default function SchoolTerminal() {
             >
               написать Сергею
             </a>
-            <button onClick={() => navigate('/access')} style={{ ...pill(false), padding: '11px 18px' }}>
+            <button onClick={() => navigate('/#formats')} style={{ ...pill(false), padding: '11px 18px' }}>
               цены
             </button>
             <button onClick={() => navigate('/school/dashboard')} style={{ ...pill(false), padding: '11px 18px' }}>

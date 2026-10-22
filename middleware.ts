@@ -1,6 +1,6 @@
 import { rewrite, next } from '@vercel/edge';
 
-// Vercel Edge Middleware — runs before the filesystem, so it can intercept "/" and "/access".
+// Vercel Edge Middleware — runs before the filesystem, so it can intercept "/" and the documents.
 // Who gets the pre-rendered HTML (full text of the page):
 //   · every known bot / crawler / social scraper / LLM reader (BOT_RE);
 //   · every client that is NOT a real browser opening the page — scripts and AI agents
@@ -8,7 +8,7 @@ import { rewrite, next } from '@vercel/edge';
 //     bots, old browsers. Since 04.10.2026 (Сергей: «чтобы любой ИИ смог читать хотя бы
 //     текст») this is the default: before, only named bots got the text, and an AI tool
 //     fetching the page with a plain HTTP client saw an empty 8 KB shell.
-//   · since 05.10.2026 the same for the pricing page /access (Сергей: «опять gpt не может
+//   · from 05.10.2026 to 22.10.2026 the same for the pricing page /access (Сергей: «опять gpt не может
 //     прочитать страницу» — ChatGPT по ссылке на цены видел пустую оболочку).
 //   · since 07.10.2026 the same for the documents /privacy and /terms (ad platforms check
 //     the privacy policy link with their own robots).
@@ -17,12 +17,11 @@ import { rewrite, next } from '@vercel/edge';
 // modern browser sends and plain HTTP clients don't. Both variants carry the same
 // scripts, so a human who lands on a pre-rendered file still gets the full working app.
 export const config = {
-  matcher: ['/', '/access', '/privacy', '/terms'],
+  matcher: ['/', '/privacy', '/terms'],
 };
 
 const PRERENDERED: Record<string, string> = {
   '/': '/prerendered.html',
-  '/access': '/access-prerendered.html',
   '/privacy': '/privacy-prerendered.html',
   '/terms': '/terms-prerendered.html',
 };

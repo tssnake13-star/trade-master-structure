@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -20,7 +20,6 @@ import SchoolAnalytics from "./pages/SchoolAnalytics";
 import PreviewRedesign from "./pages/PreviewRedesign";
 import PreviewNext from "./pages/PreviewNext";
 import PreviewCandles from "./pages/PreviewCandles";
-import Access from "./pages/Access";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import SchoolPreview from "./pages/SchoolPreview";
@@ -42,7 +41,9 @@ const App = () => (
             <Route path="/" element={<Index />} />
             {/* 18.10.2026: терминал внутри Телеграма — кнопка «Терминал» в меню ботов */}
             <Route path="/tg/:bot" element={<TgTerminal />} />
-            <Route path="/access" element={<Access />} />
+            {/* 22.10.2026 страница цен убрана: цены в «09 · Сотрудничество», схему путей объясняет ролик «Карта школы».
+                Старые ссылки на /access (описания YouTube, уроки) ведут туда же; на сервере то же правило в vercel.json */}
+            <Route path="/access" element={<Navigate to="/#formats" replace />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/preview-redesign" element={<PreviewRedesign />} />

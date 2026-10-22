@@ -1,5 +1,6 @@
 import '@/styles/v3-skin.css';
 import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import useScrollAnimate from '@/hooks/useScrollAnimate';
 import { trackPageview, observeSections } from '@/lib/analytics';
 import Header from '@/components/landing/Header';
@@ -32,6 +33,23 @@ const TRACKED_SECTIONS = [
 
 const Index = () => {
   useScrollAnimate();
+
+  // Переход по якорю (/#formats, /#echo-gate): со старого адреса /access, из кабинета, из бота.
+  // При переходе внутри сайта браузер сам к якорю не прокручивает, а при открытии страницы
+  // секция может ещё не отрисоваться — ждём её до 2 с.
+  const { hash } = useLocation();
+  useEffect(() => {
+    if (!hash) return;
+    const id = decodeURIComponent(hash.slice(1));
+    let tries = 0;
+    const timer = window.setInterval(() => {
+      const el = document.getElementById(id);
+      // отступ под закреплённую шапку, иначе заголовок раздела уходит под неё
+      if (el) { window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 64 }); window.clearInterval(timer); }
+      else if (++tries > 20) window.clearInterval(timer);
+    }, 100);
+    return () => window.clearInterval(timer);
+  }, [hash]);
 
   useEffect(() => {
     trackPageview('/');

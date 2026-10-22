@@ -1598,7 +1598,7 @@ function CourseLadder({
                   Echo Gate · Hunter Bot · Risk Sentinel — инфраструктура исполнения на вашем счёте.
                 </p>
                 <a
-                  href="/access"
+                  href="/#formats"
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
