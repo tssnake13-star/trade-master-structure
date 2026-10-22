@@ -1,7 +1,6 @@
 import { ArrowRight, ArrowDown } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import StructureField from '@/components/landing/StructureField';
 import HeroDeskScene from '@/components/landing/HeroDeskScene';
 
@@ -64,41 +63,16 @@ const MONO_SMALL: React.CSSProperties = { fontSize: 11, letterSpacing: '0.12em',
 // 21.10.2026: фото автора с первого экрана заменено живой сценой (HeroDeskScene), Сергей:
 // «да, ставь на сайт». Его фото осталось в блоке «Автор». Ключ heroAuthor в настройках
 // сайта первым экраном больше не используется.
-// Двухколоночная раскладка (компьютер): первый экран закрепляется, и сцена оживает
-// при прокрутке, как на образце. Только если текст целиком помещается в высоту окна —
-// иначе низ текста ушёл бы под край, и сцена проигрывается сама.
-const SPLIT_MQ = '(min-width: 1024px) and (min-aspect-ratio: 1/1)';
+// 22.10.2026: первый экран больше не закрепляется на прокрутке. Сергей: «все зажигаться
+// стало быстрее… наоборот должно быть медленнее… плавно». При закреплении быстрая
+// прокрутка проматывала вступление, и человек уходил ниже, не увидев сцену. Теперь
+// вступление идёт само, медленно (8 с), а потом сцена живёт без конца (HeroDeskScene).
 
 export default function HeroSectionV3() {
-  const trackRef = useRef<HTMLDivElement>(null);
-  const textRef = useRef<HTMLDivElement>(null);
-  const [pinned, setPinned] = useState(false);
-
-  useEffect(() => {
-    const check = () => {
-      const t = textRef.current;
-      if (!t) return;
-      const fits = t.getBoundingClientRect().height + 150 <= window.innerHeight;
-      setPinned(window.matchMedia(SPLIT_MQ).matches && fits);
-    };
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
-
-  const scrollProgress = useCallback(() => {
-    const el = trackRef.current;
-    if (!el) return null;
-    const total = el.offsetHeight - window.innerHeight;
-    if (total <= 0) return null;
-    return Math.max(0, Math.min(1, -el.getBoundingClientRect().top / total));
-  }, []);
-
   // ⚠️ justify-start в секцию не возвращать: класс Tailwind грузится позже v3-skin.css
   // и перебивает .v3h-split-center — на компьютере текст встаёт по верху вместо середины
   // (поймано Сергеем 23.09.2026). Оба состояния выравнивания заданы в v3-skin.css.
   return (
-    <div ref={trackRef} className={pinned ? 'v3h-track is-pinned' : 'v3h-track'}>
     <section id="hero" className="v3h v3h-split-center relative min-h-[100svh] flex flex-col pt-16 md:pt-20 pb-12 md:pb-16" style={{ overflowX: 'clip' }}>
       {/* abstract market-structure field (nodes + levels) */}
       <StructureField />
@@ -106,7 +80,7 @@ export default function HeroSectionV3() {
       {/* сцена у правого края. Показывается только в раскладке из двух колонок —
           условие в v3-skin.css (.v3h-split-*): шире 1024 И экран не вытянут вверх. */}
       <div className="v3h-scene v3h-split-photo absolute top-0 right-0 h-full w-1/2" style={{ zIndex: 1 }}>
-        <HeroDeskScene variant="wide" progress={pinned ? scrollProgress : undefined} className="w-full h-full" />
+        <HeroDeskScene variant="wide" className="w-full h-full" />
       </div>
 
       {/* HUD corner code (в раскладке стопкой на этом месте лежат фото и логотип) */}
@@ -130,7 +104,7 @@ export default function HeroSectionV3() {
       {/* w-full обязателен: секция — flex-колонка, и без него контейнер сжимается
           под ширину содержимого, а колонка заголовка (56%) становится узкой */}
       <div className="container-landing relative w-full" style={{ zIndex: 2 }}>
-        <div ref={textRef} className="w-full v3h-split-text">
+        <div className="w-full v3h-split-text">
           <div className="v3h-eyebrow v3h-mono mb-7">
             <span className="dot" /> Свинг-трейдинг · неделя и дневка
           </div>
@@ -206,6 +180,5 @@ export default function HeroSectionV3() {
         </div>
       </div>
     </section>
-    </div>
   );
 }

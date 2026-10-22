@@ -177,10 +177,6 @@
   .v3h-split-center { justify-content: center; }
 }
 
-/* 21.10.2026: закреплённый первый экран — сцена HeroDeskScene оживает при прокрутке.
-   Класс is-pinned ставит HeroSectionV3, только если текст помещается в окно. */
-.v3h-track.is-pinned { height: 230vh; }
-.v3h-track.is-pinned > #hero { position: sticky; top: 0; height: 100vh; height: 100svh; min-height: 0; }
 /* сцена в правой половине; затемнение прячет края вписанной картинки */
 .v3h-scene { position: relative; }
 .v3h-scene::after {
@@ -194,6 +190,28 @@
 @media (min-width: 1024px) and (min-aspect-ratio: 1/1) {
   .v3h-split-text > *:not(.v3h-h1) { max-width: 78.5%; }
 }
+
+/* Карточка терминала поверх сцены: «допуск» / «отказ» (HeroDeskScene, 22.10.2026) */
+.hd-card {
+  position: absolute; z-index: 3; pointer-events: none;
+  width: min(300px, 78%); padding: 12px 14px;
+  background: oklch(0.12 0.012 70 / 0.86); backdrop-filter: blur(8px);
+  border: 1px solid var(--v3-gold-dim); box-shadow: 0 10px 40px oklch(0 0 0 / 0.55);
+  opacity: 0; transform: translateY(14px) scale(0.98);
+  transition: opacity 1s ease, transform 1.2s cubic-bezier(.2,.8,.2,1);
+}
+.hd-card.is-on { opacity: 1; transform: none; }
+.hd-card--wide { left: 18%; bottom: 15%; }
+.hd-card--narrow { right: 12px; bottom: 14px; width: min(260px, 72%); padding: 10px 12px; }
+.hd-card__head { font-family: var(--font-mono); font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--v3-mut); }
+.hd-card__head b { color: var(--v3-gold); font-weight: 400; }
+.hd-card[data-kind="no"] { border-color: var(--v3-line); }
+.hd-card[data-kind="no"] .hd-card__head b { color: var(--v3-fg); }
+.hd-card__dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--v3-gold); margin-right: 8px; vertical-align: 1px; animation: v3hPulse 1.6s ease-out infinite; }
+.hd-card[data-kind="no"] .hd-card__dot { background: var(--v3-mut); }
+.hd-card__body { margin-top: 7px; font-family: var(--font-ui); font-size: 14px; color: var(--v3-fg); line-height: 1.35; }
+.hd-card--narrow .hd-card__body { font-size: 13px; }
+.hd-card__foot { margin-top: 5px; font-family: var(--font-mono); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--v3-faint); }
 
 /* author photo flush to the right edge, fading into the background */
 .v3h-photo { position: relative; }
