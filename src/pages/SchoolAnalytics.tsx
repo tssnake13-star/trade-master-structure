@@ -191,6 +191,12 @@ const PERIODS = [
  * период: 7 дней — 7 столбиков, 90 — 90, дни без посетителей показываем нулём.
  * Иначе по графику не видно провалов и он врёт о равномерности.
  */
+// 22.10.2026 страница цен /access убрана с сайта (переадресует на раздел 09 главной).
+// Сергей: «в аналитике страницу цен тоже надо удалить». Её просмотры и нажатия остаются
+// в базе, но в списках «Страницы» и «Клики по кнопкам» больше не показываются.
+const GONE_PAGES = ['/access'];
+const isGoneClick = (target: string) => target.startsWith('access_');
+
 /** Понятное имя страницы для списка «Страницы» и подтверждения обнуления */
 function pageName(path: string) {
   if (path === '/') return 'Лендинг';
@@ -512,10 +518,11 @@ export default function SchoolAnalytics() {
                 иначе её не вернуть и не видно, что счётчик обнулён */}
             {(() => {
               const resets = data.page_resets ?? {};
+              const live = (data.by_page ?? []).filter(p => !GONE_PAGES.includes(p.path));
               const pages = [
-                ...(data.by_page ?? []),
+                ...live,
                 ...Object.keys(resets)
-                  .filter(path => !(data.by_page ?? []).some(p => p.path === path))
+                  .filter(path => !GONE_PAGES.includes(path) && !live.some(p => p.path === path))
                   .map(path => ({ path, views: 0, visits: 0 })),
               ];
               if (pages.length === 0) return null;
@@ -584,12 +591,12 @@ export default function SchoolAnalytics() {
             <div className="mt-3">
               <Bars
                 title="Клики по кнопкам"
-                rows={data.by_click.map(c => ({
+                rows={data.by_click.filter(c => !isGoneClick(c.target)).map(c => ({
                   name: CLICK_NAMES[c.target] || c.target,
                   value: c.clicks,
                   extra: `${c.visits} чел.`,
                 }))}
-                max={Math.max(1, ...data.by_click.map(c => c.clicks))}
+                max={Math.max(1, ...data.by_click.filter(c => !isGoneClick(c.target)).map(c => c.clicks))}
                 accent={COOL}
                 empty="Пока никто не нажимал кнопки за этот период."
               />
