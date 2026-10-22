@@ -20,6 +20,9 @@
  * в ответах на вопросы («Можно ли совмещать с основной работой?»).
  */
 
+import { useCallback, useRef } from 'react';
+import TerminalDemo from './TerminalDemo';
+
 const WEEK = [
   {
     when: 'Терминал · каждый день',
@@ -53,6 +56,20 @@ const gains = [
 const ACCENT = 'hsl(var(--accent))';
 
 const TransformationSection = () => {
+  // 22.10.2026: над шагами — живое окно терминала; шаг, который сейчас показывается, подсвечен.
+  // Меняем атрибуты напрямую, без перерисовки React в каждом кадре.
+  const stepsRef = useRef<HTMLDivElement>(null);
+  const onPhase = useCallback((phase: number, progress: number) => {
+    const cards = stepsRef.current?.children;
+    if (!cards) return;
+    for (let i = 0; i < cards.length; i++) {
+      const c = cards[i] as HTMLElement;
+      const on = i === phase ? '1' : '0';
+      if (c.dataset.active !== on) c.dataset.active = on;
+      if (i === phase) c.style.setProperty('--p', progress.toFixed(3));
+    }
+  }, []);
+
   return (
     <section id="week" className="section-animate py-16 md:py-24">
       <div className="container-landing">
@@ -68,10 +85,15 @@ const TransformationSection = () => {
           </p>
         </div>
 
+        {/* живое окно терминала: неделя подписчика проигрывается по кругу */}
+        <div className="mt-10 md:mt-12 max-w-5xl">
+          <TerminalDemo onPhase={onPhase} />
+        </div>
+
         {/* неделя в трёх шагах */}
-        <div className="mt-10 md:mt-12 grid md:grid-cols-3 gap-3 max-w-5xl">
+        <div ref={stepsRef} className="mt-3 grid md:grid-cols-3 gap-3 max-w-5xl">
           {WEEK.map((w, i) => (
-            <div key={w.title} className="border border-border rounded-xl bg-card p-5 md:p-6">
+            <div key={w.title} className="td-step border border-border rounded-xl bg-card p-5 md:p-6">
               <div className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: ACCENT }}>
                 0{i + 1} · {w.when}
               </div>

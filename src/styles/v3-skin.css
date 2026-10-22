@@ -293,3 +293,62 @@
 @media (max-width: 640px) {
   .v3-skin .v3h-ticker-wrap { top: 74px; right: 10px; transform: scale(0.62); transform-origin: top right; }
 }
+
+/* =====================================================================
+   Живое окно терминала в «03 · Неделя по системе» (TerminalDemo, 22.10.2026).
+   Двигаются только transform и opacity — 60 кадров и на планшете.
+   ===================================================================== */
+.td { position: relative; max-width: 64rem; }
+.td-win { border: 1px solid hsl(var(--border)); border-radius: 14px; background: hsl(var(--card)); overflow: hidden; box-shadow: 0 30px 80px -40px hsl(var(--accent) / 0.35); }
+.td-bar { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-bottom: 1px solid hsl(var(--border)); font-family: 'Martian Mono', monospace; font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
+.td-dots { display: inline-flex; gap: 5px; }
+.td-dots i { width: 7px; height: 7px; border-radius: 50%; background: hsl(var(--border)); display: block; }
+.td-title { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.td-live { color: hsl(var(--accent)); }
+.td-live-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: hsl(var(--accent)); margin-right: 6px; vertical-align: 1px; animation: v3hPulse 1.8s ease-out infinite; }
+.td-body { display: grid; grid-template-columns: 1fr 15.5rem; }
+.td-chart { position: relative; aspect-ratio: 2 / 1; overflow: hidden; background: oklch(0.13 0.01 70); }
+.td-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.td-grid { stroke: hsl(var(--border)); stroke-width: 1; vector-effect: non-scaling-stroke; opacity: .5; }
+.td-up { fill: #dea85c; } .td-down { fill: #6c7078; }
+.td-wick-up { stroke: #dea85c; stroke-width: 1; fill: none; vector-effect: non-scaling-stroke; }
+.td-wick-down { stroke: #6c7078; stroke-width: 1; fill: none; vector-effect: non-scaling-stroke; }
+/* будущее закрыто шторкой: она уезжает вправо, и свечи «рождаются» */
+.td-curtain { position: absolute; top: 0; bottom: 0; left: 0; width: 100%; background: oklch(0.13 0.01 70); will-change: transform; }
+.td-zone, .td-line, .td-tag, .td-pill, .td-dot { position: absolute; opacity: 0; will-change: transform, opacity; }
+.td-zone { background: hsl(var(--accent) / 0.16); border: 1px solid hsl(var(--accent) / 0.55); z-index: 1; }
+.td-zone span { position: absolute; left: 6px; bottom: -18px; font-family: 'Martian Mono', monospace; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--accent)); }
+.td-line { height: 0; border-top: 1px dashed; z-index: 2; }
+.td-line span { position: absolute; right: 0; top: -16px; font-family: 'Martian Mono', monospace; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; }
+.td-line--entry { border-color: #ffd38a; color: #ffd38a; border-top-style: solid; }
+.td-line--entry span { right: auto; left: 0; }
+.td-line--stop { border-color: oklch(0.62 0.12 25); color: oklch(0.7 0.12 25); }
+.td-line--take { border-color: hsl(var(--accent)); color: hsl(var(--accent)); }
+.td-line--take[data-hit="1"] { border-top-style: solid; box-shadow: 0 0 14px hsl(var(--accent) / .8); transition: box-shadow .6s; }
+.td-tag { transform: translate(-50%, -150%); font-family: 'Martian Mono', monospace; font-size: 9px; letter-spacing: .12em; text-transform: uppercase; padding: 3px 7px; border-radius: 4px; z-index: 3; white-space: nowrap; }
+.td-tag--be { background: oklch(0.2 0.01 70); color: hsl(var(--foreground)); border: 1px solid hsl(var(--border)); }
+.td-tag--take { background: hsl(var(--accent)); color: #111; }
+.td-dot { left: 0; top: 0; width: 9px; height: 9px; margin: -4.5px 0 0 -4.5px; border-radius: 50%; background: #ffe2a8; box-shadow: 0 0 0 4px hsl(var(--accent) / .25), 0 0 14px hsl(var(--accent) / .9); z-index: 4; }
+.td-pill { z-index: 5; display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 999px; background: oklch(0.16 0.01 70); border: 1px solid hsl(var(--accent) / .7); color: hsl(var(--accent)); font-family: 'Martian Mono', monospace; font-size: 10px; letter-spacing: .14em; text-transform: uppercase; white-space: nowrap; }
+.td-pill-dot { width: 6px; height: 6px; border-radius: 50%; background: hsl(var(--accent)); }
+.td-side { border-left: 1px solid hsl(var(--border)); padding: 14px; display: flex; flex-direction: column; gap: 12px; justify-content: center; }
+.td-toast, .td-sentinel { opacity: 0; will-change: transform, opacity; }
+.td-toast { border: 1px solid hsl(var(--border)); border-radius: 10px; padding: 10px 12px; background: oklch(0.15 0.01 70); }
+.td-toast-head { font-family: 'Martian Mono', monospace; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--muted-foreground)); }
+.td-toast-body { margin-top: 6px; font-size: 13px; line-height: 1.4; color: hsl(var(--foreground)); }
+.td-start { position: relative; overflow: hidden; border-radius: 10px; padding: 13px 12px; text-align: center; font-family: 'Martian Mono', monospace; font-size: 11px; letter-spacing: .16em; text-transform: uppercase; border: 1px solid hsl(var(--accent) / .7); color: hsl(var(--accent)); transition: background .4s, color .4s; }
+.td-start[data-on="1"] { background: hsl(var(--accent)); color: #111; }
+.td-ripple { position: absolute; left: 50%; top: 50%; width: 220px; height: 220px; margin: -110px 0 0 -110px; border-radius: 50%; background: hsl(var(--accent) / .45); opacity: 0; pointer-events: none; will-change: transform, opacity; }
+.td-sentinel { font-size: 12px; color: hsl(var(--muted-foreground)); }
+.td-check { color: hsl(var(--accent)); margin-right: 4px; }
+.td-cursor { position: absolute; left: 0; top: 0; z-index: 10; opacity: 0; pointer-events: none; transform-origin: 4px 2px; will-change: transform, opacity; filter: drop-shadow(0 2px 3px rgba(0,0,0,.6)); }
+@media (max-width: 767px) {
+  .td-body { grid-template-columns: 1fr; }
+  .td-chart { aspect-ratio: 1.45 / 1; }
+  .td-side { border-left: 0; border-top: 1px solid hsl(var(--border)); }
+}
+/* шаги под окном подсвечиваются в такт демонстрации */
+.td-step { position: relative; overflow: hidden; transition: border-color .5s, background-color .5s; }
+.td-step::before { content: ''; position: absolute; left: 0; top: 0; height: 2px; width: 100%; background: hsl(var(--accent)); transform-origin: left; transform: scaleX(var(--p, 0)); opacity: 0; transition: opacity .4s; }
+.td-step[data-active="1"] { border-color: hsl(var(--accent) / .6) !important; background-color: hsl(var(--accent) / .05) !important; }
+.td-step[data-active="1"]::before { opacity: 1; }

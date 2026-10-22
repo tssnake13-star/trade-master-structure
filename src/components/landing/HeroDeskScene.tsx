@@ -160,8 +160,10 @@ export default function HeroDeskScene({ variant, className }: Props) {
     // кольцо видно только за мониторами: экраны и стол его закрывают
     const behind = new Path2D();
     behind.rect(-400, -400, 2500, 1800);
-    behind.moveTo(684, 198); behind.lineTo(1176, 194); behind.lineTo(1178, 478); behind.lineTo(686, 476); behind.closePath();
-    behind.moveTo(1176, 194); behind.lineTo(1642, 158); behind.lineTo(1640, 545); behind.lineTo(1176, 482); behind.closePath();
+    // контуры мониторов вместе с рамкой: нижняя серебристая полоса правого монитора доходит
+    // до y≈560 у правого края (Сергей 22.10.2026: «кольцо… наезжает на монитор»)
+    behind.moveTo(682, 196); behind.lineTo(1176, 191); behind.lineTo(1178, 494); behind.lineTo(684, 490); behind.closePath();
+    behind.moveTo(1176, 191); behind.lineTo(1648, 152); behind.lineTo(1648, 568); behind.lineTo(1176, 496); behind.closePath();
     behind.rect(-400, 545, 2500, 900);
     behind.rect(1035, 470, 150, 75);
 
@@ -199,7 +201,9 @@ export default function HeroDeskScene({ variant, className }: Props) {
       for (const sc of screens) sc.draw(cx, now, dt);
     };
 
-    const drawFx = (now: number) => {
+    // ox, oy — насколько слой с кольцом сдвинут за мышью сильнее стола (в единицах картинки):
+    // граница «за монитором» должна стоять на мониторе, а не ехать вместе с кольцом
+    const drawFx = (now: number, ox = 0, oy = 0) => {
       fx.setTransform(1, 0, 0, 1, 0, 0);
       fx.clearRect(0, 0, fxCv.width, fxCv.height);
       if (!ringSpr || !cometSpr || !hazeSpr || !dotSpr) return;
@@ -207,7 +211,9 @@ export default function HeroDeskScene({ variant, className }: Props) {
       fx.setTransform(F.k * dpr, 0, 0, F.k * dpr, F.tx * dpr, F.ty * dpr);
       if (ringOn > 0) {
         fx.save();
+        fx.translate(-ox, -oy);
         fx.clip(behind, 'evenodd');
+        fx.translate(ox, oy);
         const box = (RING.r + ringPad) * 2;
         fx.globalAlpha = ringOn * (0.8 + 0.2 * Math.sin(t * 0.7));
         fx.drawImage(hazeSpr, RING.x - 460, RING.y - 460, 920, 920);
@@ -276,12 +282,12 @@ export default function HeroDeskScene({ variant, className }: Props) {
       const p = clamp((now - t0) / INTRO_MS);
       if (p !== lastP) { render(p); lastP = p; }
 
-      drawCharts(now, dt);
-      drawFx(now);
-      if (screensOn > 0.95 && now - cardAt > 7000) screens[cardN % 2].nudge();
-
       const a = 1 - Math.exp(-dt / 500);
       mx += (tx - mx) * a; my += (ty - my) * a;
+      drawCharts(now, dt);
+      drawFx(now, -mx * 14, -my * 9);
+      if (screensOn > 0.95 && now - cardAt > 7000) screens[cardN % 2].nudge();
+
       back.style.transform = `translate3d(${(-mx * 8 * F.k).toFixed(2)}px, ${(-my * 5 * F.k).toFixed(2)}px, 0)`;
       fxCv.style.transform = `translate3d(${(-mx * 22 * F.k).toFixed(2)}px, ${(-my * 14 * F.k).toFixed(2)}px, 0)`;
     };
