@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 /**
  * Живое окно терминала в блоке «03 · Неделя по системе».
@@ -12,6 +12,10 @@ import { useEffect, useMemo, useRef } from 'react';
  * ⚠️ 60 кадров: график — статичная SVG, всё, что движется (шторка будущего, линии, точка
  * цены, курсор, карточки), — отдельные слои, у которых меняются только transform и opacity.
  * ⚠️ Без цен, процентов и индикаторов: только свечи, зона, уровни (Сергей 21.10.2026).
+ *
+ * 22.10.2026, Сергей: «там только пример для лонга… сделать пример для шорт… чтобы после
+ * лонга показывалась продажа». Круги чередуются: покупка (EURUSD), потом продажа (GBPJPY) —
+ * та же схема в зеркале: выход вниз из накопления, ретест снизу, стоп над проколом, тейк внизу.
  */
 
 const CYCLE = 17000;
@@ -22,8 +26,22 @@ const VB = { w: 600, h: 300, pad: 14 };
 
 type C = { o: number; h: number; l: number; c: number };
 
-function makeSeries(): C[] {
-  let s = 11;
+// сценарии кругов: seed подобран так, чтобы ретест касался края зоны, а тейк 9,5R был достижим
+const SCEN = [
+  { seed: 11, dir: 1 as const, sym: 'EURUSD', side: 'покупка' },
+  { seed: 49, dir: -1 as const, sym: 'GBPJPY', side: 'продажа' },
+];
+
+function makeSeries(seed: number, dir: 1 | -1): C[] {
+  const out = makeLong(seed);
+  if (dir > 0) return out;
+  // продажа — зеркало той же схемы: рост вместо спуска, выход вниз, тренд вниз
+  const m = Math.max(...out.map((k) => k.h)) + Math.min(...out.map((k) => k.l));
+  return out.map((k) => ({ o: m - k.o, c: m - k.c, h: m - k.l, l: m - k.h }));
+}
+
+function makeLong(seed: number): C[] {
+  let s = seed;
   const rnd = () => ((s = (s * 16807) % 2147483647) / 2147483647);
   const g = () => (rnd() + rnd() + rnd() - 1.5) * 1.1;
   const out: C[] = [];
@@ -50,7 +68,10 @@ const ease = (t: number) => t * t * (3 - 2 * t);
 
 export default function TerminalDemo({ onPhase }: { onPhase?: (phase: number, progress: number) => void }) {
   const root = useRef<HTMLDivElement>(null);
-  const series = useMemo(makeSeries, []);
+  const [sc, setSc] = useState(0);
+  const scen = SCEN[sc];
+  const dir = scen.dir;
+  const series = useMemo(() => makeSeries(scen.seed, scen.dir), [scen]);
 
   // геометрия графика в координатах SVG
   const geo = useMemo(() => {
@@ -62,20 +83,24 @@ export default function TerminalDemo({ onPhase }: { onPhase?: (phase: number, pr
     const acc = series.slice(18, SIGNAL);
     const zoneTop = Math.max(...acc.map((k) => k.h));
     const zoneBot = Math.min(...acc.map((k) => k.l));
-    const entry = zoneTop + 0.2;
+    // вход у края зоны, через который вышла цена (у покупки — верх, у продажи — низ)
+    const entry = (dir > 0 ? zoneTop : zoneBot) + 0.2 * dir;
     // 22.10.2026, Сергей: стоп «как минимум… за ложным пробоем»: сразу за проколом на ретесте,
-    // а не под всей зоной. Тейк — на вершине движения, ровно 9,5 стопа (средний выигрыш системы
+    // а не за всей зоной. Тейк — на краю движения, ровно 9,5 стопа (средний выигрыш системы
     // +9,50 R), чтобы соотношение было видно на глаз.
-    const top = Math.max(...series.slice(ENTRY).map((k) => k.h)) - 0.3;
-    const r = (top - entry) / 9.5;
-    const retestLow = Math.min(...series.slice(SIGNAL + 1, ENTRY + 1).map((k) => k.l));
-    const stop = Math.min(entry - r, retestLow - 0.2);
-    const take = entry + (entry - stop) * 9.5;
+    const after = series.slice(ENTRY);
+    const extreme = dir > 0 ? Math.max(...after.map((k) => k.h)) - 0.3 : Math.min(...after.map((k) => k.l)) + 0.3;
+    const r = Math.abs(extreme - entry) / 9.5;
+    const retest = series.slice(SIGNAL + 1, ENTRY + 1);
+    const stop = dir > 0
+      ? Math.min(entry - r, Math.min(...retest.map((k) => k.l)) - 0.2)
+      : Math.max(entry + r, Math.max(...retest.map((k) => k.h)) + 0.2);
+    const take = entry + dir * Math.abs(entry - stop) * 9.5;
     // свеча, которая первой дотягивается до тейка: на ней загорается «тейк взят»
     let hitIdx = N - 1;
-    for (let i = ENTRY + 1; i < N; i++) if (series[i].h >= take) { hitIdx = i; break; }
+    for (let i = ENTRY + 1; i < N; i++) if (dir > 0 ? series[i].h >= take : series[i].l <= take) { hitIdx = i; break; }
     return { x, y, slot, zoneTop, zoneBot, entry, stop, take, hitIdx };
-  }, [series]);
+  }, [series, dir]);
 
   // свечи рисуются один раз
   const candles = useMemo(() => {
@@ -97,6 +122,7 @@ export default function TerminalDemo({ onPhase }: { onPhase?: (phase: number, pr
     if (!el) return;
     const $ = <T extends HTMLElement>(s: string) => el.querySelector(s) as T;
     const chart = $('[data-chart]');
+    const svgEl = chart.querySelector('svg') as SVGSVGElement;
     const curtain = $('[data-curtain]');
     const zone = $('[data-zone]');
     const pill = $('[data-pill]');
@@ -146,6 +172,8 @@ export default function TerminalDemo({ onPhase }: { onPhase?: (phase: number, pr
     const render = (ms: number) => {
       const t = ms / 1000;
       fade = 1 - seg(t, 16.2, 16.9); // в конце круга всё гаснет и начинается заново
+      // график тоже гаснет в конце и проявляется в начале: следующий круг — другой пример
+      put(svgEl, 'opacity', (fade * ease(seg(t, 0, 0.6))).toFixed(3));
       // какая свеча сейчас последняя видимая: до входа рынок стоит у сигнала, потом сделка идёт
       const live = t < 9.5 ? SIGNAL + 2.6 + seg(t, 6, 9) * 0.4 : ENTRY + 1 + ease(seg(t, 9.5, 15)) * (N - ENTRY - 1);
       put(curtain, 'transform', `translate3d(${px(geo.x(live) - geo.slot * 0.5).toFixed(1)}px, 0, 0)`);
@@ -221,7 +249,13 @@ export default function TerminalDemo({ onPhase }: { onPhase?: (phase: number, pr
       raf = requestAnimationFrame(loop);
       if (!visible || document.hidden) { paused = paused || now; return; }
       if (paused) { t0 += now - paused; paused = 0; }
-      render((now - t0) % CYCLE);
+      // круг закончился — следующий пример: покупка ↔ продажа
+      if (now - t0 >= CYCLE) {
+        cancelAnimationFrame(raf);
+        setSc((v) => (v + 1) % SCEN.length);
+        return;
+      }
+      render(now - t0);
     };
     raf = requestAnimationFrame(loop);
     return () => { cancelAnimationFrame(raf); io.disconnect(); ro.disconnect(); };
@@ -239,7 +273,7 @@ export default function TerminalDemo({ onPhase }: { onPhase?: (phase: number, pr
       <div className="td-win">
         <div className="td-bar">
           <span className="td-dots"><i /><i /><i /></span>
-          <span className="td-title">ECHO-GATE INSIDE · EURUSD · D1</span>
+          <span className="td-title">ECHO-GATE INSIDE · {scen.sym} · D1</span>
           <span className="td-live"><span className="td-live-dot" /> live</span>
         </div>
         <div className="td-body">
@@ -259,9 +293,13 @@ export default function TerminalDemo({ onPhase }: { onPhase?: (phase: number, pr
             <div className="td-tag td-tag--take" data-taketag style={{ ...pct(geo.x(N - 9), geo.y(geo.take)) }}>тейк взят</div>
             <div className="td-curtain" data-curtain />
             <div className="td-dot" data-dot />
-            {/* метка встаёт слева от свечи выхода: справа на телефоне ей не хватает места */}
-            <div className="td-pill" data-pill style={{ right: `${((VB.w - geo.x(SIGNAL) + 14) / VB.w) * 100}%`, top: `${((geo.y(geo.zoneTop) - 72) / VB.h) * 100}%` }}>
-              <span className="td-pill-dot" /> Допуск · покупка
+            {/* метка встаёт слева от свечи выхода (справа на телефоне ей не хватает места):
+                у покупки над зоной, у продажи под ней — там, где на графике пусто */}
+            <div className="td-pill" data-pill style={{
+              right: `${((VB.w - geo.x(SIGNAL) + 14) / VB.w) * 100}%`,
+              top: `${((dir > 0 ? geo.y(geo.zoneTop) - 72 : geo.y(geo.zoneBot) + 26) / VB.h) * 100}%`,
+            }}>
+              <span className="td-pill-dot" /> Допуск · {scen.side}
             </div>
           </div>
 
