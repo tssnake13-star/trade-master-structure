@@ -10,9 +10,13 @@ import gbpUsdImg from '@/assets/trades/gbp-usd-13-08-2026.jpg';
 import usdCadImg from '@/assets/trades/usd-cad-19-08-2026.jpg';
 import eurAudImg from '@/assets/trades/eur-aud-31-08-2026.jpg';
 import gbpAudImg from '@/assets/trades/gbp-aud-31-08-2026.jpg';
+import cadJpyImg from '@/assets/trades/cad-jpy-18-09-2026.jpg';
+import nzdUsdImg from '@/assets/trades/nzd-usd-22-09-2026.jpg';
+import usdChfImg from '@/assets/trades/usd-chf-22-09-2026.jpg';
 
 /**
- * Скрины из личного дневника сделок за июль и август 2026 (обновлены 06.09.2026).
+ * Скрины из личного дневника сделок за июль — сентябрь 2026 (обновлены 06.09.2026;
+ * 22.10.2026 добавлены CAD/JPY, NZD/USD и USD/CHF за сентябрь, сетка на компьютере — 4 в ряд).
  * Подписи намеренно короткие: инструмент, дата, направление, результат в R.
  * Раньше под каждой карточкой стоял абзац-шаблон («сигнал получен
  * и отфильтрован…»), одинаковый на все — он читался как вода.
@@ -34,6 +38,9 @@ const trades = [
   { instrument: 'USD/CAD', date: '19.08.2026', side: 'WORK-SELL', result: '+14,8R', image: usdCadImg },
   { instrument: 'GBP/AUD', date: '31.08.2026', side: 'WORK-SELL', result: '+10,9R', image: gbpAudImg },
   { instrument: 'EUR/AUD', date: '31.08.2026', side: 'WORK-SELL', result: '+8,4R', image: eurAudImg },
+  { instrument: 'CAD/JPY', date: '18.09.2026', side: 'WORK-SELL', result: '+10,7R', image: cadJpyImg },
+  { instrument: 'NZD/USD', date: '22.09.2026', side: 'WORK-SELL', result: '+10,8R', image: nzdUsdImg },
+  { instrument: 'USD/CHF', date: '22.09.2026', side: 'WORK-BUY', result: '+15,4R', image: usdChfImg },
 ];
 
 // Подпись скрина — полная, а не одно имя пары: по ней ИИ и поисковики понимают, что на
@@ -68,7 +75,7 @@ const TradesSection = () => {
           </h2>
           
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            Июль и август 2026. Ни одна из этих сделок не была обязательной.<br />
+            Июль — сентябрь 2026. Ни одна из этих сделок не была обязательной.<br />
             Все они были разрешены системой.
           </p>
 
@@ -156,15 +163,15 @@ const TradesSection = () => {
             ))}
           </div>
           
-          {/* Desktop — grid */}
-          <div className="mt-8 md:mt-10 hidden md:grid md:grid-cols-3 gap-3 md:gap-4">
+          {/* Desktop — grid. 22.10.2026, Сергей: «карточки поменьше… в одной строчке 4 сделки» */}
+          <div className="mt-8 md:mt-10 hidden md:grid md:grid-cols-4 gap-3">
             {trades.map((trade, index) => (
               <button
                 key={index}
                 onClick={() => setSelectedTrade(trade)}
                 className="bg-card border border-border rounded-xl text-left transition-all hover:border-muted-foreground/50 cursor-pointer group overflow-hidden"
               >
-                <div className="relative h-24 md:h-28 overflow-hidden">
+                <div className="relative h-20 overflow-hidden">
                   <img
                     src={trade.image}
                     alt={tradeAlt(trade)}
@@ -174,26 +181,26 @@ const TradesSection = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent to-card" />
                 </div>
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="font-medium text-foreground text-sm">{trade.instrument}</span>
-                    <span className="text-xs text-muted-foreground">{trade.date}</span>
+                <div className="p-3">
+                  <div className="flex items-center justify-between gap-2 mb-2.5">
+                    <span className="font-medium text-foreground text-sm whitespace-nowrap">{trade.instrument}</span>
+                    <span className="text-[11px] text-muted-foreground whitespace-nowrap">{trade.date}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <span
-                      className="text-mono inline-flex px-2 py-1"
-                      style={{ fontSize: 9, letterSpacing: '0.16em', color: 'hsl(var(--muted-foreground))', border: '1px solid hsl(var(--border))' }}
+                      className="text-mono inline-flex px-1.5 py-1"
+                      style={{ fontSize: 8, letterSpacing: '0.14em', color: 'hsl(var(--muted-foreground))', border: '1px solid hsl(var(--border))' }}
                     >
                       {trade.side}
                     </span>
                     <span
-                      className="font-['Bricolage_Grotesque'] tabular-nums"
-                      style={{ fontSize: 18, lineHeight: 1, color: 'hsl(var(--accent))' }}
+                      className="font-['Bricolage_Grotesque'] tabular-nums whitespace-nowrap"
+                      style={{ fontSize: 16, lineHeight: 1, color: 'hsl(var(--accent))' }}
                     >
                       {trade.result}
                     </span>
                   </div>
-                  <span className="text-xs text-muted-foreground/60 mt-3 block group-hover:text-muted-foreground">
+                  <span className="text-[11px] text-muted-foreground/60 mt-2.5 block group-hover:text-muted-foreground">
                     Открыть скрин ↗
                   </span>
                 </div>
