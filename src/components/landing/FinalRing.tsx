@@ -4,12 +4,18 @@ import { useEffect, useRef } from 'react';
  * Золотое кольцо последнего экрана («Первый шаг бесплатный»), по образцу Сергея
  * (финал сайта барбершопа: кресло на фоне светящегося кольца). 22.10.2026: «да, давай
  * последний экран». Кольцо прорисовывается, когда блок попадает на экран, потом живёт
- * без конца: два блика бегут навстречу друг другу, свечение дышит, вокруг плывут искры.
+ * без конца: вокруг плывут искры, свечение дышит.
+ * 22.10.2026, Сергей про бегущие блики: «ужасно смотрится, надо заменить» → выбрал вариант
+ * «7 делений — 7 дней»: кольцо из 7 дуг, они по очереди загораются по кругу (по 0,8 с),
+ * когда горят все 7, кольцо вспыхивает целиком и гаснет, отсчёт идёт заново.
+ * Намёк на 7 дней бесплатного терминала.
  *
  * ⚠️ 60 кадров: один canvas, свечение и блики нарисованы заранее (спрайты), в кадре их
  * только поворачивают; за краем экрана и в фоновой вкладке ничего не считается.
  * Центр кольца — середина элемента с атрибутом data-ring-center внутри секции.
  */
+
+const ease = (t: number) => t * t * (3 - 2 * t);
 
 type Spark = { a: number; r: number; v: number; s: number; ph: number };
 
@@ -31,14 +37,15 @@ export default function FinalRing() {
     if (!canvas || !section || !ctx) return;
 
     let W = 0, H = 0, dpr = 1, cx = 0, cy = 0, R = 0, pad = 0;
-    let ring: HTMLCanvasElement | null = null, comet: HTMLCanvasElement | null = null;
-    let comet2: HTMLCanvasElement | null = null, haze: HTMLCanvasElement | null = null, dot: HTMLCanvasElement | null = null;
+    let ring: HTMLCanvasElement | null = null, segDim: HTMLCanvasElement | null = null;
+    let segLit: HTMLCanvasElement | null = null, haze: HTMLCanvasElement | null = null, dot: HTMLCanvasElement | null = null;
+    const SEG = (Math.PI * 2) / 7, GAP = 0.09;
 
-    const glow = (c: CanvasRenderingContext2D, h: number, color: string, width: number, from: number, to: number) => {
-      c.lineCap = 'round';
+    const glow = (c: CanvasRenderingContext2D, h: number, color: string, width: number, from: number, to: number, mul = 1) => {
+      c.lineCap = 'butt';
       for (const [blur, alpha, w] of [[42, 0.45, width * 2.4], [16, 0.8, width * 1.3], [0, 1, width]] as const) {
         c.save();
-        c.globalAlpha = alpha;
+        c.globalAlpha = alpha * mul;
         c.shadowColor = color; c.shadowBlur = blur * dpr;
         c.strokeStyle = color; c.lineWidth = w * dpr;
         c.beginPath(); c.arc(h, h, R * dpr, from, to); c.stroke();
@@ -61,8 +68,11 @@ export default function FinalRing() {
       pad = 70;
       const size = (R + pad) * 2 * dpr;
       ring = sprite(size, (c, h) => glow(c, h, '#ffcf7a', 3.2, 0, Math.PI * 2));
-      comet = sprite(size, (c, h) => glow(c, h, '#fff3d6', 5, -Math.PI / 2, -Math.PI / 2 + 0.55));
-      comet2 = sprite(size, (c, h) => glow(c, h, '#ffd89a', 3.5, -Math.PI / 2, -Math.PI / 2 + 0.3));
+      // 7 дуг: все тускло и одна яркая (её поворачивают на нужное место)
+      segDim = sprite(size, (c, h) => {
+        for (let i = 0; i < 7; i++) glow(c, h, '#ffcf7a', 3.2, -Math.PI / 2 + i * SEG + GAP / 2, -Math.PI / 2 + (i + 1) * SEG - GAP / 2, 0.28);
+      });
+      segLit = sprite(size, (c, h) => glow(c, h, '#ffd98f', 3.6, -Math.PI / 2 + GAP / 2, -Math.PI / 2 + SEG - GAP / 2));
       haze = sprite((R + pad * 2) * 2 * dpr, (c, h) => {
         const g = c.createRadialGradient(h, h, R * dpr * 0.2, h, h, h);
         g.addColorStop(0, 'rgba(243,177,79,0.10)'); g.addColorStop(0.55, 'rgba(243,177,79,0.16)');
@@ -90,17 +100,24 @@ export default function FinalRing() {
     const draw = (now: number) => {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (!ring || !comet || !comet2 || !haze || !dot) return;
+      if (!ring || !segDim || !segLit || !haze || !dot) return;
       const t = now / 1000;
       const k = Math.min(1, (now - shownAt) / 2200);
       const draw01 = k * k * (3 - 2 * k);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const box = (R + pad) * 2;
 
-      ctx.globalAlpha = draw01 * (0.75 + 0.25 * Math.sin(t * 0.8));
+      // отсчёт: дуги загораются по одной, потом всё кольцо вспыхивает и гаснет
+      const cyc = 7 * 0.8 + 2.2, u = ((now - shownAt) / 1000) % cyc;
+      const lit = draw01 >= 1 ? Math.min(7, u / 0.8) : 0;
+      const flash = draw01 >= 1 && u > 5.6 ? Math.sin(Math.min(1, (u - 5.6) / 2.2) * Math.PI) : 0;
+      const fadeOut = u > 6.7 ? 1 - ease(Math.min(1, (u - 6.7) / 1.1)) : 1;
+
+      ctx.globalAlpha = draw01 * (0.7 + 0.3 * flash);
       const hb = (R + pad * 2) * 2;
       ctx.drawImage(haze, cx - hb / 2, cy - hb / 2, hb, hb);
 
+      // при появлении блока тусклые дуги прорисовываются по кругу
       ctx.save();
       ctx.globalAlpha = 1;
       if (draw01 < 1) {
@@ -110,19 +127,22 @@ export default function FinalRing() {
         ctx.closePath();
         ctx.clip();
       }
-      ctx.drawImage(ring, cx - box / 2, cy - box / 2, box, box);
+      ctx.drawImage(segDim, cx - box / 2, cy - box / 2, box, box);
       ctx.restore();
 
-      if (draw01 > 0.98) {
-        // два блика навстречу друг другу
-        for (const [spr, speed, alpha] of [[comet, 0.42, 0.95], [comet2, -0.27, 0.6]] as const) {
-          ctx.save();
-          ctx.translate(cx, cy);
-          ctx.rotate(t * speed);
-          ctx.globalAlpha = alpha;
-          ctx.drawImage(spr, -box / 2, -box / 2, box, box);
-          ctx.restore();
-        }
+      for (let i = 0; i < 7; i++) {
+        const a = Math.max(0, Math.min(1, lit - i)) * fadeOut;
+        if (a <= 0) continue;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(i * SEG);
+        ctx.globalAlpha = ease(a) * (0.85 + 0.15 * flash);
+        ctx.drawImage(segLit, -box / 2, -box / 2, box, box);
+        ctx.restore();
+      }
+      if (flash > 0) {
+        ctx.globalAlpha = flash * 0.6;
+        ctx.drawImage(ring, cx - box / 2, cy - box / 2, box, box);
       }
 
       for (const s of sparks) {
