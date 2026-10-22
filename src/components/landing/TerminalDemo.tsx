@@ -118,10 +118,19 @@ export default function TerminalDemo({ onPhase }: { onPhase?: (phase: number, pr
 
     const px = (vx: number) => (vx / VB.w) * W;
     const py = (vy: number) => (vy / VB.h) * H;
+    // стиль пишется только когда значение изменилось
+    const cache = new WeakMap<HTMLElement | SVGElement, Record<string, string>>();
+    const put = (e: HTMLElement | SVGElement, prop: 'opacity' | 'transform', v: string) => {
+      let c = cache.get(e);
+      if (!c) { c = {}; cache.set(e, c); }
+      if (c[prop] !== v) { c[prop] = v; e.style[prop] = v; }
+    };
     let fade = 1;
+    let wasStarted: boolean | null = null;
+    let lastBtnOpacity = '';
     const show = (e: HTMLElement, a: number, dy = 0) => {
-      e.style.opacity = (a * fade).toFixed(3);
-      e.style.transform = `translate3d(0, ${(dy * (1 - a)).toFixed(1)}px, 0)`;
+      put(e, 'opacity', (a * fade).toFixed(3));
+      put(e, 'transform', `translate3d(0, ${(dy * (1 - a)).toFixed(1)}px, 0)`);
     };
 
     const render = (ms: number) => {
@@ -129,7 +138,7 @@ export default function TerminalDemo({ onPhase }: { onPhase?: (phase: number, pr
       fade = 1 - seg(t, 16.2, 16.9); // в конце круга всё гаснет и начинается заново
       // какая свеча сейчас последняя видимая: до входа рынок стоит у сигнала, потом сделка идёт
       const live = t < 9.5 ? SIGNAL + 2.6 + seg(t, 6, 9) * 0.4 : ENTRY + 1 + ease(seg(t, 9.5, 15)) * (N - ENTRY - 1);
-      curtain.style.transform = `translate3d(${px(geo.x(live) - geo.slot * 0.5).toFixed(1)}px, 0, 0)`;
+      put(curtain, 'transform', `translate3d(${px(geo.x(live) - geo.slot * 0.5).toFixed(1)}px, 0, 0)`);
 
       // 1. зона и допуск
       show(zone, ease(seg(t, 0.6, 1.8)));
@@ -145,34 +154,41 @@ export default function TerminalDemo({ onPhase }: { onPhase?: (phase: number, pr
       const cxp = sx + (ex - sx) * toEntry + (bx - ex) * toBtn;
       const cyp = sy + (ey - sy) * toEntry + (by - ey) * toBtn;
       const press = seg(t, 6.2, 6.5) > 0 && t < 6.6 ? 0.85 : seg(t, 8.3, 8.6) > 0 && t < 8.7 ? 0.85 : 1;
-      cursor.style.opacity = (cIn * (1 - seg(t, 9, 9.6)) * fade).toFixed(3);
-      cursor.style.transform = `translate3d(${cxp.toFixed(1)}px, ${cyp.toFixed(1)}px, 0) scale(${press})`;
+      put(cursor, 'opacity', (cIn * (1 - seg(t, 9, 9.6)) * fade).toFixed(3));
+      put(cursor, 'transform', `translate3d(${cxp.toFixed(1)}px, ${cyp.toFixed(1)}px, 0) scale(${press})`);
       show(entryL, ease(seg(t, 6.3, 6.8)));
+      // текст и состояние кнопки пишутся только при смене: запись в каждом кадре стоила лишнего пересчёта
       const started = t >= 8.4;
-      btn.dataset.on = started ? '1' : '0';
-      btnText.textContent = started ? 'Сделку ведёт советник' : 'СТАРТ';
+      if (started !== wasStarted) {
+        wasStarted = started;
+        btn.dataset.on = started ? '1' : '0';
+        btnText.textContent = started ? 'Сделку ведёт советник' : 'СТАРТ';
+        measure();
+      }
       const rp = seg(t, 8.4, 9.2);
-      ripple.style.opacity = (rp > 0 && rp < 1 ? 1 - rp : 0).toFixed(3);
-      btn.style.opacity = (0.35 + 0.65 * fade).toFixed(3);
-      ripple.style.transform = `scale(${(0.2 + rp * 1.6).toFixed(3)})`;
+      put(ripple, 'opacity', (rp > 0 && rp < 1 ? 1 - rp : 0).toFixed(3));
+      const bo = (0.35 + 0.65 * fade).toFixed(2);
+      if (bo !== lastBtnOpacity) { lastBtnOpacity = bo; put(btn, 'opacity', bo); }
+      put(ripple, 'transform', `scale(${(0.2 + rp * 1.6).toFixed(3)})`);
 
       // 3. исполнение: стоп и тейк, безубыток, тейк
-      show(stopL, ease(seg(t, 9.1, 9.7)));
+      put(stopL, 'opacity', (ease(seg(t, 9.1, 9.7)) * fade).toFixed(3));
       show(takeL, ease(seg(t, 9.1, 9.7)));
       show(sentinel, ease(seg(t, 9.6, 10.3)), 10);
       const be = ease(seg(t, 12, 12.8));
-      stopL.style.transform = `translate3d(0, ${(py(geo.y(geo.entry)) - py(geo.y(geo.stop))) * be}px, 0)`;
+      put(stopL, 'transform', `translate3d(0, ${((py(geo.y(geo.entry)) - py(geo.y(geo.stop))) * be).toFixed(1)}px, 0)`);
       show(beTag, ease(seg(t, 12.6, 13.1)));
       const hit = ease(seg(t, 14.6, 15.1));
       show(takeTag, hit);
-      takeL.dataset.hit = t > 14.6 ? '1' : '0';
+      const hitOn = t > 14.6 ? '1' : '0';
+      if (takeL.dataset.hit !== hitOn) takeL.dataset.hit = hitOn;
 
       // точка цены — на закрытии последней видимой свечи
       const i0 = Math.min(N - 1, Math.floor(live - 0.5)), f = Math.max(0, Math.min(1, live - 0.5 - i0));
       const k = series[i0], kn = series[Math.min(N - 1, i0 + 1)];
       const price = k.c + (kn.c - k.c) * f;
-      dot.style.transform = `translate3d(${px(geo.x(live - 0.5)).toFixed(1)}px, ${py(geo.y(price)).toFixed(1)}px, 0)`;
-      dot.style.opacity = fade.toFixed(3);
+      put(dot, 'transform', `translate3d(${px(geo.x(live - 0.5)).toFixed(1)}px, ${py(geo.y(price)).toFixed(1)}px, 0)`);
+      put(dot, 'opacity', fade.toFixed(3));
 
       const phase = t < 4.6 ? 0 : t < 9 ? 1 : 2;
       const from = [0, 4.6, 9][phase], to = [4.6, 9, 16.4][phase];

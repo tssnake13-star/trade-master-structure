@@ -66,7 +66,11 @@ const TransformationSection = () => {
       const c = cards[i] as HTMLElement;
       const on = i === phase ? '1' : '0';
       if (c.dataset.active !== on) c.dataset.active = on;
-      if (i === phase) c.style.setProperty('--p', progress.toFixed(3));
+      // полоса прогресса шага: шаг 1/60 достаточно, лишние записи стоят пересчёта стилей
+      if (i === phase) {
+        const v = (Math.round(progress * 60) / 60).toFixed(3);
+        if (c.style.getPropertyValue('--p') !== v) c.style.setProperty('--p', v);
+      }
     }
   }, []);
 
