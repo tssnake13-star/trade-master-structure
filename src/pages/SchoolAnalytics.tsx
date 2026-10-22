@@ -313,7 +313,9 @@ export default function SchoolAnalytics() {
   // и analytics_summary считает только после неё. Обнуляется отдельная страница
   // («мне нужно только обнулять страницу цен. Посещение сайта обнулять не надо»):
   // точка действует только на список «Страницы». Общая точка analytics_reset_at
-  // осталась от первого варианта, на экране её можно только снять.
+  // с 22.10.2026 ставится кнопкой «Начать счёт заново» (Сергей: «да, добавь кнопку» —
+  // сайт в этот день сильно поменялся, старые и новые цифры не смешиваем).
+  // Снимается кнопкой «Вернуть всю историю»: события из базы не удаляются.
   const [resetting, setResetting] = useState(false);
   const saveSetting = async (key: string, value: string) => {
     setResetting(true);
@@ -398,13 +400,24 @@ export default function SchoolAnalytics() {
           ))}
         </div>
 
-        {/* Общее обнуление на экране не делается, только снимается, если оно стоит */}
-        {data?.reset_at && (
-          <div
-            className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2"
-            style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#666' }}
+        {/* Общая точка отсчёта: «Начать счёт заново» ставит её на эту минуту, «Вернуть всю историю» снимает */}
+        <div
+          className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2"
+          style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#666' }}
+        >
+          {data?.reset_at && <span>Счёт с {formatReset(data.reset_at)}</span>}
+          <button
+            onClick={() => {
+              if (!window.confirm('Начать счёт заново с этой минуты? Посещения, источники, воронка и клики будут считаться только с этого момента. Старые записи останутся в базе: их можно вернуть кнопкой «Вернуть всю историю».')) return;
+              void saveSetting('analytics_reset_at', new Date().toISOString());
+            }}
+            disabled={resetting}
+            className="hover:opacity-70 transition disabled:opacity-40"
+            style={{ color: ACCENT, textTransform: 'uppercase', letterSpacing: '0.14em' }}
           >
-            <span>Счёт с {formatReset(data.reset_at)}</span>
+            Начать счёт заново
+          </button>
+          {data?.reset_at && (
             <button
               onClick={() => void saveSetting('analytics_reset_at', '')}
               disabled={resetting}
@@ -413,8 +426,8 @@ export default function SchoolAnalytics() {
             >
               Вернуть всю историю
             </button>
-          </div>
-        )}
+          )}
+        </div>
 
         {loading && (
           <p className="mt-10" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#666' }}>
