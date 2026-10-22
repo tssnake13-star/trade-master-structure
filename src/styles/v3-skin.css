@@ -349,9 +349,9 @@
 }
 /* шаги под окном подсвечиваются в такт демонстрации */
 .td-step { position: relative; overflow: hidden; transition: border-color .5s, background-color .5s; }
-.td-step::before { content: ''; position: absolute; left: 0; top: 0; height: 2px; width: 100%; background: hsl(var(--accent)); transform-origin: left; transform: scaleX(var(--p, 0)); opacity: 0; transition: opacity .4s; }
+.td-step-bar { position: absolute; left: 0; top: 0; height: 2px; width: 100%; background: hsl(var(--accent)); transform-origin: left; transform: scaleX(0); opacity: 0; transition: opacity .4s; will-change: transform; }
 .td-step[data-active="1"] { border-color: hsl(var(--accent) / .6) !important; background-color: hsl(var(--accent) / .05) !important; }
-.td-step[data-active="1"]::before { opacity: 1; }
+.td-step[data-active="1"] .td-step-bar { opacity: 1; }
 
 /* =====================================================================
    Последний экран: заголовок внутри светящегося кольца (FinalRing, 22.10.2026)

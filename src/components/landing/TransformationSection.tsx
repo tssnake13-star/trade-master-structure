@@ -66,10 +66,11 @@ const TransformationSection = () => {
       const c = cards[i] as HTMLElement;
       const on = i === phase ? '1' : '0';
       if (c.dataset.active !== on) c.dataset.active = on;
-      // полоса прогресса шага: шаг 1/60 достаточно, лишние записи стоят пересчёта стилей
+      // полоса прогресса шага: каждый кадр, только transform — без ступенек и пересчёта стилей
+      // (Сергей 22.10.2026: «прерывисто, как будто с зависанием… надо плавнее»)
       if (i === phase) {
-        const v = (Math.round(progress * 60) / 60).toFixed(3);
-        if (c.style.getPropertyValue('--p') !== v) c.style.setProperty('--p', v);
+        const bar = c.firstElementChild as HTMLElement | null;
+        if (bar) bar.style.transform = `scaleX(${progress.toFixed(4)})`;
       }
     }
   }, []);
@@ -98,6 +99,7 @@ const TransformationSection = () => {
         <div ref={stepsRef} className="mt-3 grid md:grid-cols-3 gap-3 max-w-5xl">
           {WEEK.map((w, i) => (
             <div key={w.title} className="td-step border border-border rounded-xl bg-card p-5 md:p-6">
+              <span className="td-step-bar" aria-hidden="true" />
               <div className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: ACCENT }}>
                 0{i + 1} · {w.when}
               </div>

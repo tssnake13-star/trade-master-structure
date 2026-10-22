@@ -63,9 +63,18 @@ export default function TerminalDemo({ onPhase }: { onPhase?: (phase: number, pr
     const zoneTop = Math.max(...acc.map((k) => k.h));
     const zoneBot = Math.min(...acc.map((k) => k.l));
     const entry = zoneTop + 0.2;
-    const stop = zoneBot - 0.4;
-    const take = entry + (entry - stop) * 2.6;
-    return { x, y, slot, zoneTop, zoneBot, entry, stop, take };
+    // 22.10.2026, Сергей: стоп «как минимум… за ложным пробоем»: сразу за проколом на ретесте,
+    // а не под всей зоной. Тейк — на вершине движения, ровно 9,5 стопа (средний выигрыш системы
+    // +9,50 R), чтобы соотношение было видно на глаз.
+    const top = Math.max(...series.slice(ENTRY).map((k) => k.h)) - 0.3;
+    const r = (top - entry) / 9.5;
+    const retestLow = Math.min(...series.slice(SIGNAL + 1, ENTRY + 1).map((k) => k.l));
+    const stop = Math.min(entry - r, retestLow - 0.2);
+    const take = entry + (entry - stop) * 9.5;
+    // свеча, которая первой дотягивается до тейка: на ней загорается «тейк взят»
+    let hitIdx = N - 1;
+    for (let i = ENTRY + 1; i < N; i++) if (series[i].h >= take) { hitIdx = i; break; }
+    return { x, y, slot, zoneTop, zoneBot, entry, stop, take, hitIdx };
   }, [series]);
 
   // свечи рисуются один раз
@@ -126,6 +135,7 @@ export default function TerminalDemo({ onPhase }: { onPhase?: (phase: number, pr
       if (c[prop] !== v) { c[prop] = v; e.style[prop] = v; }
     };
     let fade = 1;
+    let hitAt = -1;
     let wasStarted: boolean | null = null;
     let lastBtnOpacity = '';
     const show = (e: HTMLElement, a: number, dy = 0) => {
@@ -178,9 +188,12 @@ export default function TerminalDemo({ onPhase }: { onPhase?: (phase: number, pr
       const be = ease(seg(t, 12, 12.8));
       put(stopL, 'transform', `translate3d(0, ${((py(geo.y(geo.entry)) - py(geo.y(geo.stop))) * be).toFixed(1)}px, 0)`);
       show(beTag, ease(seg(t, 12.6, 13.1)));
-      const hit = ease(seg(t, 14.6, 15.1));
+      const hitNow = t >= 9.5 && live - 0.5 >= geo.hitIdx;
+      if (hitNow && hitAt < 0) hitAt = t;
+      if (t < 9.5) hitAt = -1;
+      const hit = hitAt < 0 ? 0 : ease(seg(t, hitAt, hitAt + 0.5));
       show(takeTag, hit);
-      const hitOn = t > 14.6 ? '1' : '0';
+      const hitOn = hitNow ? '1' : '0';
       if (takeL.dataset.hit !== hitOn) takeL.dataset.hit = hitOn;
 
       // точка цены — на закрытии последней видимой свечи
@@ -239,9 +252,9 @@ export default function TerminalDemo({ onPhase }: { onPhase?: (phase: number, pr
               <path d={candles.down} className="td-down" />
             </svg>
             <div className="td-zone" data-zone style={zoneStyle}><span>накопление</span></div>
-            <div className="td-line td-line--take" data-take style={lineAt(geo.take, SIGNAL)}><span>тейк</span></div>
+            <div className="td-line td-line--take" data-take style={lineAt(geo.take, SIGNAL)}><span>тейк · 9,5R</span></div>
             <div className="td-line td-line--entry" data-entry style={lineAt(geo.entry, ENTRY - 1)}><span>вход</span></div>
-            <div className="td-line td-line--stop" data-stop style={lineAt(geo.stop, SIGNAL)}><span>стоп</span></div>
+            <div className="td-line td-line--stop" data-stop style={lineAt(geo.stop, ENTRY - 1)}><span>стоп · 1R</span></div>
             <div className="td-tag td-tag--be" data-be style={{ ...pct(geo.x(N - 12), geo.y(geo.entry)) }}>безубыток</div>
             <div className="td-tag td-tag--take" data-taketag style={{ ...pct(geo.x(N - 9), geo.y(geo.take)) }}>тейк взят</div>
             <div className="td-curtain" data-curtain />
