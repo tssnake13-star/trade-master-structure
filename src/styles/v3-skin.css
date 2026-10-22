@@ -191,11 +191,16 @@
   .v3h-split-text > *:not(.v3h-h1) { max-width: 78.5%; }
 }
 
+/* Слои сцены первого экрана (HeroDeskScene): у каждого меняются только прозрачность
+   и сдвиг — это работа видеокарты, без перерисовки (Сергей 22.10.2026: «60 кадров»). */
+.hd-scene { contain: layout paint; }
+.hd-layer { position: absolute; inset: 0; width: 100%; height: 100%; display: block; will-change: transform, opacity; }
+
 /* Карточка терминала поверх сцены: «допуск» / «отказ» (HeroDeskScene, 22.10.2026) */
 .hd-card {
   position: absolute; z-index: 3; pointer-events: none;
   width: min(300px, 78%); padding: 12px 14px;
-  background: oklch(0.12 0.012 70 / 0.86); backdrop-filter: blur(8px);
+  background: oklch(0.12 0.012 70 / 0.94);
   border: 1px solid var(--v3-gold-dim); box-shadow: 0 10px 40px oklch(0 0 0 / 0.55);
   opacity: 0; transform: translateY(14px) scale(0.98);
   transition: opacity 1s ease, transform 1.2s cubic-bezier(.2,.8,.2,1);

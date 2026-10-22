@@ -106,7 +106,7 @@ export default function HeroSectionV3() {
       <div className="container-landing relative w-full" style={{ zIndex: 2 }}>
         <div className="w-full v3h-split-text">
           <div className="v3h-eyebrow v3h-mono mb-7">
-            <span className="dot" /> Свинг-трейдинг · неделя и дневка
+            <span className="dot" /> Свинг-трейдинг · W1 · D1 · H4
           </div>
 
           <h1 className="v3h-h1">
