@@ -48,8 +48,12 @@ const MON_BOX = { x: 812, y: 196, w: 776, h: 330 };
 // кольцо на кадре и рамка картинок света кольца
 const RING = { x: 1214.7, y: 312.4, r: 268.7 };
 const RING_BOX = { x: 922, y: 19, w: 585, h: 586 };
-// видимая на фото часть кольца начинается у левого монитора и идёт по часовой через верх
-const RING_START = (185 * Math.PI) / 180;
+// видимая на фото часть кольца начинается у левого монитора (~182°, ниже кольцо за его верхним краем) и идёт
+// по часовой через верх до правого (~343°). Прорисовка стартует прямо у края монитора: со старта на 185° кусок
+// у основания загорался последним и всё вступление стоял серой заплаткой (Сергей 23.10.2026: «квадратный силуэт»)
+const RING_START = (181 * Math.PI) / 180;
+// мягкая граница прорисовки, рад по обе стороны фронта: вместо прямого среза по радиусу
+const SWEEP_SOFT = 0.1;
 const INTRO_MS = 8000;
 // блик: голова и хвост — пятна вдоль кольца (отставание в радианах, яркость, радиус)
 const COMET: [number, number, number][] = [[0, 1, 46], [0.12, 0.65, 40], [0.24, 0.4, 34], [0.36, 0.2, 28]];
@@ -73,9 +77,9 @@ const clamp = (v: number) => Math.max(0, Math.min(1, v));
 const clamp1 = (v: number) => Math.max(-1, Math.min(1, v));
 const seg = (p: number, a: number, b: number) => clamp((p - a) / (b - a));
 const ease = (t: number) => t * t * (3 - 2 * t);
-// угол прорисовки кольца: видимую верхнюю дугу (~155°) проходим за 70% времени, остальное — быстрее
+// угол прорисовки кольца: видимую верхнюю дугу (~162°) проходим за 70% времени, остальное — быстрее
 const sweepAngle = (t: number) =>
-  RING_START + (t < 0.7 ? 0.43 * (t / 0.7) : 0.43 + 0.57 * ((t - 0.7) / 0.3)) * Math.PI * 2;
+  RING_START + (t < 0.7 ? 0.45 * (t / 0.7) : 0.45 + 0.55 * ((t - 0.7) / 0.3)) * Math.PI * 2;
 
 type Props = {
   /** 'wide' — сцена целиком справа от текста; 'narrow' — мониторы и кольцо (полоса на телефоне) */
@@ -227,6 +231,11 @@ export default function HeroDeskScene({ variant, className }: Props) {
     let dotSpr: HTMLCanvasElement | null = null;
     let spotSpr: HTMLCanvasElement | null = null;
     const cometCv = document.createElement('canvas');
+    // прорисовка кольца с мягким фронтом: заплатка и подсветка смешиваются по коническому градиенту
+    // (Chrome, Safari 16.1+); без него — прежний срез по радиусу
+    const sweepCv = document.createElement('canvas');
+    const sc = sweepCv.getContext('2d');
+    const softSweep = !!sc && typeof sc.createConicGradient === 'function';
     const underCv = document.createElement('canvas');
     const overCv = document.createElement('canvas');
     let monX = 0, monY = 0;
@@ -291,6 +300,8 @@ export default function HeroDeskScene({ variant, className }: Props) {
         c.fillStyle = gr; c.fillRect(0, 0, 160, 160);
       });
       cometCv.width = cometCv.height = Math.max(2, Math.ceil(COMET_WIN * s));
+      sweepCv.width = Math.max(2, Math.ceil(RING_BOX.w * s));
+      sweepCv.height = Math.max(2, Math.ceil(RING_BOX.h * s));
     };
     layout();
     const ro = new ResizeObserver(layout);
@@ -336,7 +347,33 @@ export default function HeroDeskScene({ variant, className }: Props) {
       rc.setTransform(1, 0, 0, 1, 0, 0);
       rc.clearRect(0, 0, ringCv.width, ringCv.height);
       rc.setTransform(F.k * dpr, 0, 0, F.k * dpr, F.tx * dpr, F.ty * dpr);
-      if (ringOn < 1) {
+      if (ringOn < 1 && sc && softSweep) {
+        // незажжённая часть закрыта заплаткой, зажжённая светится ярче обычного; на фронте они смешиваются
+        // по коническому градиенту вокруг центра кольца шириной 2×SWEEP_SOFT
+        const ang = sweepAngle(ringOn);
+        const turn = Math.PI * 2;
+        const start = ang - SWEEP_SOFT;
+        const f = (2 * SWEEP_SOFT) / turn;
+        const end = Math.min(1, Math.max(f, (RING_START + turn - start) / turn));
+        const ox = ((RING.x - RING_BOX.x) * sweepCv.width) / RING_BOX.w;
+        const oy = ((RING.y - RING_BOX.y) * sweepCv.height) / RING_BOX.h;
+        const layer = (img: HTMLImageElement, stops: [number, number][], alpha: number) => {
+          sc.globalCompositeOperation = 'source-over';
+          sc.clearRect(0, 0, sweepCv.width, sweepCv.height);
+          sc.drawImage(img, 0, 0, sweepCv.width, sweepCv.height);
+          const g = sc.createConicGradient(start, ox, oy);
+          for (const [o, a] of stops) g.addColorStop(o, `rgba(0,0,0,${a})`);
+          sc.globalCompositeOperation = 'destination-in';
+          sc.fillStyle = g;
+          sc.fillRect(0, 0, sweepCv.width, sweepCv.height);
+          rc.globalAlpha = alpha;
+          rc.drawImage(sweepCv, RING_BOX.x, RING_BOX.y, RING_BOX.w, RING_BOX.h);
+          rc.globalAlpha = 1;
+        };
+        layer(ringOff, [[0, 0], [f, 1], [end, 1], [end, 0], [1, 0]], 1);
+        layer(ringLight, [[0, 1], [f, 0], [end, 0], [end, 1], [1, 1]], 0.45 - 0.25 * ringOn);
+        drawComet(ang, 1);
+      } else if (ringOn < 1) {
         // незажжённая часть кольца закрыта заплаткой, зажжённая светится ярче обычного
         const ang = sweepAngle(ringOn);
         rc.save();
