@@ -90,6 +90,8 @@ export interface MarketRow {
       text?: string | null;
       // 16.10.2026: у поводыря запаса нет — смотрели индекс доллара над ним; ok сверху — уже итог по обоим
       top?: { ok: boolean; none?: boolean; side?: string | null; a?: string | null; touch?: string | null } | null;
+      // 23.10.2026: у поводыря и индекса над ним запаса нет — смотрели сам инструмент; есть у самого — ok сверху true
+      own?: { ok: boolean; none?: boolean; a?: string | null; touch?: string | null } | null;
     } | null;
     // 18.10.2026: итог дневки — входить можно или нельзя (ok) и почему нельзя (why, словами клеток карточки);
     // мост считает теми же проверками, что держат допуск бота (terminal_publish._itog)

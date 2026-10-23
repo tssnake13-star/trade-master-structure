@@ -260,13 +260,27 @@ function Zapas({ r }: { r: MarketRow }) {
   const t = z?.top;
   const tDown = t?.side === 'SHORT';
   const mine = z ? <>{who}{down ? 'лоу' : 'хай'} {z.a} переписан{z.touch ? ` ${z.touch}` : ''}</> : null;
-  if (z && t) {
+  // 23.10.2026, его слово «внедряй смягчение»: у поводыря (и индекса доллара над ним) запаса нет — смотрели сам
+  // инструмент: «есть либо у поводыря, либо у самого инструмента — вход разрешается»
+  const o = z?.own;
+  const oDown = sideOf(r.side) === 'SHORT';
+  const ownLine = o ? (
+    <>
+      <br />у самого инструмента —{' '}
+      {o.ok
+        ? (o.none ? 'большого отката не было' : <>запас до {oDown ? 'лоу' : 'хая'} {o.a}</>)
+        : <>{oDown ? 'лоу' : 'хай'} {o.a} переписан{o.touch ? ` ${o.touch}` : ''}</>}
+    </>
+  ) : null;
+  if (z && (t || o)) {
     value = z.ok ? 'ЕСТЬ' : 'нет';
     color = z.ok ? UP : DIM;
-    const dxy = t.ok
-      ? (t.none ? 'большого отката не было' : <>запас до {tDown ? 'лоу' : 'хая'} {t.a}</>)
-      : <>{tDown ? 'лоу' : 'хай'} {t.a} переписан{t.touch ? ` ${t.touch}` : ''}</>;
-    sub = <>{mine}<br />у индекса доллара — {dxy}</>;
+    const dxy = t
+      ? t.ok
+        ? (t.none ? 'большого отката не было' : <>запас до {tDown ? 'лоу' : 'хая'} {t.a}</>)
+        : <>{tDown ? 'лоу' : 'хай'} {t.a} переписан{t.touch ? ` ${t.touch}` : ''}</>
+      : null;
+    sub = <>{mine}{t ? <><br />у индекса доллара — {dxy}</> : null}{ownLine}</>;
   } else if (z && z.ok) {
     value = 'ЕСТЬ';
     color = UP;
