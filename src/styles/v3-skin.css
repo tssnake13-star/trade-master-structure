@@ -448,6 +448,37 @@
 .td-step[data-active="1"] .td-step-bar { opacity: 1; }
 
 /* =====================================================================
+   Проба 3D (?3d, 23.10.2026): окно терминала монитором в объёме (Monitor3D.tsx).
+   Корпус — лицевая рамка, задняя крышка и четыре грани толщины; поворот задаёт Monitor3D.
+   ===================================================================== */
+.m3d { perspective: 1700px; perspective-origin: 50% 35%; }
+.m3d-rig { position: relative; transform-style: preserve-3d; will-change: transform; --th: 16px; }
+.m3d-screen {
+  position: relative; padding: 9px; border-radius: 16px;
+  background: linear-gradient(160deg, #1d2024, #0d0f12 55%, #15181c);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.07), inset 0 1px 0 rgba(255,255,255,0.12);
+}
+.m3d-screen .td-win { border-radius: 8px; }
+.m3d-back {
+  position: absolute; inset: 0; border-radius: 16px; transform: translateZ(calc(-1 * var(--th)));
+  background: linear-gradient(180deg, #23262b, #121418);
+}
+.m3d-side { position: absolute; background: linear-gradient(90deg, #2b2f35, #17191d); }
+.m3d-side--l { top: 12px; bottom: 12px; left: 0; width: var(--th); transform-origin: 0 50%; transform: rotateY(90deg); }
+.m3d-side--r { top: 12px; bottom: 12px; right: 0; width: var(--th); transform-origin: 100% 50%; transform: rotateY(-90deg); }
+.m3d-side--t { left: 12px; right: 12px; top: 0; height: var(--th); transform-origin: 50% 0; transform: rotateX(-90deg); background: linear-gradient(180deg, #34383e, #1a1c20); }
+.m3d-side--b { left: 12px; right: 12px; bottom: 0; height: var(--th); transform-origin: 50% 100%; transform: rotateX(90deg); background: linear-gradient(0deg, #2a2d32, #141619); }
+.m3d-glare {
+  position: absolute; inset: 9px; border-radius: 8px; pointer-events: none;
+  background: linear-gradient(112deg, rgba(255,255,255,0) 38%, rgba(255,255,255,0.075) 47%, rgba(255,255,255,0.02) 53%, rgba(255,255,255,0) 60%);
+  background-size: 260% 100%; background-position: var(--gx, 50%) 0;
+}
+.m3d-shadow {
+  height: 34px; width: 82%; margin: 6px auto 0; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(0,0,0,0.65), rgba(0,0,0,0)); filter: blur(6px);
+}
+
+/* =====================================================================
    Последний экран: заголовок внутри светящегося кольца (FinalRing, 22.10.2026)
    ===================================================================== */
 .final-ring { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; }

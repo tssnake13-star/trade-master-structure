@@ -21,6 +21,23 @@ import { useEffect, useRef } from 'react';
 
 const ease = (t: number) => t * t * (3 - 2 * t);
 
+/** первые секунды по часам кольца оно прорисовывается, потом идёт отсчёт */
+export const RING_DRAW_IN = 2.2;
+
+/**
+ * Отсчёт кольца по его часам t (секунды): сколько круга прорисовано, сколько дуг горит (0…7),
+ * вспышка целиком и угасание перед новым кругом. Общий для плоского кольца и пробы 3D (FinalRing3D).
+ */
+export function ringCount(t: number) {
+  const draw01 = ease(Math.min(1, t / RING_DRAW_IN));
+  const counting = t > RING_DRAW_IN;
+  const cyc = 7 * 0.8 + 2.2, u = counting ? (t - RING_DRAW_IN) % cyc : 0;
+  const lit = counting ? Math.min(7, u / 0.8) : 0;
+  const flash = counting && u > 5.6 ? Math.sin(Math.min(1, (u - 5.6) / 2.2) * Math.PI) : 0;
+  const fadeOut = u > 6.7 ? 1 - ease(Math.min(1, (u - 6.7) / 1.1)) : 1;
+  return { draw01, lit, flash, fadeOut };
+}
+
 type Spark = { a: number; r: number; v: number; s: number; ph: number };
 
 function sprite(size: number, draw: (c: CanvasRenderingContext2D, h: number) => void) {
@@ -98,22 +115,16 @@ export default function FinalRing() {
       a: rnd() * Math.PI * 2, r: 0.7 + rnd() * 0.75, v: (rnd() - 0.5) * 0.12, s: 0.8 + rnd() * 1.8, ph: rnd() * 6.28,
     }));
 
-    // t — часы кольца в секундах: первые DRAW_IN секунд кольцо прорисовывается, потом идёт отсчёт
-    const DRAW_IN = 2.2;
+    // t — часы кольца в секундах: первые RING_DRAW_IN секунд кольцо прорисовывается, потом идёт отсчёт
     const draw = (t: number) => {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       if (!ring || !segDim || !segLit || !haze || !dot) return;
-      const draw01 = ease(Math.min(1, t / DRAW_IN));
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const box = (R + pad) * 2;
 
       // отсчёт: дуги загораются по одной, потом всё кольцо вспыхивает и гаснет
-      const counting = t > DRAW_IN;
-      const cyc = 7 * 0.8 + 2.2, u = counting ? (t - DRAW_IN) % cyc : 0;
-      const lit = counting ? Math.min(7, u / 0.8) : 0;
-      const flash = counting && u > 5.6 ? Math.sin(Math.min(1, (u - 5.6) / 2.2) * Math.PI) : 0;
-      const fadeOut = u > 6.7 ? 1 - ease(Math.min(1, (u - 6.7) / 1.1)) : 1;
+      const { draw01, lit, flash, fadeOut } = ringCount(t);
 
       ctx.globalAlpha = draw01 * (0.7 + 0.3 * flash);
       const hb = (R + pad * 2) * 2;
@@ -161,7 +172,7 @@ export default function FinalRing() {
 
     // «меньше движения»: кольцо стоит, все 7 дуг горят
     const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const ro = new ResizeObserver(() => { layout(); if (still) draw(DRAW_IN + 7 * 0.8); });
+    const ro = new ResizeObserver(() => { layout(); if (still) draw(RING_DRAW_IN + 7 * 0.8); });
     ro.observe(section);
     if (still) return () => ro.disconnect();
 

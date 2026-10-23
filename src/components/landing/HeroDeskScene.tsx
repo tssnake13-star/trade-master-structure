@@ -60,8 +60,12 @@ const COMET_WIN = 280;
 // 3D: глубина стены с кольцом и пыли, наибольший сдвиг камеры (px кадра), сила «наезда» во вступлении
 const D_RING = 0.06;
 const D_DUST = 0.7;
-const MAX_OFF = 40;
+// проба 3D (?3d): 23.10.2026 Сергей посмотрел видео — «я не вижу изменений»: сдвиг был 40 px кадра.
+// Теперь камера ходит заметнее, а при прокрутке въезжает в комнату: стена с кольцом уходит вглубь,
+// стол приближается, мониторы стоят (они на глубине опоры PIVOT, поэтому графики не съезжают)
+const MAX_OFF = 70;
 const ZOOM0 = 0.28;
+const ZOOM_SCROLL = 0.3;
 
 // инструменты в карточках — только то, что Сергей разбирает (нефть он не торгует)
 const SYMBOLS = ['XAUUSD', 'EURUSD', 'GBPJPY', 'BTCUSD', 'USDCAD', 'AUDJPY', 'ETHUSD', 'GBPUSD'];
@@ -511,7 +515,7 @@ export default function HeroDeskScene({ variant, className }: Props) {
         // при прокрутке ближние предметы уходят вверх быстрее дальних
         const t = now / 1000;
         const idle = clamp((now - mouseAt - 2500) / 1500);
-        const driftX = 0.38 * Math.sin(t * 0.21), driftY = 0.2 * Math.sin(t * 0.29 + 1);
+        const driftX = 0.5 * Math.sin(t * 0.21), driftY = 0.26 * Math.sin(t * 0.29 + 1);
         const userX = tiltOn ? tiltX : mx, userY = tiltOn ? tiltY : my;
         const scroll = clamp(window.scrollY / Math.max(1, window.innerHeight));
         const goalX = clamp1(userX * (1 - idle) + driftX * (tiltOn ? 0.3 : idle));
@@ -519,7 +523,8 @@ export default function HeroDeskScene({ variant, className }: Props) {
         const b = 1 - Math.exp(-dt / 350);
         cx3 += (goalX - cx3) * b; cy3 += (goalY - cy3) * b;
         const offX = cx3 * MAX_OFF, offY = cy3 * MAX_OFF * 0.6;
-        const zm = ZOOM0 * (1 - ease(introP));
+        // въезд набирается за первые полэкрана прокрутки, пока сцена ещё видна целиком
+        const zm = ZOOM0 * (1 - ease(introP)) + ZOOM_SCROLL * ease(clamp(window.scrollY / Math.max(1, window.innerHeight * 0.55)));
         // время пара по кругу в час: в 32-битной дроби секунды не теряют точность
         depth.draw({ w: photo3d.width, h: photo3d.height, k: F.k * dpr, tx: F.tx * dpr, ty: F.ty * dpr, offX, offY, zoom: zm, time: (t % 3600) });
         // слой кольца — на глубине стены, пыль — ближе мониторов

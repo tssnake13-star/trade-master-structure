@@ -22,6 +22,8 @@
 
 import { useCallback, useRef } from 'react';
 import TerminalDemo from './TerminalDemo';
+import Monitor3D from './Monitor3D';
+import { PROBE_3D } from '@/lib/probe3d';
 import Words from '@/components/fx/Words';
 
 const WEEK = [
@@ -93,7 +95,8 @@ const TransformationSection = () => {
 
         {/* живое окно терминала: неделя подписчика проигрывается по кругу */}
         <div className="mt-10 md:mt-12 max-w-5xl">
-          <TerminalDemo onPhase={onPhase} />
+          {/* проба 3D (?3d): то же окно в корпусе монитора, поворачивается к зрителю при прокрутке */}
+          {PROBE_3D ? <Monitor3D><TerminalDemo onPhase={onPhase} /></Monitor3D> : <TerminalDemo onPhase={onPhase} />}
         </div>
 
         {/* неделя в трёх шагах */}
