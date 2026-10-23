@@ -18,21 +18,22 @@ import { useEffect, useMemo, useRef, useState } from 'react';
  * та же схема в зеркале: выход вниз из накопления, ретест снизу, стоп над проколом, тейк внизу.
  */
 
-const CYCLE = 17000;
-const N = 60;
-const SIGNAL = 38; // свеча выхода из накопления
-const ENTRY = 41; // свеча, на которой ставится точка входа
-const VB = { w: 600, h: 300, pad: 14 };
+// 23.10.2026: данные и разметка общие с изогнутым монитором (CurvedMonitor), поэтому вынесены наружу
+export const CYCLE = 17000;
+export const N = 60;
+export const SIGNAL = 38; // свеча выхода из накопления
+export const ENTRY = 41; // свеча, на которой ставится точка входа
+export const VB = { w: 600, h: 300, pad: 14 };
 
-type C = { o: number; h: number; l: number; c: number };
+export type C = { o: number; h: number; l: number; c: number };
 
 // сценарии кругов: seed подобран так, чтобы ретест касался края зоны, а тейк 9,5R был достижим
-const SCEN = [
+export const SCEN = [
   { seed: 11, dir: 1 as const, sym: 'EURUSD', side: 'покупка' },
   { seed: 49, dir: -1 as const, sym: 'GBPJPY', side: 'продажа' },
 ];
 
-function makeSeries(seed: number, dir: 1 | -1): C[] {
+export function makeSeries(seed: number, dir: 1 | -1): C[] {
   const out = makeLong(seed);
   if (dir > 0) return out;
   // продажа — зеркало той же схемы: рост вместо спуска, выход вниз, тренд вниз
@@ -63,8 +64,37 @@ function makeLong(seed: number): C[] {
 }
 
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
-const seg = (t: number, a: number, b: number) => clamp((t - a) / (b - a));
-const ease = (t: number) => t * t * (3 - 2 * t);
+export const seg = (t: number, a: number, b: number) => clamp((t - a) / (b - a));
+export const ease = (t: number) => t * t * (3 - 2 * t);
+
+/** геометрия графика в координатах SVG (VB): шкалы, зона накопления, вход, стоп, тейк, свеча тейка */
+export function terminalGeo(series: C[], dir: 1 | -1) {
+  const lo = Math.min(...series.map((k) => k.l)) - 1;
+  const hi = Math.max(...series.map((k) => k.h)) + 1;
+  const slot = (VB.w - VB.pad * 2) / N;
+  const x = (i: number) => VB.pad + slot * (i + 0.5);
+  const y = (v: number) => VB.pad + ((hi - v) / (hi - lo)) * (VB.h - VB.pad * 2);
+  const acc = series.slice(18, SIGNAL);
+  const zoneTop = Math.max(...acc.map((k) => k.h));
+  const zoneBot = Math.min(...acc.map((k) => k.l));
+  // вход у края зоны, через который вышла цена (у покупки — верх, у продажи — низ)
+  const entry = (dir > 0 ? zoneTop : zoneBot) + 0.2 * dir;
+  // 22.10.2026, Сергей: стоп «как минимум… за ложным пробоем»: сразу за проколом на ретесте,
+  // а не за всей зоной. Тейк — на краю движения, ровно 9,5 стопа (средний выигрыш системы
+  // +9,50 R), чтобы соотношение было видно на глаз.
+  const after = series.slice(ENTRY);
+  const extreme = dir > 0 ? Math.max(...after.map((k) => k.h)) - 0.3 : Math.min(...after.map((k) => k.l)) + 0.3;
+  const r = Math.abs(extreme - entry) / 9.5;
+  const retest = series.slice(SIGNAL + 1, ENTRY + 1);
+  const stop = dir > 0
+    ? Math.min(entry - r, Math.min(...retest.map((k) => k.l)) - 0.2)
+    : Math.max(entry + r, Math.max(...retest.map((k) => k.h)) + 0.2);
+  const take = entry + dir * Math.abs(entry - stop) * 9.5;
+  // свеча, которая первой дотягивается до тейка: на ней загорается «тейк взят»
+  let hitIdx = N - 1;
+  for (let i = ENTRY + 1; i < N; i++) if (dir > 0 ? series[i].h >= take : series[i].l <= take) { hitIdx = i; break; }
+  return { x, y, slot, zoneTop, zoneBot, entry, stop, take, hitIdx };
+}
 
 export default function TerminalDemo({ onPhase }: { onPhase?: (phase: number, progress: number) => void }) {
   const root = useRef<HTMLDivElement>(null);
@@ -74,33 +104,7 @@ export default function TerminalDemo({ onPhase }: { onPhase?: (phase: number, pr
   const series = useMemo(() => makeSeries(scen.seed, scen.dir), [scen]);
 
   // геометрия графика в координатах SVG
-  const geo = useMemo(() => {
-    const lo = Math.min(...series.map((k) => k.l)) - 1;
-    const hi = Math.max(...series.map((k) => k.h)) + 1;
-    const slot = (VB.w - VB.pad * 2) / N;
-    const x = (i: number) => VB.pad + slot * (i + 0.5);
-    const y = (v: number) => VB.pad + ((hi - v) / (hi - lo)) * (VB.h - VB.pad * 2);
-    const acc = series.slice(18, SIGNAL);
-    const zoneTop = Math.max(...acc.map((k) => k.h));
-    const zoneBot = Math.min(...acc.map((k) => k.l));
-    // вход у края зоны, через который вышла цена (у покупки — верх, у продажи — низ)
-    const entry = (dir > 0 ? zoneTop : zoneBot) + 0.2 * dir;
-    // 22.10.2026, Сергей: стоп «как минимум… за ложным пробоем»: сразу за проколом на ретесте,
-    // а не за всей зоной. Тейк — на краю движения, ровно 9,5 стопа (средний выигрыш системы
-    // +9,50 R), чтобы соотношение было видно на глаз.
-    const after = series.slice(ENTRY);
-    const extreme = dir > 0 ? Math.max(...after.map((k) => k.h)) - 0.3 : Math.min(...after.map((k) => k.l)) + 0.3;
-    const r = Math.abs(extreme - entry) / 9.5;
-    const retest = series.slice(SIGNAL + 1, ENTRY + 1);
-    const stop = dir > 0
-      ? Math.min(entry - r, Math.min(...retest.map((k) => k.l)) - 0.2)
-      : Math.max(entry + r, Math.max(...retest.map((k) => k.h)) + 0.2);
-    const take = entry + dir * Math.abs(entry - stop) * 9.5;
-    // свеча, которая первой дотягивается до тейка: на ней загорается «тейк взят»
-    let hitIdx = N - 1;
-    for (let i = ENTRY + 1; i < N; i++) if (dir > 0 ? series[i].h >= take : series[i].l <= take) { hitIdx = i; break; }
-    return { x, y, slot, zoneTop, zoneBot, entry, stop, take, hitIdx };
-  }, [series, dir]);
+  const geo = useMemo(() => terminalGeo(series, dir), [series, dir]);
 
   // свечи рисуются один раз
   const candles = useMemo(() => {

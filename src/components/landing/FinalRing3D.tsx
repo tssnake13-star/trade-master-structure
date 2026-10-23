@@ -3,10 +3,12 @@ import FinalRing, { ringCount, RING_DRAW_IN } from './FinalRing';
 import { createRing3D } from './ring3d';
 
 /**
- * Кольцо последнего экрана объёмным предметом — проба 3D по адресу с ?3d (23.10.2026). Отсчёт тот же,
+ * Кольцо последнего экрана объёмным предметом (23.10.2026: проба ?3d, потом Сергей: «Ставь кольцо»). Отсчёт тот же,
  * что у плоского кольца (ringCount): прорисовка, 7 дуг по одной, вспышка, угасание. Наклон: за прокруткой —
  * блок подъезжает снизу, кольцо разворачивается к зрителю; на компьютере ещё и за мышью. Без WebGL —
  * прежнее плоское кольцо.
+ * Холст — полоса вокруг кольца, а не весь блок: на телефоне блок высотой ~1700 px, а кольцу с маревом и искрами
+ * хватает четырёх радиусов.
  */
 const ease = (t: number) => t * t * (3 - 2 * t);
 const clamp1 = (v: number) => Math.max(-1, Math.min(1, v));
@@ -25,17 +27,23 @@ export default function FinalRing3D() {
     let W = 0;
     const layout = () => {
       W = section.clientWidth;
-      const H = section.clientHeight;
-      if (!W || !H) return;
+      const SH = section.clientHeight;
+      if (!W || !SH) return;
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const anchor = section.querySelector('[data-ring-center]') as HTMLElement | null;
       const sr = section.getBoundingClientRect();
-      let cx = W / 2, cy = H * 0.4;
+      let cx = W / 2, cy = SH * 0.4;
       if (anchor) {
         const ar = anchor.getBoundingClientRect();
         cx = ar.left - sr.left + ar.width / 2; cy = ar.top - sr.top + ar.height / 2;
       }
-      ring.resize(W, H, dpr, cx, cy, Math.min(W * (W < 768 ? 0.44 : 0.3), 330));
+      const R = Math.min(W * (W < 768 ? 0.44 : 0.3), 330);
+      // полоса холста: 4 радиуса по высоте вокруг центра кольца, не выходя за блок
+      const top = Math.max(0, Math.round(cy - R * 2));
+      const H = Math.min(SH, Math.round(cy + R * 2)) - top;
+      canvas.style.top = `${top}px`;
+      canvas.style.height = `${H}px`;
+      ring.resize(W, H, dpr, cx, cy - top, R);
     };
 
     const frame = (clock: number, tiltX: number, tiltY: number) => {

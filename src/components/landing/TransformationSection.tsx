@@ -21,9 +21,7 @@
  */
 
 import { useCallback, useRef } from 'react';
-import TerminalDemo from './TerminalDemo';
-import Monitor3D from './Monitor3D';
-import { PROBE_3D } from '@/lib/probe3d';
+import CurvedMonitor from './CurvedMonitor';
 import Words from '@/components/fx/Words';
 
 const WEEK = [
@@ -95,8 +93,9 @@ const TransformationSection = () => {
 
         {/* живое окно терминала: неделя подписчика проигрывается по кругу */}
         <div className="mt-10 md:mt-12 max-w-5xl">
-          {/* проба 3D (?3d): то же окно в корпусе монитора, поворачивается к зрителю при прокрутке */}
-          {PROBE_3D ? <Monitor3D><TerminalDemo onPhase={onPhase} /></Monitor3D> : <TerminalDemo onPhase={onPhase} />}
+          {/* 23.10.2026, Сергей: «Ставь кольцо и монитор, монитор сделай изогнутым» — окно на изогнутом мониторе в 3D;
+              без WebGL CurvedMonitor показывает прежнее окно TerminalDemo */}
+          <CurvedMonitor onPhase={onPhase} />
         </div>
 
         {/* неделя в трёх шагах */}

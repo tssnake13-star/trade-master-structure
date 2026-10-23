@@ -2,10 +2,9 @@ import { lazy, Suspense } from 'react';
 import { MessageCircle } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
-import { PROBE_3D } from '@/lib/probe3d';
 import FinalRing from './FinalRing';
 
-// проба 3D (?3d): объёмное кольцо грузится отдельным файлом, обычным посетителям не мешает
+// 23.10.2026, Сергей: «Ставь кольцо» — объёмное кольцо для всех (отдельный файл ~4 КБ); без WebGL — плоское
 const FinalRing3D = lazy(() => import('./FinalRing3D'));
 
 const DualCTASection = () => {
@@ -13,7 +12,7 @@ const DualCTASection = () => {
     // 22.10.2026: последний экран по образцу Сергея — заголовок внутри светящегося кольца (FinalRing),
     // карточки заходят на низ кольца. Тексты и кнопки прежние.
     <section className="final-cta relative overflow-hidden py-12 md:py-20">
-      {PROBE_3D ? <Suspense fallback={null}><FinalRing3D /></Suspense> : <FinalRing />}
+      {typeof window === 'undefined' ? <FinalRing /> : <Suspense fallback={null}><FinalRing3D /></Suspense>}
       <div className="container-landing relative" style={{ zIndex: 1 }}>
         <div data-ring-center className="final-cta__center">
           <h2 className="text-foreground text-center">
