@@ -64,7 +64,7 @@ const CoreProblemSection = () => {
           </p>
           <p className="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">
             Стоп по системе — это −1 R. Прибыльная сделка — в среднем +9,50 R.
-            Пропустить одну — как получить <mark className="fx-mark" style={{ color: ACCENT }}>9 стопов подряд</mark>.
+            Пропустить одну — как получить <span style={{ color: ACCENT }}>9 стопов подряд</span>.
           </p>
         </div>
 

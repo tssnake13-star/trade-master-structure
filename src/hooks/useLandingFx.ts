@@ -79,15 +79,12 @@ export default function useLandingFx() {
     main.querySelectorAll<HTMLElement>('#trades button img').forEach((img) => {
       if (img.parentElement) img.parentElement.dataset.scan = '';
     });
-    // маркеры под ключевыми фразами живут внутри абзацев и проявляются сами по себе
-    const marks = Array.from(main.querySelectorAll<HTMLElement>('mark.fx-mark'));
 
     // ---- проявление: всё, что вошло в экран одновременно, идёт по очереди ----
     let batchAt = 0;
     let batchK = 0;
     const reveal = (el: HTMLElement, d: number) => {
       el.dataset.in = '';
-      if (el.matches('mark.fx-mark')) return; // маркер остаётся закрашенным
       el.querySelectorAll<HTMLElement>('[data-scan], [data-shine]').forEach((s) => {
         s.style.setProperty('--sd', `${d + 380}ms`);
         if (s.hasAttribute('data-scan')) s.dataset.scanning = '';
@@ -124,7 +121,6 @@ export default function useLandingFx() {
       { rootMargin: '0px 0px -2% 0px', threshold: 0 },
     );
     roles.forEach((el) => io.observe(el));
-    marks.forEach((el) => io.observe(el));
 
     // ---- лучи по рамке главных карточек и свет по кругу на главной кнопке ----
     const loops = Array.from(document.querySelectorAll<HTMLElement>('[data-beam], [data-orbit]'));
@@ -179,7 +175,7 @@ export default function useLandingFx() {
       cancelAnimationFrame(raf);
       timers.forEach((t) => window.clearTimeout(t));
       injected.forEach((s) => s.remove());
-      [...roles, ...marks].forEach((el) => {
+      roles.forEach((el) => {
         delete el.dataset.fx;
         delete el.dataset.in;
         el.style.removeProperty('--d');

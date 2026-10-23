@@ -70,22 +70,6 @@ html.fx-on [data-fx="photo"] img { transform: scale(1.14); transition: transform
 html.fx-on [data-fx="photo"][data-in] { clip-path: inset(0 0 0 0); }
 html.fx-on [data-fx="photo"][data-in] img { transform: none; }
 
-/* ---- маркер под ключевой фразой (Aceternity «Hero Highlight») ---- */
-mark.fx-mark {
-  color: inherit;
-  background-color: transparent;
-  padding: 0 0.08em;
-  margin: 0 -0.08em;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-  background-image: linear-gradient(90deg, hsl(var(--accent) / 0.3), hsl(var(--accent) / 0.16));
-  background-repeat: no-repeat;
-  background-position: 0 92%;
-  background-size: 100% 0.42em;
-}
-html.fx-on mark.fx-mark { background-size: 0% 0.42em; transition: background-size 1.3s var(--fx-ease) calc(var(--d, 0ms) + 450ms); }
-html.fx-on mark.fx-mark[data-in] { background-size: 100% 0.42em; }
-
 /* ---- блик по цифрам (Magic UI «Animated Shiny Text»): один проход вместо отсчёта с нуля ---- */
 html.fx-on [data-shine] {
   background-image: linear-gradient(100deg, hsl(var(--foreground)) 0 44%, hsl(var(--accent)) 48.5%, #fff4dc 50%, hsl(var(--accent)) 51.5%, hsl(var(--foreground)) 56% 100%);

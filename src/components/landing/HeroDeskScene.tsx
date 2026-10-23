@@ -123,9 +123,19 @@ export default function HeroDeskScene({ variant, className }: Props) {
     // свет кольца и «кольцо выключено» нужны и холсту (прорисовка, блик): грузим рядом со сценой
     const ringLight = new Image();
     const ringOff = new Image();
+    // свет кольца с прозрачными полями по COMET_WIN / 2: окно блика всегда целиком внутри картинки.
+    // Safari рисует кусок, вылезающий за край картинки, со сдвигом, и блик уходил с кольца
+    // (Сергей 23.10.2026, планшет: «блик идёт не по кольцу… где-то вне кольца»)
+    const lightPad = document.createElement('canvas');
     let ringReady = 0;
     const onImg = () => { ringReady++; };
-    ringLight.onload = onImg; ringOff.onload = onImg;
+    ringLight.onload = () => {
+      lightPad.width = RING_BOX.w + COMET_WIN;
+      lightPad.height = RING_BOX.h + COMET_WIN;
+      lightPad.getContext('2d')?.drawImage(ringLight, COMET_WIN / 2, COMET_WIN / 2, RING_BOX.w, RING_BOX.h);
+      onImg();
+    };
+    ringOff.onload = onImg;
     ringLight.src = ringLightUrl; ringOff.src = ringOffUrl;
 
     // карточка терминала: одна за раз, не чаще раза в 6 с
@@ -265,8 +275,9 @@ export default function HeroDeskScene({ variant, className }: Props) {
       }
       c2.globalAlpha = 1;
       c2.globalCompositeOperation = 'source-in';
-      // картинка света кольца — в масштабе кадра 1:1, начало в RING_BOX
-      c2.drawImage(ringLight, wx - RING_BOX.x, wy - RING_BOX.y, COMET_WIN, COMET_WIN, 0, 0, cometCv.width, cometCv.height);
+      // свет кольца — в масштабе кадра 1:1, начало картинки в RING_BOX плюс поля
+      const pad = COMET_WIN / 2;
+      c2.drawImage(lightPad, wx - RING_BOX.x + pad, wy - RING_BOX.y + pad, COMET_WIN, COMET_WIN, 0, 0, cometCv.width, cometCv.height);
       cx.globalAlpha = alpha;
       cx.drawImage(cometCv, wx, wy, COMET_WIN, COMET_WIN);
       cx.globalAlpha = 1;

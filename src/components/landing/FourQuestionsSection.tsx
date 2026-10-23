@@ -70,7 +70,7 @@ const FourQuestionsSection = () => {
         </div>
 
         <p className="mt-8 text-base md:text-lg text-foreground max-w-3xl">
-          <mark className="fx-mark">Прошла все четыре — допуск. Не прошла — отказ, и сделки нет.</mark>
+          Прошла все четыре — допуск. Не прошла — отказ, и сделки нет.
           <span className="text-muted-foreground"> Решает алгоритм, а не настроение в моменте.</span>
         </p>
       </div>
