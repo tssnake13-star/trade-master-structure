@@ -5,7 +5,6 @@ import ringOffUrl from '@/assets/hero-ring-off.webp';
 import depthUrl from '@/assets/hero-depth.webp';
 import { LiveScreen, makeScreen, type LiveEvent, type ScreenDef } from './heroDeskLive';
 import { createDepthPhoto, FOCUS, PIVOT } from './heroDepth';
-import { V5 } from '@/lib/lookV5';
 
 /**
  * Сцена первого экрана: рабочее место трейдера, которое оживает.
@@ -143,10 +142,10 @@ export default function HeroDeskScene({ variant, className }: Props) {
     const hz = hazeCv.getContext('2d');
     if (!cx || !rc || !fx || !hz) return;
 
-    // проба 3D: включается адресом с ?3d, обычные посетители видят прежнюю сцену.
-    // Облик, шаг 4 (проба ?v5): то же фото через WebGL ради пара, который поднимается, но камера стоит
+    // Облик, шаг 4 (23.10.2026): фото рисуется через WebGL ради пара, который поднимается; камера стоит.
+    // Камера за мышью и наклоном телефона — только проба по адресу с ?3d. Без WebGL остаётся обычное фото.
     const cam3d = new URLSearchParams(window.location.search).has('3d');
-    const depth = cam3d || V5 ? createDepthPhoto(photo3d, deskImg, depthUrl) : null;
+    const depth = createDepthPhoto(photo3d, deskImg, depthUrl);
     let use3d = false;
     depth?.whenReady.then(() => {
       use3d = true;

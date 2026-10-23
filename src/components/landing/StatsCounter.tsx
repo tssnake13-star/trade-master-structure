@@ -4,8 +4,7 @@ import { AUTHOR_STATS } from '@/lib/authorStats';
 const stats = AUTHOR_STATS;
 
 // 23.10.2026: отсчёт с нуля убран. Бегущие цифры похожи на табло автомата, а скриншот посреди
-// отсчёта показывал неверное число. Цифра стоит сразу итоговая, по ней один раз проходит блик
-// (data-shine, useLandingFx + styles/fx.css).
+// отсчёта показывал неверное число. Цифра стоит сразу итоговая (блик по цифрам снят с обликом, шаг 4).
 const StatItem = ({ value, suffix, label, decimals = 0, compact = false }: { value: number; suffix: string; label: string; decimals?: number; compact?: boolean }) => {
   const count = value;
   return (

@@ -1,4 +1,3 @@
-import Words from '@/components/fx/Words';
 /**
  * CoreProblemSection — «01 · Проблема».
  *
@@ -23,11 +22,11 @@ const errors = [
 
 const CoreProblemSection = () => {
   return (
-    <section id="problem" className="section-animate py-12 md:py-20 bg-card/50 border-y border-border">
+    <section id="problem" className="py-12 md:py-20 bg-card/50 border-y border-border">
       <div className="container-landing">
         <div className="max-w-3xl">
           <h2 className="text-foreground">
-            <Words>Вы торгуете. <span className="mute">Просто</span> <em>не по системе.</em></Words>
+            Вы торгуете. <span className="mute">Просто</span> <em>не по системе.</em>
           </h2>
 
           <div className="mt-6 md:mt-8 space-y-4">

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
-import Words from '@/components/fx/Words';
 
 /**
  * FAQSection — «11 · Вопросы». Первыми стоят два вопроса-фильтра из «ПОРТРЕТ КЛИЕНТА.md»
@@ -75,11 +74,11 @@ const FAQSection = () => {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="section-animate py-12 md:py-20 bg-card/50 border-y border-border">
+    <section id="faq" className="py-12 md:py-20 bg-card/50 border-y border-border">
       <div className="container-landing">
         <div className="max-w-3xl">
           <h2 className="text-foreground">
-            <Words>Частые <em>вопросы</em></Words>
+            Частые <em>вопросы</em>
           </h2>
         </div>
 

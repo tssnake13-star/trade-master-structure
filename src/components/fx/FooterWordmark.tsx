@@ -2,9 +2,9 @@ import { useEffect, useRef } from 'react';
 
 /**
  * Большая надпись TRADELIKETYO в подвале (23.10.2026, по мотивам Aceternity «Text Hover Effect»).
- * Когда подвал доходит до экрана, контур букв прорисовывается золотой линией, потом буквы
- * чуть заливаются. На компьютере под курсором буквы светятся ярче. Надпись — украшение:
- * для чтения экраном она скрыта, название школы стоит в подвале обычным текстом.
+ * Контур и лёгкая заливка стоят сразу (прорисовку контура при появлении сняли с обликом, шаг 4:
+ * ниже первого экрана ничего не движется само). На компьютере под курсором буквы светятся ярче.
+ * Надпись — украшение: для чтения экраном она скрыта, название школы стоит в подвале обычным текстом.
  */
 export default function FooterWordmark() {
   const wrap = useRef<HTMLDivElement>(null);
@@ -13,17 +13,7 @@ export default function FooterWordmark() {
   useEffect(() => {
     const el = wrap.current;
     if (!el) return;
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (!e.isIntersecting) return;
-        el.dataset.in = '';
-        io.disconnect();
-      },
-      { rootMargin: '0px 0px -10% 0px' },
-    );
-    io.observe(el);
-
-    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return () => io.disconnect();
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
     let raf = 0;
     let x = 0;
     let y = 0;
@@ -42,7 +32,6 @@ export default function FooterWordmark() {
     };
     el.addEventListener('pointermove', onMove, { passive: true });
     return () => {
-      io.disconnect();
       el.removeEventListener('pointermove', onMove);
       cancelAnimationFrame(raf);
     };

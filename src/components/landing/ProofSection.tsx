@@ -2,7 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { User } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { STUDENT_CASES } from '@/lib/testimonials';
-import Words from '@/components/fx/Words';
 
 /**
  * ProofSection — «04 · Отзывы».
@@ -68,11 +67,11 @@ const ProofSection = () => {
   }, []);
 
   return (
-    <section id="proof" className="py-12 md:py-20 bg-card/50 section-animate">
+    <section id="proof" className="py-12 md:py-20 bg-card/50">
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="text-foreground">
-            <Words>Знания у них <span className="mute">уже были.</span> Не хватало <em>системы.</em></Words>
+            Знания у них <span className="mute">уже были.</span> Не хватало <em>системы.</em>
           </h2>
 
           <p className="mt-4 text-base md:text-lg text-muted-foreground">

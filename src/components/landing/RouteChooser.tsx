@@ -2,7 +2,6 @@ import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
 import { nextStreamLabel } from '@/lib/practicum';
 import { STUDY_PRICES } from '@/lib/prices';
-import Words from '@/components/fx/Words';
 
 /**
  * Верхний этаж блока цен (08.10.2026): на /access наверху страницы, на лендинге в «12 · Сотрудничество».
@@ -81,7 +80,7 @@ export default function RouteChooser({
     <div>
       {kicker && <span className="section-label" style={{ color: LABEL }}>{kicker}</span>}
       <Title className="text-foreground" style={{ fontSize: 'clamp(36px, 5vw, 66px)', lineHeight: 1, maxWidth: '20ch' }}>
-        <Words>Никогда ещё трейдинг <em>не был так прост</em></Words>
+        Никогда ещё трейдинг <em>не был так прост</em>
       </Title>
       {/* честная строка обязательна рядом со слоганом (оффер, раздел 8) */}
       <p className="mt-4 text-sm md:text-base" style={{ color: MUTED }}>

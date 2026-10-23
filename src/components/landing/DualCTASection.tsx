@@ -32,7 +32,7 @@ const DualCTASection = () => {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackClick('final_trial')}
-              className="cta-trial btn-primary cta-shine group w-full justify-center"
+              className="cta-trial btn-primary group w-full justify-center"
             >
               Попробовать 7 дней
             </a>

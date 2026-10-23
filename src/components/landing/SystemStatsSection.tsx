@@ -1,4 +1,3 @@
-import Words from '@/components/fx/Words';
 // Срез таблицы «TLT_Statement_2025-2026» (январь 2025 — сентябрь 2026), обновлено 04.10.2026.
 // Обновлять только отсюда.
 const stats = [
@@ -11,11 +10,11 @@ const stats = [
 
 const SystemStatsSection = () => {
   return (
-    <section id="stats" className="section-animate py-12 md:py-20 bg-card/50 border-y border-border">
+    <section id="stats" className="py-12 md:py-20 bg-card/50 border-y border-border">
       <div className="container-landing">
         <div className="max-w-3xl">
           <h2 className="text-foreground">
-            <Words>Прибыльных сделок 23,5%. <em>Этого хватает.</em></Words>
+            Прибыльных сделок 23,5%. <em>Этого хватает.</em>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
             Статистика системы за 21 месяц — 387 сделок. Риск 0,25% на сделку, без компаундинга.

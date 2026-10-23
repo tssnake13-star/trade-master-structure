@@ -1,5 +1,4 @@
 import { Check, X } from 'lucide-react';
-import Words from '@/components/fx/Words';
 
 /**
  * FitSection — «02 · Для кого». Стоит сразу за «Проблемой»: по аналитике
@@ -33,11 +32,11 @@ const notFitItems = [
 
 const FitSection = () => {
   return (
-    <section id="filter" className="section-animate py-12 md:py-20 bg-card/50">
+    <section id="filter" className="py-12 md:py-20 bg-card/50">
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="text-foreground">
-            <Words>Для тех, кто уже торгует, <em>но не может сидеть у графика</em></Words>
+            Для тех, кто уже торгует, <em>но не может сидеть у графика</em>
           </h2>
 
           <p className="mt-4 text-base md:text-lg text-muted-foreground">

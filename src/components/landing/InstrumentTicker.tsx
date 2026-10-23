@@ -10,8 +10,8 @@ const PAIRS = [
   'BTC / USD', 'ETH / USD',
 ];
 
-const TickerRow = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (
-  <div className="flex shrink-0 items-center" aria-hidden={ariaHidden}>
+const TickerRow = () => (
+  <div className="flex shrink-0 items-center">
     {PAIRS.map((pair, i) => (
       // между парами просто воздух: точка-разделитель снята с обликом (23.10.2026), пару отмечает свой кружок
       <div key={`${pair}-${i}`} className="flex items-center mr-12">
@@ -54,9 +54,9 @@ const InstrumentTicker = () => {
       }}
       aria-label="Торгуемые инструменты"
     >
-      <div className="ticker-track flex w-max">
+      {/* облик, шаг 4 (23.10.2026): строка стоит, прежде бежала по кругу */}
+      <div className="flex w-max">
         <TickerRow />
-        <TickerRow ariaHidden />
       </div>
     </div>
   );

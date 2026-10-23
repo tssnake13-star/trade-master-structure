@@ -22,7 +22,6 @@
 
 import { useCallback, useRef } from 'react';
 import TerminalDemo from './TerminalDemo';
-import Words from '@/components/fx/Words';
 
 const WEEK = [
   {
@@ -78,11 +77,11 @@ const TransformationSection = () => {
   }, []);
 
   return (
-    <section id="week" className="section-animate py-16 md:py-24">
+    <section id="week" className="py-16 md:py-24">
       <div className="container-landing">
         <div className="max-w-3xl">
           <h2 className="text-foreground">
-            <Words>Сделка живёт днями. <em>Следить за каждым движением не нужно.</em></Words>
+            Сделка живёт днями. <em>Следить за каждым движением не нужно.</em>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '58ch' }}>
             Свинг на трёх таймфреймах, W1, D1 и H4: сделка живёт днями, и сидеть у графика ради неё не нужно.

@@ -13,9 +13,7 @@ import SchoolMapVideo from './SchoolMapVideo';
  */
 const LevelsSection = () => {
   return (
-    <section id="formats" className="section-animate relative py-12 md:py-20 bg-card/40 border-y border-border">
-      {/* 23.10.2026: лампа над разделом — тот же свет, что у лампы на столе в первом экране */}
-      <div className="fx-lamp" data-fx="lamp" aria-hidden="true" />
+    <section id="formats" className="relative py-12 md:py-20 bg-card/40 border-y border-border">
       <div className="container-landing relative">
         <RouteChooser showPrices={false} heading="h2" clickPrefix="landing" />
 

@@ -1,16 +1,11 @@
 import '@/styles/v3-skin.css';
-// облик, шаг 4: проба по адресу с ?v5 (lib/lookV5.ts)
-import { V5 } from '@/lib/lookV5';
-import '@/styles/look-v5.css';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import useScrollAnimate from '@/hooks/useScrollAnimate';
 import { trackPageview, observeSections } from '@/lib/analytics';
 import Header from '@/components/landing/Header';
 import StickyHeader from '@/components/landing/StickyHeader';
 import SideNav from '@/components/landing/SideNav';
 import HeroSectionV3 from '@/components/landing/HeroSectionV3';
-import StructureField from '@/components/landing/StructureField';
 import InstrumentTicker from '@/components/landing/InstrumentTicker';
 import CoreProblemSection from '@/components/landing/CoreProblemSection';
 import FourQuestionsSection from '@/components/landing/FourQuestionsSection';
@@ -26,9 +21,6 @@ import AuthorSection from '@/components/landing/AuthorSection';
 import PrincipleSection from '@/components/landing/PrincipleSection';
 import DualCTASection from '@/components/landing/DualCTASection';
 import Footer from '@/components/landing/Footer';
-import WordmarkKinetic from '@/components/preview-next/WordmarkKinetic';
-import useLandingFx from '@/hooks/useLandingFx';
-import ScrollProgress from '@/components/fx/ScrollProgress';
 
 /** Блоки, по которым считаем, до чего люди доскролливают (воронка внимания). */
 const TRACKED_SECTIONS = [
@@ -36,11 +28,17 @@ const TRACKED_SECTIONS = [
   'difference', 'questions', 'formats', 'author', 'faq',
 ];
 
-const Index = () => {
-  useScrollAnimate();
-  // 23.10.2026: разделы собираются по частям, свет на карточках, лучи (styles/fx.css)
-  useLandingFx();
+/**
+ * Мысль-делитель между разделами: крупные бледные слова. Облик, шаг 4 (23.10.2026): «вау» только
+ * на первом экране, ниже ничего не движется само, поэтому слова стоят (прежде буквы шли волной при прокрутке).
+ */
+const Thought = ({ text, emphasis }: { text: string; emphasis: string }) => (
+  <div className="py-20 md:py-28 overflow-hidden relative" style={{ zIndex: 2 }}>
+    <div className="pn-wordmark">{text}<em>{emphasis}</em></div>
+  </div>
+);
 
+const Index = () => {
   // Переход по якорю (/#formats, /#echo-gate): со старого адреса /access, из кабинета, из бота.
   // При переходе внутри сайта браузер сам к якорю не прокручивает, а при открытии страницы
   // секция может ещё не отрисоваться — ждём её до 2 с.
@@ -71,10 +69,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background landing-skin v3-skin relative isolate">
-      {/* site-wide "Структура" ambient field — behind all content (hero keeps its own) */}
-      {/* облик, шаг 4 (проба ?v5): без фона с точками за всей страницей и без полосы прочитанного */}
-      {!V5 && <StructureField position="fixed" zIndex={-1} opacity={0.6} mask="radial-gradient(130% 110% at 50% 42%, #000 38%, transparent 90%)" />}
-      {!V5 && <ScrollProgress />}
+      {/* Облик, шаг 4 (23.10.2026, Сергей: «Ставь четвёртый шаг»): движение только на первом экране.
+          Сняты фон с точками за всей страницей, полоса прочитанного, проявление разделов целиком и по словам,
+          лучи по рамкам, свет за курсором, лампа, мерцание и блик кнопок, бегущая строка. Остаётся движение,
+          которое отвечает на действие (наведение, открытие ответа), живой макет терминала и кольцо в конце. */}
       <Header />
       <StickyHeader />
       <SideNav />
@@ -101,7 +99,7 @@ const Index = () => {
         <TransformationSection />
 
         {/* Мысль-делитель */}
-        <WordmarkKinetic text="Система, " emphasis="не эмоция" />
+        <Thought text="Система, " emphasis="не эмоция" />
 
         {/* Это работает? */}
         <ProofSection />
@@ -125,7 +123,7 @@ const Index = () => {
             спорил с линейкой «два пути». Файл оставлен. */}
 
         {/* Мысль-делитель */}
-        <WordmarkKinetic text="Допуск, " emphasis="не сигнал" />
+        <Thought text="Допуск, " emphasis="не сигнал" />
 
         {/* Сколько стоит и кто автор */}
         <LevelsSection />
