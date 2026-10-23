@@ -54,7 +54,8 @@ const gains = [
   'Каждый отказ тоже имеет причину',
 ];
 
-const ACCENT = 'hsl(var(--accent))';
+// подписи шагов, «Теперь» и галочки — светлым: цвет на странице только у решения (облик, шаг 3)
+const MARK = 'hsl(var(--foreground))';
 
 const TransformationSection = () => {
   // 22.10.2026: над шагами — живое окно терминала; шаг, который сейчас показывается, подсвечен.
@@ -100,7 +101,7 @@ const TransformationSection = () => {
           {WEEK.map((w, i) => (
             <div key={w.title} className="td-step border border-border rounded-xl bg-card p-5 md:p-6">
               <span className="td-step-bar" aria-hidden="true" />
-              <div className="font-ui text-[12.5px] tracking-[0.01em]" style={{ color: ACCENT }}>
+              <div className="font-ui text-[12.5px] tracking-[0.01em]" style={{ color: MARK }}>
                 {i + 1}. {w.when}
               </div>
               <div className="text-2xl mt-3 text-foreground">{w.title}</div>
@@ -112,7 +113,7 @@ const TransformationSection = () => {
         {/* 11.10.2026: блок «10 · Защита капитала» снят с главной, его мысль и лимиты живут здесь строкой */}
         <div
           className="mt-3 max-w-5xl rounded-xl p-5 md:p-6"
-          style={{ border: '1px solid hsl(var(--accent) / 0.3)', background: 'hsl(var(--accent) / 0.05)' }}
+          style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}
         >
           <p className="text-base md:text-lg text-foreground font-medium">
             Плохую неделю останавливает лимит, а не сила воли.
@@ -130,7 +131,7 @@ const TransformationSection = () => {
             <ul className="space-y-4">
               {stops.map((s) => (
                 <li key={s} className="flex items-start gap-3">
-                  <span aria-hidden className="mt-1 flex-shrink-0 text-sm" style={{ color: 'hsl(var(--destructive))' }}>✕</span>
+                  <span aria-hidden className="mt-1 flex-shrink-0 text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>✕</span>
                   <span className="text-base md:text-lg text-muted-foreground">{s}</span>
                 </li>
               ))}
@@ -138,11 +139,11 @@ const TransformationSection = () => {
           </div>
 
           <div className="md:self-center md:border-l md:border-border md:pl-12">
-            <div className="section-label" style={{ color: ACCENT, opacity: 1 }}>Теперь</div>
+            <div className="section-label" style={{ color: MARK, opacity: 1 }}>Теперь</div>
             <ul className="space-y-5">
               {gains.map((g) => (
                 <li key={g} className="flex items-start gap-3">
-                  <span aria-hidden className="mt-0.5 flex-shrink-0" style={{ color: ACCENT }}>✓</span>
+                  <span aria-hidden className="mt-0.5 flex-shrink-0" style={{ color: MARK }}>✓</span>
                   <span className="text-xl md:text-2xl leading-snug text-foreground">{g}</span>
                 </li>
               ))}

@@ -70,7 +70,7 @@ const ComparisonSection = () => {
             >
               <div
                 className="font-ui text-[12.5px] tracking-[0.01em] mb-5"
-                style={{ color: col.accent ? ACCENT : 'hsl(var(--muted-foreground))' }}
+                style={{ color: col.accent ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))' }}
               >
                 {col.title}
               </div>
@@ -92,7 +92,7 @@ const ComparisonSection = () => {
 
         <p className="mt-6 text-base md:text-lg text-foreground font-medium" style={{ maxWidth: '64ch' }}>
           Поэтому здесь безопаснее: я торгую с риском 0,25% на сделку, максимальная просадка
-          за 21 месяц — <span style={{ color: ACCENT }}>2,23%</span>. Ваш риск выбираете вы.
+          за 21 месяц — <span className="text-foreground">2,23%</span>. Ваш риск выбираете вы.
         </p>
       </div>
     </section>

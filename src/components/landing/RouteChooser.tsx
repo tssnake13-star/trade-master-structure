@@ -24,8 +24,9 @@ import Words from '@/components/fx/Words';
  * у VIP «стоимость скажу лично» (Сергей 20.10.2026: «хотя бы VIP убери»). Цены из lib/prices.ts.
  */
 
-const GOLD = 'hsl(var(--accent))';
-const COOL = 'hsl(var(--cool))';
+// подписи путей — светлым и приглушённым: цвет на странице только у решения (облик, шаг 3)
+const LABEL = 'hsl(var(--foreground))';
+const MUTED = 'hsl(var(--muted-foreground))';
 const MONO: React.CSSProperties = { fontSize: 12.5, letterSpacing: '0.01em' };
 const SERIF: React.CSSProperties = { fontFamily: 'var(--font-display)', fontWeight: 500 };
 
@@ -78,12 +79,12 @@ export default function RouteChooser({
   const echoPrice = showPrices ? { price: 'от $199', per: 'первый месяц' } : { price: '7 дней', per: 'бесплатно, после 4 вопросов' };
   return (
     <div>
-      {kicker && <span className="section-label" style={{ color: GOLD }}>{kicker}</span>}
+      {kicker && <span className="section-label" style={{ color: LABEL }}>{kicker}</span>}
       <Title className="text-foreground" style={{ fontSize: 'clamp(36px, 5vw, 66px)', lineHeight: 1, maxWidth: '20ch' }}>
         <Words>Никогда ещё трейдинг <em>не был так прост</em></Words>
       </Title>
       {/* честная строка обязательна рядом со слоганом (оффер, раздел 8) */}
-      <p className="mt-4 text-sm md:text-base" style={{ color: 'hsl(var(--accent-dim))' }}>
+      <p className="mt-4 text-sm md:text-base" style={{ color: MUTED }}>
         Торговли без убытков не бывает, и я её не обещаю. Зато риск каждой сделки известен до входа, а из 21 месяца
         в минус закрылись только 3.
       </p>
@@ -106,13 +107,13 @@ export default function RouteChooser({
           className="flex flex-col p-6 md:p-8"
           style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--accent) / 0.45)' }}
         >
-          <span className="text-mono" style={{ ...MONO, color: GOLD }}>Путь 1</span>
+          <span className="text-mono" style={{ ...MONO, color: LABEL }}>Путь 1</span>
           <span className="mt-2 text-lg text-foreground leading-snug">Хочу торговать по системе, не изучая её целиком</span>
           <span className="mt-4 text-foreground" style={{ ...SERIF, fontSize: 30, lineHeight: 1.05 }}>ECHO-GATE INSIDE</span>
           <ul className="mt-4 grid gap-2">
             {ECHO_POINTS.map((p) => (
               <li key={p} className="flex gap-2.5 text-sm md:text-base text-muted-foreground leading-snug">
-                <span style={{ color: GOLD }}>·</span>
+                <span style={{ color: LABEL }}>·</span>
                 <span>{p}</span>
               </li>
             ))}
@@ -136,7 +137,7 @@ export default function RouteChooser({
               href="#echo-gate"
               onClick={() => trackClick(`${clickPrefix}_route_echo_gate`)}
               className="group inline-flex items-center gap-1.5 text-mono"
-              style={{ ...MONO, color: GOLD }}
+              style={{ ...MONO, color: LABEL }}
             >
               Подробнее
             </a>
@@ -145,7 +146,7 @@ export default function RouteChooser({
 
         {/* Путь 02 — обучение: тише, три ступени внутри */}
         <div className="flex flex-col p-6 md:p-7" style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
-          <span className="text-mono" style={{ ...MONO, color: COOL }}>Путь 2</span>
+          <span className="text-mono" style={{ ...MONO, color: MUTED }}>Путь 2</span>
           <span className="mt-2 text-base text-foreground/90 leading-snug">Хочу изучить систему и решать сам</span>
           <span className="mt-4 text-foreground" style={{ ...SERIF, fontSize: 24, lineHeight: 1.05 }}>Обучение</span>
           <div className="mt-4 grid">

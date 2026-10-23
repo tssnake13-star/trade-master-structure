@@ -97,7 +97,7 @@ const FAQSection = () => {
                   <Plus
                     className="w-4 h-4 flex-shrink-0 transition-transform duration-300"
                     style={{
-                      color: 'hsl(var(--accent))',
+                      color: 'hsl(var(--foreground))',
                       transform: isOpen ? 'rotate(45deg)' : 'rotate(0deg)',
                     }}
                   />

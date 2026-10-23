@@ -20,7 +20,6 @@ const errors = [
   { n: '03', t: 'Пропуск на работе', d: 'Сделку ждали неделю. Она пришла, пока вы были на совещании.' },
 ];
 
-const ACCENT = 'hsl(var(--accent))';
 
 const CoreProblemSection = () => {
   return (
@@ -56,14 +55,14 @@ const CoreProblemSection = () => {
         {/* цена пропуска — цифрами из журнала */}
         <div
           className="mt-6 p-5 md:p-6 max-w-3xl"
-          style={{ border: '1px solid hsl(var(--accent) / 0.3)', background: 'hsl(var(--accent) / 0.05)' }}
+          style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}
         >
           <p className="text-base md:text-lg text-foreground font-medium">
             Пропущенная сделка стоит дороже стопа.
           </p>
           <p className="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">
             Стоп по системе — это −1 R. Прибыльная сделка — в среднем +9,50 R.
-            Пропустить одну — как получить <span style={{ color: ACCENT }}>9 стопов подряд</span>.
+            Пропустить одну — как получить <span className="text-foreground">9 стопов подряд</span>.
           </p>
         </div>
 

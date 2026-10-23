@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
@@ -14,12 +14,12 @@ import cadJpyImg from '@/assets/trades/cad-jpy-18-09-2026.jpg';
 import nzdUsdImg from '@/assets/trades/nzd-usd-22-09-2026.jpg';
 import usdChfImg from '@/assets/trades/usd-chf-22-09-2026.jpg';
 import Words from '@/components/fx/Words';
-import { V4 } from '@/lib/lookV4';
 import Verdict from './Verdict';
 
 /**
  * Скрины из личного дневника сделок за июль — сентябрь 2026 (обновлены 06.09.2026;
- * 22.10.2026 добавлены CAD/JPY, NZD/USD и USD/CHF за сентябрь, сетка на компьютере — 4 в ряд).
+ * 22.10.2026 добавлены CAD/JPY, NZD/USD и USD/CHF за сентябрь). С 23.10.2026 (облик, шаг 3) сделки — строки
+ * журнала: миниатюра, дата, пара и направление, знак «Допуск», результат в R; график открывается по нажатию.
  * Подписи намеренно короткие: инструмент, дата, направление, результат в R.
  * Раньше под каждой карточкой стоял абзац-шаблон («сигнал получен
  * и отфильтрован…»), одинаковый на все — он читался как вода.
@@ -53,20 +53,6 @@ const tradeAlt = (t: typeof trades[0]) =>
 
 const TradesSection = () => {
   const [selectedTrade, setSelectedTrade] = useState<typeof trades[0] | null>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = scrollRef.current;
-    if (!el) return;
-    const handleScroll = () => {
-      const scrollLeft = el.scrollLeft;
-      const cardWidth = el.offsetWidth * 0.9 + 12; // 90% + gap
-      setActiveIndex(Math.round(scrollLeft / cardWidth));
-    };
-    el.addEventListener('scroll', handleScroll, { passive: true });
-    return () => el.removeEventListener('scroll', handleScroll);
-  }, []);
 
   return (
     <section id="trades" className="py-12 md:py-20 section-animate">
@@ -87,7 +73,7 @@ const TradesSection = () => {
               случае с августа»). Июль в журнал не попадает, поэтому «с августа», а не «все». */}
           <p
             className="mt-4 text-sm md:text-base text-muted-foreground"
-            style={{ borderLeft: '2px solid hsl(var(--accent) / 0.5)', paddingLeft: 12, maxWidth: '62ch' }}
+            style={{ borderLeft: '2px solid var(--v3-faint)', paddingLeft: 12, maxWidth: '62ch' }}
           >
             На каждом скрине два графика: до движения и после. С августа решение по каждой сделке ещё и
             записывается в журнал терминала до движения, у каждой записи стоит время сигнала. Журнал можно{' '}
@@ -103,135 +89,24 @@ const TradesSection = () => {
             .
           </p>
 
-          {V4 && (
-            // облик, шаг 3 (проба ?v4): сделки строками журнала, у каждой знак «Допуск»; график — по нажатию
-            <ul className="journal journal--trades mt-8 md:mt-10">
-              {trades.map((trade, index) => (
-                <li key={index}>
-                  <button type="button" className="journal__row" onClick={() => setSelectedTrade(trade)}>
-                    <img className="journal__thumb" src={trade.image} alt={tradeAlt(trade)} loading="lazy" decoding="async" />
-                    <span className="journal__date">{trade.date}</span>
-                    <span className="journal__sym">
-                      {trade.instrument}
-                      <span className="journal__dir">{trade.side === 'WORK-SELL' ? 'продажа' : 'покупка'}</span>
-                    </span>
-                    <span className="journal__verdict"><Verdict ok /></span>
-                    <span className="journal__res">{trade.result.replace('R', ' R')}</span>
-                    <span className="journal__open">Открыть график</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {!V4 && (<>
-          {/* Mobile — horizontal scroll snap */}
-          <div
-            ref={scrollRef}
-            className="mt-8 md:hidden flex gap-3 overflow-x-auto snap-x snap-mandatory pb-4"
-            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-          >
+          {/* сделки строками журнала, у каждой знак «Допуск»; график — по нажатию на строку */}
+          <ul className="journal journal--trades mt-8 md:mt-10">
             {trades.map((trade, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedTrade(trade)}
-                className="snap-center shrink-0 bg-card border border-border rounded-xl text-left transition-all hover:border-muted-foreground/50 cursor-pointer group overflow-hidden"
-                style={{ width: '90%' }}
-              >
-                <div className="relative h-28 overflow-hidden">
-                  <img
-                    src={trade.image}
-                    alt={tradeAlt(trade)}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover object-center brightness-[0.4] group-hover:brightness-[0.6] transition-all duration-300 filter blur-[2px] group-hover:blur-0"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-card" />
-                </div>
-                <div className="p-4">
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="font-medium text-foreground text-sm">{trade.instrument}</span>
-                    <span className="text-xs text-muted-foreground">{trade.date}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="text-mono inline-flex px-2 py-1"
-                      style={{ fontSize: 9, letterSpacing: '0.16em', color: 'hsl(var(--muted-foreground))', border: '1px solid hsl(var(--border))' }}
-                    >
-                      {trade.side}
-                    </span>
-                    <span
-                      className="tabular-nums"
-                      style={{ fontSize: 18, lineHeight: 1, color: 'hsl(var(--accent))' }}
-                    >
-                      {trade.result}
-                    </span>
-                  </div>
-                  <span className="text-xs text-muted-foreground/60 mt-3 block group-hover:text-muted-foreground">
-                    Открыть скрин
+              <li key={index}>
+                <button type="button" className="journal__row" onClick={() => setSelectedTrade(trade)}>
+                  <img className="journal__thumb" src={trade.image} alt={tradeAlt(trade)} loading="lazy" decoding="async" />
+                  <span className="journal__date">{trade.date}</span>
+                  <span className="journal__sym">
+                    {trade.instrument}
+                    <span className="journal__dir">{trade.side === 'WORK-SELL' ? 'продажа' : 'покупка'}</span>
                   </span>
-                </div>
-              </button>
+                  <span className="journal__verdict"><Verdict ok /></span>
+                  <span className="journal__res">{trade.result.replace('R', ' R')}</span>
+                  <span className="journal__open">Открыть график</span>
+                </button>
+              </li>
             ))}
-          </div>
-
-          {/* Mobile dot indicators */}
-          <div className="md:hidden flex justify-center gap-1.5 mt-2">
-            {trades.map((_, i) => (
-              <div
-                key={i}
-                className={`w-1.5 h-1.5 rounded-full transition-colors duration-200 ${
-                  i === activeIndex ? 'bg-foreground' : 'bg-foreground/20'
-                }`}
-              />
-            ))}
-          </div>
-          
-          {/* Desktop — grid. 22.10.2026, Сергей: «карточки поменьше… в одной строчке 4 сделки» */}
-          <div className="mt-8 md:mt-10 hidden md:grid md:grid-cols-4 gap-3">
-            {trades.map((trade, index) => (
-              <button
-                key={index}
-                onClick={() => setSelectedTrade(trade)}
-                className="bg-card border border-border rounded-xl text-left transition-all hover:border-muted-foreground/50 cursor-pointer group overflow-hidden"
-              >
-                <div className="relative h-20 overflow-hidden">
-                  <img
-                    src={trade.image}
-                    alt={tradeAlt(trade)}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover object-center brightness-[0.4] group-hover:brightness-[0.6] transition-all duration-300 filter blur-[2px] group-hover:blur-0"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent to-card" />
-                </div>
-                <div className="p-3">
-                  <div className="flex items-center justify-between gap-2 mb-2.5">
-                    <span className="font-medium text-foreground text-sm whitespace-nowrap">{trade.instrument}</span>
-                    <span className="text-[11px] text-muted-foreground whitespace-nowrap">{trade.date}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="text-mono inline-flex px-1.5 py-1"
-                      style={{ fontSize: 8, letterSpacing: '0.14em', color: 'hsl(var(--muted-foreground))', border: '1px solid hsl(var(--border))' }}
-                    >
-                      {trade.side}
-                    </span>
-                    <span
-                      className="tabular-nums whitespace-nowrap"
-                      style={{ fontSize: 16, lineHeight: 1, color: 'hsl(var(--accent))' }}
-                    >
-                      {trade.result}
-                    </span>
-                  </div>
-                  <span className="text-[11px] text-muted-foreground/60 mt-2.5 block group-hover:text-muted-foreground">
-                    Открыть скрин
-                  </span>
-                </div>
-              </button>
-            ))}
-          </div>
-          </>)}
+          </ul>
 
           <p className="mt-8 text-sm text-muted-foreground text-center md:text-left">
             Это не поиск идеального входа.<br />
@@ -265,7 +140,7 @@ const TradesSection = () => {
                   <div className="p-4 border-t border-border">
                     <p className="text-sm text-muted-foreground">
                       Оригинал из дневника сделок: {selectedTrade.side},{' '}
-                      <span style={{ color: 'hsl(var(--accent))' }}>{selectedTrade.result}</span>
+                      <span className="text-foreground">{selectedTrade.result}</span>
                     </p>
                   </div>
                 </div>

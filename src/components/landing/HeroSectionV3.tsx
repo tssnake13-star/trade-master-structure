@@ -143,7 +143,7 @@ export default function HeroSectionV3() {
           {/* фильтр: отсекает интрадей до лички */}
           <p
             className="mt-4 text-sm md:text-base"
-            style={{ color: 'var(--v3-mut)', borderLeft: '2px solid var(--v3-gold-dim)', paddingLeft: 12, maxWidth: '46ch' }}
+            style={{ color: 'var(--v3-mut)', borderLeft: '2px solid var(--v3-faint)', paddingLeft: 12, maxWidth: '46ch' }}
           >
             Если вам нужен рынок каждый день и движение внутри часа, вам не сюда.
           </p>

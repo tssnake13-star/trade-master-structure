@@ -182,13 +182,7 @@ export default function HeroDeskScene({ variant, className }: Props) {
       if (screensOn < 0.95 || now - cardAt < 6000) return;
       cardAt = now;
       const sym = SYMBOLS[cardN++ % SYMBOLS.length];
-      card.dataset.kind = e.ok ? 'ok' : 'no';
-      setText('[data-c-title]', e.ok ? 'Допуск' : 'Отказ');
-      setText('[data-c-body]', e.ok
-        ? `${sym} · ${e.dir > 0 ? 'покупка' : 'продажа'} · выход из накопления`
-        : `${sym} · выход ложный, сделки нет`);
-      setText('[data-c-foot]', e.ok ? 'вердикт — в Telegram' : 'система сказала «нет»');
-      // облик, шаг 3 (проба ?v4): та же карточка со знаком вердикта, без капса, точек и тире
+      // знак вердикта, без капса, точек и тире (облик, шаг 3, 23.10.2026)
       const mark = card.querySelector('[data-c-mark]') as HTMLElement;
       mark.textContent = e.ok ? 'Допуск' : 'Отказ';
       mark.className = `verdict ${e.ok ? 'verdict--ok' : 'verdict--no'}`;
@@ -562,14 +556,9 @@ export default function HeroDeskScene({ variant, className }: Props) {
       </div>
 
       <div data-card className={`hd-card hd-card--${variant}`}>
-        <div className="hd-card__head"><span className="hd-card__dot" />ECHO-GATE INSIDE · <b data-c-title>Допуск</b></div>
-        <div className="hd-card__body" data-c-body />
-        <div className="hd-card__foot" data-c-foot />
-        <div className="hd-card__v4">
-          <div className="hd-card__row"><span className="verdict verdict--ok" data-c-mark>Допуск</span><span className="hd-card__sym" data-c-sym /></div>
-          <div className="hd-card__why" data-c-why />
-          <div className="hd-card__src" data-c-src />
-        </div>
+        <div className="hd-card__row"><span className="verdict verdict--ok" data-c-mark>Допуск</span><span className="hd-card__sym" data-c-sym /></div>
+        <div className="hd-card__why" data-c-why />
+        <div className="hd-card__src" data-c-src />
       </div>
     </div>
   );

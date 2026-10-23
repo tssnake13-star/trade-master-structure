@@ -20,7 +20,7 @@ const TickerRow = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (
           style={{
             width: 5,
             height: 5,
-            background: 'hsl(var(--accent))',
+            background: 'hsl(var(--muted-foreground))',
             opacity: 0.5,
             marginRight: 10,
           }}

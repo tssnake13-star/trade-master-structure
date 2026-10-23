@@ -171,7 +171,8 @@ const PACKAGES: Pkg[] = [
 // Подписка на экосистему: сроки и цены в lib/prices.ts (ECOSYSTEM), там же правила зачёта и «подарочных месяцев».
 // 20.10.2026, его «делай по плану»: цены подписки видны и на главной, прямо на карточке.
 
-const GOLD = 'hsl(var(--accent))';
+// подписи, значки и галочки — светлым: цвет на странице только у решения (облик, шаг 3)
+const LABEL = 'hsl(var(--foreground))';
 const MONO: React.CSSProperties = { fontSize: 12.5, letterSpacing: '0.01em' };
 const SERIF: React.CSSProperties = { fontFamily: 'var(--font-display)', fontWeight: 500 };
 
@@ -187,7 +188,7 @@ export default function PackageCards({
     <ul className="space-y-2.5">
       {points.map((pt, i) => (
         <li key={i} className="flex items-start gap-2.5 text-sm text-foreground/90">
-          <Check size={15} style={{ color: GOLD, marginTop: 2, flexShrink: 0 }} />
+          <Check size={15} style={{ color: LABEL, marginTop: 2, flexShrink: 0 }} />
           <span>{pt}</span>
         </li>
       ))}
@@ -202,7 +203,7 @@ export default function PackageCards({
         {p.guarantee.map((g, i) => (
           <div key={i} className="p-3.5" style={{ border: '1px solid hsl(var(--rule-soft))', background: 'hsl(var(--card-hover, var(--card)))' }}>
             <div className="flex items-start gap-2">
-              <ShieldCheck size={14} style={{ color: GOLD, marginTop: 2, flexShrink: 0 }} />
+              <ShieldCheck size={14} style={{ color: LABEL, marginTop: 2, flexShrink: 0 }} />
               <div>
                 <div className="text-sm text-foreground/90 font-medium">{g.title}</div>
                 <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{g.text}</p>
@@ -234,7 +235,7 @@ export default function PackageCards({
         border: `1px solid ${p.featured ? 'hsl(var(--accent) / 0.45)' : 'hsl(var(--border))'}`,
       }}
     >
-      <div className="text-mono" style={{ ...MONO, color: GOLD }}>{p.tag}</div>
+      <div className="text-mono" style={{ ...MONO, color: LABEL }}>{p.tag}</div>
       <h3 className="mt-2 text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>{p.name}</h3>
       {p.subtitle && (
         <div className="text-mono mt-1.5" style={{ ...MONO, color: 'hsl(var(--muted-foreground))' }}>
@@ -245,7 +246,7 @@ export default function PackageCards({
 
       <div className="mt-5">{includedList(p.points)}</div>
 
-      <div className="mt-5 pt-4 text-sm italic" style={{ borderTop: '1px solid hsl(var(--rule-soft))', color: 'hsl(var(--accent-dim))' }}>
+      <div className="mt-5 pt-4 text-sm italic" style={{ borderTop: '1px solid hsl(var(--rule-soft))', color: 'hsl(var(--muted-foreground))' }}>
         {p.outcome}
       </div>
 
@@ -256,8 +257,8 @@ export default function PackageCards({
       {guaranteeBlock(p)}
 
       {(showPrices ? p.upsell : p.upsellPublic ?? p.upsell) && (
-        <div className="mt-4 p-3.5 text-xs leading-relaxed" style={{ border: '1px solid hsl(var(--accent) / 0.3)', background: 'hsl(var(--accent) / 0.05)', color: 'hsl(var(--foreground) / 0.85)' }}>
-          <span className="text-mono" style={{ ...MONO, color: GOLD, display: 'block', marginBottom: 6 }}>Переход выше</span>
+        <div className="mt-4 p-3.5 text-xs leading-relaxed" style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))', color: 'hsl(var(--foreground) / 0.85)' }}>
+          <span className="text-mono" style={{ ...MONO, color: LABEL, display: 'block', marginBottom: 6 }}>Переход выше</span>
           {showPrices ? p.upsell : p.upsellPublic ?? p.upsell}
         </div>
       )}
@@ -276,7 +277,7 @@ export default function PackageCards({
       ) : (
         <div
           className="text-mono mt-5 inline-flex items-center self-start px-3 py-1.5"
-          style={{ ...MONO, color: GOLD, border: '1px solid hsl(var(--accent) / 0.3)', background: 'hsl(var(--accent) / 0.05)' }}
+          style={{ ...MONO, color: LABEL, border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}
         >
           {p.period}
         </div>
@@ -304,12 +305,12 @@ export default function PackageCards({
         Доплата работает наверх, в VIP. */}
     {/* 23.10.2026, Сергей: «написано слишком много текста. Один абзац… разделить на два столбика»
         и «принципы из книги „Пиши, сокращай“». Те же условия, по одному в строке, в две колонки по путям. */}
-    <div className="mb-3 p-4 md:p-5" style={{ border: '1px solid hsl(var(--accent) / 0.28)', background: 'hsl(var(--accent) / 0.04)' }}>
-      <div className="text-mono" style={{ ...MONO, color: GOLD }}>Как устроен выбор</div>
+    <div className="mb-3 p-4 md:p-5" style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}>
+      <div className="text-mono" style={{ ...MONO, color: LABEL }}>Как устроен выбор</div>
       <div className="mt-3 grid md:grid-cols-2 gap-x-8 gap-y-5 text-sm text-foreground/85 leading-relaxed">
         <div>
           <div className="text-foreground font-medium">Торговать по системе</div>
-          <ul className="mt-2 space-y-1.5 list-disc pl-4 marker:text-[hsl(var(--accent))]">
+          <ul className="mt-2 space-y-1.5 list-disc pl-4 marker:text-muted-foreground">
             <li>Подписка ECHO-GATE INSIDE. Изучать систему для неё не нужно.</li>
             <li>Можно начать с одного месяца. Продлите на 3 месяца в течение этого месяца, и оплаченное засчитается.</li>
             <li>В течение 3 месяцев подписку можно перевести на год или в VIP с зачётом оплаченного.</li>
@@ -317,7 +318,7 @@ export default function PackageCards({
         </div>
         <div>
           <div className="text-foreground font-medium">Изучить систему</div>
-          <ul className="mt-2 space-y-1.5 list-disc pl-4 marker:text-[hsl(var(--accent))]">
+          <ul className="mt-2 space-y-1.5 list-disc pl-4 marker:text-muted-foreground">
             <li>Курс Trade System или практикум. Это разные ступени: из курса в практикум доплатой не перейти, выбирайте сразу.</li>
             <li>Прямые эфиры есть в практикуме и после него сохраняются с подпиской. В Trade System их нет.</li>
             <li>В VIP оплаченное засчитывается полностью: 30 дней после курса, 67 дней после практикума.</li>
@@ -335,7 +336,7 @@ export default function PackageCards({
 
       {/* путь 01 — подписка для всех, главный продукт */}
       <div id="echo-gate" data-beam="" data-fx="card" className="mb-3 p-6 md:p-7" style={{ background: 'radial-gradient(120% 80% at 50% 0%, hsl(var(--accent) / 0.08), hsl(var(--card)) 60%)', border: '1px solid hsl(var(--accent) / 0.45)' }}>
-        <div className="text-mono" style={{ ...MONO, color: GOLD }}>Путь 1: подписка для всех</div>
+        <div className="text-mono" style={{ ...MONO, color: LABEL }}>Путь 1: подписка для всех</div>
         <h3 className="mt-2 text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>ECHO-GATE INSIDE</h3>
         <p className="mt-3 text-sm md:text-base text-muted-foreground" style={{ maxWidth: '72ch' }}>
           Для тех, кто хочет торговать по системе, не изучая её целиком. Терминал в личном кабинете считает рынок
@@ -360,14 +361,14 @@ export default function PackageCards({
           круглосуточно. Размер депозита и риск на сделку вы выбираете сами: я торгую с риском 0,25% на сделку,
           но ваш риск остаётся вашим решением.
         </p>
-        <p className="mt-3 text-xs md:text-sm" style={{ maxWidth: '72ch', color: 'hsl(var(--accent-dim))' }}>
+        <p className="mt-3 text-xs md:text-sm" style={{ maxWidth: '72ch', color: 'hsl(var(--muted-foreground))' }}>
           Честно: торговли без убытков не бывает, и я её не обещаю. Убыточные сделки бывают и подряд, но риск
           каждой ограничен ещё до входа, а из 21 месяца в минус закрылись 3. Точку входа вы ставите сами,
           поэтому ваш результат может отличаться от моего. Прошлый результат не гарантирует будущий.
         </p>
         <div className="mt-5 grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
           {ECOSYSTEM.map((e) => (
-            <div key={e.period} className="p-4" style={{ border: `1px solid ${e.featured ? 'hsl(var(--accent) / 0.3)' : 'hsl(var(--rule-soft))'}` }}>
+            <div key={e.period} className="p-4" style={{ border: `1px solid ${e.featured ? 'hsl(var(--border))' : 'hsl(var(--rule-soft))'}` }}>
               {/* 20.10.2026, его «делай по плану»: цены подписки видны и на главной, как на /access */}
               <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                 <span style={{ ...SERIF, fontSize: 26, color: 'hsl(var(--foreground))' }}>{e.price}</span>
@@ -418,7 +419,7 @@ export default function PackageCards({
         {/* Trade System — во всю ширину, содержимое в 2 колонки (низкая широкая карточка) */}
         <div id="trade-system" className="relative p-6 md:p-7" style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
           <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1.5">
-            <span className="text-mono" style={{ ...MONO, color: GOLD }}>{ts.tag}</span>
+            <span className="text-mono" style={{ ...MONO, color: LABEL }}>{ts.tag}</span>
             <h3 className="text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>{ts.name}</h3>
             {ts.subtitle && (
               <span className="text-mono" style={{ ...MONO, color: 'hsl(var(--muted-foreground))' }}>{ts.subtitle}</span>
@@ -447,8 +448,8 @@ export default function PackageCards({
 
             <div className="space-y-4">
               {ts.addon && (
-                <div className="p-4" style={{ border: '1px solid hsl(var(--accent) / 0.22)', background: 'hsl(var(--accent) / 0.035)' }}>
-                  <div className="text-mono" style={{ ...MONO, color: GOLD }}>{ts.addon.label}</div>
+                <div className="p-4" style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}>
+                  <div className="text-mono" style={{ ...MONO, color: LABEL }}>{ts.addon.label}</div>
                   <div className="mt-2.5">
                     <span className="text-sm text-foreground/90 leading-snug">+ {ts.addon.title}</span>
                   </div>
@@ -457,8 +458,8 @@ export default function PackageCards({
                 </div>
               )}
               {(showPrices ? ts.upsell : ts.upsellPublic ?? ts.upsell) && (
-                <div className="p-3.5 text-xs leading-relaxed" style={{ border: '1px solid hsl(var(--accent) / 0.3)', background: 'hsl(var(--accent) / 0.05)', color: 'hsl(var(--foreground) / 0.85)' }}>
-                  <span className="text-mono" style={{ ...MONO, color: GOLD, display: 'block', marginBottom: 6 }}>Переход выше</span>
+                <div className="p-3.5 text-xs leading-relaxed" style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))', color: 'hsl(var(--foreground) / 0.85)' }}>
+                  <span className="text-mono" style={{ ...MONO, color: LABEL, display: 'block', marginBottom: 6 }}>Переход выше</span>
                   {showPrices ? ts.upsell : ts.upsellPublic ?? ts.upsell}
                 </div>
               )}
@@ -469,7 +470,7 @@ export default function PackageCards({
           {/* низ: слева — для кого + цена, справа — кнопка */}
           <div className="mt-6 pt-5 flex flex-col md:flex-row md:items-end md:justify-between gap-5" style={{ borderTop: '1px solid hsl(var(--rule-soft))' }}>
             <div className="md:max-w-[62%]">
-              <p className="text-sm italic" style={{ color: 'hsl(var(--accent-dim))' }}>{ts.outcome}</p>
+              <p className="text-sm italic" style={{ color: 'hsl(var(--muted-foreground))' }}>{ts.outcome}</p>
               <div className="mt-4 flex items-baseline gap-3">
                 <span style={{ ...SERIF, fontSize: 38, lineHeight: 1, color: 'hsl(var(--foreground))' }}>{ts.price}</span>
                 <span className="text-mono" style={{ ...MONO, color: 'hsl(var(--muted-foreground))' }}>{ts.period}</span>

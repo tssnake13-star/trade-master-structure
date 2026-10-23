@@ -34,7 +34,7 @@ const AuthorSection = () => {
               
               <div className="space-y-4 mb-6">
                 <p className="text-base md:text-lg text-foreground font-medium leading-relaxed">
-                  Мои лучшие сделки — те, которые я <span style={{ color: 'hsl(var(--accent))' }}>не совершил</span>
+                  Мои лучшие сделки — те, которые я <span style={{ color: 'hsl(var(--foreground))' }}>не совершил</span>
                 </p>
                 <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
                   Поэтому я не учу угадывать входы
@@ -51,7 +51,7 @@ const AuthorSection = () => {
               {/* «14 лет в рынке» отсюда убрано 11.10.2026: оно стоит в заголовке и в цифрах ниже */}
               <div className="flex flex-wrap gap-x-6 gap-y-2 mb-3">
                 {['Практикующий трейдер', 'Не сигнальщик, не инфобизнесмен'].map((s) => (
-                  <span key={s} className="font-ui text-[12.5px] tracking-[0.01em]" style={{ color: 'hsl(var(--accent))' }}>{s}</span>
+                  <span key={s} className="font-ui text-[12.5px] tracking-[0.01em]" style={{ color: 'hsl(var(--foreground))' }}>{s}</span>
                 ))}
               </div>
               <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
