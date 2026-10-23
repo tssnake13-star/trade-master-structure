@@ -1,4 +1,6 @@
 import Words from '@/components/fx/Words';
+import { V4 } from '@/lib/lookV4';
+import Verdict from './Verdict';
 /**
  * FourQuestionsSection — «08 · Четыре вопроса».
  *
@@ -47,30 +49,47 @@ const FourQuestionsSection = () => {
           </p>
         </div>
 
-        <div className="mt-8 md:mt-10 grid md:grid-cols-2 gap-3">
-          {questions.map((q) => (
-            <div key={q.n} className="border border-border rounded-xl bg-card p-6 flex gap-4">
-              <div
-                className="font-ui text-sm tabular-nums flex-shrink-0"
-                style={{ color: 'hsl(var(--accent))' }}
-              >
-                {/* четыре вопроса идут по порядку, номер остаётся (без нуля впереди, облик 23.10.2026) */}
-                {q.n}
-              </div>
-              <div>
-                <div className="text-xl md:text-2xl text-foreground">
-                  {q.title}
+        {V4 ? (
+          // облик, шаг 3 (проба ?v4): вопросы строками журнала, по порядку и с номерами; итог — знак вердикта
+          <ol className="journal journal--q mt-8 md:mt-10 max-w-4xl">
+            {questions.map((q) => (
+              <li key={q.n} className="journal__row">
+                <span className="journal__num">{q.n}</span>
+                <span className="journal__title">{q.title}</span>
+                <span className="journal__desc">{q.desc}</span>
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <div className="mt-8 md:mt-10 grid md:grid-cols-2 gap-3">
+            {questions.map((q) => (
+              <div key={q.n} className="border border-border rounded-xl bg-card p-6 flex gap-4">
+                <div
+                  className="font-ui text-sm tabular-nums flex-shrink-0"
+                  style={{ color: 'hsl(var(--accent))' }}
+                >
+                  {/* четыре вопроса идут по порядку, номер остаётся (без нуля впереди, облик 23.10.2026) */}
+                  {q.n}
                 </div>
-                <p className="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">
-                  {q.desc}
-                </p>
+                <div>
+                  <div className="text-xl md:text-2xl text-foreground">
+                    {q.title}
+                  </div>
+                  <p className="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">
+                    {q.desc}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         <p className="mt-8 text-base md:text-lg text-foreground max-w-3xl">
-          Прошла все четыре — допуск. Не прошла — отказ, и сделки нет.
+          {V4 ? (
+            <>Прошла все четыре — <Verdict ok />. Не прошла — <Verdict ok={false} />, и сделки нет.</>
+          ) : (
+            'Прошла все четыре — допуск. Не прошла — отказ, и сделки нет.'
+          )}
           <span className="text-muted-foreground"> Решает алгоритм, а не настроение в моменте.</span>
         </p>
       </div>

@@ -16,6 +16,8 @@
   --v3-gold-dim: #8C6A3D;
   --v3-line:     #2E1C0C;   /* Пар, приглушённый до линии */
   --v3-ring:     #E9A54A;   /* Кольцо — только главная кнопка */
+  --v3-admit:    #E9C793;   /* знак «Допуск» */
+  --v3-reject:   #748093;   /* знак «Отказ» — как падающие свечи */
   --font-display: 'Literata', 'PT Serif', Georgia, 'Times New Roman', serif;
   --font-ui:      'Onest', 'Segoe UI', system-ui, -apple-system, sans-serif;
   /* имя осталось от моноширинных подписей; с шага 2 подписи набраны Onest */
@@ -53,6 +55,22 @@ html:has(.v3-skin.landing-skin) body { background: #140C05; }
   border-color: var(--v3-ring) !important;
 }
 .v3-skin .cta-trial:hover { background: #F2B964 !important; }
+
+/* знак вердикта (components/landing/Verdict.tsx): «Допуск» залит песочным, «Отказ» — стальной контур */
+.v3-skin .verdict {
+  display: inline-block;
+  font-family: var(--font-ui);
+  font-weight: 650;
+  font-size: 13.5px;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  padding: 3px 10px 4px;
+  border-radius: 4px;
+  white-space: nowrap;
+  vertical-align: 0.12em;
+}
+.v3-skin .verdict--ok { background: var(--v3-admit); color: var(--v3-bg); }
+.v3-skin .verdict--no { color: var(--v3-reject); box-shadow: inset 0 0 0 1.5px var(--v3-reject); }
 
 /* ---- заголовки → Literata (high specificity beats landing-skin) -- */
 .v3-skin.landing-skin h1,

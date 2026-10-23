@@ -14,6 +14,8 @@ import cadJpyImg from '@/assets/trades/cad-jpy-18-09-2026.jpg';
 import nzdUsdImg from '@/assets/trades/nzd-usd-22-09-2026.jpg';
 import usdChfImg from '@/assets/trades/usd-chf-22-09-2026.jpg';
 import Words from '@/components/fx/Words';
+import { V4 } from '@/lib/lookV4';
+import Verdict from './Verdict';
 
 /**
  * Скрины из личного дневника сделок за июль — сентябрь 2026 (обновлены 06.09.2026;
@@ -101,6 +103,28 @@ const TradesSection = () => {
             .
           </p>
 
+          {V4 && (
+            // облик, шаг 3 (проба ?v4): сделки строками журнала, у каждой знак «Допуск»; график — по нажатию
+            <ul className="journal journal--trades mt-8 md:mt-10">
+              {trades.map((trade, index) => (
+                <li key={index}>
+                  <button type="button" className="journal__row" onClick={() => setSelectedTrade(trade)}>
+                    <img className="journal__thumb" src={trade.image} alt={tradeAlt(trade)} loading="lazy" decoding="async" />
+                    <span className="journal__date">{trade.date}</span>
+                    <span className="journal__sym">
+                      {trade.instrument}
+                      <span className="journal__dir">{trade.side === 'WORK-SELL' ? 'продажа' : 'покупка'}</span>
+                    </span>
+                    <span className="journal__verdict"><Verdict ok /></span>
+                    <span className="journal__res">{trade.result.replace('R', ' R')}</span>
+                    <span className="journal__open">Открыть график</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {!V4 && (<>
           {/* Mobile — horizontal scroll snap */}
           <div
             ref={scrollRef}
@@ -207,6 +231,7 @@ const TradesSection = () => {
               </button>
             ))}
           </div>
+          </>)}
 
           <p className="mt-8 text-sm text-muted-foreground text-center md:text-left">
             Это не поиск идеального входа.<br />
