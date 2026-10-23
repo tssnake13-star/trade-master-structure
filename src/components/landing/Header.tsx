@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, ArrowRight } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { NAV_ITEMS, TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
 import logoVideoFallback from '@/assets/logo-header.mp4';
@@ -78,7 +78,6 @@ const Header = () => {
                 className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-sm font-medium rounded-lg hover:bg-foreground/90 transition-all duration-200"
               >
                 Попробовать 7 дней
-                <ArrowRight className="w-4 h-4" />
               </a>
             </div>
 
@@ -133,7 +132,6 @@ const Header = () => {
               className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background font-medium rounded-lg hover:bg-foreground/90 transition-all duration-200"
             >
               Попробовать терминал 7 дней
-              <ArrowRight className="w-5 h-5" />
             </a>
           </div>
         </div>

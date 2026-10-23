@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react';
 
 const sections = [
-  { id: 'hero', num: '00', label: 'Главная' },
-  { id: 'problem', num: '01', label: 'Проблема' },
-  { id: 'filter', num: '02', label: 'Для кого' },
-  { id: 'week', num: '03', label: 'Неделя по системе' },
-  { id: 'proof', num: '04', label: 'Отзывы' },
-  { id: 'stats', num: '05', label: 'Результаты' },
-  { id: 'trades', num: '06', label: 'Сделки' },
-  { id: 'difference', num: '07', label: 'Отличие' },
-  { id: 'questions', num: '08', label: 'Четыре вопроса' },
-  { id: 'formats', num: '09', label: 'Сотрудничество' },
-  { id: 'author', num: '10', label: 'Автор' },
-  { id: 'faq', num: '11', label: 'Вопросы' },
+  { id: 'hero', label: 'Главная' },
+  { id: 'problem', label: 'Проблема' },
+  { id: 'filter', label: 'Для кого' },
+  { id: 'week', label: 'Неделя по системе' },
+  { id: 'proof', label: 'Отзывы' },
+  { id: 'stats', label: 'Результаты' },
+  { id: 'trades', label: 'Сделки' },
+  { id: 'difference', label: 'Отличие' },
+  { id: 'questions', label: 'Четыре вопроса' },
+  { id: 'formats', label: 'Сотрудничество' },
+  { id: 'author', label: 'Автор' },
+  { id: 'faq', label: 'Вопросы' },
 ];
 
 const SideNav = () => {
@@ -73,7 +73,7 @@ const SideNav = () => {
           <a
             key={s.id}
             href={`#${s.id}`}
-            className="group flex items-center gap-3 text-[10px] uppercase tracking-[0.22em] py-1"
+            className="group flex items-center gap-3 text-[12.5px] tracking-[0.01em] py-1"
             style={{
               color: isActive ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground) / 0.5)',
               transition: 'color 0.3s ease',
@@ -90,8 +90,6 @@ const SideNav = () => {
                 transition: 'width 0.3s ease, background 0.3s ease',
               }}
             />
-            <span className="tabular-nums opacity-70">{s.num}</span>
-            <span className="opacity-40">·</span>
             <span>{s.label}</span>
           </a>
         );

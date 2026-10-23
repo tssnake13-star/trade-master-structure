@@ -14,7 +14,6 @@ import cadJpyImg from '@/assets/trades/cad-jpy-18-09-2026.jpg';
 import nzdUsdImg from '@/assets/trades/nzd-usd-22-09-2026.jpg';
 import usdChfImg from '@/assets/trades/usd-chf-22-09-2026.jpg';
 import Words from '@/components/fx/Words';
-import { v2 } from '@/lib/lookV2';
 
 /**
  * Скрины из личного дневника сделок за июль — сентябрь 2026 (обновлены 06.09.2026;
@@ -71,7 +70,6 @@ const TradesSection = () => {
     <section id="trades" className="py-12 md:py-20 section-animate">
       <div className="container-landing">
         <div className="max-w-4xl">
-          <span className="section-label">06 · Сделки</span>
           <h2 className="text-foreground">
             <Words>Каждая из этих сделок <em>сначала получила допуск</em></Words>
           </h2>
@@ -146,7 +144,7 @@ const TradesSection = () => {
                     </span>
                   </div>
                   <span className="text-xs text-muted-foreground/60 mt-3 block group-hover:text-muted-foreground">
-                    {v2('Открыть скрин ↗', 'Открыть скрин')}
+                    Открыть скрин
                   </span>
                 </div>
               </button>
@@ -203,7 +201,7 @@ const TradesSection = () => {
                     </span>
                   </div>
                   <span className="text-[11px] text-muted-foreground/60 mt-2.5 block group-hover:text-muted-foreground">
-                    {v2('Открыть скрин ↗', 'Открыть скрин')}
+                    Открыть скрин
                   </span>
                 </div>
               </button>
@@ -241,7 +239,7 @@ const TradesSection = () => {
                   </div>
                   <div className="p-4 border-t border-border">
                     <p className="text-sm text-muted-foreground">
-                      {v2(`Оригинал из дневника сделок · ${selectedTrade.side} · `, `Оригинал из дневника сделок: ${selectedTrade.side}, `)}
+                      Оригинал из дневника сделок: {selectedTrade.side},{' '}
                       <span style={{ color: 'hsl(var(--accent))' }}>{selectedTrade.result}</span>
                     </p>
                   </div>

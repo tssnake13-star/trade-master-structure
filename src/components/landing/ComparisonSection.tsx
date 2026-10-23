@@ -1,5 +1,4 @@
 import Words from '@/components/fx/Words';
-import { v2 } from '@/lib/lookV2';
 /**
  * ComparisonSection — «07 · Отличие». Прямая отстройка от альтернатив, с которыми
  * сравнивает опытный трейдер: сигнальные каналы и «ещё один курс». Три колонки
@@ -36,7 +35,7 @@ const columns = [
     values: [
       'Алгоритм допуска — Echo Gate',
       'Изучили систему — она ваша; подписка — на её срок',
-      v2('Risk Sentinel: −4% в неделю → блок', 'Risk Sentinel блокирует новые сделки при −4% за неделю'),
+      'Risk Sentinel блокирует новые сделки при −4% за неделю',
       'Встроена в исполнение',
     ],
   },
@@ -49,7 +48,6 @@ const ComparisonSection = () => {
     <section id="difference" className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <span className="section-label">07 · Отличие</span>
           <h2 className="text-foreground">
             <Words>Это не <em>сигналы</em>. И не <span className="mute">«ещё один курс»</span>.</Words>
           </h2>
@@ -71,7 +69,7 @@ const ComparisonSection = () => {
               }
             >
               <div
-                className="font-['Martian_Mono'] text-[11px] uppercase tracking-[0.2em] mb-5"
+                className="font-['Martian_Mono'] text-[12.5px] tracking-[0.01em] mb-5"
                 style={{ color: col.accent ? ACCENT : 'hsl(var(--muted-foreground))' }}
               >
                 {col.title}
@@ -79,7 +77,7 @@ const ComparisonSection = () => {
               <ul className="space-y-4">
                 {col.values.map((v, i) => (
                   <li key={i}>
-                    <div className="font-['Martian_Mono'] text-[9px] uppercase tracking-[0.18em] text-muted-foreground/60 mb-1">
+                    <div className="font-['Martian_Mono'] text-[12.5px] tracking-[0.01em] text-muted-foreground/60 mb-1">
                       {CRITERIA[i]}
                     </div>
                     <div className={`text-sm md:text-[15px] ${col.accent ? 'text-foreground' : 'text-muted-foreground'}`}>

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { ArrowRight } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
 import logoVideo from '@/assets/logo-video.mp4';
@@ -38,7 +37,6 @@ const StickyHeader = () => {
             <span>Попробовать терминал 7 дней</span>
             <span className="text-xs font-normal opacity-75">после 4 вопросов, бесплатно</span>
           </span>
-          <ArrowRight className="w-5 h-5 flex-shrink-0" />
         </a>
       </div>
     </div>

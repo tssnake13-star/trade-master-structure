@@ -188,21 +188,17 @@
   font-style: normal;
 }
 
+/* Подпись внутри раздела («Больше не», «Теперь», «Главный принцип»). Подписей с номером и капсом
+   над разделами с 23.10.2026 нет (облик, шаг 1): заголовок говорит сам. */
 .landing-skin .section-label {
   font-family: 'Martian Mono', ui-monospace, monospace;
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.01em;
   opacity: 0.5;
   margin-bottom: 20px;
   display: block;
   color: hsl(var(--muted-foreground));
-}
-@media (min-width: 768px) {
-  .landing-skin .section-label {
-    font-size: 12px;
-  }
 }
 
 .landing-skin .stat-number {
@@ -223,12 +219,11 @@
   margin-top: 8px;
 }
 
-/* Header nav links: small uppercase mono */
+/* Меню в шапке: обычным регистром (облик, 23.10.2026) */
 .landing-skin header nav a {
   font-family: 'Martian Mono', ui-monospace, monospace;
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
+  font-size: 14px;
+  letter-spacing: 0.01em;
 }
 
 /* Lede paragraph helper (optional class) */

@@ -1,4 +1,4 @@
-import { ArrowRight, MessageCircle } from 'lucide-react';
+import { MessageCircle } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
 import FinalRing from './FinalRing';
@@ -35,7 +35,6 @@ const DualCTASection = () => {
               className="btn-primary cta-shine group w-full justify-center"
             >
               Попробовать 7 дней
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>
 

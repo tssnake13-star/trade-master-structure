@@ -71,7 +71,6 @@ const ProofSection = () => {
     <section id="proof" className="py-12 md:py-20 bg-card/50 section-animate">
       <div className="container-landing">
         <div className="max-w-4xl">
-          <span className="section-label">04 · Отзывы</span>
           <h2 className="text-foreground">
             <Words>Знания у них <span className="mute">уже были.</span> Не хватало <em>системы.</em></Words>
           </h2>

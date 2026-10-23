@@ -1,10 +1,8 @@
-import { ArrowDown, ArrowRight } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
 import { nextStreamLabel } from '@/lib/practicum';
 import { STUDY_PRICES } from '@/lib/prices';
 import Words from '@/components/fx/Words';
-import { v2 } from '@/lib/lookV2';
 
 /**
  * Верхний этаж блока цен (08.10.2026): на /access наверху страницы, на лендинге в «12 · Сотрудничество».
@@ -28,7 +26,7 @@ import { v2 } from '@/lib/lookV2';
 
 const GOLD = 'hsl(var(--accent))';
 const COOL = 'hsl(var(--cool))';
-const MONO: React.CSSProperties = { fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase' };
+const MONO: React.CSSProperties = { fontSize: 12.5, letterSpacing: '0.01em' };
 const SERIF: React.CSSProperties = { fontFamily: "'Cormorant', serif", fontWeight: 500 };
 
 // Что получает подписчик: вердикт сразу — главная разница с пробным доступом, где журнал идёт с задержкой в 3 дня
@@ -65,7 +63,7 @@ const STUDY: Study[] = [
 export default function RouteChooser({
   showPrices = true,
   heading = 'h1',
-  kicker = 'TLT · Доступ · цены и условия',
+  kicker,
   clickPrefix = 'access',
 }: {
   showPrices?: boolean;
@@ -80,7 +78,7 @@ export default function RouteChooser({
   const echoPrice = showPrices ? { price: 'от $199', per: 'первый месяц' } : { price: '7 дней', per: 'бесплатно, после 4 вопросов' };
   return (
     <div>
-      <span className="section-label" style={{ color: GOLD }}>{kicker}</span>
+      {kicker && <span className="section-label" style={{ color: GOLD }}>{kicker}</span>}
       <Title className="text-foreground" style={{ fontSize: 'clamp(36px, 5vw, 66px)', lineHeight: 1, maxWidth: '20ch' }}>
         <Words>Никогда ещё трейдинг <em>не был так прост</em></Words>
       </Title>
@@ -108,7 +106,7 @@ export default function RouteChooser({
           className="flex flex-col p-6 md:p-8"
           style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--accent) / 0.45)' }}
         >
-          <span className="text-mono" style={{ ...MONO, color: GOLD }}>{v2('Путь 01', 'Путь 1')}</span>
+          <span className="text-mono" style={{ ...MONO, color: GOLD }}>Путь 1</span>
           <span className="mt-2 text-lg text-foreground leading-snug">Хочу торговать по системе, не изучая её целиком</span>
           <span className="mt-4 text-foreground" style={{ ...SERIF, fontSize: 30, lineHeight: 1.05 }}>ECHO-GATE INSIDE</span>
           <ul className="mt-4 grid gap-2">
@@ -122,7 +120,7 @@ export default function RouteChooser({
           <span className="flex-grow" />
           <span className="mt-6 flex items-baseline gap-2">
             <span style={{ ...SERIF, fontSize: 38, lineHeight: 1, color: 'hsl(var(--foreground))' }}>{echoPrice.price}</span>
-            <span className="text-mono" style={{ ...MONO, letterSpacing: '0.12em', color: 'hsl(var(--muted-foreground))' }}>{echoPrice.per}</span>
+            <span className="text-mono" style={{ ...MONO, color: 'hsl(var(--muted-foreground))' }}>{echoPrice.per}</span>
           </span>
           <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
             <a
@@ -133,7 +131,6 @@ export default function RouteChooser({
               className="btn-primary group inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium"
             >
               Попробовать 7 дней
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
             <a
               href="#echo-gate"
@@ -141,14 +138,14 @@ export default function RouteChooser({
               className="group inline-flex items-center gap-1.5 text-mono"
               style={{ ...MONO, color: GOLD }}
             >
-              Подробнее <ArrowDown className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform" />
+              Подробнее
             </a>
           </div>
         </div>
 
         {/* Путь 02 — обучение: тише, три ступени внутри */}
         <div className="flex flex-col p-6 md:p-7" style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
-          <span className="text-mono" style={{ ...MONO, color: COOL }}>{v2('Путь 02', 'Путь 2')}</span>
+          <span className="text-mono" style={{ ...MONO, color: COOL }}>Путь 2</span>
           <span className="mt-2 text-base text-foreground/90 leading-snug">Хочу изучить систему и решать сам</span>
           <span className="mt-4 text-foreground" style={{ ...SERIF, fontSize: 24, lineHeight: 1.05 }}>Обучение</span>
           <div className="mt-4 grid">
@@ -169,8 +166,7 @@ export default function RouteChooser({
                   </span>
                   <span className="flex items-baseline gap-1.5 shrink-0">
                     {shown.price && <span style={{ ...SERIF, fontSize: 22, lineHeight: 1, color: 'hsl(var(--foreground))' }}>{shown.price}</span>}
-                    <span className="text-mono" style={{ ...MONO, letterSpacing: '0.1em', color: 'hsl(var(--muted-foreground))' }}>{shown.per}</span>
-                    <ArrowDown className="w-3.5 h-3.5 self-center group-hover:translate-y-0.5 transition-transform" style={{ color: COOL }} />
+                    <span className="text-mono" style={{ ...MONO, color: 'hsl(var(--muted-foreground))' }}>{shown.per}</span>
                   </span>
                 </a>
               );
@@ -180,7 +176,7 @@ export default function RouteChooser({
       </div>
 
       <p className="mt-5 text-sm text-muted-foreground">
-        Не знаете, что выбрать? Пришлите сделку: ВЕРДИКТ бесплатно, и я скажу, какой путь ваш{v2(' ·', '.')}{' '}
+        Не знаете, что выбрать? Пришлите сделку: ВЕРДИКТ бесплатно, и я скажу, какой путь ваш.{' '}
         <a
           href={TELEGRAM_LINKS.razbor}
           target="_blank"
@@ -188,7 +184,7 @@ export default function RouteChooser({
           onClick={() => trackClick(`${clickPrefix}_chooser_razbor`)}
           className="inline-flex items-center gap-1 underline underline-offset-2 hover:text-foreground transition-colors"
         >
-          {v2('прислать сделку', 'Прислать сделку')} <ArrowRight className="w-3.5 h-3.5" />
+          Прислать сделку
         </a>
       </p>
     </div>

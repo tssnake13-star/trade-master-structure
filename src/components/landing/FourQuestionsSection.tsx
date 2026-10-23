@@ -1,5 +1,4 @@
 import Words from '@/components/fx/Words';
-import { v2 } from '@/lib/lookV2';
 /**
  * FourQuestionsSection — «08 · Четыре вопроса».
  *
@@ -13,22 +12,22 @@ import { v2 } from '@/lib/lookV2';
 
 const questions = [
   {
-    n: '01',
+    n: '1',
     title: 'Куда',
     desc: 'Направление инструмента и его контекст.',
   },
   {
-    n: '02',
+    n: '2',
     title: 'Подтверждается ли',
     desc: 'Подтверждает ли следующий таймфрейм это направление.',
   },
   {
-    n: '03',
+    n: '3',
     title: 'Когда входить',
     desc: 'Момент, в котором сделка становится действительной, и условие, без которого она не считается.',
   },
   {
-    n: '04',
+    n: '4',
     title: 'Где выходить',
     desc: 'Целевой уровень и соотношение риска к прибыли.',
   },
@@ -39,7 +38,6 @@ const FourQuestionsSection = () => {
     <section id="questions" className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <span className="section-label">08 · Четыре вопроса</span>
           <h2 className="text-foreground">
             <Words>Сделка проходит 4 вопроса. <em>Иначе её нет.</em></Words>
           </h2>
@@ -56,8 +54,8 @@ const FourQuestionsSection = () => {
                 className="font-['Martian_Mono'] text-sm tabular-nums flex-shrink-0"
                 style={{ color: 'hsl(var(--accent))' }}
               >
-                {/* четыре вопроса идут по порядку, номер остаётся; в пробе облика (?v2) без нуля впереди */}
-                {v2(q.n, String(Number(q.n)))}
+                {/* четыре вопроса идут по порядку, номер остаётся (без нуля впереди, облик 23.10.2026) */}
+                {q.n}
               </div>
               <div>
                 <div className="font-['Bricolage_Grotesque'] text-xl md:text-2xl text-foreground">

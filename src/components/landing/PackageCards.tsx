@@ -1,9 +1,8 @@
-import { ArrowRight, Check, ShieldCheck, X } from 'lucide-react';
+import { Check, ShieldCheck, X } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
 import { nextStreamLabel } from '@/lib/practicum';
 import { ECOSYSTEM, STUDY_PRICES } from '@/lib/prices';
-import { v2 } from '@/lib/lookV2';
 
 /**
  * PackageCards — shared package/pricing cards used on the homepage and on the /access page.
@@ -65,7 +64,7 @@ type Pkg = {
 
 const PACKAGES: Pkg[] = [
   {
-    tag: v2('Путь 02 · самостоятельно', 'Путь 2: самостоятельно'),
+    tag: 'Путь 2: самостоятельно',
     name: 'Trade System',
     clickId: 'trade_system',
     subtitle: 'Полностью самостоятельный',
@@ -104,7 +103,7 @@ const PACKAGES: Pkg[] = [
     showPriceAlways: true,
   },
   {
-    tag: v2('Путь 02 · вместе со мной', 'Путь 2: вместе со мной'),
+    tag: 'Путь 2: вместе со мной',
     name: 'Trade Master Practicum',
     clickId: 'practicum',
     subtitle: '60 дней работы со мной',
@@ -173,7 +172,7 @@ const PACKAGES: Pkg[] = [
 // 20.10.2026, его «делай по плану»: цены подписки видны и на главной, прямо на карточке.
 
 const GOLD = 'hsl(var(--accent))';
-const MONO: React.CSSProperties = { fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase' };
+const MONO: React.CSSProperties = { fontSize: 12.5, letterSpacing: '0.01em' };
 const SERIF: React.CSSProperties = { fontFamily: "'Cormorant', serif", fontWeight: 500 };
 
 export default function PackageCards({
@@ -238,7 +237,7 @@ export default function PackageCards({
       <div className="text-mono" style={{ ...MONO, color: GOLD }}>{p.tag}</div>
       <h3 className="mt-2 text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>{p.name}</h3>
       {p.subtitle && (
-        <div className="text-mono mt-1.5" style={{ ...MONO, letterSpacing: '0.16em', color: 'hsl(var(--muted-foreground))' }}>
+        <div className="text-mono mt-1.5" style={{ ...MONO, color: 'hsl(var(--muted-foreground))' }}>
           {p.subtitle}
         </div>
       )}
@@ -272,12 +271,12 @@ export default function PackageCards({
             <span style={{ ...SERIF, fontSize: 38, lineHeight: 1, color: 'hsl(var(--foreground))' }}>{p.price}</span>
             {p.oldPrice && <span className="text-sm line-through" style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }}>{p.oldPrice}</span>}
           </div>
-          <div className="text-mono mt-1" style={{ ...MONO, letterSpacing: '0.14em', color: 'hsl(var(--muted-foreground))' }}>{p.period}</div>
+          <div className="text-mono mt-1" style={{ ...MONO, color: 'hsl(var(--muted-foreground))' }}>{p.period}</div>
         </>
       ) : (
         <div
           className="text-mono mt-5 inline-flex items-center self-start px-3 py-1.5"
-          style={{ ...MONO, letterSpacing: '0.14em', color: GOLD, border: '1px solid hsl(var(--accent) / 0.3)', background: 'hsl(var(--accent) / 0.05)' }}
+          style={{ ...MONO, color: GOLD, border: '1px solid hsl(var(--accent) / 0.3)', background: 'hsl(var(--accent) / 0.05)' }}
         >
           {p.period}
         </div>
@@ -293,7 +292,6 @@ export default function PackageCards({
         }`}
       >
         {p.ctaText ?? (p.featured ? 'Получить доступ' : 'Выбрать')}
-        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
       </a>
     </div>
   );
@@ -337,7 +335,7 @@ export default function PackageCards({
 
       {/* путь 01 — подписка для всех, главный продукт */}
       <div id="echo-gate" data-beam="" data-fx="card" className="mb-3 p-6 md:p-7" style={{ background: 'radial-gradient(120% 80% at 50% 0%, hsl(var(--accent) / 0.08), hsl(var(--card)) 60%)', border: '1px solid hsl(var(--accent) / 0.45)' }}>
-        <div className="text-mono" style={{ ...MONO, color: GOLD }}>{v2('Путь 01 · подписка для всех', 'Путь 1: подписка для всех')}</div>
+        <div className="text-mono" style={{ ...MONO, color: GOLD }}>Путь 1: подписка для всех</div>
         <h3 className="mt-2 text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>ECHO-GATE INSIDE</h3>
         <p className="mt-3 text-sm md:text-base text-muted-foreground" style={{ maxWidth: '72ch' }}>
           Для тех, кто хочет торговать по системе, не изучая её целиком. Терминал в личном кабинете считает рынок
@@ -376,7 +374,7 @@ export default function PackageCards({
                 {e.oldPrice && (
                   <span className="text-sm line-through" style={{ color: 'hsl(var(--muted-foreground) / 0.6)' }}>{e.oldPrice}</span>
                 )}
-                <span className="text-mono" style={{ ...MONO, fontSize: 10, letterSpacing: '0.12em', color: 'hsl(var(--muted-foreground))' }}>
+                <span className="text-mono" style={{ ...MONO, color: 'hsl(var(--muted-foreground))' }}>
                   / {e.period}
                 </span>
               </div>
@@ -396,7 +394,6 @@ export default function PackageCards({
             className="btn-primary inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium group"
           >
             Оформить подписку
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </a>
           {/* 07.10.2026: пробный доступ на 7 дней открывается сам при регистрации в кабинете, с замками.
               08.10.2026: кнопка ведёт через бота, он присылает регистрацию и оставляет человека в базе */}
@@ -408,7 +405,6 @@ export default function PackageCards({
             className="btn-secondary inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium group"
           >
             Попробовать 7 дней
-            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </a>
         </div>
         <p className="mt-3 text-xs text-muted-foreground" style={{ maxWidth: '72ch' }}>
@@ -425,7 +421,7 @@ export default function PackageCards({
             <span className="text-mono" style={{ ...MONO, color: GOLD }}>{ts.tag}</span>
             <h3 className="text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>{ts.name}</h3>
             {ts.subtitle && (
-              <span className="text-mono" style={{ ...MONO, letterSpacing: '0.16em', color: 'hsl(var(--muted-foreground))' }}>{ts.subtitle}</span>
+              <span className="text-mono" style={{ ...MONO, color: 'hsl(var(--muted-foreground))' }}>{ts.subtitle}</span>
             )}
           </div>
           <p className="mt-3 text-sm text-muted-foreground leading-relaxed" style={{ maxWidth: '76ch' }}>{ts.forWhom}</p>
@@ -476,7 +472,7 @@ export default function PackageCards({
               <p className="text-sm italic" style={{ color: 'hsl(var(--accent-dim))' }}>{ts.outcome}</p>
               <div className="mt-4 flex items-baseline gap-3">
                 <span style={{ ...SERIF, fontSize: 38, lineHeight: 1, color: 'hsl(var(--foreground))' }}>{ts.price}</span>
-                <span className="text-mono" style={{ ...MONO, letterSpacing: '0.14em', color: 'hsl(var(--muted-foreground))' }}>{ts.period}</span>
+                <span className="text-mono" style={{ ...MONO, color: 'hsl(var(--muted-foreground))' }}>{ts.period}</span>
               </div>
             </div>
             <a
@@ -487,7 +483,6 @@ export default function PackageCards({
               className="btn-secondary inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium group flex-shrink-0"
             >
               {ts.ctaText ?? 'Выбрать'}
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </a>
           </div>
         </div>

@@ -7,7 +7,6 @@ const AuthorSection = () => {
     <section id="author" className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-4xl">
-          <span className="section-label">10 · Автор</span>
           {/* 11.10.2026: «которой учу» уводило в обучение; весь сайт говорит «попробуйте систему» */}
           <h2 className="text-foreground mb-8">
             <Words>15 лет в рынке. <em>Торгую по той же системе,</em> <span className="mute">которую даю вам попробовать.</span></Words>
@@ -52,7 +51,7 @@ const AuthorSection = () => {
               {/* «14 лет в рынке» отсюда убрано 11.10.2026: оно стоит в заголовке и в цифрах ниже */}
               <div className="flex flex-wrap gap-x-6 gap-y-2 mb-3">
                 {['Практикующий трейдер', 'Не сигнальщик, не инфобизнесмен'].map((s) => (
-                  <span key={s} className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--accent))' }}>{s}</span>
+                  <span key={s} className="font-['Martian_Mono'] text-[12.5px] tracking-[0.01em]" style={{ color: 'hsl(var(--accent))' }}>{s}</span>
                 ))}
               </div>
               <p className="text-sm md:text-base text-muted-foreground leading-relaxed">

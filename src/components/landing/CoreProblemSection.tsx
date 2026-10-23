@@ -1,5 +1,4 @@
 import Words from '@/components/fx/Words';
-import { v2 } from '@/lib/lookV2';
 /**
  * CoreProblemSection — «01 · Проблема».
  *
@@ -28,7 +27,6 @@ const CoreProblemSection = () => {
     <section id="problem" className="section-animate py-12 md:py-20 bg-card/50 border-y border-border">
       <div className="container-landing">
         <div className="max-w-3xl">
-          <span className="section-label">01 · Проблема</span>
           <h2 className="text-foreground">
             <Words>Вы торгуете. <span className="mute">Просто</span> <em>не по системе.</em></Words>
           </h2>
@@ -48,9 +46,8 @@ const CoreProblemSection = () => {
         <div className="mt-10 grid md:grid-cols-3 gap-3">
           {errors.map((e) => (
             <div key={e.n} className="border border-border rounded-xl bg-card p-5">
-              {/* в пробе облика (?v2) без номера: три разных ошибки, а не шаги по порядку */}
-              {v2(<div className="font-['Martian_Mono'] text-[11px] tracking-[0.2em]" style={{ color: ACCENT }}>{e.n}</div>, null)}
-              <div className={`font-['Bricolage_Grotesque'] text-xl ${v2('mt-2', '')} text-foreground`}>{e.t}</div>
+              {/* без номера: три разных ошибки, а не шаги по порядку (облик, 23.10.2026) */}
+              <div className="font-['Bricolage_Grotesque'] text-xl text-foreground">{e.t}</div>
               <p className="mt-2 text-sm text-muted-foreground">{e.d}</p>
             </div>
           ))}

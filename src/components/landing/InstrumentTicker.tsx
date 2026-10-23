@@ -13,7 +13,8 @@ const PAIRS = [
 const TickerRow = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (
   <div className="flex shrink-0 items-center" aria-hidden={ariaHidden}>
     {PAIRS.map((pair, i) => (
-      <div key={`${pair}-${i}`} className="flex items-center">
+      // между парами просто воздух: точка-разделитель снята с обликом (23.10.2026), пару отмечает свой кружок
+      <div key={`${pair}-${i}`} className="flex items-center mr-12">
         <span
           className="inline-block rounded-full"
           style={{
@@ -27,25 +28,13 @@ const TickerRow = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (
         <span
           className="text-mono"
           style={{
-            fontSize: 12,
-            textTransform: 'uppercase',
-            letterSpacing: '0.16em',
+            fontSize: 12.5,
+            letterSpacing: '0.04em',
             color: 'hsl(var(--muted-foreground))',
             opacity: 0.6,
           }}
         >
           {pair}
-        </span>
-        <span
-          className="text-mono tick-sep"
-          style={{
-            fontSize: 12,
-            color: 'hsl(var(--muted-foreground))',
-            opacity: 0.4,
-            margin: '0 28px',
-          }}
-        >
-          ·
         </span>
       </div>
     ))}

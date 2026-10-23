@@ -31,13 +31,18 @@
   font-weight: 500 !important;
   letter-spacing: -0.012em !important;
 }
+/* Облик, шаг 1 (23.10.2026): заголовок одним цветом и шрифтом, без золотого курсивного слова.
+   У выделенного слова свой шрифт в index.css (Bricolage) — возвращаем шрифт заголовка */
 .v3-skin.landing-skin h1 em,
 .v3-skin.landing-skin h2 em,
 .v3-skin.landing-skin h3 em {
-  font-style: italic !important;
-  font-weight: 400 !important;
-  color: var(--v3-gold) !important;
+  font-family: inherit !important;
+  font-style: normal !important;
+  font-weight: inherit !important;
+  font-variation-settings: inherit !important;
+  color: inherit !important;
 }
+.v3-skin.landing-skin :is(h1, h2, h3) .mute { color: inherit; opacity: 1; }
 
 /* ---- mono labels → Space Mono --------------------------------------- */
 .v3-skin.landing-skin .section-label,
@@ -67,9 +72,8 @@
 
 .v3h-mono {
   font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+  font-size: 12.5px;
+  letter-spacing: 0.01em;
   color: var(--v3-mut);
 }
 
@@ -89,7 +93,7 @@
   letter-spacing: -0.015em !important;
   color: var(--v3-fg);
 }
-.v3h-h1 em { font-style: italic; font-weight: 400; color: var(--v3-gold); }
+.v3h-h1 em { font-style: normal; font-weight: inherit; color: inherit; }
 .v3h-h1 .mute { color: var(--v3-mut); }
 .v3h-h1 .word {
   display: inline-block; opacity: 0; transform: translateY(0.35em);
@@ -144,8 +148,8 @@
 .v3h-btn {
   display: inline-flex; align-items: center; gap: 12px;
   font-family: var(--font-ui);
-  font-weight: 600; font-size: 13px;
-  letter-spacing: 0.06em; text-transform: uppercase;
+  font-weight: 600; font-size: 15px;
+  letter-spacing: 0.01em;
   padding: 16px 26px; border-radius: 0;
   border: 1px solid transparent;
   transition: all 0.4s cubic-bezier(0.22,0.61,0.36,1);
@@ -155,8 +159,6 @@
 .v3h-btn--solid:hover { background: var(--v3-gold); }
 .v3h-btn--ghost { background: transparent; color: var(--v3-mut); border-color: var(--v3-line); }
 .v3h-btn--ghost:hover { color: var(--v3-fg); border-color: var(--v3-mut); }
-.v3h-btn .arr { transition: transform 0.4s cubic-bezier(0.22,0.61,0.36,1); }
-.v3h-btn:hover .arr { transform: translateX(4px); }
 
 /* Раскладка первого экрана.
    ⚠️ 23.09.2026, Сергей: «на планшете и на телефоне фото на главной плохо видно,
@@ -262,8 +264,9 @@
   white-space: nowrap;
 }
 .v3-skin .pn-wordmark em {
-  color: var(--v3-gold-dim);
-  font-style: italic;
+  font-family: inherit;
+  font-style: normal;
+  color: inherit;
 }
 .v3-skin .pn-wordmark .pn-wm-letter {
   display: inline-block;
