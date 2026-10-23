@@ -1,3 +1,4 @@
+import Words from '@/components/fx/Words';
 /**
  * CoreProblemSection — «01 · Проблема».
  *
@@ -28,7 +29,7 @@ const CoreProblemSection = () => {
         <div className="max-w-3xl">
           <span className="section-label">01 · Проблема</span>
           <h2 className="text-foreground">
-            Вы торгуете. <span className="mute">Просто</span> <em>не по системе.</em>
+            <Words>Вы торгуете. <span className="mute">Просто</span> <em>не по системе.</em></Words>
           </h2>
 
           <div className="mt-6 md:mt-8 space-y-4">
@@ -63,7 +64,7 @@ const CoreProblemSection = () => {
           </p>
           <p className="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">
             Стоп по системе — это −1 R. Прибыльная сделка — в среднем +9,50 R.
-            Пропустить одну — как получить <span style={{ color: ACCENT }}>9 стопов подряд</span>.
+            Пропустить одну — как получить <mark className="fx-mark" style={{ color: ACCENT }}>9 стопов подряд</mark>.
           </p>
         </div>
 

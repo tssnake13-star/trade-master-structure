@@ -1,3 +1,4 @@
+import Words from '@/components/fx/Words';
 // Срез таблицы «TLT_Statement_2025-2026» (январь 2025 — сентябрь 2026), обновлено 04.10.2026.
 // Обновлять только отсюда.
 const stats = [
@@ -15,7 +16,7 @@ const SystemStatsSection = () => {
         <div className="max-w-3xl">
           <span className="section-label">05 · Результаты системы</span>
           <h2 className="text-foreground">
-            Прибыльных сделок 23,5%. <em>Этого хватает.</em>
+            <Words>Прибыльных сделок 23,5%. <em>Этого хватает.</em></Words>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
             Статистика системы за 21 месяц — 387 сделок. Риск 0,25% на сделку, без компаундинга.

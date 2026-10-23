@@ -13,8 +13,10 @@ import SchoolMapVideo from './SchoolMapVideo';
  */
 const LevelsSection = () => {
   return (
-    <section id="formats" className="section-animate py-12 md:py-20 bg-card/40 border-y border-border">
-      <div className="container-landing">
+    <section id="formats" className="section-animate relative py-12 md:py-20 bg-card/40 border-y border-border">
+      {/* 23.10.2026: лампа над разделом — тот же свет, что у лампы на столе в первом экране */}
+      <div className="fx-lamp" data-fx="lamp" aria-hidden="true" />
+      <div className="container-landing relative">
         <RouteChooser showPrices={false} heading="h2" kicker="09 · Сотрудничество" clickPrefix="landing" />
 
         <div className="mt-10 md:mt-14">

@@ -1,5 +1,6 @@
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { Link } from 'react-router-dom';
+import FooterWordmark from '@/components/fx/FooterWordmark';
 
 const Footer = () => {
   return (
@@ -31,7 +32,10 @@ const Footer = () => {
             </a>
           </div>
         </div>
-        
+
+        {/* 23.10.2026: большая надпись прорисовывается контуром, когда подвал доходит до экрана */}
+        <FooterWordmark />
+
         <div className="mt-8 pt-8 border-t border-border text-center">
           <Link
             to="/school"

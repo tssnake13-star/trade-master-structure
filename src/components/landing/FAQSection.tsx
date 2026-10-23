@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
+import Words from '@/components/fx/Words';
 
 /**
  * FAQSection — «11 · Вопросы». Первыми стоят два вопроса-фильтра из «ПОРТРЕТ КЛИЕНТА.md»
@@ -78,7 +79,7 @@ const FAQSection = () => {
         <div className="max-w-3xl">
           <span className="section-label">11 · Вопросы</span>
           <h2 className="text-foreground">
-            Частые <em>вопросы</em>
+            <Words>Частые <em>вопросы</em></Words>
           </h2>
         </div>
 

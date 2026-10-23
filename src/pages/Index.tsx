@@ -24,6 +24,8 @@ import PrincipleSection from '@/components/landing/PrincipleSection';
 import DualCTASection from '@/components/landing/DualCTASection';
 import Footer from '@/components/landing/Footer';
 import WordmarkKinetic from '@/components/preview-next/WordmarkKinetic';
+import useLandingFx from '@/hooks/useLandingFx';
+import ScrollProgress from '@/components/fx/ScrollProgress';
 
 /** Блоки, по которым считаем, до чего люди доскролливают (воронка внимания). */
 const TRACKED_SECTIONS = [
@@ -33,6 +35,8 @@ const TRACKED_SECTIONS = [
 
 const Index = () => {
   useScrollAnimate();
+  // 23.10.2026: разделы собираются по частям, свет на карточках, лучи (styles/fx.css)
+  useLandingFx();
 
   // Переход по якорю (/#formats, /#echo-gate): со старого адреса /access, из кабинета, из бота.
   // При переходе внутри сайта браузер сам к якорю не прокручивает, а при открытии страницы
@@ -66,6 +70,7 @@ const Index = () => {
     <div className="min-h-screen bg-background landing-skin v3-skin relative isolate">
       {/* site-wide "Структура" ambient field — behind all content (hero keeps its own) */}
       <StructureField position="fixed" zIndex={-1} opacity={0.6} mask="radial-gradient(130% 110% at 50% 42%, #000 38%, transparent 90%)" />
+      <ScrollProgress />
       <Header />
       <StickyHeader />
       <SideNav />

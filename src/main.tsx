@@ -3,6 +3,7 @@ import App from "./App.tsx";
 import "./index.css";
 import "./styles/school-skin.css";
 import "./styles/preview-skin.css";
+import "./styles/fx.css";
 
 // Кабинет и терминал лежат отдельными файлами (23.10.2026). После новой выкладки старые файлы
 // с сервера пропадают: если вкладка открыта с прошлой версии, переход в кабинет не найдёт свой файл.

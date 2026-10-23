@@ -13,6 +13,7 @@ import gbpAudImg from '@/assets/trades/gbp-aud-31-08-2026.jpg';
 import cadJpyImg from '@/assets/trades/cad-jpy-18-09-2026.jpg';
 import nzdUsdImg from '@/assets/trades/nzd-usd-22-09-2026.jpg';
 import usdChfImg from '@/assets/trades/usd-chf-22-09-2026.jpg';
+import Words from '@/components/fx/Words';
 
 /**
  * Скрины из личного дневника сделок за июль — сентябрь 2026 (обновлены 06.09.2026;
@@ -71,7 +72,7 @@ const TradesSection = () => {
         <div className="max-w-4xl">
           <span className="section-label">06 · Сделки</span>
           <h2 className="text-foreground">
-            Каждая из этих сделок <em>сначала получила допуск</em>
+            <Words>Каждая из этих сделок <em>сначала получила допуск</em></Words>
           </h2>
           
           <p className="mt-4 text-base md:text-lg text-muted-foreground">

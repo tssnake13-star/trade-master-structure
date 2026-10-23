@@ -1,4 +1,5 @@
 import { Check, X } from 'lucide-react';
+import Words from '@/components/fx/Words';
 
 /**
  * FitSection — «02 · Для кого». Стоит сразу за «Проблемой»: по аналитике
@@ -37,7 +38,7 @@ const FitSection = () => {
         <div className="max-w-4xl">
           <span className="section-label">02 · Для кого</span>
           <h2 className="text-foreground">
-            Для тех, кто уже торгует, <em>но не может сидеть у графика</em>
+            <Words>Для тех, кто уже торгует, <em>но не может сидеть у графика</em></Words>
           </h2>
 
           <p className="mt-4 text-base md:text-lg text-muted-foreground">

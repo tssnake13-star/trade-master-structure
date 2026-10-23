@@ -1,3 +1,4 @@
+import Words from '@/components/fx/Words';
 /**
  * ComparisonSection — «07 · Отличие». Прямая отстройка от альтернатив, с которыми
  * сравнивает опытный трейдер: сигнальные каналы и «ещё один курс». Три колонки
@@ -49,7 +50,7 @@ const ComparisonSection = () => {
         <div className="max-w-3xl">
           <span className="section-label">07 · Отличие</span>
           <h2 className="text-foreground">
-            Это не <em>сигналы</em>. И не <span className="mute">«ещё один курс»</span>.
+            <Words>Это не <em>сигналы</em>. И не <span className="mute">«ещё один курс»</span>.</Words>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '58ch' }}>
             Опытные трейдеры обычно сравнивают три варианта. Разница — по сути:
@@ -60,6 +61,7 @@ const ComparisonSection = () => {
           {columns.map((col) => (
             <div
               key={col.title}
+              data-beam={col.accent ? '' : undefined}
               className="rounded-xl p-5 md:p-6 border bg-card"
               style={
                 col.accent

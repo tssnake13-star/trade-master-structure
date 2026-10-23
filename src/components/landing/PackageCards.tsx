@@ -316,7 +316,7 @@ export default function PackageCards({
       {choiceNote === 'top' && choiceNoteBlock}
 
       {/* путь 01 — подписка для всех, главный продукт */}
-      <div id="echo-gate" className="mb-3 p-6 md:p-7" style={{ background: 'radial-gradient(120% 80% at 50% 0%, hsl(var(--accent) / 0.08), hsl(var(--card)) 60%)', border: '1px solid hsl(var(--accent) / 0.45)' }}>
+      <div id="echo-gate" data-beam="" data-fx="card" className="mb-3 p-6 md:p-7" style={{ background: 'radial-gradient(120% 80% at 50% 0%, hsl(var(--accent) / 0.08), hsl(var(--card)) 60%)', border: '1px solid hsl(var(--accent) / 0.45)' }}>
         <div className="text-mono" style={{ ...MONO, color: GOLD }}>Путь 01 · подписка для всех</div>
         <h3 className="mt-2 text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>ECHO-GATE INSIDE</h3>
         <p className="mt-3 text-sm md:text-base text-muted-foreground" style={{ maxWidth: '72ch' }}>

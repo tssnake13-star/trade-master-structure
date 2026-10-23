@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { User } from 'lucide-react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { STUDENT_CASES } from '@/lib/testimonials';
+import Words from '@/components/fx/Words';
 
 /**
  * ProofSection — «04 · Отзывы».
@@ -72,7 +73,7 @@ const ProofSection = () => {
         <div className="max-w-4xl">
           <span className="section-label">04 · Отзывы</span>
           <h2 className="text-foreground">
-            Знания у них <span className="mute">уже были.</span> Не хватало <em>системы.</em>
+            <Words>Знания у них <span className="mute">уже были.</span> Не хватало <em>системы.</em></Words>
           </h2>
 
           <p className="mt-4 text-base md:text-lg text-muted-foreground">

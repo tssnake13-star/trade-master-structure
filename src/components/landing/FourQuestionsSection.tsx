@@ -1,3 +1,4 @@
+import Words from '@/components/fx/Words';
 /**
  * FourQuestionsSection — «08 · Четыре вопроса».
  *
@@ -39,7 +40,7 @@ const FourQuestionsSection = () => {
         <div className="max-w-3xl">
           <span className="section-label">08 · Четыре вопроса</span>
           <h2 className="text-foreground">
-            Сделка проходит 4 вопроса. <em>Иначе её нет.</em>
+            <Words>Сделка проходит 4 вопроса. <em>Иначе её нет.</em></Words>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
             Система отвечает на четыре вопроса любой сделки. Одинаково — в понедельник утром
@@ -69,7 +70,7 @@ const FourQuestionsSection = () => {
         </div>
 
         <p className="mt-8 text-base md:text-lg text-foreground max-w-3xl">
-          Прошла все четыре — допуск. Не прошла — отказ, и сделки нет.
+          <mark className="fx-mark">Прошла все четыре — допуск. Не прошла — отказ, и сделки нет.</mark>
           <span className="text-muted-foreground"> Решает алгоритм, а не настроение в моменте.</span>
         </p>
       </div>

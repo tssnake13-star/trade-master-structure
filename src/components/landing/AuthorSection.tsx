@@ -1,5 +1,6 @@
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import StatsCounter from './StatsCounter';
+import Words from '@/components/fx/Words';
 
 const AuthorSection = () => {
   return (
@@ -9,7 +10,7 @@ const AuthorSection = () => {
           <span className="section-label">10 · Автор</span>
           {/* 11.10.2026: «которой учу» уводило в обучение; весь сайт говорит «попробуйте систему» */}
           <h2 className="text-foreground mb-8">
-            15 лет в рынке. <em>Торгую по той же системе,</em> <span className="mute">которую даю вам попробовать.</span>
+            <Words>15 лет в рынке. <em>Торгую по той же системе,</em> <span className="mute">которую даю вам попробовать.</span></Words>
           </h2>
           
           <div className="flex flex-col md:flex-row gap-6 md:gap-10 items-start">
