@@ -5,6 +5,7 @@ import ringOffUrl from '@/assets/hero-ring-off.webp';
 import depthUrl from '@/assets/hero-depth.webp';
 import { LiveScreen, makeScreen, type LiveEvent, type ScreenDef } from './heroDeskLive';
 import { createDepthPhoto, FOCUS, PIVOT } from './heroDepth';
+import { V5 } from '@/lib/lookV5';
 
 /**
  * Сцена первого экрана: рабочее место трейдера, которое оживает.
@@ -138,17 +139,19 @@ export default function HeroDeskScene({ variant, className }: Props) {
     const hz = hazeCv.getContext('2d');
     if (!cx || !rc || !fx || !hz) return;
 
-    // проба 3D: включается адресом с ?3d, обычные посетители видят прежнюю сцену
-    const depth = new URLSearchParams(window.location.search).has('3d')
-      ? createDepthPhoto(photo3d, deskImg, depthUrl)
-      : null;
+    // проба 3D: включается адресом с ?3d, обычные посетители видят прежнюю сцену.
+    // Облик, шаг 4 (проба ?v5): то же фото через WebGL ради пара, который поднимается, но камера стоит
+    const cam3d = new URLSearchParams(window.location.search).has('3d');
+    const depth = cam3d || V5 ? createDepthPhoto(photo3d, deskImg, depthUrl) : null;
     let use3d = false;
     depth?.whenReady.then(() => {
       use3d = true;
       photo3d.style.display = 'block';
       photoSvg.style.visibility = 'hidden';
-      zoom.style.transform = 'none';
-      back.style.transform = 'none';
+      if (cam3d) {
+        zoom.style.transform = 'none';
+        back.style.transform = 'none';
+      }
     }).catch(() => { /* картинки не пришли — остаётся обычное фото */ });
 
     // свет кольца и «кольцо выключено» нужны и холсту (прорисовка, блик): грузим рядом со сценой
@@ -215,7 +218,7 @@ export default function HeroDeskScene({ variant, className }: Props) {
       // пока кольцо не начало прорисовываться, оно целиком закрыто неподвижной заплаткой
       fade(ringOffEl, ringOn > 0 ? 0 : 1);
       // в 3D камера отъезжает «наездом с трансфокацией», а не общим масштабом
-      if (!use3d) zoom.style.transform = `scale(${(1.14 - 0.14 * ease(p)).toFixed(4)})`;
+      if (!use3d || !cam3d) zoom.style.transform = `scale(${(1.14 - 0.14 * ease(p)).toFixed(4)})`;
     };
 
     // размеры холстов, заготовки экранов и спрайты: пересчитываются при смене размера блока
@@ -435,7 +438,7 @@ export default function HeroDeskScene({ variant, className }: Props) {
       tiltY = clamp1((ev.beta - beta0) / 22);
       tiltOn = true;
     };
-    if (depth) window.addEventListener('deviceorientation', onTilt, { passive: true });
+    if (depth && cam3d) window.addEventListener('deviceorientation', onTilt, { passive: true });
 
     // за краем экрана и в фоновой вкладке сцена не считается
     let visible = true;
@@ -464,7 +467,10 @@ export default function HeroDeskScene({ variant, className }: Props) {
       breathe(now);
       if (screensOn > 0.95 && now - cardAt > 7000) screens[cardN % 2].nudge();
 
-      if (use3d && depth) {
+      if (use3d && depth && !cam3d) {
+        // пар без 3D: камера стоит, фото «течёт» только в маске пара; сдвиг за мышью — общий, как у обычного фото
+        depth.draw({ w: photo3d.width, h: photo3d.height, k: F.k * dpr, tx: F.tx * dpr, ty: F.ty * dpr, offX: 0, offY: 0, zoom: 0, time: (now / 1000) % 3600 });
+      } else if (use3d && depth) {
         // камера: мышь или наклон, а без них — медленное «дыхание», чтобы объём был виден сразу;
         // при прокрутке ближние предметы уходят вверх быстрее дальних
         const t = now / 1000;

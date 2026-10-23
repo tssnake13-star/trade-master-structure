@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect } from 'react';
+import { V5 } from '@/lib/lookV5';
 
 const useIsoLayoutEffect = typeof window === 'undefined' ? useEffect : useLayoutEffect;
 
@@ -26,6 +27,8 @@ export default function useLandingFx() {
     const main = document.querySelector<HTMLElement>('.v3-skin main');
     if (!main) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    // облик, шаг 4 (проба ?v5): ниже первого экрана ничего не появляется и не бегает само
+    if (V5) return;
     const html = document.documentElement;
     const hover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
     html.classList.add('fx-on');

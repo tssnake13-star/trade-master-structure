@@ -1,4 +1,7 @@
 import '@/styles/v3-skin.css';
+// облик, шаг 4: проба по адресу с ?v5 (lib/lookV5.ts)
+import { V5 } from '@/lib/lookV5';
+import '@/styles/look-v5.css';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import useScrollAnimate from '@/hooks/useScrollAnimate';
@@ -69,8 +72,9 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background landing-skin v3-skin relative isolate">
       {/* site-wide "Структура" ambient field — behind all content (hero keeps its own) */}
-      <StructureField position="fixed" zIndex={-1} opacity={0.6} mask="radial-gradient(130% 110% at 50% 42%, #000 38%, transparent 90%)" />
-      <ScrollProgress />
+      {/* облик, шаг 4 (проба ?v5): без фона с точками за всей страницей и без полосы прочитанного */}
+      {!V5 && <StructureField position="fixed" zIndex={-1} opacity={0.6} mask="radial-gradient(130% 110% at 50% 42%, #000 38%, transparent 90%)" />}
+      {!V5 && <ScrollProgress />}
       <Header />
       <StickyHeader />
       <SideNav />
