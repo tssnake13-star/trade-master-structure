@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,28 +7,35 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import SchoolAuth from "./pages/SchoolAuth";
-import SchoolDashboard from "./pages/SchoolDashboard";
-import SchoolCourse from "./pages/SchoolCourse";
-import SchoolLesson from "./pages/SchoolLesson";
-import SchoolAdmin from "./pages/SchoolAdmin";
-import SchoolStudentDetail from "./pages/SchoolStudentDetail";
-import SchoolResetPassword from "./pages/SchoolResetPassword";
-import SchoolProfile from "./pages/SchoolProfile";
-import SchoolTerminal from "./pages/SchoolTerminal";
-import TgTerminal from "./pages/TgTerminal";
-import SchoolAnalytics from "./pages/SchoolAnalytics";
-import PreviewRedesign from "./pages/PreviewRedesign";
-import PreviewNext from "./pages/PreviewNext";
-import PreviewCandles from "./pages/PreviewCandles";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
-import SchoolPreview from "./pages/SchoolPreview";
-import SchoolLadderPreview from "./pages/SchoolLadderPreview";
-import SchoolHomePreview from "./pages/SchoolHomePreview";
 import SiteAssetsApplier from "./components/SiteAssetsApplier";
 
+// 23.10.2026 (Сергей: «облегчи главную»): кабинет, терминал и пробные страницы грузятся своими
+// файлами, только когда человек на них зашёл. До этого главная тянула весь сайт одним скриптом
+// (1,6 МБ, ~480 КБ сжатым), и человек из Instagram смотрел на пустую страницу, пока тот грузился.
+const SchoolAuth = lazy(() => import("./pages/SchoolAuth"));
+const SchoolDashboard = lazy(() => import("./pages/SchoolDashboard"));
+const SchoolCourse = lazy(() => import("./pages/SchoolCourse"));
+const SchoolLesson = lazy(() => import("./pages/SchoolLesson"));
+const SchoolAdmin = lazy(() => import("./pages/SchoolAdmin"));
+const SchoolStudentDetail = lazy(() => import("./pages/SchoolStudentDetail"));
+const SchoolResetPassword = lazy(() => import("./pages/SchoolResetPassword"));
+const SchoolProfile = lazy(() => import("./pages/SchoolProfile"));
+const SchoolTerminal = lazy(() => import("./pages/SchoolTerminal"));
+const TgTerminal = lazy(() => import("./pages/TgTerminal"));
+const SchoolAnalytics = lazy(() => import("./pages/SchoolAnalytics"));
+const PreviewRedesign = lazy(() => import("./pages/PreviewRedesign"));
+const PreviewNext = lazy(() => import("./pages/PreviewNext"));
+const PreviewCandles = lazy(() => import("./pages/PreviewCandles"));
+const SchoolPreview = lazy(() => import("./pages/SchoolPreview"));
+const SchoolLadderPreview = lazy(() => import("./pages/SchoolLadderPreview"));
+const SchoolHomePreview = lazy(() => import("./pages/SchoolHomePreview"));
+
 const queryClient = new QueryClient();
+
+// Пока грузится файл страницы — пустой тёмный фон того же цвета, без мигания белым.
+const PageFallback = () => <div className="min-h-screen bg-background" />;
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
@@ -37,6 +45,7 @@ const App = () => (
       <BrowserRouter>
         <SiteAssetsApplier />
         <AuthProvider>
+          <Suspense fallback={<PageFallback />}>
           <Routes>
             <Route path="/" element={<Index />} />
             {/* 18.10.2026: терминал внутри Телеграма — кнопка «Терминал» в меню ботов */}
@@ -64,6 +73,7 @@ const App = () => (
             <Route path="/school/terminal" element={<SchoolTerminal />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
