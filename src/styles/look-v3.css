@@ -1,0 +1,91 @@
+/*
+ * Облик сайта, шаг 2 (23.10.2026) — проба по адресу с ?v3: lib/lookV3.ts ставит html.look-v3
+ * и подгружает шрифты. Два шрифта вместо шести и цвета со снимка первого экрана:
+ * Literata — заголовки и текст, Onest — кнопки, меню, цифры и подписи. Фон — тень комнаты со снимка,
+ * текст — тёплая «бумага», линии — приглушённый пар, янтарь кольца только у главной кнопки.
+ * Макет терминала (.td) не трогаем: там моноширинный, как в настоящем терминале.
+ * После «ставь» правила переезжают в основные стили без html.look-v3.
+ */
+
+/* ---- цвета со снимка ---- */
+html.look-v3 body { background: #140C05; }
+html.look-v3 .landing-skin {
+  --background: 28 60% 5%;            /* Комната #140C05 — тень со снимка */
+  --foreground: 40 42% 90%;           /* Бумага #EFE8DA */
+  --card: 28 44% 8%;
+  --card-foreground: 40 42% 90%;
+  --popover: 28 44% 8%;
+  --popover-foreground: 40 42% 90%;
+  --primary: 40 42% 90%;
+  --primary-foreground: 28 60% 5%;
+  --secondary: 28 35% 10%;
+  --secondary-foreground: 38 12% 64%;
+  --muted: 28 35% 10%;
+  --muted-foreground: 38 12% 64%;
+  --accent: 36 66% 75%;               /* Допуск #E9C793 — как растущие свечи на мониторах */
+  --accent-foreground: 28 60% 5%;
+  --accent-dim: 33 40% 36%;
+  --border: 28 50% 13%;               /* Пар #5C3512, приглушённый до линии */
+  --input: 28 40% 16%;
+  --ring: 34 79% 60%;                 /* Кольцо #E9A54A */
+  --v3-bg: #140C05;
+  --v3-fg: #EFE8DA;
+  --v3-mut: #A59E92;
+  --v3-faint: #6E665B;
+  --v3-gold: #E9C793;
+  --v3-gold-dim: #8C6A3D;
+  --v3-line: #2E1C0C;
+}
+
+/* сцена первого экрана: чёрный снимка поднимается до цвета страницы (фильтр в HeroDeskScene),
+   затемнения вступления и виньетка тоже цвета комнаты — сцена сливается с фоном без рамки */
+html.look-v3 .hd-scene { --hd-lift: 1; }
+html.look-v3 .v3h-scene [data-photo] { filter: url(#hd-lift-wide); }
+html.look-v3 .v3h-split-strip [data-photo] { filter: url(#hd-lift-narrow); }
+html.look-v3 .hd-scene [data-dark2] { background: var(--v3-bg) !important; }
+html.look-v3 .hd-scene [data-dark] stop { stop-color: var(--v3-bg); }
+
+/* главная кнопка — «Попробовать 7 дней» — янтарь кольца, и только она */
+html.look-v3 .landing-skin a[href$="/trial"]:is(.v3h-btn, .btn-primary, .btn-secondary, [class*="bg-foreground"]) {
+  background: #E9A54A !important;
+  color: #140C05 !important;
+  border-color: #E9A54A !important;
+}
+html.look-v3 .landing-skin a[href$="/trial"]:is(.v3h-btn, .btn-primary, .btn-secondary, [class*="bg-foreground"]):hover {
+  background: #F2B964 !important;
+}
+
+/* ---- шрифты ---- */
+html.look-v3 .v3-skin {
+  --font-display: 'Literata', 'PT Serif', Georgia, 'Times New Roman', serif;
+  --font-ui: 'Onest', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Onest', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+/* основной текст — Literata (был Hanken Grotesk), вводная строка первого экрана тоже */
+html.look-v3 .landing-skin { font-family: var(--font-display); }
+html.look-v3 .landing-skin :is(.lede, .v3h-offer) { font-family: var(--font-display) !important; }
+/* заголовки карточек и цитата (были Bricolage) и цены в карточках (были Cormorant) — Literata */
+html.look-v3 .landing-skin :is([class*="Bricolage_Grotesque"], [style*="Cormorant"]) { font-family: var(--font-display) !important; }
+/* цифры, подписи, меню и кнопки — Onest */
+html.look-v3 .landing-skin :is(.tabular-nums, .stat-number, [class*="Martian_Mono"], .btn-primary, .btn-secondary, .v3h-btn, header a, nav[aria-label="Навигация по разделам"] a):not(.td *) {
+  font-family: var(--font-ui) !important;
+}
+
+/* ---- размеры: у Literata буквы крупнее, чем у Cormorant того же кегля, — заголовки на ступень меньше ---- */
+html.look-v3 .v3-skin.landing-skin h2,
+html.look-v3 .v3-skin.landing-skin .heading-section { font-size: clamp(30px, 4.2vw, 56px) !important; line-height: 1.1 !important; }
+html.look-v3 .v3-skin.landing-skin h3 { font-size: clamp(20px, 2vw, 28px); }
+html.look-v3 .v3-skin .pn-wordmark { font-size: clamp(42px, 10.5vw, 168px); }
+html.look-v3 .v3h-offer { font-size: clamp(18px, 1.9vw, 22px); }
+/* первый экран: две строки без переноса, размер от ширины колонки
+   (Literata 500, межбуквенный −0,015em: 12,92 em и 6,29 em, запас 4%) */
+html.look-v3 .v3h-h1 .v3h-line1,
+html.look-v3 .v3h-h1 .v3h-line2 { font-size: calc(7.45vw - 3px) !important; }
+@media (min-width: 768px) {
+  html.look-v3 .v3h-h1 .v3h-line1,
+  html.look-v3 .v3h-h1 .v3h-line2 { font-size: min(calc(7.45vw - 5.9px), 57.2px) !important; }
+}
+@media (min-width: 1024px) {
+  html.look-v3 .v3h-h1 .v3h-line1,
+  html.look-v3 .v3h-h1 .v3h-line2 { font-size: min(calc(4.17vw - 3.3px), 45.3px) !important; }
+}

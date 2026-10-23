@@ -1,4 +1,7 @@
 import '@/styles/v3-skin.css';
+// облик, шаг 2: проба по адресу с ?v3 (lib/lookV3.ts)
+import '@/lib/lookV3';
+import '@/styles/look-v3.css';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import useScrollAnimate from '@/hooks/useScrollAnimate';
