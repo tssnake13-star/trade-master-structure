@@ -13,8 +13,11 @@
  * отсюда и неровные края. Теперь у каждого экрана свой контур по замерам кадра (верх и низ —
  * параболы), график идёт по изгибу, шаг свечей растёт к ближнему краю, как в перспективе.
  * Экран занимает всю лицевую сторону монитора: снаружи остаётся только волосок тёмного стекла.
- * Чтобы картинка выглядела снятой, а не нарисованной: интерфейс терминала (панель, шкала цены,
- * шкала времени, сетка), мягкое свечение свечей, блик стекла, затемнение к краям и зерно.
+ * Чтобы картинка выглядела снятой, а не нарисованной: мягкое свечение свечей, сетка, блик стекла,
+ * затемнение к краям и зерно.
+ * 23.10.2026, Сергей: «графики должны полностью заполнять мониторы… не должно быть этих полей с чёрточками
+ * сверху, снизу, на правой боковой». Панель сверху, шкала цены справа и шкала времени снизу сняты: свечи
+ * идут во весь экран, свеча, уезжающая за левый край, обрезается по контуру экрана.
  *
  * Рисуется на canvas в координатах картинки (1672×941): вызывающий уже выставил ctx.setTransform.
  */
@@ -38,11 +41,8 @@ export type LiveEvent = { ok: boolean; dir: 1 | -1 };
 
 const UP = '#e9c793';
 const DOWN = '#748093';
-// рабочие области экрана в долях (u — по ширине, v — по высоте)
-const BAR = 0.052; // верхняя панель терминала
-const AXIS_U = 0.918; // слева от шкалы цены
-const AXIS_V = 0.928; // над шкалой времени
-const U0 = 0.012, U1 = 0.905, V0 = 0.085, V1 = 0.895; // поле графика
+// поле графика в долях экрана (u — по ширине, v — по высоте): во весь экран, по вертикали небольшой воздух
+const U0 = 0.008, U1 = 0.985, V0 = 0.06, V1 = 0.94;
 
 const yq = (c: Curve, x: number) => c[0] * x * x + c[1] * x + c[2];
 
@@ -165,8 +165,6 @@ export class LiveScreen {
   private hi = 1;
   private rnd: () => number;
   // неподвижная часть интерфейса строится один раз: экран на кадре не двигается
-  private chromePanels = new Path2D();
-  private chromeMarks = new Path2D();
   private chromeGrid = new Path2D();
 
   constructor(
@@ -189,7 +187,7 @@ export class LiveScreen {
     this.left = 2 + Math.floor(this.rnd() * 4);
     this.lo = Math.min(...this.candles.map((k) => k.l));
     this.hi = Math.max(...this.candles.map((k) => k.h));
-    this.buildChrome(seed);
+    this.buildGrid();
   }
 
   private quad(path: Path2D, u0: number, v0: number, u1: number, v1: number) {
@@ -211,32 +209,10 @@ export class LiveScreen {
     }
   }
 
-  /** панель сверху, шкала цены справа, шкала времени снизу, сетка: всё мелкое, как на снимке экрана */
-  private buildChrome(seed: number) {
-    let s = seed * 31 + 7;
-    const r = () => ((s = (s * 16807) % 2147483647) / 2147483647);
-    this.quad(this.chromePanels, 0, 0, 1, BAR);
-    this.quad(this.chromePanels, AXIS_U, BAR, 1, 1);
-    this.quad(this.chromePanels, 0, AXIS_V, AXIS_U, 1);
-    // пункты меню и значки на верхней панели
-    let u = 0.012;
-    while (u < 0.6) {
-      const w = 0.012 + r() * 0.03;
-      this.quad(this.chromeMarks, u, BAR * 0.36, u + w, BAR * 0.64);
-      u += w + 0.012 + r() * 0.01;
-    }
-    for (let i = 0; i < 4; i++) this.quad(this.chromeMarks, 0.93 + i * 0.016, BAR * 0.32, 0.94 + i * 0.016, BAR * 0.68);
-    // подписи цены на шкале
-    for (let v = BAR + 0.05; v < AXIS_V - 0.02; v += 0.068) {
-      this.quad(this.chromeMarks, AXIS_U + 0.012, v, AXIS_U + 0.05 + r() * 0.012, v + 0.016);
-    }
-    // подписи времени
-    for (let k = 0.05; k < AXIS_U - 0.04; k += 0.105) {
-      this.quad(this.chromeMarks, k, AXIS_V + 0.024, k + 0.024 + r() * 0.01, AXIS_V + 0.042);
-    }
-    // сетка поля графика
-    for (let v = V0 + 0.04; v < V1; v += 0.135) this.seg(this.chromeGrid, U0, v, AXIS_U, v, 12);
-    for (let k = 0.05; k < AXIS_U; k += 0.105) this.seg(this.chromeGrid, k, BAR, k, AXIS_V, 6);
+  /** тонкая сетка во весь экран — единственное, что осталось от интерфейса терминала */
+  private buildGrid() {
+    for (let v = 0.12; v < 1; v += 0.135) this.seg(this.chromeGrid, 0, v, 1, v, 12);
+    for (let k = 0.05; k < 1; k += 0.105) this.seg(this.chromeGrid, k, 0, k, 1, 6);
   }
 
   private gauss() {
@@ -302,7 +278,7 @@ export class LiveScreen {
   }
 
   /**
-   * Неподвижная подложка экрана: тёмное стекло, матрица, интерфейс терминала, сетка.
+   * Неподвижная подложка экрана: тёмное стекло, матрица, сетка.
    * Рисуется один раз в заготовку (при смене размера), в кадре её только копируют.
    */
   drawUnder(ctx: CanvasRenderingContext2D) {
@@ -316,13 +292,9 @@ export class LiveScreen {
     bg.addColorStop(1, '#0a0e15');
     ctx.fillStyle = bg;
     ctx.fill(sc.active);
-    ctx.fillStyle = 'rgba(22,31,44,0.95)';
-    ctx.fill(this.chromePanels);
     ctx.strokeStyle = 'rgba(150,170,200,0.07)';
     ctx.lineWidth = 0.6;
     ctx.stroke(this.chromeGrid);
-    ctx.fillStyle = 'rgba(150,168,192,0.42)';
-    ctx.fill(this.chromeMarks);
   }
 
   /** неподвижное стекло поверх графика: блик, затемнение к краям, зерно, свет на верхней кромке */
@@ -388,8 +360,10 @@ export class LiveScreen {
     const span = this.hi - this.lo;
     const lo0 = this.lo;
     const vy = (p: number) => V1 - ((p - lo0) / span) * (V1 - V0);
-    // подложка и стекло — заготовки (drawUnder / drawOver); всё живое лежит внутри поля графика,
-    // поэтому обрезка по контуру экрана в кадре не нужна
+    // подложка и стекло — заготовки (drawUnder / drawOver). Поле графика — во весь экран, поэтому свеча,
+    // уезжающая влево, и начало зоны обрезаются по контуру экрана, иначе вылезли бы на рамку
+    ctx.save();
+    ctx.clip(this.screen.active);
 
     // зоны накопления и уровни
     const firstId = this.candles[1]?.id ?? 0;
@@ -405,7 +379,7 @@ export class LiveScreen {
       if (z.ok) {
         const k = Math.min(1, age / 1.6);
         const reach = k * k * (3 - 2 * k);
-        this.seg(level, u1, vy(z.level), u1 + (AXIS_U - u1) * reach, vy(z.level), 8);
+        this.seg(level, u1, vy(z.level), u1 + (U1 - u1) * reach, vy(z.level), 8);
         if (age < 3.5) {
           const r = (0.005 + 0.0025 * Math.sin(age * 5)) * Math.sin(Math.min(1, age / 3.5) * Math.PI);
           this.quad(mark, u1 - r, vy(z.level) - r * 2.2, u1 + r, vy(z.level) + r * 2.2);
@@ -447,5 +421,6 @@ export class LiveScreen {
     ctx.strokeStyle = DOWN; ctx.stroke(wd);
     ctx.fillStyle = UP; ctx.fill(up);
     ctx.fillStyle = DOWN; ctx.fill(down);
+    ctx.restore();
   }
 }
