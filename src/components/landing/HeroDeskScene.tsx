@@ -2,7 +2,9 @@ import { useEffect, useRef } from 'react';
 import deskImg from '@/assets/hero-desk-ring.jpg';
 import ringLightUrl from '@/assets/hero-ring-light.webp';
 import ringOffUrl from '@/assets/hero-ring-off.webp';
+import depthUrl from '@/assets/hero-depth.webp';
 import { LiveScreen, makeScreen, type LiveEvent, type ScreenDef } from './heroDeskLive';
+import { createDepthPhoto, FOCUS, PIVOT } from './heroDepth';
 
 /**
  * Сцена первого экрана: рабочее место трейдера, которое оживает.
@@ -10,7 +12,7 @@ import { LiveScreen, makeScreen, type LiveEvent, type ScreenDef } from './heroDe
  * «хочу добавить вот такую анимацию… по теме трейдинга». Проба утверждена: «да, ставь на сайт».
  *
  * 23.10.2026, Сергей: «мониторы должны быть широкоформатного размера, как на исходнике… с кольцом…
- * безрамочные… картинка как будто виртуальная, надо как реальная». Сцена теперь стоит на его кадре
+ * безрамочные… картинка как будто виртуальная, надо как реальная». Сцена стоит на его кадре
  * с кольцом (4.webp из переписки): кольцо, дым и стол — настоящая фотография, на экранах наш
  * терминал по точным изогнутым контурам (heroDeskLive.ts). Картинки готовит
  * scratchpad/make_hero_assets.py: кадр с погашенными экранами, свет кольца и «кольцо выключено».
@@ -22,6 +24,11 @@ import { LiveScreen, makeScreen, type LiveEvent, type ScreenDef } from './heroDe
  *   · всплывает карточка «Допуск» или «Отказ»;
  *   · по настоящему кольцу бежит блик, свечение дышит, в свете поднимается пыль;
  *   · на компьютере сцена слегка идёт за мышью: пыль сильнее стола — глубина.
+ *
+ * Проба 3D (23.10.2026, Сергей: «очень хочется 3D-сайт», адрес с ?3d): фото рисуется через WebGL
+ * по карте глубины (heroDepth.ts). Мониторы — опора, кресло и стена с кольцом расходятся, когда
+ * ведёшь мышью, наклоняешь телефон или прокручиваешь; во вступлении «наезд с трансфокацией».
+ * Слои поверх фото идут за своей глубиной: кольцо со свечением — как стена, пыль — ближе.
  *
  * ⚠️ Устройство под 60 кадров (Сергей 22.10.2026: «тормозит страшно… 60 кадров в секунду должно»):
  *   · фото, затемнения, кромка, свечение кольца и дымка — отдельные слои, у которых меняются только
@@ -46,6 +53,11 @@ const INTRO_MS = 8000;
 // блик: голова и хвост — пятна вдоль кольца (отставание в радианах, яркость, радиус)
 const COMET: [number, number, number][] = [[0, 1, 46], [0.12, 0.65, 40], [0.24, 0.4, 34], [0.36, 0.2, 28]];
 const COMET_WIN = 280;
+// 3D: глубина стены с кольцом и пыли, наибольший сдвиг камеры (px кадра), сила «наезда» во вступлении
+const D_RING = 0.06;
+const D_DUST = 0.7;
+const MAX_OFF = 40;
+const ZOOM0 = 0.28;
 
 // инструменты в карточках — только то, что Сергей разбирает (нефть он не торгует)
 const SYMBOLS = ['XAUUSD', 'EURUSD', 'GBPJPY', 'BTCUSD', 'USDCAD', 'AUDJPY', 'ETHUSD', 'GBPUSD'];
@@ -57,6 +69,7 @@ const DUST = Array.from({ length: 26 }, (_, i) => {
 });
 
 const clamp = (v: number) => Math.max(0, Math.min(1, v));
+const clamp1 = (v: number) => Math.max(-1, Math.min(1, v));
 const seg = (p: number, a: number, b: number) => clamp((p - a) / (b - a));
 const ease = (t: number) => t * t * (3 - 2 * t);
 // угол прорисовки кольца: видимую верхнюю дугу (~155°) проходим за 70% времени, остальное — быстрее
@@ -104,6 +117,10 @@ export default function HeroDeskScene({ variant, className }: Props) {
     const q = <T extends Element>(s: string) => el.querySelector(s) as T;
     const zoom = q<HTMLDivElement>('[data-zoom]');
     const back = q<HTMLDivElement>('[data-back]');
+    const photoSvg = q<SVGSVGElement>('[data-photo]');
+    const photo3d = q<HTMLCanvasElement>('[data-photo3d]');
+    const gRing = q<HTMLDivElement>('[data-g-ring]');
+    const ringCv = q<HTMLCanvasElement>('[data-ring]');
     const chartsCv = q<HTMLCanvasElement>('[data-charts]');
     const hazeCv = q<HTMLCanvasElement>('[data-haze]');
     const fxCv = q<HTMLCanvasElement>('[data-fx]');
@@ -116,9 +133,23 @@ export default function HeroDeskScene({ variant, className }: Props) {
     const edge = q<HTMLDivElement>('[data-edge]');
     const card = q<HTMLDivElement>('[data-card]');
     const cx = chartsCv.getContext('2d');
+    const rc = ringCv.getContext('2d');
     const fx = fxCv.getContext('2d');
     const hz = hazeCv.getContext('2d');
-    if (!cx || !fx || !hz) return;
+    if (!cx || !rc || !fx || !hz) return;
+
+    // проба 3D: включается адресом с ?3d, обычные посетители видят прежнюю сцену
+    const depth = new URLSearchParams(window.location.search).has('3d')
+      ? createDepthPhoto(photo3d, deskImg, depthUrl)
+      : null;
+    let use3d = false;
+    depth?.whenReady.then(() => {
+      use3d = true;
+      photo3d.style.display = 'block';
+      photoSvg.style.visibility = 'hidden';
+      zoom.style.transform = 'none';
+      back.style.transform = 'none';
+    }).catch(() => { /* картинки не пришли — остаётся обычное фото */ });
 
     // свет кольца и «кольцо выключено» нужны и холсту (прорисовка, блик): грузим рядом со сценой
     const ringLight = new Image();
@@ -141,6 +172,7 @@ export default function HeroDeskScene({ variant, className }: Props) {
     // карточка терминала: одна за раз, не чаще раза в 6 с
     let screensOn = 0;
     let ringOn = 0;
+    let introP = 0;
     let cardN = 0;
     let cardAt = -1e9;
     let cardTimer = 0;
@@ -171,6 +203,7 @@ export default function HeroDeskScene({ variant, className }: Props) {
       node.style.visibility = o <= 0.001 ? 'hidden' : 'visible';
     };
     const render = (p: number) => {
+      introP = p;
       const light = ease(seg(p, 0.02, 0.3));
       fade(dark2, 0.78 * (1 - light));
       fade(dark, 1 - 0.75 * light);
@@ -180,7 +213,8 @@ export default function HeroDeskScene({ variant, className }: Props) {
       ringOn = seg(p, 0.6, 0.97);
       // пока кольцо не начало прорисовываться, оно целиком закрыто неподвижной заплаткой
       fade(ringOffEl, ringOn > 0 ? 0 : 1);
-      zoom.style.transform = `scale(${(1.14 - 0.14 * ease(p)).toFixed(4)})`;
+      // в 3D камера отъезжает «наездом с трансфокацией», а не общим масштабом
+      if (!use3d) zoom.style.transform = `scale(${(1.14 - 0.14 * ease(p)).toFixed(4)})`;
     };
 
     // размеры холстов, заготовки экранов и спрайты: пересчитываются при смене размера блока
@@ -202,10 +236,14 @@ export default function HeroDeskScene({ variant, className }: Props) {
       if (!W || !H) return;
       // плотность холстов не выше 1,5: на «ретине» разницы не видно, а пикселей почти вдвое меньше
       dpr = Math.min(window.devicePixelRatio || 1, 1.5);
-      for (const c of [chartsCv, fxCv, hazeCv]) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
+      for (const c of [chartsCv, ringCv, fxCv, hazeCv, photo3d]) { c.width = Math.round(W * dpr); c.height = Math.round(H * dpr); }
       F = fit(variant, W, H);
       const s = F.k * dpr;
       zoom.style.transformOrigin = `${(F.tx + 1200 * F.k).toFixed(1)}px ${(F.ty + 380 * F.k).toFixed(1)}px`;
+      // в 3D слои с кольцом и пылью масштабируются вокруг той же точки, что и фото
+      const fo = `${(F.tx + FOCUS.x * F.k).toFixed(1)}px ${(F.ty + FOCUS.y * F.k).toFixed(1)}px`;
+      gRing.style.transformOrigin = fo;
+      fxCv.style.transformOrigin = fo;
       // верхний и нижний край вписанного кадра растворяются в фоне страницы: без видимой «ступеньки»
       const top = F.ty, bot = H - (F.ty + 941 * F.k);
       edge.style.background =
@@ -278,50 +316,59 @@ export default function HeroDeskScene({ variant, className }: Props) {
       // свет кольца — в масштабе кадра 1:1, начало картинки в RING_BOX плюс поля
       const pad = COMET_WIN / 2;
       c2.drawImage(lightPad, wx - RING_BOX.x + pad, wy - RING_BOX.y + pad, COMET_WIN, COMET_WIN, 0, 0, cometCv.width, cometCv.height);
-      cx.globalAlpha = alpha;
-      cx.drawImage(cometCv, wx, wy, COMET_WIN, COMET_WIN);
-      cx.globalAlpha = 1;
+      rc.globalAlpha = alpha;
+      rc.drawImage(cometCv, wx, wy, COMET_WIN, COMET_WIN);
+      rc.globalAlpha = 1;
     };
 
-    // экраны, прорисовка кольца и блик — под затемнениями, вместе с фото
+    // кольцо: прорисовка во вступлении и бегущий блик (слой кольца, в 3D он идёт как стена)
+    let ringClear = false;
+    const drawRing = (now: number) => {
+      if (ringReady < 2 || ringOn <= 0) {
+        if (!ringClear) { rc.setTransform(1, 0, 0, 1, 0, 0); rc.clearRect(0, 0, ringCv.width, ringCv.height); ringClear = true; }
+        return;
+      }
+      ringClear = false;
+      rc.setTransform(1, 0, 0, 1, 0, 0);
+      rc.clearRect(0, 0, ringCv.width, ringCv.height);
+      rc.setTransform(F.k * dpr, 0, 0, F.k * dpr, F.tx * dpr, F.ty * dpr);
+      if (ringOn < 1) {
+        // незажжённая часть кольца закрыта заплаткой, зажжённая светится ярче обычного
+        const ang = sweepAngle(ringOn);
+        rc.save();
+        rc.beginPath();
+        rc.moveTo(RING.x, RING.y);
+        rc.arc(RING.x, RING.y, RING.r + 60, ang, RING_START + Math.PI * 2);
+        rc.closePath();
+        rc.clip();
+        rc.drawImage(ringOff, RING_BOX.x, RING_BOX.y, RING_BOX.w, RING_BOX.h);
+        rc.restore();
+        rc.save();
+        rc.beginPath();
+        rc.moveTo(RING.x, RING.y);
+        rc.arc(RING.x, RING.y, RING.r + 60, RING_START, ang);
+        rc.closePath();
+        rc.clip();
+        rc.globalAlpha = 0.45 - 0.25 * ringOn;
+        rc.drawImage(ringLight, RING_BOX.x, RING_BOX.y, RING_BOX.w, RING_BOX.h);
+        rc.restore();
+        rc.globalAlpha = 1;
+        drawComet(ang, 1);
+      } else {
+        drawComet(sweepAngle(1) + ((now / 1000) * 120) / RING.r, 0.95);
+      }
+    };
+
+    // экраны: заготовка-подложка, живые свечи, заготовка-стекло
     const drawCharts = (now: number, dt: number) => {
       cx.setTransform(1, 0, 0, 1, 0, 0);
       cx.clearRect(0, 0, chartsCv.width, chartsCv.height);
-      if (screensOn > 0) cx.drawImage(underCv, monX, monY);
+      if (screensOn <= 0) return;
+      cx.drawImage(underCv, monX, monY);
       cx.setTransform(F.k * dpr, 0, 0, F.k * dpr, F.tx * dpr, F.ty * dpr);
-      const t = now / 1000;
-      if (ringReady >= 2 && ringOn > 0) {
-        if (ringOn < 1) {
-          // незажжённая часть кольца закрыта заплаткой, зажжённая светится ярче обычного
-          const ang = sweepAngle(ringOn);
-          cx.save();
-          cx.beginPath();
-          cx.moveTo(RING.x, RING.y);
-          cx.arc(RING.x, RING.y, RING.r + 60, ang, RING_START + Math.PI * 2);
-          cx.closePath();
-          cx.clip();
-          cx.drawImage(ringOff, RING_BOX.x, RING_BOX.y, RING_BOX.w, RING_BOX.h);
-          cx.restore();
-          cx.save();
-          cx.beginPath();
-          cx.moveTo(RING.x, RING.y);
-          cx.arc(RING.x, RING.y, RING.r + 60, RING_START, ang);
-          cx.closePath();
-          cx.clip();
-          cx.globalAlpha = 0.45 - 0.25 * ringOn;
-          cx.drawImage(ringLight, RING_BOX.x, RING_BOX.y, RING_BOX.w, RING_BOX.h);
-          cx.restore();
-          cx.globalAlpha = 1;
-          drawComet(ang, 1);
-        } else {
-          drawComet(sweepAngle(1) + (t * 120) / RING.r, 0.95);
-        }
-      }
-      if (screensOn > 0) {
-        for (const sc of screens) sc.drawLive(cx, now, dt);
-        cx.setTransform(1, 0, 0, 1, 0, 0);
-        cx.drawImage(overCv, monX, monY);
-      }
+      for (const sc of screens) sc.drawLive(cx, now, dt);
+      cx.setTransform(1, 0, 0, 1, 0, 0);
+      cx.drawImage(overCv, monX, monY);
     };
 
     // пыль медленно поднимается в свете и мерцает; слой с пылью идёт за мышью сильнее стола
@@ -357,21 +404,37 @@ export default function HeroDeskScene({ variant, className }: Props) {
       render(1);
       const now = performance.now();
       // картинки кольца могут ещё грузиться: нарисуем, когда придут
-      const still = () => { drawCharts(now, 1000); drawFx(now); breathe(now); };
+      const still = () => {
+        drawCharts(now, 1000); drawRing(now); drawFx(now); breathe(now);
+        if (use3d && depth) depth.draw({ w: photo3d.width, h: photo3d.height, k: F.k * dpr, tx: F.tx * dpr, ty: F.ty * dpr, offX: 0, offY: 0, zoom: 0, time: 0 });
+      };
       still();
       ringLight.addEventListener('load', still);
       ringOff.addEventListener('load', still);
+      depth?.whenReady.then(still).catch(() => {});
       return () => { ro.disconnect(); };
     }
 
     // глубина за курсором (только мышь): стол сдвигается чуть-чуть, пыль сильнее
     let mx = 0, my = 0, tx = 0, ty = 0;
+    let mouseAt = -1e9;
     const onMove = (ev: PointerEvent) => {
       if (ev.pointerType !== 'mouse') return;
       tx = (ev.clientX / window.innerWidth) * 2 - 1;
       ty = (ev.clientY / window.innerHeight) * 2 - 1;
+      mouseAt = performance.now();
     };
     window.addEventListener('pointermove', onMove, { passive: true });
+    // 3D на телефоне: наклон (там, где браузер отдаёт его без запроса, — Android)
+    let tiltX = 0, tiltY = 0, tiltOn = false, beta0: number | null = null;
+    const onTilt = (ev: DeviceOrientationEvent) => {
+      if (ev.gamma == null || ev.beta == null) return;
+      if (beta0 == null) beta0 = ev.beta;
+      tiltX = clamp1(ev.gamma / 22);
+      tiltY = clamp1((ev.beta - beta0) / 22);
+      tiltOn = true;
+    };
+    if (depth) window.addEventListener('deviceorientation', onTilt, { passive: true });
 
     // за краем экрана и в фоновой вкладке сцена не считается
     let visible = true;
@@ -382,7 +445,8 @@ export default function HeroDeskScene({ variant, className }: Props) {
     let lastP = -1;
     let last = performance.now();
     let raf = 0;
-    let lastBack = '', lastFx = '';
+    let lastBack = '', lastFx = '', lastRing = '';
+    let cx3 = 0, cy3 = 0;
     const loop = (now: number) => {
       raf = requestAnimationFrame(loop);
       const dt = Math.min(100, now - last);
@@ -394,9 +458,37 @@ export default function HeroDeskScene({ variant, className }: Props) {
       const a = 1 - Math.exp(-dt / 500);
       mx += (tx - mx) * a; my += (ty - my) * a;
       drawCharts(now, dt);
+      drawRing(now);
       drawFx(now);
       breathe(now);
       if (screensOn > 0.95 && now - cardAt > 7000) screens[cardN % 2].nudge();
+
+      if (use3d && depth) {
+        // камера: мышь или наклон, а без них — медленное «дыхание», чтобы объём был виден сразу;
+        // при прокрутке ближние предметы уходят вверх быстрее дальних
+        const t = now / 1000;
+        const idle = clamp((now - mouseAt - 2500) / 1500);
+        const driftX = 0.38 * Math.sin(t * 0.21), driftY = 0.2 * Math.sin(t * 0.29 + 1);
+        const userX = tiltOn ? tiltX : mx, userY = tiltOn ? tiltY : my;
+        const scroll = clamp(window.scrollY / Math.max(1, window.innerHeight));
+        const goalX = clamp1(userX * (1 - idle) + driftX * (tiltOn ? 0.3 : idle));
+        const goalY = clamp1(userY * (1 - idle) + driftY * (tiltOn ? 0.3 : idle) - scroll * 0.9);
+        const b = 1 - Math.exp(-dt / 350);
+        cx3 += (goalX - cx3) * b; cy3 += (goalY - cy3) * b;
+        const offX = cx3 * MAX_OFF, offY = cy3 * MAX_OFF * 0.6;
+        const zm = ZOOM0 * (1 - ease(introP));
+        // время пара по кругу в час: в 32-битной дроби секунды не теряют точность
+        depth.draw({ w: photo3d.width, h: photo3d.height, k: F.k * dpr, tx: F.tx * dpr, ty: F.ty * dpr, offX, offY, zoom: zm, time: (t % 3600) });
+        // слой кольца — на глубине стены, пыль — ближе мониторов
+        const layer = (d: number) => {
+          const rel = d - PIVOT;
+          return `translate3d(${(offX * rel * F.k).toFixed(1)}px, ${(offY * rel * F.k).toFixed(1)}px, 0) scale(${(1 + zm * rel).toFixed(4)})`;
+        };
+        const rt = layer(D_RING), ft = layer(D_DUST);
+        if (rt !== lastRing) { gRing.style.transform = rt; lastRing = rt; }
+        if (ft !== lastFx) { fxCv.style.transform = ft; lastFx = ft; }
+        return;
+      }
 
       const bt = `translate3d(${(-mx * 8 * F.k).toFixed(1)}px, ${(-my * 5 * F.k).toFixed(1)}px, 0)`;
       const ft = `translate3d(${(-mx * 22 * F.k).toFixed(1)}px, ${(-my * 14 * F.k).toFixed(1)}px, 0)`;
@@ -408,6 +500,7 @@ export default function HeroDeskScene({ variant, className }: Props) {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('deviceorientation', onTilt);
       io.disconnect();
       ro.disconnect();
       window.clearTimeout(cardTimer);
@@ -422,13 +515,18 @@ export default function HeroDeskScene({ variant, className }: Props) {
     <div ref={root} className={`hd-scene relative overflow-hidden ${className ?? ''}`} aria-hidden="true">
       <div data-zoom className="hd-layer" style={{ transform: 'scale(1.14)' }}>
         <div data-back className="hd-layer">
-          <svg {...svgProps}><image href={deskImg} width="1672" height="941" /></svg>
-          {/* кольцо, пока не зажглось: неподвижная заплатка, во время прорисовки её снимает холст */}
-          <svg data-ringoff {...svgProps}>{ringImg(ringOffUrl)}</svg>
-          {/* живые мониторы, прорисовка кольца и бегущий блик (heroDeskLive.ts) */}
+          <svg data-photo {...svgProps}><image href={deskImg} width="1672" height="941" /></svg>
+          {/* проба 3D (адрес с ?3d): то же фото через WebGL по карте глубины */}
+          <canvas data-photo3d className="hd-layer" style={{ display: 'none' }} />
+          {/* слой кольца: заплатка «кольцо выключено», прорисовка и блик, свечение, дымка */}
+          <div data-g-ring className="hd-layer">
+            <svg data-ringoff {...svgProps}>{ringImg(ringOffUrl)}</svg>
+            <canvas data-ring className="hd-layer" />
+            <svg data-ringglow {...svgProps} style={{ opacity: 0 }}>{ringImg(ringLightUrl)}</svg>
+            <canvas data-haze className="hd-layer" style={{ opacity: 0 }} />
+          </div>
+          {/* живые мониторы (heroDeskLive.ts) */}
           <canvas data-charts className="hd-layer" />
-          <svg data-ringglow {...svgProps} style={{ opacity: 0 }}>{ringImg(ringLightUrl)}</svg>
-          <canvas data-haze className="hd-layer" style={{ opacity: 0 }} />
           <svg data-off {...svgProps}>
             <path d={SCREEN_L.svg} fill="#040507" />
             <path d={SCREEN_R.svg} fill="#040507" />
