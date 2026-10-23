@@ -9,6 +9,10 @@ import { useEffect, useRef } from 'react';
  * «7 делений — 7 дней»: кольцо из 7 дуг, они по очереди загораются по кругу (по 0,8 с),
  * когда горят все 7, кольцо вспыхивает целиком и гаснет, отсчёт идёт заново.
  * Намёк на 7 дней бесплатного терминала.
+ * 23.10.2026, Сергей: «при первом появлении почему-то половина кольца горит, а половина нет». Отсчёт шёл
+ * с той же секунды, что и прорисовка, а гореть дугам разрешалось только после неё: через 2,2 с сразу
+ * вспыхивали почти три деления. Теперь у кольца свои часы, и отсчёт начинается, когда кольцо прорисовано.
+ * Часы идут, только пока блок на экране: вернувшись к нему, человек видит отсчёт с того же места.
  *
  * ⚠️ 60 кадров: один canvas, свечение и блики нарисованы заранее (спрайты), в кадре их
  * только поворачивают; за краем экрана и в фоновой вкладке ничего не считается.
@@ -86,8 +90,6 @@ export default function FinalRing() {
       });
     };
     layout();
-    const ro = new ResizeObserver(layout);
-    ro.observe(section);
 
     // искры кружат вокруг кольца и медленно поднимаются
     let seed = 5;
@@ -96,21 +98,21 @@ export default function FinalRing() {
       a: rnd() * Math.PI * 2, r: 0.7 + rnd() * 0.75, v: (rnd() - 0.5) * 0.12, s: 0.8 + rnd() * 1.8, ph: rnd() * 6.28,
     }));
 
-    let shownAt = 0; // когда блок впервые попал на экран: с этого момента кольцо прорисовывается
-    const draw = (now: number) => {
+    // t — часы кольца в секундах: первые DRAW_IN секунд кольцо прорисовывается, потом идёт отсчёт
+    const DRAW_IN = 2.2;
+    const draw = (t: number) => {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       if (!ring || !segDim || !segLit || !haze || !dot) return;
-      const t = now / 1000;
-      const k = Math.min(1, (now - shownAt) / 2200);
-      const draw01 = k * k * (3 - 2 * k);
+      const draw01 = ease(Math.min(1, t / DRAW_IN));
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       const box = (R + pad) * 2;
 
       // отсчёт: дуги загораются по одной, потом всё кольцо вспыхивает и гаснет
-      const cyc = 7 * 0.8 + 2.2, u = ((now - shownAt) / 1000) % cyc;
-      const lit = draw01 >= 1 ? Math.min(7, u / 0.8) : 0;
-      const flash = draw01 >= 1 && u > 5.6 ? Math.sin(Math.min(1, (u - 5.6) / 2.2) * Math.PI) : 0;
+      const counting = t > DRAW_IN;
+      const cyc = 7 * 0.8 + 2.2, u = counting ? (t - DRAW_IN) % cyc : 0;
+      const lit = counting ? Math.min(7, u / 0.8) : 0;
+      const flash = counting && u > 5.6 ? Math.sin(Math.min(1, (u - 5.6) / 2.2) * Math.PI) : 0;
       const fadeOut = u > 6.7 ? 1 - ease(Math.min(1, (u - 6.7) / 1.1)) : 1;
 
       ctx.globalAlpha = draw01 * (0.7 + 0.3 * flash);
@@ -157,23 +159,23 @@ export default function FinalRing() {
       ctx.globalAlpha = 1;
     };
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      shownAt = -1e9;
-      draw(performance.now());
-      return () => ro.disconnect();
-    }
+    // «меньше движения»: кольцо стоит, все 7 дуг горят
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const ro = new ResizeObserver(() => { layout(); if (still) draw(DRAW_IN + 7 * 0.8); });
+    ro.observe(section);
+    if (still) return () => ro.disconnect();
 
     let visible = false;
-    const io = new IntersectionObserver(([en]) => {
-      visible = en.isIntersecting;
-      if (visible && !shownAt) shownAt = performance.now();
-    }, { threshold: 0.2 });
+    const io = new IntersectionObserver(([en]) => { visible = en.isIntersecting; }, { threshold: 0.2 });
     io.observe(section);
-    let raf = 0;
+    let raf = 0, clock = 0, last = 0;
     const loop = (now: number) => {
       raf = requestAnimationFrame(loop);
-      if (!visible || document.hidden || !W) return;
-      draw(now);
+      if (!visible || document.hidden || !W) { last = 0; return; }
+      // за кадр часы идут не больше чем на 0,1 с: после паузы кольцо продолжает с того же места
+      if (last) clock += Math.min(0.1, (now - last) / 1000);
+      last = now;
+      draw(clock);
     };
     raf = requestAnimationFrame(loop);
     return () => { cancelAnimationFrame(raf); io.disconnect(); ro.disconnect(); };
