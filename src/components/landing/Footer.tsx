@@ -8,8 +8,10 @@ const Footer = () => {
       <div className="container-landing">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
-            <p className="text-lg font-semibold text-foreground">TRADELIKETYO</p>
-            <p className="text-sm text-muted-foreground mt-1">Система допуска к сделке</p>
+            {/* 23.10.2026, Сергей: белое «TRADELIKETYO» дублировало большую надпись ниже — с глаз убрано,
+                для поисковиков и программ чтения с экрана название остаётся */}
+            <p className="sr-only">TRADELIKETYO</p>
+            <p className="text-sm text-muted-foreground">Система допуска к сделке</p>
           </div>
           
           {/* Secondary links */}
