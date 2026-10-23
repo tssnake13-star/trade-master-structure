@@ -52,7 +52,7 @@
 .hd-card__v4 { display: none; }
 html.look-v4 .hd-card > :not(.hd-card__v4) { display: none; }
 html.look-v4 .hd-card__v4 { display: block; }
-html.look-v4 .hd-card { border-color: var(--v3-line); background: rgba(28, 19, 11, 0.94); }
+html.look-v4 .hd-card { border-color: var(--v3-line); }
 .hd-card__row { display: flex; align-items: center; gap: 10px; }
 .hd-card__sym { font-family: var(--font-ui); font-weight: 600; font-size: 14px; color: var(--v3-fg); }
 .hd-card__why { margin-top: 8px; font-family: var(--font-display); font-size: 14px; line-height: 1.35; color: var(--v3-fg); }

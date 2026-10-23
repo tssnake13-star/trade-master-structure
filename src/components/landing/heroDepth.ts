@@ -67,7 +67,6 @@ uniform float zoom;
 uniform vec2 focus;
 uniform float pivot;
 uniform float time;
-uniform vec3 lift;
 varying vec2 v;
 const vec2 SIZE = vec2(${IMG_W}.0, ${IMG_H}.0);
 // пар: сдвиг за период (px кадра) и периодов в секунду — подъём около 17 px кадра в секунду
@@ -115,8 +114,6 @@ void main() {
   vec4 c;
   if (m > 0.004) c = steam(s, m);
   else c = texture2D(img, s / SIZE);
-  // подъём теней: чёрный снимка становится цветом страницы, белый остаётся белым
-  c.rgb = c.rgb * (1.0 - lift) + lift;
   gl_FragColor = c * inside;
 }
 `;
@@ -138,8 +135,8 @@ function loadImage(url: string) {
   });
 }
 
-/** null — WebGL недоступен: остаётся обычное фото. lift — до какого цвета (0…1) поднять тени снимка */
-export function createDepthPhoto(canvas: HTMLCanvasElement, photoUrl: string, depthUrl: string, lift: [number, number, number] = [0, 0, 0]) {
+/** null — WebGL недоступен: остаётся обычное фото */
+export function createDepthPhoto(canvas: HTMLCanvasElement, photoUrl: string, depthUrl: string) {
   const gl = canvas.getContext('webgl', { alpha: true, antialias: false, premultipliedAlpha: true, preserveDrawingBuffer: false });
   if (!gl) return null;
   const vs = shader(gl, gl.VERTEX_SHADER, VS);
@@ -165,7 +162,6 @@ export function createDepthPhoto(canvas: HTMLCanvasElement, photoUrl: string, de
   gl.uniform1i(u('dep'), 1);
   gl.uniform2f(uFocus, FOCUS.x, FOCUS.y);
   gl.uniform1f(uPivot, PIVOT);
-  gl.uniform3f(u('lift'), lift[0], lift[1], lift[2]);
 
   const texture = (unit: number, im: HTMLImageElement) => {
     const t = gl.createTexture();
