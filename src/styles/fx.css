@@ -84,6 +84,8 @@ html.fx-on [data-shine][data-shining] { animation: fxShine 1.9s cubic-bezier(0.4
 @keyframes fxShine { from { background-position: 100% 0; } to { background-position: 0% 0; } }
 
 /* ---- скан по графикам сделок: одна золотая линия сверху вниз ---- */
+/* линия живёт внутри своей картинки: без этого она растягивалась на весь список (23.10.2026) */
+html.fx-on [data-scan] { position: relative; overflow: hidden; }
 html.fx-on [data-scan]::after {
   content: '';
   position: absolute;
@@ -101,6 +103,18 @@ html.fx-on [data-scan][data-scanning]::after { animation: fxScan 1.6s cubic-bezi
   15% { opacity: 1; }
   80% { opacity: 1; }
   100% { transform: translateY(235%); opacity: 0; }
+}
+/* миниатюры в списке сделок (44 px): полоса во всю высоту и проходит ровно по картинке, иначе её не видно */
+html.fx-on .journal__thumb[data-scan]::after {
+  height: 100%;
+  background: linear-gradient(180deg, transparent 0%, hsl(var(--accent) / 0.16) 50%, hsl(var(--accent) / 0.7) 88%, #fff1d2 94%, transparent 100%);
+}
+html.fx-on .journal__thumb[data-scan][data-scanning]::after { animation-name: fxScanThumb; animation-duration: 1.3s; }
+@keyframes fxScanThumb {
+  0% { transform: translateY(-100%); opacity: 0; }
+  12% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0; }
 }
 
 /* ---- свет за курсором (Magic UI «Magic Card», Aceternity «Glowing Effect»), только мышь ---- */

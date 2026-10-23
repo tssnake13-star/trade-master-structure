@@ -79,38 +79,42 @@ export default function SchoolMapVideo() {
       <p className="smv-caption">
         Не знаете, какой путь ваш? <span>Карта школы за 4,5 минуты</span>
       </p>
-      <div className="smv-frame">
-        {/* сюда YouTube вставляет плеер — только после нажатия */}
-        <div ref={holder} className="smv-holder" />
+      {/* 23.10.2026: свечение за роликом дышит (Сергей: «чтобы это свечение было динамичное… пульсировала»);
+          пока ролик идёт, свет стоит ровно и не отвлекает */}
+      <div className="smv-stage" data-state={state}>
+        <div className="smv-frame">
+          {/* сюда YouTube вставляет плеер — только после нажатия */}
+          <div ref={holder} className="smv-holder" />
 
-        {(state === 'idle' || state === 'loading') && (
-          <button type="button" className="smv-cover" onClick={start} aria-label="Смотреть ролик «Карта школы», 4 минуты 35 секунд">
-            <img src={preview} alt="Карта школы TRADELIKETYO: дверь — 7 дней бесплатно, путь 1 — бинокль, путь 2 — микроскоп" loading="lazy" decoding="async" width={1280} height={720} />
-            <span className="smv-play" data-loading={state === 'loading' ? '1' : '0'}>
-              <Play className="w-7 h-7" fill="currentColor" />
-            </span>
-            <span className="smv-time">4:35</span>
-          </button>
-        )}
-
-        {state === 'ended' && (
-          <div className="smv-end">
-            <p className="smv-end-title">Начните с двери</p>
-            <p className="smv-end-sub">7 дней терминала бесплатно: журнал моих решений и проверка вашей сделки</p>
-            <a
-              href={TELEGRAM_LINKS.trial}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="v3h-btn v3h-btn--solid"
-              onClick={() => trackClick('map_video_trial')}
-            >
-              7 дней бесплатно <ArrowRight className="arr w-4 h-4" />
-            </a>
-            <button type="button" className="smv-replay" onClick={replay}>
-              <RotateCcw className="w-3.5 h-3.5" /> Посмотреть ещё раз
+          {(state === 'idle' || state === 'loading') && (
+            <button type="button" className="smv-cover" onClick={start} aria-label="Смотреть ролик «Карта школы», 4 минуты 35 секунд">
+              <img src={preview} alt="Карта школы TRADELIKETYO: дверь — 7 дней бесплатно, путь 1 — бинокль, путь 2 — микроскоп" loading="lazy" decoding="async" width={1280} height={720} />
+              <span className="smv-play" data-loading={state === 'loading' ? '1' : '0'}>
+                <Play className="w-7 h-7" fill="currentColor" />
+              </span>
+              <span className="smv-time">4:35</span>
             </button>
-          </div>
-        )}
+          )}
+
+          {state === 'ended' && (
+            <div className="smv-end">
+              <p className="smv-end-title">Начните с двери</p>
+              <p className="smv-end-sub">7 дней терминала бесплатно: журнал моих решений и проверка вашей сделки</p>
+              <a
+                href={TELEGRAM_LINKS.trial}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="v3h-btn v3h-btn--solid"
+                onClick={() => trackClick('map_video_trial')}
+              >
+                7 дней бесплатно <ArrowRight className="arr w-4 h-4" />
+              </a>
+              <button type="button" className="smv-replay" onClick={replay}>
+                <RotateCcw className="w-3.5 h-3.5" /> Посмотреть ещё раз
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -94,7 +94,11 @@ const TradesSection = () => {
             {trades.map((trade, index) => (
               <li key={index}>
                 <button type="button" className="journal__row" onClick={() => setSelectedTrade(trade)}>
-                  <img className="journal__thumb" src={trade.image} alt={tradeAlt(trade)} loading="lazy" decoding="async" />
+                  {/* 23.10.2026: график в своей рамке — линия скана идёт по нему, как раньше на карточках
+                      (Сергей: «шторка идёт одна по всем строкам вниз… смотрится ужасно») */}
+                  <span className="journal__thumb">
+                    <img src={trade.image} alt={tradeAlt(trade)} loading="lazy" decoding="async" />
+                  </span>
                   <span className="journal__date">{trade.date}</span>
                   <span className="journal__sym">
                     {trade.instrument}

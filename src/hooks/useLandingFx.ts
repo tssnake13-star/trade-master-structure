@@ -81,12 +81,25 @@ export default function useLandingFx() {
     });
 
     // ---- проявление: всё, что вошло в экран одновременно, идёт по очереди ----
+    // Фото автора открывается шторкой при каждом возвращении на экран (Сергей 23.10.2026: «я его пролистал,
+    // потом возвращаюсь, и он опять появляется»). Текст проявляется один раз: при повторе человеку, который
+    // вернулся перечитать цену или условие, пришлось бы ждать, пока текст появится снова.
+    const REPLAY = new Set(['photo']);
+    const hideAgain = (el: HTMLElement) => {
+      // за краем экрана шторка закрывается мгновенно, без обратного хода
+      const parts = [el, ...Array.from(el.querySelectorAll<HTMLElement>('img'))];
+      parts.forEach((p) => { p.style.transition = 'none'; });
+      delete el.dataset.in;
+      void el.offsetWidth;
+      parts.forEach((p) => p.style.removeProperty('transition'));
+    };
     let batchAt = 0;
     let batchK = 0;
     const reveal = (el: HTMLElement, d: number) => {
       el.dataset.in = '';
-      el.querySelectorAll<HTMLElement>('[data-scan], [data-shine]').forEach((s) => {
-        s.style.setProperty('--sd', `${d + 380}ms`);
+      // несколько графиков в одной роли (список сделок) сканируются по очереди, как прежде карточки
+      el.querySelectorAll<HTMLElement>('[data-scan], [data-shine]').forEach((s, i) => {
+        s.style.setProperty('--sd', `${d + 380 + i * 70}ms`);
         if (s.hasAttribute('data-scan')) s.dataset.scanning = '';
         else s.dataset.shining = '';
       });
@@ -94,6 +107,7 @@ export default function useLandingFx() {
       const words = role === 'h' || role === 'quote' ? el.querySelectorAll('.fx-word').length : 0;
       const step = role === 'quote' ? 75 : 45;
       const total = d + words * step + (role === 'photo' ? 2600 : role === 'lamp' ? 2200 : 1500);
+      if (role && REPLAY.has(role)) return; // такие роли остаются размеченными: им ещё появляться снова
       timers.push(
         window.setTimeout(() => {
           delete el.dataset.fx;
@@ -120,7 +134,16 @@ export default function useLandingFx() {
       },
       { rootMargin: '0px 0px -2% 0px', threshold: 0 },
     );
-    roles.forEach((el) => io.observe(el));
+    // повтор: появляется, как только край вошёл в экран, и закрывается, когда ушёл за край целиком
+    const replayIo = new IntersectionObserver((entries) =>
+      entries.forEach((e) => {
+        const el = e.target as HTMLElement;
+        if (e.isIntersecting) {
+          if (!('in' in el.dataset)) reveal(el, 0);
+        } else if ('in' in el.dataset) hideAgain(el);
+      }),
+    );
+    roles.forEach((el) => (REPLAY.has(el.dataset.fx || '') ? replayIo : io).observe(el));
 
     // ---- лучи по рамке главных карточек и свет по кругу на главной кнопке ----
     const loops = Array.from(document.querySelectorAll<HTMLElement>('[data-beam], [data-orbit]'));
@@ -170,6 +193,7 @@ export default function useLandingFx() {
 
     return () => {
       io.disconnect();
+      replayIo.disconnect();
       loopIo.disconnect();
       document.removeEventListener('pointermove', onMove);
       cancelAnimationFrame(raf);

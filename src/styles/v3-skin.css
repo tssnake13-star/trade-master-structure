@@ -293,7 +293,8 @@
 }
 .journal--trades .journal__row:hover { background: hsl(var(--card)); }
 .journal--trades .journal__row:focus-visible { outline: 2px solid var(--v3-ring); outline-offset: 2px; }
-.journal__thumb { grid-area: thumb; width: 72px; height: 44px; object-fit: cover; border-radius: 4px; filter: brightness(0.55) saturate(0.8); }
+.journal__thumb { grid-area: thumb; position: relative; display: block; overflow: hidden; width: 72px; height: 44px; border-radius: 4px; }
+.journal__thumb img { display: block; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.55) saturate(0.8); }
 .journal__date { grid-area: date; font-family: var(--font-ui); font-variant-numeric: tabular-nums; font-size: 14px; color: hsl(var(--muted-foreground)); }
 .journal__sym { grid-area: sym; font-family: var(--font-ui); font-weight: 600; color: hsl(var(--foreground)); }
 .journal__dir { margin-left: 8px; font-weight: 400; color: hsl(var(--muted-foreground)); }
@@ -472,7 +473,22 @@
 .smv { max-width: 48rem; margin: 0 auto; }
 .smv-caption { text-align: center; font-size: 15px; color: hsl(var(--muted-foreground)); margin: 0 0 14px; }
 .smv-caption span { color: hsl(var(--foreground)); font-weight: 500; }
-.smv-frame { position: relative; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: #000; border: 1px solid hsl(var(--border)); box-shadow: 0 30px 80px -45px hsl(var(--accent) / 0.45); }
+/* ореол за роликом дышит (23.10.2026, Сергей: «чтобы светилась… пульсировала… и так вот заметно»): янтарный
+   слой чуть меньше рамки, размытие выводит свет за её края. Слой не перерисовывается — меняются только
+   прозрачность и масштаб; шире рамки он не бывает, иначе на телефоне появилась бы прокрутка вбок. */
+.smv-stage { position: relative; isolation: isolate; }
+.smv-stage::before {
+  content: ''; position: absolute; inset: 5% 4%; z-index: -1; border-radius: 28px; pointer-events: none;
+  background: var(--v3-ring, #E9A54A);
+  filter: blur(36px);
+  opacity: 0.3; transform: scale(0.95);
+  animation: smvGlow 3.6s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+@keyframes smvGlow { 50% { opacity: 0.8; transform: scale(1.04); } }
+.smv-stage[data-state="playing"]::before { animation: none; opacity: 0.3; transform: scale(0.97); }
+@media (prefers-reduced-motion: reduce) { .smv-stage::before { animation: none; opacity: 0.7; } }
+.smv-frame { position: relative; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: #000; border: 1px solid hsl(var(--border)); }
 .smv-holder, .smv-holder > div, .smv-holder iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 .smv-cover { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; cursor: pointer; background: #000; z-index: 2; }
 .smv-cover img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.2,.7,.2,1), filter .4s; }
