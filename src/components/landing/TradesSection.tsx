@@ -137,7 +137,7 @@ const TradesSection = () => {
                       {trade.side}
                     </span>
                     <span
-                      className="font-['Bricolage_Grotesque'] tabular-nums"
+                      className="tabular-nums"
                       style={{ fontSize: 18, lineHeight: 1, color: 'hsl(var(--accent))' }}
                     >
                       {trade.result}
@@ -194,7 +194,7 @@ const TradesSection = () => {
                       {trade.side}
                     </span>
                     <span
-                      className="font-['Bricolage_Grotesque'] tabular-nums whitespace-nowrap"
+                      className="tabular-nums whitespace-nowrap"
                       style={{ fontSize: 16, lineHeight: 1, color: 'hsl(var(--accent))' }}
                     >
                       {trade.result}

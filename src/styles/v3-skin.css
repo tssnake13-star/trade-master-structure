@@ -1,26 +1,60 @@
 /* =====================================================================
-   V3 "editorial terminal" skin for the PRODUCTION landing ("/").
-   Applies the shared TRADELIKETYO Redesign v3 identity site-wide:
-   Cormorant display serif, Space Mono labels, sharp buttons, warm gold.
+   Облик главной ("/") — план «Облик TRADELIKETYO», шаг 2 (23.10.2026, Сергей: «Ставь»).
+   Два шрифта: Literata — заголовки и текст, Onest — кнопки, меню, цифры, подписи.
+   Цвета со снимка первого экрана: фон — тень комнаты, текст — тёплая «бумага», линии —
+   приглушённый пар, акцент — песочный «Допуск», янтарь кольца — только у главной кнопки.
    Scoped to .v3-skin so /school (the cabinet / counters) is untouched.
-   Original copy is preserved — this only restyles.
    ===================================================================== */
-@import url('https://fonts.googleapis.com/css2?family=Cormorant:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Syne:wght@400;500;600;700;800&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,400..700;1,7..72,400..600&family=Onest:wght@400..700&display=swap');
 
 .v3-skin {
-  --v3-bg:       oklch(0.09 0.012 70);
-  --v3-fg:       oklch(0.92 0.02 80);
-  --v3-mut:      oklch(0.62 0.02 75);
-  --v3-faint:    oklch(0.40 0.015 75);
-  --v3-gold:     oklch(0.82 0.14 72);
-  --v3-gold-dim: oklch(0.52 0.10 72);
-  --v3-line:     oklch(0.20 0.01 75);
-  --font-display: 'Cormorant', Georgia, 'Times New Roman', serif;
-  --font-ui:      'Syne', system-ui, sans-serif;
-  --font-mono:    'Space Mono', ui-monospace, monospace;
+  --v3-bg:       #140C05;   /* Комната — тень со снимка */
+  --v3-fg:       #EFE8DA;   /* Бумага */
+  --v3-mut:      #A59E92;
+  --v3-faint:    #6E665B;
+  --v3-gold:     #E9C793;   /* Допуск — как растущие свечи на мониторах */
+  --v3-gold-dim: #8C6A3D;
+  --v3-line:     #2E1C0C;   /* Пар, приглушённый до линии */
+  --v3-ring:     #E9A54A;   /* Кольцо — только главная кнопка */
+  --font-display: 'Literata', 'PT Serif', Georgia, 'Times New Roman', serif;
+  --font-ui:      'Onest', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  /* имя осталось от моноширинных подписей; с шага 2 подписи набраны Onest */
+  --font-mono:    'Onest', 'Segoe UI', system-ui, -apple-system, sans-serif;
 }
+/* те же цвета для токенов страницы (в index.css они холодные — для кабинета); основной текст — Literata */
+.v3-skin.landing-skin {
+  --background: 28 60% 5%;
+  --foreground: 40 42% 90%;
+  --card: 28 44% 8%;
+  --card-foreground: 40 42% 90%;
+  --popover: 28 44% 8%;
+  --popover-foreground: 40 42% 90%;
+  --primary: 40 42% 90%;
+  --primary-foreground: 28 60% 5%;
+  --secondary: 28 35% 10%;
+  --secondary-foreground: 38 12% 64%;
+  --muted: 28 35% 10%;
+  --muted-foreground: 38 12% 64%;
+  --accent: 36 66% 75%;
+  --accent-foreground: 28 60% 5%;
+  --accent-dim: 33 40% 36%;
+  --border: 28 50% 13%;
+  --input: 28 40% 16%;
+  --ring: 34 79% 60%;
+  font-family: var(--font-display);
+}
+html:has(.v3-skin.landing-skin),
+html:has(.v3-skin.landing-skin) body { background: #140C05; }
 
-/* ---- display headings → Cormorant (high specificity beats landing-skin) -- */
+/* главная кнопка «Попробовать 7 дней» — янтарь кольца, и только она */
+.v3-skin .cta-trial {
+  background: var(--v3-ring) !important;
+  color: var(--v3-bg) !important;
+  border-color: var(--v3-ring) !important;
+}
+.v3-skin .cta-trial:hover { background: #F2B964 !important; }
+
+/* ---- заголовки → Literata (high specificity beats landing-skin) -- */
 .v3-skin.landing-skin h1,
 .v3-skin.landing-skin h2,
 .v3-skin.landing-skin h3,
@@ -43,8 +77,12 @@
   color: inherit !important;
 }
 .v3-skin.landing-skin :is(h1, h2, h3) .mute { color: inherit; opacity: 1; }
+/* у Literata буквы крупнее, чем у прежнего Cormorant того же кегля, — заголовки на ступень меньше */
+.v3-skin.landing-skin h2,
+.v3-skin.landing-skin .heading-section { font-size: clamp(30px, 4.2vw, 56px) !important; line-height: 1.1 !important; }
+.v3-skin.landing-skin h3 { font-size: clamp(20px, 2vw, 28px); }
 
-/* ---- mono labels → Space Mono --------------------------------------- */
+/* ---- подписи → Onest ------------------------------------------------ */
 .v3-skin.landing-skin .section-label,
 .v3-skin.landing-skin .text-mono,
 .v3-skin.landing-skin .stat-label,
@@ -52,6 +90,11 @@
 .v3-skin.landing-skin header nav a {
   font-family: var(--font-mono) !important;
 }
+/* цифры, кнопки, меню — Onest (макет терминала .td со своим моноширинным не трогаем) */
+.v3-skin.landing-skin :is(.tabular-nums, .stat-number, .font-ui, .btn-primary, .btn-secondary, .v3h-btn, header a, nav[aria-label="Навигация по разделам"] a):not(.td *) {
+  font-family: var(--font-ui);
+}
+.v3-skin.landing-skin .lede { font-family: var(--font-display); }
 
 /* ---- sharp, decisive buttons (no radius) ---------------------------- */
 .v3-skin .btn-primary,
@@ -104,26 +147,26 @@
 /* Заголовок первого экрана — две строки, которые не переносятся внутри.
    Размер от ширины колонки, запас ~4%.
    Колонка: телефон 100vw−40px · планшет 100vw−79px · от 1024px 56% × (100vw−79px), макс. 609px.
-   11.10.2026 заголовок «Попробуйте мою систему, / не изучая её.» Замер в браузере
-   (Cormorant, с межбуквенным −0,015em, вторая строка курсивом): 10,47 em и 5,64 em.
-   Обе строки одного размера, его задаёт первая, она длиннее; вторая выделена золотым курсивом.
-   Прежний заголовок «Решение в выходные. / В будни только исполнение.»: 9,71 и 10,75 em. */
+   Заголовок «Попробуйте мою систему, / не изучая её.» (11.10.2026). Замер в браузере
+   (Literata 500, межбуквенный −0,015em, облик 23.10.2026): 12,92 em и 6,29 em.
+   Обе строки одного размера, его задаёт первая, она длиннее.
+   Прежде, в Cormorant: 10,47 и 5,64 em. */
 .v3h-h1 .v3h-line { display: block; white-space: nowrap; }
 .v3h-h1 .v3h-line1,
-.v3h-h1 .v3h-line2 { font-size: calc(9.17vw - 3.7px) !important; }
+.v3h-h1 .v3h-line2 { font-size: calc(7.45vw - 3px) !important; }
 .v3h-h1 .v3h-line2 { margin-top: 0.1em; }
 @media (min-width: 768px) {
   .v3h-h1 .v3h-line1,
-  .v3h-h1 .v3h-line2 { font-size: min(calc(9.17vw - 7.2px), 70.5px) !important; }
+  .v3h-h1 .v3h-line2 { font-size: min(calc(7.45vw - 5.9px), 57.2px) !important; }
 }
 @media (min-width: 1024px) {
   .v3h-h1 .v3h-line1,
-  .v3h-h1 .v3h-line2 { font-size: min(calc(5.13vw - 4.06px), 55.8px) !important; }
+  .v3h-h1 .v3h-line2 { font-size: min(calc(4.17vw - 3.3px), 45.3px) !important; }
 }
 
 .v3h-offer {
-  font-family: var(--font-ui);
-  font-size: clamp(20px, 2.2vw, 25px);
+  font-family: var(--font-display);
+  font-size: clamp(18px, 1.9vw, 22px);
   line-height: 1.5;
   color: var(--v3-mut);
   max-width: 46ch;
@@ -196,6 +239,8 @@
 /* Слои сцены первого экрана (HeroDeskScene): у каждого меняются только прозрачность
    и сдвиг — это работа видеокарты, без перерисовки (Сергей 22.10.2026: «60 кадров»). */
 .hd-scene { contain: layout paint; }
+/* виньетка сцены темнеет к цвету комнаты, а не к чёрному: сцена сливается со страницей */
+.hd-scene [data-dark] stop { stop-color: var(--v3-bg); }
 .hd-layer { position: absolute; inset: 0; width: 100%; height: 100%; display: block; will-change: transform, opacity; }
 
 /* Карточка терминала поверх сцены: «допуск» / «отказ» (HeroDeskScene, 22.10.2026) */
@@ -250,12 +295,12 @@
 /* =====================================================================
    Giant "thought" wordmark dividers between sections (kinetic on scroll).
    Reuses the WordmarkKinetic component (.pn-wordmark / .pn-wm-letter),
-   restyled here in Cormorant so it lives on the production landing too.
+   restyled here in the display face (Literata since 23.10.2026) so it lives on the production landing too.
    ===================================================================== */
 .v3-skin .pn-wordmark {
   font-family: var(--font-display);
   font-weight: 400;
-  font-size: clamp(58px, 14vw, 220px);
+  font-size: clamp(42px, 10.5vw, 168px);
   line-height: 0.9;
   letter-spacing: -0.03em;
   text-align: center;

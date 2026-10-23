@@ -75,7 +75,7 @@ const Header = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackClick('header_trial')}
-                className="inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-sm font-medium rounded-lg hover:bg-foreground/90 transition-all duration-200"
+                className="cta-trial inline-flex items-center gap-2 px-5 py-2.5 bg-foreground text-background text-sm font-medium rounded-lg hover:bg-foreground/90 transition-all duration-200"
               >
                 Попробовать 7 дней
               </a>
@@ -129,7 +129,7 @@ const Header = () => {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => { trackClick('header_trial'); setIsMobileMenuOpen(false); }}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background font-medium rounded-lg hover:bg-foreground/90 transition-all duration-200"
+              className="cta-trial inline-flex items-center gap-2 px-6 py-3 bg-foreground text-background font-medium rounded-lg hover:bg-foreground/90 transition-all duration-200"
             >
               Попробовать терминал 7 дней
             </a>

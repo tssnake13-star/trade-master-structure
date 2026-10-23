@@ -61,7 +61,7 @@ const SideNav = () => {
       // наезжали на левый край содержимого (07.10.2026, замер на 1600px: 268 против 249)
       className="hidden min-[1680px]:flex fixed left-8 top-1/2 -translate-y-1/2 z-40 flex-col gap-2.5"
       style={{
-        fontFamily: "'Martian Mono', ui-monospace, monospace",
+        fontFamily: 'var(--font-ui)',
         opacity: pastHero ? 1 : 0,
         pointerEvents: pastHero ? 'auto' : 'none',
         transition: 'opacity 0.4s ease',

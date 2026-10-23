@@ -59,7 +59,7 @@ const D_DUST = 0.7;
 const MAX_OFF = 40;
 const ZOOM0 = 0.28;
 // тень комнаты со снимка (#140C05, облик 23.10.2026): до неё поднимается чёрный снимка, и сцена сливается
-// со страницей того же цвета. Включается стилем: фильтр у фото и --hd-lift: 1 у сцены (для 3D)
+// со страницей того же цвета: SVG-фильтр hd-lift-… у фото, в 3D — шейдер (heroDepth.ts)
 const LIFT = [20, 12, 5];
 
 // инструменты в карточках — только то, что Сергей разбирает (нефть он не торгует)
@@ -142,9 +142,8 @@ export default function HeroDeskScene({ variant, className }: Props) {
     if (!cx || !rc || !fx || !hz) return;
 
     // проба 3D: включается адресом с ?3d, обычные посетители видят прежнюю сцену
-    const lifted = getComputedStyle(el).getPropertyValue('--hd-lift').trim() === '1';
     const depth = new URLSearchParams(window.location.search).has('3d')
-      ? createDepthPhoto(photo3d, deskImg, depthUrl, lifted ? [LIFT[0] / 255, LIFT[1] / 255, LIFT[2] / 255] : [0, 0, 0])
+      ? createDepthPhoto(photo3d, deskImg, depthUrl, [LIFT[0] / 255, LIFT[1] / 255, LIFT[2] / 255])
       : null;
     let use3d = false;
     depth?.whenReady.then(() => {
@@ -520,7 +519,7 @@ export default function HeroDeskScene({ variant, className }: Props) {
       <div data-zoom className="hd-layer" style={{ transform: 'scale(1.14)' }}>
         <div data-back className="hd-layer">
           <svg data-photo {...svgProps}>
-            {/* подъём теней до цвета страницы: фильтр подключает стиль (url(#hd-lift-…)) */}
+            {/* подъём теней до цвета страницы: чёрный снимка становится цветом комнаты */}
             <defs>
               <filter id={`hd-lift-${variant}`} colorInterpolationFilters="sRGB">
                 <feComponentTransfer>
@@ -530,7 +529,7 @@ export default function HeroDeskScene({ variant, className }: Props) {
                 </feComponentTransfer>
               </filter>
             </defs>
-            <image href={deskImg} width="1672" height="941" />
+            <image href={deskImg} width="1672" height="941" filter={`url(#hd-lift-${variant})`} />
           </svg>
           {/* проба 3D (адрес с ?3d): то же фото через WebGL по карте глубины */}
           <canvas data-photo3d className="hd-layer" style={{ display: 'none' }} />
@@ -557,7 +556,7 @@ export default function HeroDeskScene({ variant, className }: Props) {
             </defs>
             <rect x="0" y="0" width="1672" height="941" fill={`url(#hd-lamp-${variant})`} />
           </svg>
-          <div data-dark2 className="hd-layer" style={{ background: '#000', opacity: 0.78 }} />
+          <div data-dark2 className="hd-layer" style={{ background: 'var(--v3-bg)', opacity: 0.78 }} />
           <svg data-rim {...svgProps}>
             <defs><filter id={`hd-soft-${variant}`}><feGaussianBlur stdDeviation="2.2" /></filter></defs>
             <g fill="none" stroke="#e9a54a" strokeWidth="2.4" filter={`url(#hd-soft-${variant})`}>

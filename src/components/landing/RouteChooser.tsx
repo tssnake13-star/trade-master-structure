@@ -27,7 +27,7 @@ import Words from '@/components/fx/Words';
 const GOLD = 'hsl(var(--accent))';
 const COOL = 'hsl(var(--cool))';
 const MONO: React.CSSProperties = { fontSize: 12.5, letterSpacing: '0.01em' };
-const SERIF: React.CSSProperties = { fontFamily: "'Cormorant', serif", fontWeight: 500 };
+const SERIF: React.CSSProperties = { fontFamily: 'var(--font-display)', fontWeight: 500 };
 
 // Что получает подписчик: вердикт сразу — главная разница с пробным доступом, где журнал идёт с задержкой в 3 дня
 const ECHO_POINTS = [
@@ -128,7 +128,7 @@ export default function RouteChooser({
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackClick(`${clickPrefix}_route_trial`)}
-              className="btn-primary group inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium"
+              className="cta-trial btn-primary group inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium"
             >
               Попробовать 7 дней
             </a>

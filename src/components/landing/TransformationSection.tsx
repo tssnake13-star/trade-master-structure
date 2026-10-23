@@ -100,10 +100,10 @@ const TransformationSection = () => {
           {WEEK.map((w, i) => (
             <div key={w.title} className="td-step border border-border rounded-xl bg-card p-5 md:p-6">
               <span className="td-step-bar" aria-hidden="true" />
-              <div className="font-['Martian_Mono'] text-[12.5px] tracking-[0.01em]" style={{ color: ACCENT }}>
+              <div className="font-ui text-[12.5px] tracking-[0.01em]" style={{ color: ACCENT }}>
                 {i + 1}. {w.when}
               </div>
-              <div className="font-['Bricolage_Grotesque'] text-2xl mt-3 text-foreground">{w.title}</div>
+              <div className="text-2xl mt-3 text-foreground">{w.title}</div>
               <p className="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">{w.text}</p>
             </div>
           ))}
@@ -164,7 +164,7 @@ const TransformationSection = () => {
             Два пути, один алгоритм
           </span>
           {/* 11.10.2026: первым идёт подписка, школа вторым путём для тех, кто захочет глубже */}
-          <p className="font-['Bricolage_Grotesque'] text-3xl md:text-5xl leading-[1.12] tracking-tight text-foreground">
+          <p className="text-3xl md:text-5xl leading-[1.12] tracking-tight text-foreground">
             ECHO-GATE INSIDE считает рынок за вас:
             от вас 2 действия.
             <br className="hidden md:block" />{' '}

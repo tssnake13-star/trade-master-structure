@@ -47,7 +47,7 @@ const CoreProblemSection = () => {
           {errors.map((e) => (
             <div key={e.n} className="border border-border rounded-xl bg-card p-5">
               {/* без номера: три разных ошибки, а не шаги по порядку (облик, 23.10.2026) */}
-              <div className="font-['Bricolage_Grotesque'] text-xl text-foreground">{e.t}</div>
+              <div className="text-xl text-foreground">{e.t}</div>
               <p className="mt-2 text-sm text-muted-foreground">{e.d}</p>
             </div>
           ))}

@@ -30,19 +30,19 @@ const SystemStatsSection = () => {
               key={s.l}
               className={`border border-border rounded-xl bg-card p-5 ${i === stats.length - 1 ? 'col-span-2 lg:col-span-1' : ''}`}
             >
-              <div className="font-['Bricolage_Grotesque'] text-3xl md:text-4xl tracking-tight tabular-nums text-foreground">{s.n}</div>
-              <div className="font-['Martian_Mono'] text-[12.5px] tracking-[0.01em] text-muted-foreground mt-2">{s.l}</div>
+              <div className="text-3xl md:text-4xl tracking-tight tabular-nums text-foreground">{s.n}</div>
+              <div className="font-ui text-[12.5px] tracking-[0.01em] text-muted-foreground mt-2">{s.l}</div>
             </div>
           ))}
         </div>
 
         <div className="mt-3 grid md:grid-cols-2 gap-3">
           <div className="border border-border rounded-xl bg-card p-5">
-            <div className="font-['Martian_Mono'] text-[12.5px] tracking-[0.01em]" style={{ color: 'hsl(var(--accent))' }}>Win Rate 23,5% при R:R 9,5:1</div>
+            <div className="font-ui text-[12.5px] tracking-[0.01em]" style={{ color: 'hsl(var(--accent))' }}>Win Rate 23,5% при R:R 9,5:1</div>
             <p className="mt-2 text-sm text-muted-foreground">Точка безубытка около 9,5%: при +9,5 R на прибыльную сделку и −1 R на стоп хватает одной прибыльной из десяти с половиной. Важно не как часто вы правы, а сколько берёте, когда правы.</p>
           </div>
           <div className="border border-border rounded-xl bg-card p-5">
-            <div className="font-['Martian_Mono'] text-[12.5px] tracking-[0.01em]" style={{ color: 'hsl(var(--accent))' }}>Profit Factor 2,92</div>
+            <div className="font-ui text-[12.5px] tracking-[0.01em]" style={{ color: 'hsl(var(--accent))' }}>Profit Factor 2,92</div>
             <p className="mt-2 text-sm text-muted-foreground">На каждый потерянный $1 система возвращает $2,92. Результат на фиксированном риске — не «разгон депозита», а устойчивая работа.</p>
           </div>
         </div>

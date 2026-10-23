@@ -51,14 +51,14 @@ const FourQuestionsSection = () => {
           {questions.map((q) => (
             <div key={q.n} className="border border-border rounded-xl bg-card p-6 flex gap-4">
               <div
-                className="font-['Martian_Mono'] text-sm tabular-nums flex-shrink-0"
+                className="font-ui text-sm tabular-nums flex-shrink-0"
                 style={{ color: 'hsl(var(--accent))' }}
               >
                 {/* четыре вопроса идут по порядку, номер остаётся (без нуля впереди, облик 23.10.2026) */}
                 {q.n}
               </div>
               <div>
-                <div className="font-['Bricolage_Grotesque'] text-xl md:text-2xl text-foreground">
+                <div className="text-xl md:text-2xl text-foreground">
                   {q.title}
                 </div>
                 <p className="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">

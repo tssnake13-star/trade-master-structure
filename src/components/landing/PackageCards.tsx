@@ -173,7 +173,7 @@ const PACKAGES: Pkg[] = [
 
 const GOLD = 'hsl(var(--accent))';
 const MONO: React.CSSProperties = { fontSize: 12.5, letterSpacing: '0.01em' };
-const SERIF: React.CSSProperties = { fontFamily: "'Cormorant', serif", fontWeight: 500 };
+const SERIF: React.CSSProperties = { fontFamily: 'var(--font-display)', fontWeight: 500 };
 
 export default function PackageCards({
   showPrices,
@@ -402,7 +402,7 @@ export default function PackageCards({
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackClick('package_echo_gate_trial')}
-            className="btn-secondary inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium group"
+            className="cta-trial btn-secondary inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium group"
           >
             Попробовать 7 дней
           </a>

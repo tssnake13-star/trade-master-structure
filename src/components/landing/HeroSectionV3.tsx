@@ -149,7 +149,7 @@ export default function HeroSectionV3() {
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-4">
-            <a href={TELEGRAM_LINKS.trial} target="_blank" rel="noopener noreferrer" className="v3h-btn v3h-btn--solid" data-orbit="" onClick={() => trackClick('hero_trial')}>
+            <a href={TELEGRAM_LINKS.trial} target="_blank" rel="noopener noreferrer" className="cta-trial v3h-btn v3h-btn--solid" data-orbit="" onClick={() => trackClick('hero_trial')}>
               {/* на телефоне полная надпись переносится на две строки — там короче */}
               <span className="hidden sm:inline">Попробовать терминал 7 дней</span>
               <span className="sm:hidden">Попробовать 7 дней</span>
