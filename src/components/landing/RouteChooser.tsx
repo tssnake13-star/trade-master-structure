@@ -4,6 +4,7 @@ import { trackClick } from '@/lib/analytics';
 import { nextStreamLabel } from '@/lib/practicum';
 import { STUDY_PRICES } from '@/lib/prices';
 import Words from '@/components/fx/Words';
+import { v2 } from '@/lib/lookV2';
 
 /**
  * Верхний этаж блока цен (08.10.2026): на /access наверху страницы, на лендинге в «12 · Сотрудничество».
@@ -107,7 +108,7 @@ export default function RouteChooser({
           className="flex flex-col p-6 md:p-8"
           style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--accent) / 0.45)' }}
         >
-          <span className="text-mono" style={{ ...MONO, color: GOLD }}>Путь 01</span>
+          <span className="text-mono" style={{ ...MONO, color: GOLD }}>{v2('Путь 01', 'Путь 1')}</span>
           <span className="mt-2 text-lg text-foreground leading-snug">Хочу торговать по системе, не изучая её целиком</span>
           <span className="mt-4 text-foreground" style={{ ...SERIF, fontSize: 30, lineHeight: 1.05 }}>ECHO-GATE INSIDE</span>
           <ul className="mt-4 grid gap-2">
@@ -147,7 +148,7 @@ export default function RouteChooser({
 
         {/* Путь 02 — обучение: тише, три ступени внутри */}
         <div className="flex flex-col p-6 md:p-7" style={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))' }}>
-          <span className="text-mono" style={{ ...MONO, color: COOL }}>Путь 02</span>
+          <span className="text-mono" style={{ ...MONO, color: COOL }}>{v2('Путь 02', 'Путь 2')}</span>
           <span className="mt-2 text-base text-foreground/90 leading-snug">Хочу изучить систему и решать сам</span>
           <span className="mt-4 text-foreground" style={{ ...SERIF, fontSize: 24, lineHeight: 1.05 }}>Обучение</span>
           <div className="mt-4 grid">
@@ -179,7 +180,7 @@ export default function RouteChooser({
       </div>
 
       <p className="mt-5 text-sm text-muted-foreground">
-        Не знаете, что выбрать? Пришлите сделку: ВЕРДИКТ бесплатно, и я скажу, какой путь ваш ·{' '}
+        Не знаете, что выбрать? Пришлите сделку: ВЕРДИКТ бесплатно, и я скажу, какой путь ваш{v2(' ·', '.')}{' '}
         <a
           href={TELEGRAM_LINKS.razbor}
           target="_blank"
@@ -187,7 +188,7 @@ export default function RouteChooser({
           onClick={() => trackClick(`${clickPrefix}_chooser_razbor`)}
           className="inline-flex items-center gap-1 underline underline-offset-2 hover:text-foreground transition-colors"
         >
-          прислать сделку <ArrowRight className="w-3.5 h-3.5" />
+          {v2('прислать сделку', 'Прислать сделку')} <ArrowRight className="w-3.5 h-3.5" />
         </a>
       </p>
     </div>

@@ -37,7 +37,7 @@ const TickerRow = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (
           {pair}
         </span>
         <span
-          className="text-mono"
+          className="text-mono tick-sep"
           style={{
             fontSize: 12,
             color: 'hsl(var(--muted-foreground))',

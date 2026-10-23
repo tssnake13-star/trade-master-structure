@@ -3,6 +3,7 @@ import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
 import StructureField from '@/components/landing/StructureField';
 import HeroDeskScene from '@/components/landing/HeroDeskScene';
+import { v2 } from '@/lib/lookV2';
 
 /**
  * HeroSectionV3 — первый экран лендинга в стиле v3 «editorial terminal».
@@ -106,7 +107,7 @@ export default function HeroSectionV3() {
       <div className="container-landing relative w-full" style={{ zIndex: 2 }}>
         <div className="w-full v3h-split-text">
           <div className="v3h-eyebrow v3h-mono mb-7">
-            <span className="dot" /> Свинг-трейдинг · W1 · D1 · H4
+            <span className="dot" /> {v2('Свинг-трейдинг · W1 · D1 · H4', 'Свинг-трейдинг на W1, D1 и H4')}
           </div>
 
           <h1 className="v3h-h1">
@@ -165,7 +166,7 @@ export default function HeroSectionV3() {
 
           {/* что будет после клика */}
           <p className="v3h-mono mt-6" style={{ ...MONO_SMALL, opacity: 0.55 }}>
-            4 вопроса в Telegram · потом 7 дней бесплатно
+            {v2('4 вопроса в Telegram · потом 7 дней бесплатно', 'Сначала 4 вопроса в Telegram, потом 7 дней бесплатно')}
           </p>
 
           {/* ранний сигнал доверия — факты из журнала, якорь к результатам */}
@@ -174,7 +175,7 @@ export default function HeroSectionV3() {
             className="v3h-mono mt-3 inline-flex items-center gap-1.5 opacity-70 hover:opacity-100 transition-opacity"
             style={{ fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase' }}
           >
-            15 лет в рынке · 387 сделок в журнале за 21 месяц
+            {v2('15 лет в рынке · 387 сделок в журнале за 21 месяц', '15 лет в рынке, 387 сделок в журнале за 21 месяц')}
             <ArrowRight className="arr w-3 h-3" />
           </a>
         </div>

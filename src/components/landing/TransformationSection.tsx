@@ -23,20 +23,25 @@
 import { useCallback, useRef } from 'react';
 import TerminalDemo from './TerminalDemo';
 import Words from '@/components/fx/Words';
+import { v2 } from '@/lib/lookV2';
 
+// when2 — подпись шага в пробе облика (?v2): без точек-разделителей
 const WEEK = [
   {
     when: 'Терминал · каждый день',
+    when2: 'Терминал, каждый день',
     title: 'Находит сделку',
     text: 'Считает рынок по правилам алгоритма и даёт допуск или отказ. Мой вердикт с причиной приходит сразу: в терминал и в Telegram.',
   },
   {
     when: 'От вас · 2 действия',
+    when2: 'Ваши 2 действия',
     title: 'Точка входа и СТАРТ',
     text: 'Отмечаете точку входа и нажимаете СТАРТ в советнике. Где ставить точку входа, объясняет один урок.',
   },
   {
     when: 'Сделка · живёт днями',
+    when2: 'Сделка живёт днями',
     title: 'Исполнение',
     text: 'Советник входит, ставит стоп и тейк, переводит в безубыток. Лимиты держит Risk Sentinel, следить за каждым движением не нужно.',
   },
@@ -102,7 +107,7 @@ const TransformationSection = () => {
             <div key={w.title} className="td-step border border-border rounded-xl bg-card p-5 md:p-6">
               <span className="td-step-bar" aria-hidden="true" />
               <div className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: ACCENT }}>
-                0{i + 1} · {w.when}
+                {v2(`0${i + 1} · ${w.when}`, `${i + 1}. ${w.when2}`)}
               </div>
               <div className="font-['Bricolage_Grotesque'] text-2xl mt-3 text-foreground">{w.title}</div>
               <p className="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">{w.text}</p>
@@ -166,10 +171,10 @@ const TransformationSection = () => {
           </span>
           {/* 11.10.2026: первым идёт подписка, школа вторым путём для тех, кто захочет глубже */}
           <p className="font-['Bricolage_Grotesque'] text-3xl md:text-5xl leading-[1.12] tracking-tight text-foreground">
-            ECHO-GATE INSIDE <em className="not-italic" style={{ color: ACCENT }}>считает</em> рынок за вас:
+            ECHO-GATE INSIDE <em className="not-italic" style={v2({ color: ACCENT }, undefined)}>считает</em> рынок за вас:
             от вас 2 действия.
             <br className="hidden md:block" />{' '}
-            Захотите решать сами, школа этому <em className="not-italic" style={{ color: ACCENT }}>научит</em>.
+            Захотите решать сами, школа этому <em className="not-italic" style={v2({ color: ACCENT }, undefined)}>научит</em>.
           </p>
         </div>
       </div>

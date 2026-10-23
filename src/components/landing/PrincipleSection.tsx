@@ -1,4 +1,5 @@
 import Words from '@/components/fx/Words';
+import { v2 } from '@/lib/lookV2';
 
 const PrincipleSection = () => {
   return (
@@ -10,7 +11,7 @@ const PrincipleSection = () => {
               снят в тот же день, Сергей: «желтая какая-то рамка… портит весь вид» */}
           <p data-fx="quote" className="font-['Bricolage_Grotesque'] text-2xl md:text-4xl leading-tight tracking-tight text-foreground">
             <Words>
-              Профессионал отличается не анализом. А тем, что <em className="not-italic" style={{ color: 'hsl(var(--accent))' }}>умеет остановиться</em>. Когда система говорит «нет» — он не входит.
+              Профессионал отличается не анализом. А тем, что <em className="not-italic" style={v2({ color: 'hsl(var(--accent))' }, undefined)}>умеет остановиться</em>. Когда система говорит «нет» — он не входит.
             </Words>
           </p>
         </div>

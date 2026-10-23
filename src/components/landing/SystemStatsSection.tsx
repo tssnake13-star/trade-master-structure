@@ -1,8 +1,9 @@
 import Words from '@/components/fx/Words';
+import { v2 } from '@/lib/lookV2';
 // Срез таблицы «TLT_Statement_2025-2026» (январь 2025 — сентябрь 2026), обновлено 04.10.2026.
 // Обновлять только отсюда.
 const stats = [
-  { n: '+136,0%', l: 'доходность · 21 мес' },
+  { n: '+136,0%', l: v2('доходность · 21 мес', 'доходность за 21 мес') },
   { n: '2,92', l: 'profit factor' },
   { n: '−2,23%', l: 'макс. просадка' },
   { n: '18/21', l: 'прибыльных месяцев' },
@@ -39,7 +40,7 @@ const SystemStatsSection = () => {
 
         <div className="mt-3 grid md:grid-cols-2 gap-3">
           <div className="border border-border rounded-xl bg-card p-5">
-            <div className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--accent))' }}>Win Rate 23,5% · R:R 9,5:1</div>
+            <div className="font-['Martian_Mono'] text-[10px] uppercase tracking-[0.18em]" style={{ color: 'hsl(var(--accent))' }}>{v2('Win Rate 23,5% · R:R 9,5:1', 'Win Rate 23,5% при R:R 9,5:1')}</div>
             <p className="mt-2 text-sm text-muted-foreground">Точка безубытка около 9,5%: при +9,5 R на прибыльную сделку и −1 R на стоп хватает одной прибыльной из десяти с половиной. Важно не как часто вы правы, а сколько берёте, когда правы.</p>
           </div>
           <div className="border border-border rounded-xl bg-card p-5">

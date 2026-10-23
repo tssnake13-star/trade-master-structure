@@ -1,4 +1,5 @@
 import Words from '@/components/fx/Words';
+import { v2 } from '@/lib/lookV2';
 /**
  * FourQuestionsSection — «08 · Четыре вопроса».
  *
@@ -55,7 +56,8 @@ const FourQuestionsSection = () => {
                 className="font-['Martian_Mono'] text-sm tabular-nums flex-shrink-0"
                 style={{ color: 'hsl(var(--accent))' }}
               >
-                {q.n}
+                {/* четыре вопроса идут по порядку, номер остаётся; в пробе облика (?v2) без нуля впереди */}
+                {v2(q.n, String(Number(q.n)))}
               </div>
               <div>
                 <div className="font-['Bricolage_Grotesque'] text-xl md:text-2xl text-foreground">

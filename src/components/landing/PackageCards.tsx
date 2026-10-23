@@ -3,6 +3,7 @@ import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
 import { nextStreamLabel } from '@/lib/practicum';
 import { ECOSYSTEM, STUDY_PRICES } from '@/lib/prices';
+import { v2 } from '@/lib/lookV2';
 
 /**
  * PackageCards — shared package/pricing cards used on the homepage and on the /access page.
@@ -64,7 +65,7 @@ type Pkg = {
 
 const PACKAGES: Pkg[] = [
   {
-    tag: 'Путь 02 · самостоятельно',
+    tag: v2('Путь 02 · самостоятельно', 'Путь 2: самостоятельно'),
     name: 'Trade System',
     clickId: 'trade_system',
     subtitle: 'Полностью самостоятельный',
@@ -103,7 +104,7 @@ const PACKAGES: Pkg[] = [
     showPriceAlways: true,
   },
   {
-    tag: 'Путь 02 · вместе со мной',
+    tag: v2('Путь 02 · вместе со мной', 'Путь 2: вместе со мной'),
     name: 'Trade Master Practicum',
     clickId: 'practicum',
     subtitle: '60 дней работы со мной',
@@ -336,7 +337,7 @@ export default function PackageCards({
 
       {/* путь 01 — подписка для всех, главный продукт */}
       <div id="echo-gate" data-beam="" data-fx="card" className="mb-3 p-6 md:p-7" style={{ background: 'radial-gradient(120% 80% at 50% 0%, hsl(var(--accent) / 0.08), hsl(var(--card)) 60%)', border: '1px solid hsl(var(--accent) / 0.45)' }}>
-        <div className="text-mono" style={{ ...MONO, color: GOLD }}>Путь 01 · подписка для всех</div>
+        <div className="text-mono" style={{ ...MONO, color: GOLD }}>{v2('Путь 01 · подписка для всех', 'Путь 1: подписка для всех')}</div>
         <h3 className="mt-2 text-foreground" style={{ fontSize: 28, lineHeight: 1.05 }}>ECHO-GATE INSIDE</h3>
         <p className="mt-3 text-sm md:text-base text-muted-foreground" style={{ maxWidth: '72ch' }}>
           Для тех, кто хочет торговать по системе, не изучая её целиком. Терминал в личном кабинете считает рынок

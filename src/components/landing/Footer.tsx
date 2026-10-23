@@ -1,6 +1,7 @@
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { Link } from 'react-router-dom';
 import FooterWordmark from '@/components/fx/FooterWordmark';
+import { v2 } from '@/lib/lookV2';
 
 const Footer = () => {
   return (
@@ -43,7 +44,7 @@ const Footer = () => {
             to="/school"
             className="inline-block text-sm text-muted-foreground/60 hover:text-foreground transition-colors mb-4"
           >
-            Уже в системе? Войти в школу →
+            {v2('Уже в системе? Войти в школу →', 'Уже в системе? Войти в школу')}
           </Link>
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} TRADELIKETYO. Все права защищены.

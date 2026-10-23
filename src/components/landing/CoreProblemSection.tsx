@@ -1,4 +1,5 @@
 import Words from '@/components/fx/Words';
+import { v2 } from '@/lib/lookV2';
 /**
  * CoreProblemSection — «01 · Проблема».
  *
@@ -47,8 +48,9 @@ const CoreProblemSection = () => {
         <div className="mt-10 grid md:grid-cols-3 gap-3">
           {errors.map((e) => (
             <div key={e.n} className="border border-border rounded-xl bg-card p-5">
-              <div className="font-['Martian_Mono'] text-[11px] tracking-[0.2em]" style={{ color: ACCENT }}>{e.n}</div>
-              <div className="font-['Bricolage_Grotesque'] text-xl mt-2 text-foreground">{e.t}</div>
+              {/* в пробе облика (?v2) без номера: три разных ошибки, а не шаги по порядку */}
+              {v2(<div className="font-['Martian_Mono'] text-[11px] tracking-[0.2em]" style={{ color: ACCENT }}>{e.n}</div>, null)}
+              <div className={`font-['Bricolage_Grotesque'] text-xl ${v2('mt-2', '')} text-foreground`}>{e.t}</div>
               <p className="mt-2 text-sm text-muted-foreground">{e.d}</p>
             </div>
           ))}

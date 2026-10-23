@@ -2,6 +2,7 @@ import { TELEGRAM_LINKS } from '@/lib/constants';
 import PackageCards from './PackageCards';
 import RouteChooser from './RouteChooser';
 import SchoolMapVideo from './SchoolMapVideo';
+import { v2 } from '@/lib/lookV2';
 
 /**
  * «09 · Сотрудничество» (до 11.10.2026 — 12) — линейка «вход и два пути» (Сергей 07.10.2026).
@@ -29,9 +30,9 @@ const LevelsSection = () => {
           <SchoolMapVideo />
         </div>
         <p className="mt-8 md:mt-10 text-center text-sm text-muted-foreground">
-          Каждую заявку разбираю лично. Если вам ко мне пока рано, скажу прямо ·{' '}
+          Каждую заявку разбираю лично. Если вам ко мне пока рано, скажу прямо{v2(' ·', '.')}{' '}
           <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground transition-colors">
-            задать вопрос Сергею
+            {v2('задать вопрос Сергею', 'Задать вопрос Сергею')}
           </a>
         </p>
       </div>
