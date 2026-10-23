@@ -82,10 +82,7 @@ export default function HeroSectionV3() {
         <HeroDeskScene variant="wide" className="w-full h-full" />
       </div>
 
-      {/* HUD corner code (в раскладке стопкой на этом месте лежат фото и логотип) */}
-      <div className="v3h-hud v3h-split-hud absolute" style={{ top: 22, left: 22, zIndex: 3, lineHeight: 1.5 }}>
-        8V8<br />01
-      </div>
+      {/* код «8V8 01» в левом верхнем углу снят 23.10.2026 (Сергей: «зачем они здесь вообще? какое-то техническое название») */}
 
       {/* фото для телефона и планшета.
           На телефоне высота прежняя, 38vh: кнопка должна остаться близко к первому экрану,
@@ -149,7 +146,7 @@ export default function HeroSectionV3() {
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-4">
-            <a href={TELEGRAM_LINKS.trial} target="_blank" rel="noopener noreferrer" className="cta-trial v3h-btn v3h-btn--solid" onClick={() => trackClick('hero_trial')}>
+            <a href={TELEGRAM_LINKS.trial} target="_blank" rel="noopener noreferrer" className="cta-trial v3h-btn v3h-btn--solid" data-orbit="" onClick={() => trackClick('hero_trial')}>
               {/* на телефоне полная надпись переносится на две строки — там короче */}
               <span className="hidden sm:inline">Попробовать терминал 7 дней</span>
               <span className="sm:hidden">Попробовать 7 дней</span>

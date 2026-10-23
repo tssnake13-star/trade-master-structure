@@ -1,3 +1,4 @@
+import Words from '@/components/fx/Words';
 import Verdict from './Verdict';
 /**
  * FourQuestionsSection — «08 · Четыре вопроса».
@@ -35,11 +36,11 @@ const questions = [
 
 const FourQuestionsSection = () => {
   return (
-    <section id="questions" className="py-12 md:py-20">
+    <section id="questions" className="section-animate py-12 md:py-20">
       <div className="container-landing">
         <div className="max-w-3xl">
           <h2 className="text-foreground">
-            Сделка проходит 4 вопроса. <em>Иначе её нет.</em>
+            <Words>Сделка проходит 4 вопроса. <em>Иначе её нет.</em></Words>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
             Система отвечает на четыре вопроса любой сделки. Одинаково — в понедельник утром

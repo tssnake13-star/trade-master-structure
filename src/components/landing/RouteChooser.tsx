@@ -2,6 +2,7 @@ import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
 import { nextStreamLabel } from '@/lib/practicum';
 import { STUDY_PRICES } from '@/lib/prices';
+import Words from '@/components/fx/Words';
 
 /**
  * Верхний этаж блока цен (08.10.2026): на /access наверху страницы, на лендинге в «12 · Сотрудничество».
@@ -75,12 +76,15 @@ export default function RouteChooser({
   const stream = nextStreamLabel();
   const Sub = heading === 'h1' ? 'h2' : 'h3';
   // 20.10.2026: подписку можно начать с первого месяца за $199 (решение Сергея), с зачётом в 3 месяца
-  const echoPrice = showPrices ? { price: 'от $199', per: 'первый месяц' } : { price: '7 дней', per: 'бесплатно, после 4 вопросов' };
+  // 23.10.2026: «бесплатно» крупно и цветом кнопки «Попробовать» (Сергей: «бесплатно слово не выделяется»)
+  const echoPrice = showPrices
+    ? { price: 'от $199', free: '', per: 'первый месяц' }
+    : { price: '7 дней', free: 'бесплатно', per: 'после 4 вопросов' };
   return (
     <div>
       {kicker && <span className="section-label" style={{ color: LABEL }}>{kicker}</span>}
       <Title className="text-foreground" style={{ fontSize: 'clamp(36px, 5vw, 66px)', lineHeight: 1, maxWidth: '20ch' }}>
-        Никогда ещё трейдинг <em>не был так прост</em>
+        <Words>Никогда ещё трейдинг <em>не был так прост</em></Words>
       </Title>
       {/* честная строка обязательна рядом со слоганом (оффер, раздел 8) */}
       <p className="mt-4 text-sm md:text-base" style={{ color: MUTED }}>
@@ -118,8 +122,11 @@ export default function RouteChooser({
             ))}
           </ul>
           <span className="flex-grow" />
-          <span className="mt-6 flex items-baseline gap-2">
-            <span style={{ ...SERIF, fontSize: 38, lineHeight: 1, color: 'hsl(var(--foreground))' }}>{echoPrice.price}</span>
+          <span className="mt-6 flex flex-wrap items-baseline gap-x-2 gap-y-1">
+            <span style={{ ...SERIF, fontSize: 'clamp(30px, 8vw, 38px)', lineHeight: 1, color: 'hsl(var(--foreground))' }}>
+              {echoPrice.price}
+              {echoPrice.free && <> <span style={{ color: 'var(--v3-ring, #E9A54A)' }}>{echoPrice.free}</span></>}
+            </span>
             <span className="text-mono" style={{ ...MONO, color: 'hsl(var(--muted-foreground))' }}>{echoPrice.per}</span>
           </span>
           <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">

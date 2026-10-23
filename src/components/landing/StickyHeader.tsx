@@ -27,6 +27,7 @@ const StickyHeader = () => {
           rel="noopener noreferrer"
           onClick={() => trackClick('sticky_trial')}
           className="cta-trial flex items-center justify-center gap-3 w-full py-2.5 bg-foreground text-background font-semibold rounded-lg hover:bg-foreground/90 transition-colors"
+          style={{ animation: 'ctaGlow 2s ease-in-out infinite' }}
         >
           {/* 08.10.2026 «бинокль впереди»: кнопка зовёт в 7 дней терминала. Ведёт через бота
               (?start=trial), чтобы человек остался в базе; бот присылает регистрацию.

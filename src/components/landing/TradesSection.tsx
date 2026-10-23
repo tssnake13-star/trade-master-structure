@@ -13,6 +13,7 @@ import gbpAudImg from '@/assets/trades/gbp-aud-31-08-2026.jpg';
 import cadJpyImg from '@/assets/trades/cad-jpy-18-09-2026.jpg';
 import nzdUsdImg from '@/assets/trades/nzd-usd-22-09-2026.jpg';
 import usdChfImg from '@/assets/trades/usd-chf-22-09-2026.jpg';
+import Words from '@/components/fx/Words';
 import Verdict from './Verdict';
 
 /**
@@ -54,11 +55,11 @@ const TradesSection = () => {
   const [selectedTrade, setSelectedTrade] = useState<typeof trades[0] | null>(null);
 
   return (
-    <section id="trades" className="py-12 md:py-20">
+    <section id="trades" className="py-12 md:py-20 section-animate">
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="text-foreground">
-            Каждая из этих сделок <em>сначала получила допуск</em>
+            <Words>Каждая из этих сделок <em>сначала получила допуск</em></Words>
           </h2>
           
           <p className="mt-4 text-base md:text-lg text-muted-foreground">

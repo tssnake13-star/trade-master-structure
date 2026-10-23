@@ -427,6 +427,15 @@
   animation-duration: 1.5s;
 }
 
+/* Instrument ticker — infinite right-to-left scroll */
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.ticker-track {
+  animation: ticker-scroll 40s linear infinite;
+  will-change: transform;
+}
 
 /* =====================================================
    REDESIGN UTILITIES

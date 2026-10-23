@@ -1,16 +1,241 @@
 /* ==========================================================================
-   Большая надпись TRADELIKETYO в подвале (FooterWordmark, 23.10.2026, по мотивам Aceternity «Text Hover Effect»).
+   Апгрейд анимации главной (23.10.2026)
+   Сергей: «полный апгрейд сайта по анимации, чтобы анимация была дорогая, выглядела дорого,
+   с эффектом вау».
 
-   Остальные эффекты апгрейда анимации главной (разделы по частям, заголовки по словам, лучи по рамкам,
-   свет за курсором, лампа, полоса прочитанного, блик по цифрам, скан по графикам) сняты с обликом, шаг 4
-   (23.10.2026, Сергей: «Ставь четвёртый шаг»): «вау» только на первом экране, ниже ничего не движется само.
-   Надпись стоит целиком, под курсором на компьютере светится ярче.
+   Приёмы взяты из библиотек и переписаны под наш Tailwind 3 без библиотек движения:
+   Magic UI — Blur Fade, Magic Card, Border Beam, Shimmer Button, Animated Shiny Text, Scroll Progress;
+   Aceternity UI — Text Generate Effect, Glowing Effect, Hero Highlight, Lamp Section Header,
+   Text Hover Effect; Animata — Mask Reveal.
+
+   Правила:
+   — двигаем только прозрачность, сдвиг и маску; всё разовое, кроме двух лучей и кнопки;
+   — лучи и кнопка стоят, пока их не видно (data-vis ставит useLandingFx);
+   — всё скрытое прячется только при классе fx-on: его ставит useLandingFx в браузере,
+     без настройки «меньше движения». Боты и «меньше движения» видят страницу как раньше.
    ========================================================================== */
 
+:root { --fx-ease: cubic-bezier(0.16, 1, 0.3, 1); }
+
+/* прежнее «весь раздел целиком» выключено: раздел теперь собирается по частям */
+html.fx-on .landing-skin .section-animate { opacity: 1; transform: none; transition: none; }
+
+/* ---- подпись раздела «01 · Проблема»: проявляется слева направо ---- */
+html.fx-on [data-fx="label"] { clip-path: inset(0 100% 0 0); transition: clip-path 1.2s var(--fx-ease) var(--d, 0ms); }
+html.fx-on [data-fx="label"][data-in] { clip-path: inset(0 0 0 0); }
+
+/* ---- заголовок по словам: из размытия, снизу вверх ---- */
+html.fx-on .fx-word { display: inline-block; }
+html.fx-on [data-fx="h"] .fx-word,
+html.fx-on [data-fx="quote"] .fx-word {
+  opacity: 0;
+  transform: translate3d(0, 0.38em, 0);
+  filter: blur(6px);
+  transition-property: opacity, transform, filter;
+  transition-duration: 0.8s, 1.1s, 0.8s;
+  transition-timing-function: var(--fx-ease);
+  transition-delay: calc(var(--d, 0ms) + var(--w, 0) * 45ms);
+}
+html.fx-on [data-fx="quote"] .fx-word {
+  transition-duration: 1.2s, 1.5s, 1.2s;
+  transition-delay: calc(var(--d, 0ms) + var(--w, 0) * 75ms);
+}
+html.fx-on [data-fx="h"][data-in] .fx-word,
+html.fx-on [data-fx="quote"][data-in] .fx-word { opacity: 1; transform: none; filter: none; }
+/* на телефоне без размытия: на маленьком тексте его почти не видно, а кадры оно стоит */
+@media (max-width: 767px) {
+  html.fx-on [data-fx="h"] .fx-word,
+  html.fx-on [data-fx="quote"] .fx-word { filter: none; }
+}
+
+/* ---- текст и плашки: мягко снизу ---- */
+html.fx-on [data-fx="up"] {
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+  transition: opacity 0.75s var(--fx-ease) var(--d, 0ms), transform 1.1s var(--fx-ease) var(--d, 0ms);
+}
+html.fx-on [data-fx="up"][data-in] { opacity: 1; transform: none; }
+
+/* ---- карточки: подъём с лёгким масштабом, по очереди ---- */
+html.fx-on [data-fx="card"] {
+  opacity: 0;
+  transform: translate3d(0, 26px, 0) scale(0.985);
+  transition: opacity 0.8s var(--fx-ease) var(--d, 0ms), transform 1.2s var(--fx-ease) var(--d, 0ms);
+}
+html.fx-on [data-fx="card"][data-in] { opacity: 1; transform: none; }
+
+/* ---- портрет автора: шторка снизу и медленное отдаление ---- */
+html.fx-on [data-fx="photo"] { clip-path: inset(100% 0 0 0); transition: clip-path 1.6s var(--fx-ease) var(--d, 0ms); }
+html.fx-on [data-fx="photo"] img { transform: scale(1.14); transition: transform 2.4s var(--fx-ease) var(--d, 0ms); }
+html.fx-on [data-fx="photo"][data-in] { clip-path: inset(0 0 0 0); }
+html.fx-on [data-fx="photo"][data-in] img { transform: none; }
+
+/* ---- блик по цифрам (Magic UI «Animated Shiny Text»): один проход вместо отсчёта с нуля ---- */
+html.fx-on [data-shine] {
+  background-image: linear-gradient(100deg, hsl(var(--foreground)) 0 44%, hsl(var(--accent)) 48.5%, #fff4dc 50%, hsl(var(--accent)) 51.5%, hsl(var(--foreground)) 56% 100%);
+  background-size: 260% 100%;
+  background-position: 100% 0;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+html.fx-on [data-shine][data-shining] { animation: fxShine 1.9s cubic-bezier(0.45, 0, 0.2, 1) var(--sd, 300ms) 1 both; }
+@keyframes fxShine { from { background-position: 100% 0; } to { background-position: 0% 0; } }
+
+/* ---- скан по графикам сделок: одна золотая линия сверху вниз ---- */
+html.fx-on [data-scan]::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: 45%;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(180deg, transparent 0%, hsl(var(--accent) / 0.1) 60%, hsl(var(--accent) / 0.55) 96%, #fff1d2 98.5%, transparent 100%);
+  transform: translateY(-105%);
+  opacity: 0;
+}
+html.fx-on [data-scan][data-scanning]::after { animation: fxScan 1.6s cubic-bezier(0.45, 0, 0.25, 1) var(--sd, 300ms) 1 both; }
+@keyframes fxScan {
+  0% { transform: translateY(-105%); opacity: 0; }
+  15% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { transform: translateY(235%); opacity: 0; }
+}
+
+/* ---- свет за курсором (Magic UI «Magic Card», Aceternity «Glowing Effect»), только мышь ---- */
+html.fx-hover [data-spot] { position: relative; isolation: isolate; }
+.fx-spot {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+  background: radial-gradient(520px circle at var(--mx, 50%) var(--my, 50%), hsl(var(--accent) / 0.085), transparent 62%);
+}
+.fx-spot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), hsl(var(--accent) / 0.9), transparent 72%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+html.fx-hover [data-spot]:hover > .fx-spot { opacity: 1; }
+
+/* ---- луч по рамке главных карточек (Magic UI «Border Beam») ---- */
+[data-beam] { position: relative; }
+.fx-beam,
+.fx-orbit {
+  position: absolute;
+  border-radius: inherit;
+  pointer-events: none;
+  overflow: hidden;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.fx-beam { inset: -1px; padding: 1.5px; z-index: 1; }
+html.fx-on [data-beam] { border-color: hsl(var(--accent) / 0.32) !important; }
+.fx-beam::before,
+.fx-orbit::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--bs, 900px);
+  height: var(--bs, 900px);
+  transform: translate(-50%, -50%) rotate(0deg);
+  animation: fxSpin 8s linear infinite;
+}
+.fx-beam::before {
+  background: conic-gradient(from 0deg, transparent 0deg 262deg, hsl(var(--accent) / 0.22) 296deg, hsl(var(--accent) / 0.85) 336deg, #fff8ea 356deg, transparent 360deg);
+}
+@keyframes fxSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+[data-beam]:not([data-vis]) .fx-beam::before,
+[data-orbit]:not([data-vis]) .fx-orbit::before { animation-play-state: paused; }
+
+/* ---- свет по кругу на главной кнопке (Magic UI «Shimmer Button») ---- */
+[data-orbit] { position: relative; isolation: isolate; }
+.fx-orbit { inset: -4px; padding: 1.5px; z-index: 2; }
+.fx-orbit::before {
+  background: conic-gradient(from 0deg, transparent 0deg 296deg, hsl(var(--accent) / 0.6) 330deg, hsl(var(--accent)) 348deg, #fff 356deg, transparent 360deg);
+  animation-duration: 4.6s;
+}
+
+/* ---- лампа над разделом «Сотрудничество» (Aceternity «Lamp Section Header») ---- */
+/* заголовок раздела стоит слева, поэтому на компьютере лампа висит над ним, а не по центру */
+.fx-lamp {
+  --lx: 50%;
+  position: absolute;
+  left: 0; right: 0; top: 0;
+  height: min(600px, 130vw);
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+@media (min-width: 1024px) { .fx-lamp { --lx: max(26%, calc(50% - 390px)); } }
+.fx-lamp::before {
+  content: '';
+  position: absolute;
+  left: var(--lx);
+  top: 0;
+  width: min(1300px, 200vw);
+  height: 100%;
+  transform: translateX(-50%);
+  transform-origin: 50% 0;
+  background: conic-gradient(from 146deg at 50% 0%, transparent 0deg, hsl(var(--accent) / 0.16) 18deg, hsl(var(--accent) / 0.32) 34deg, hsl(var(--accent) / 0.16) 50deg, transparent 68deg 360deg);
+  -webkit-mask: radial-gradient(58% 100% at 50% 0%, #000 22%, transparent 82%);
+  mask: radial-gradient(58% 100% at 50% 0%, #000 22%, transparent 82%);
+  transition: transform 2.2s var(--fx-ease), opacity 1.6s ease;
+}
+.fx-lamp::after {
+  content: '';
+  position: absolute;
+  left: var(--lx);
+  top: 0;
+  width: min(620px, 82vw);
+  height: 1.5px;
+  transform: translateX(-50%);
+  background: linear-gradient(90deg, transparent, hsl(var(--accent)) 22%, #fff1d2 50%, hsl(var(--accent)) 78%, transparent);
+  box-shadow: 0 0 24px 3px hsl(var(--accent) / 0.45);
+  transition: transform 1.9s var(--fx-ease), opacity 1.2s ease;
+}
+html.fx-on .fx-lamp[data-fx]:not([data-in])::before { transform: translateX(-50%) scaleX(0.3); opacity: 0; }
+html.fx-on .fx-lamp[data-fx]:not([data-in])::after { transform: translateX(-50%) scaleX(0.2); opacity: 0; }
+
+/* ---- полоса прочитанного вверху экрана (Magic UI «Scroll Progress») ---- */
+.fx-progress {
+  position: fixed;
+  left: 0; right: 0; top: 0;
+  height: 2px;
+  z-index: 70;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+  background: linear-gradient(90deg, hsl(var(--accent) / 0.2), hsl(var(--accent)) 70%, #fff1d2);
+  box-shadow: 0 0 10px hsl(var(--accent) / 0.5);
+}
+
+/* ---- большая надпись в подвале (Aceternity «Text Hover Effect») ---- */
 .fx-wordmark { margin-top: 2.5rem; user-select: none; -webkit-user-select: none; }
 .fx-wordmark svg { display: block; width: 100%; height: auto; overflow: visible; }
 .fx-wm-text { font-family: var(--font-display, 'Cormorant Garamond', serif); font-weight: 500; }
-.fx-wm-stroke { fill: transparent; stroke: hsl(var(--accent) / 0.5); stroke-width: 0.7; }
-.fx-wm-fill { opacity: 0.2; }
+.fx-wm-stroke { fill: transparent; stroke: hsl(var(--accent) / 0.5); stroke-width: 0.7; stroke-dasharray: 1400; stroke-dashoffset: 0; transition: stroke-dashoffset 3.4s cubic-bezier(0.6, 0.1, 0.2, 1); }
+.fx-wm-fill { opacity: 0.2; transition: opacity 2.2s ease 1.6s; }
 .fx-wm-hot { opacity: 0; transition: opacity 0.6s ease; }
 .fx-wordmark:hover .fx-wm-hot { opacity: 1; }
+html.fx-on .fx-wordmark:not([data-in]) .fx-wm-stroke { stroke-dashoffset: 1400; }
+html.fx-on .fx-wordmark:not([data-in]) .fx-wm-fill { opacity: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fx-beam::before, .fx-orbit::before { animation: none; opacity: 0; }
+  .fx-progress { transition: none; }
+}

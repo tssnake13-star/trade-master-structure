@@ -222,11 +222,10 @@
    Планшет стоя и телефон получают раскладку стопкой: фото сверху во всю ширину,
    текст под ним. Планшет лёжа остаётся на двух колонках: там полоса сверху срезала бы
    фигуру до одной головы. */
-.v3h-split-photo, .v3h-split-hud { display: none; }
+.v3h-split-photo { display: none; }
 .v3h-split-center { justify-content: flex-start; }
 @media (min-width: 1024px) and (min-aspect-ratio: 1/1) {
   .v3h-split-photo { display: block; }
-  .v3h-split-hud { display: block; }
   .v3h-split-strip { display: none; }
   .v3h-split-text { max-width: 56%; }
   .v3h-split-center { justify-content: center; }
@@ -326,7 +325,6 @@
 }
 
 /* HUD */
-.v3h-hud { font-family: var(--font-mono); color: var(--v3-faint); font-size: 10px; letter-spacing: 0.2em; }
 .v3h-ticker__price { font-family: var(--font-mono); font-size: 20px; color: var(--v3-fg); letter-spacing: 0.02em; }
 .v3h-live .dot {
   display: inline-block; width: 6px; height: 6px; border-radius: 50%;
@@ -340,9 +338,9 @@
 }
 
 /* =====================================================================
-   Giant "thought" wordmark dividers between sections (Thought in pages/Index.tsx; class .pn-wordmark
-   from the preview-next divider), in the display face (Literata since 23.10.2026). Static since
-   step 4 of the redesign (23.10.2026): the per-letter wave on scroll is gone.
+   Giant "thought" wordmark dividers between sections (kinetic on scroll).
+   Reuses the WordmarkKinetic component (.pn-wordmark / .pn-wm-letter),
+   restyled here in the display face (Literata since 23.10.2026) so it lives on the production landing too.
    ===================================================================== */
 .v3-skin .pn-wordmark {
   font-family: var(--font-display);
@@ -360,9 +358,13 @@
   font-style: normal;
   color: inherit;
 }
+.v3-skin .pn-wordmark .pn-wm-letter {
+  display: inline-block;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s ease;
+}
 
 /* below lg (where the hamburger appears): shrink + wrap the giant thought so
-   even the longest fits */
+   even the longest fits, and don't run the per-letter wave */
 @media (max-width: 1023px) {
   .v3-skin .pn-wordmark {
     white-space: normal;
@@ -371,6 +373,7 @@
     padding: 0 16px;
     overflow-wrap: break-word;
   }
+  .v3-skin .pn-wordmark .pn-wm-letter { display: inline; transform: none !important; }
 }
 
 /* live quote (HUD ticker): drop below the header whenever the hamburger menu
@@ -451,6 +454,17 @@
 .final-cta__cards { margin-top: calc(-1 * min(14vw, 110px)); }
 .final-cta__cards > div { position: relative; }
 @media (min-width: 768px) { .final-cta__center { min-height: min(46vw, 600px); } }
+/* по главной кнопке время от времени проходит отблеск */
+.cta-shine { position: relative; overflow: hidden; }
+.cta-shine::after {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 40%;
+  background: linear-gradient(100deg, transparent 0%, rgba(255,255,255,.55) 50%, transparent 100%);
+  transform: translateX(-160%) skewX(-18deg); will-change: transform;
+  animation: ctaShine 4.5s cubic-bezier(.4,0,.2,1) infinite;
+  pointer-events: none;
+}
+@keyframes ctaShine { 0%, 62% { transform: translateX(-160%) skewX(-18deg); } 100% { transform: translateX(330%) skewX(-18deg); } }
+@media (prefers-reduced-motion: reduce) { .cta-shine::after { animation: none; opacity: 0; } }
 
 /* =====================================================================
    Ролик «Карта школы» в «09 · Сотрудничество» (SchoolMapVideo, 22.10.2026)
