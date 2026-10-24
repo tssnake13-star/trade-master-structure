@@ -273,10 +273,11 @@ export class TerminalPainter {
       ctx.fillRect(zx, zy, zw, zh);
       ctx.strokeStyle = hslVarA(P.accent, 0.55);
       ctx.strokeRect(zx + 0.5, zy + 0.5, zw - 1, zh - 1);
-      ctx.font = `9px ${MONO}`;
+      const zf = this.narrow ? 7.5 : 9;
+      ctx.font = `${zf}px ${MONO}`;
       ctx.fillStyle = P.accent;
       ctx.textBaseline = 'alphabetic';
-      spaced(ctx, 'НАКОПЛЕНИЕ', zx + 6, zy + zh + 14, 1.26);
+      spaced(ctx, 'НАКОПЛЕНИЕ', zx + 6, zy + zh + zf + 5, zf * 0.14);
       ctx.globalAlpha = 1;
     }
 
@@ -286,8 +287,10 @@ export class TerminalPainter {
     if (hitNow && this.hitAt < 0) this.hitAt = t;
     if (t < 9.5) this.hitAt = -1;
     // 24.10.2026, Сергей: «график закрывает слово вход и тейк в конце… особенно на телефоне». Подписи — на тёмной
-    // плашке поверх свечей, тейк подписан у левого конца линии (там цена ещё внизу), на телефоне шрифт крупнее
-    const fs = this.narrow ? 10.5 : 9;
+    // плашке поверх свечей, тейк подписан у левого конца линии (там цена ещё внизу).
+    // В тот же день: «в мобильной версии все надписи надо уменьшить… чтобы вход и безубыток, стоп не мешают друг
+    // другу… в лонг очень заметно» — на телефоне подписи графика мельче (были 10,5), «вход» и «стоп» не сходятся
+    const fs = this.narrow ? 8 : 9;
     const line = (y: number, from: number, color: string, dash: boolean, a: number, label: string, labelColor: string, left: boolean, glow = 0, labelA = 1, below = false) => {
       if (a <= 0) return;
       ctx.globalAlpha = a;
@@ -319,9 +322,10 @@ export class TerminalPainter {
     };
     const takeA = show(ease(seg(t, 9.1, 9.7)));
     const hit = this.hitAt < 0 ? 0 : ease(seg(t, this.hitAt, this.hitAt + 0.5));
-    // на узком экране подписи у тейка и у входа теснятся: подпись тейка уступает место «тейк взят»,
-    // подпись стопа гаснет, когда стоп переехал в безубыток, а «безубыток» стоит правее
-    line(py(geo.y(geo.take)), SIGNAL, P.accent, !hitNow, takeA, 'ТЕЙК · 9,5R', P.accent, true, hitNow ? 1 : 0, this.narrow ? 1 - hit : 1);
+    // на узком экране подписи у тейка и у входа теснятся: подпись тейка уступает место «тейк взят» (сначала
+    // гаснет одна, потом загорается другая — вдвоём они не стоят), подпись стопа гаснет, когда стоп переехал
+    // в безубыток, а «безубыток» стоит правее
+    line(py(geo.y(geo.take)), SIGNAL, P.accent, !hitNow, takeA, 'ТЕЙК · 9,5R', P.accent, true, hitNow ? 1 : 0, this.narrow ? 1 - seg(hit, 0, 0.5) : 1);
     const be = ease(seg(t, 12, 12.8));
     const stopY = py(geo.y(geo.stop)) + (py(geo.y(geo.entry)) - py(geo.y(geo.stop))) * be;
     line(stopY, ENTRY - 1, STOP_LINE, true, ease(seg(t, 9.1, 9.7)) * fade, 'СТОП · 1R', STOP_TEXT, false, 0, this.narrow ? 1 - be : 1);
@@ -348,7 +352,7 @@ export class TerminalPainter {
     };
     // на узком экране «безубыток» — у правого края и с другой стороны линии, чем подпись «вход»
     tag(px(geo.x(this.narrow ? N - 6 : N - 12)), py(geo.y(geo.entry)), 'БЕЗУБЫТОК', show(ease(seg(t, 12.6, 13.1))), BE_BG, P.fg, P.border, this.narrow && dir < 0);
-    tag(px(geo.x(N - 9)), py(geo.y(geo.take)), 'ТЕЙК ВЗЯТ', show(hit), P.accent, '#111');
+    tag(px(geo.x(N - 9)), py(geo.y(geo.take)), 'ТЕЙК ВЗЯТ', show(this.narrow ? seg(hit, 0.5, 1) : hit), P.accent, '#111');
 
     // точка цены — на закрытии последней видимой свечи
     const i0 = Math.min(N - 1, Math.floor(live - 0.5)), f = Math.max(0, Math.min(1, live - 0.5 - i0));
@@ -369,10 +373,12 @@ export class TerminalPainter {
     // плашка «Допуск · покупка» слева от свечи выхода, у покупки над зоной, у продажи под ней
     const pa = show(ease(seg(t, 1.6, 2.2)));
     if (pa > 0) {
-      ctx.font = `10px ${MONO}`;
+      // на телефоне плашка мельче, вместе с подписями графика
+      const pf = this.narrow ? 8 : 10, pk = pf / 10;
+      ctx.font = `${pf}px ${MONO}`;
       const text = `ДОПУСК · ${sideName.toUpperCase()}`;
-      const tw = Array.from(text).reduce((s, ch) => s + charW(ctx, ch), 0) + 1.4 * (text.length - 1);
-      const w = 10 + 6 + 7 + tw + 10 + 2, h = 10 * 1.5 + 12 + 2;
+      const tw = Array.from(text).reduce((s, ch) => s + charW(ctx, ch), 0) + 1.4 * pk * (text.length - 1);
+      const w = (10 + 6 + 7 + 10 + 2) * pk + tw, h = pf * 1.5 + 12 * pk + 2;
       const right = c.x + c.w - ((VB.w - geo.x(SIGNAL) + 14) / VB.w) * c.w;
       const y0 = c.y + ((dir > 0 ? geo.y(geo.zoneTop) - 72 : geo.y(geo.zoneBot) + 26) / VB.h) * c.h + 8 * (1 - ease(seg(t, 1.6, 2.2)));
       ctx.globalAlpha = pa;
@@ -380,9 +386,9 @@ export class TerminalPainter {
       ctx.fillStyle = PILL_BG; ctx.fill();
       ctx.strokeStyle = hslVarA(P.accent, 0.7); ctx.stroke();
       ctx.fillStyle = P.accent;
-      ctx.beginPath(); ctx.arc(right - w + 11 + 3, y0 + h / 2, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(right - w + (11 + 3) * pk, y0 + h / 2, 3 * pk, 0, Math.PI * 2); ctx.fill();
       ctx.textBaseline = 'middle';
-      spaced(ctx, text, right - w + 11 + 6 + 7, y0 + h / 2 + 0.5, 1.4);
+      spaced(ctx, text, right - w + (11 + 6 + 7) * pk, y0 + h / 2 + 0.5, 1.4 * pk);
       ctx.globalAlpha = 1;
     }
     ctx.restore(); // конец графика
