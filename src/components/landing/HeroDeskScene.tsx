@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import deskImg from '@/assets/hero-desk-ring.jpg';
 import ringLightUrl from '@/assets/hero-ring-light.webp';
 import ringOffUrl from '@/assets/hero-ring-off.webp';
+import ringBloomUrl from '@/assets/hero-ring-bloom.webp';
 import depthUrl from '@/assets/hero-depth.webp';
 import { LiveScreen, makeScreen, type LiveEvent, type ScreenDef } from './heroDeskLive';
 import { createDepthPhoto, FOCUS, PIVOT } from './heroDepth';
@@ -183,6 +184,19 @@ export default function HeroDeskScene({ variant, className }: Props) {
     };
     ringOff.onload = onImg;
     ringLight.src = ringLightUrl; ringOff.src = ringOffUrl;
+    // ореол блика (24.10.2026, Сергей: «разве кольцо не должно переливаться бликом… бегать вокруг?»): блик шёл
+    // только по тонкой линии кольца, а она на кадре почти белая — его не было видно. Ореол — размытый свет кольца
+    // без мониторов и ножек (scratchpad/steam_and_bloom.py), с теми же полями, что и свет
+    const ringBloom = new Image();
+    const bloomPad = document.createElement('canvas');
+    let bloomReady = false;
+    ringBloom.onload = () => {
+      bloomPad.width = RING_BOX.w + COMET_WIN;
+      bloomPad.height = RING_BOX.h + COMET_WIN;
+      bloomPad.getContext('2d')?.drawImage(ringBloom, COMET_WIN / 2, COMET_WIN / 2, RING_BOX.w, RING_BOX.h);
+      bloomReady = true;
+    };
+    ringBloom.src = ringBloomUrl;
 
     // карточка терминала: одна за раз, не чаще раза в 6 с
     let screensOn = 0;
@@ -331,22 +345,27 @@ export default function HeroDeskScene({ variant, className }: Props) {
       const wx = Math.round(RING.x + RING.r * Math.cos(mid) - COMET_WIN / 2);
       const wy = Math.round(RING.y + RING.r * Math.sin(mid) - COMET_WIN / 2);
       const k = cometCv.width / COMET_WIN;
-      c2.globalCompositeOperation = 'source-over';
-      c2.clearRect(0, 0, cometCv.width, cometCv.height);
-      for (const [lag, a, rad] of COMET) {
-        const t = ang - lag;
-        const px = (RING.x + RING.r * Math.cos(t) - wx) * k;
-        const py = (RING.y + RING.r * Math.sin(t) - wy) * k;
-        c2.globalAlpha = a;
-        c2.drawImage(spotSpr, px - rad * k, py - rad * k, rad * 2 * k, rad * 2 * k);
-      }
-      c2.globalAlpha = 1;
-      c2.globalCompositeOperation = 'source-in';
-      // свет кольца — в масштабе кадра 1:1, начало картинки в RING_BOX плюс поля
       const pad = COMET_WIN / 2;
-      c2.drawImage(lightPad, wx - RING_BOX.x + pad, wy - RING_BOX.y + pad, COMET_WIN, COMET_WIN, 0, 0, cometCv.width, cometCv.height);
-      rc.globalAlpha = alpha;
-      rc.drawImage(cometCv, wx, wy, COMET_WIN, COMET_WIN);
+      // проход блика: пятна вдоль кольца, вырезанные по картинке (свет кольца или его ореол)
+      const pass = (src: HTMLCanvasElement, a: number, grow: number) => {
+        c2.globalCompositeOperation = 'source-over';
+        c2.clearRect(0, 0, cometCv.width, cometCv.height);
+        for (const [lag, sa, rad] of COMET) {
+          const t = ang - lag;
+          const px = (RING.x + RING.r * Math.cos(t) - wx) * k;
+          const py = (RING.y + RING.r * Math.sin(t) - wy) * k;
+          c2.globalAlpha = sa;
+          c2.drawImage(spotSpr, px - rad * grow * k, py - rad * grow * k, rad * 2 * grow * k, rad * 2 * grow * k);
+        }
+        c2.globalAlpha = 1;
+        c2.globalCompositeOperation = 'source-in';
+        // картинка — в масштабе кадра 1:1, начало в RING_BOX плюс поля
+        c2.drawImage(src, wx - RING_BOX.x + pad, wy - RING_BOX.y + pad, COMET_WIN, COMET_WIN, 0, 0, cometCv.width, cometCv.height);
+        rc.globalAlpha = a;
+        rc.drawImage(cometCv, wx, wy, COMET_WIN, COMET_WIN);
+      };
+      if (bloomReady) pass(bloomPad, 0.8 * alpha, 1.25);
+      pass(lightPad, alpha, 1);
       rc.globalAlpha = 1;
     };
 
@@ -410,7 +429,7 @@ export default function HeroDeskScene({ variant, className }: Props) {
         rc.globalAlpha = 1;
         drawComet(ang, 1);
       } else {
-        drawComet(sweepAngle(1) + ((now / 1000) * 120) / RING.r, 0.95);
+        drawComet(sweepAngle(1) + ((now / 1000) * 150) / RING.r, 0.95);
       }
     };
 
