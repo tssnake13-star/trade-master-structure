@@ -24,11 +24,17 @@ export default function WordmarkKinetic({
         // 0 when divider center is far, 1 when at viewport center
         const center = r.top + r.height / 2;
         const prox = 1 - Math.min(1, Math.abs(center - vh / 2) / (vh * 0.7));
+        // 24.10.2026, Сергей: «анимация крупных словосочетаний должна подсвечивать все буквы». Прежняя волна
+        // со сдвигом 0,35 рад на букву доходила только до первых восьми-девяти букв. Теперь фронт проходит всю
+        // фразу слева направо, пока она подъезжает к середине экрана: буква подпрыгивает, загорается и остаётся
+        // гореть; у середины горит вся фраза, уходя — гаснет в обратном порядке.
+        const n = letters.length;
         letters.forEach((ltr, i) => {
-          const phase = Math.sin(prox * Math.PI - i * 0.35);
-          const lift = Math.max(0, phase) * prox * 18;
-          ltr.style.transform = `translateY(${-lift}px)`;
-          ltr.style.color = lift > 6 ? 'hsl(var(--accent) / 0.7)' : '';
+          const at = 0.25 + 0.5 * (n > 1 ? i / (n - 1) : 0);
+          const lit = Math.max(0, Math.min(1, (prox - at + 0.12) / 0.24));
+          const hop = Math.exp(-(((prox - at) / 0.09) ** 2));
+          ltr.style.transform = `translateY(${(-hop * 16).toFixed(1)}px)`;
+          ltr.style.color = lit > 0.01 ? `hsl(var(--accent) / ${(0.3 + 0.5 * lit).toFixed(2)})` : '';
         });
       });
     };

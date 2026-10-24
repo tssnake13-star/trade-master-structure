@@ -413,7 +413,9 @@
 .td-zone { background: hsl(var(--accent) / 0.16); border: 1px solid hsl(var(--accent) / 0.55); z-index: 1; }
 .td-zone span { position: absolute; left: 6px; bottom: -18px; font-family: 'Martian Mono', monospace; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: hsl(var(--accent)); }
 .td-line { height: 0; border-top: 1px dashed; z-index: 2; }
-.td-line span { position: absolute; right: 0; top: -16px; font-family: 'Martian Mono', monospace; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; }
+.td-line span { position: absolute; right: 0; top: -17px; padding: 1px 4px; border-radius: 3px; background: rgba(10,7,4,.86); font-family: 'Martian Mono', monospace; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; }
+/* 24.10.2026: тейк подписан у левого конца линии — справа к концу круга свечи доходят до тейка и закрывали подпись */
+.td-line--take span { right: auto; left: 0; }
 .td-line--entry { border-color: #ffd38a; color: #ffd38a; border-top-style: solid; }
 .td-line--entry span { right: auto; left: 0; }
 .td-line--stop { border-color: oklch(0.62 0.12 25); color: oklch(0.7 0.12 25); }

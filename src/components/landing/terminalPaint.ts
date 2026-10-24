@@ -285,7 +285,10 @@ export class TerminalPainter {
     const hitNow = t >= 9.5 && live - 0.5 >= geo.hitIdx;
     if (hitNow && this.hitAt < 0) this.hitAt = t;
     if (t < 9.5) this.hitAt = -1;
-    const line = (y: number, from: number, color: string, dash: boolean, a: number, label: string, labelColor: string, left: boolean, glow = 0) => {
+    // 24.10.2026, Сергей: «график закрывает слово вход и тейк в конце… особенно на телефоне». Подписи — на тёмной
+    // плашке поверх свечей, тейк подписан у левого конца линии (там цена ещё внизу), на телефоне шрифт крупнее
+    const fs = this.narrow ? 10.5 : 9;
+    const line = (y: number, from: number, color: string, dash: boolean, a: number, label: string, labelColor: string, left: boolean, glow = 0, labelA = 1) => {
       if (a <= 0) return;
       ctx.globalAlpha = a;
       const yy = Math.round(y) + 0.5;
@@ -299,37 +302,49 @@ export class TerminalPainter {
       ctx.beginPath(); ctx.moveTo(lineX0(from), yy); ctx.lineTo(lineX1, yy); ctx.stroke();
       ctx.setLineDash([]);
       if (glow > 0) ctx.restore();
-      ctx.font = `9px ${MONO}`;
+      if (labelA <= 0.01) { ctx.globalAlpha = 1; return; }
+      ctx.globalAlpha = a * labelA;
+      ctx.font = `${fs}px ${MONO}`;
+      const sp = fs * 0.14;
+      const tw = Array.from(label).reduce((sum, ch) => sum + charW(ctx, ch), 0) + sp * (label.length - 1);
+      const lx = left ? lineX0(from) : lineX1 - tw;
+      rr(ctx, lx - 4, yy - 7 - fs - 2, tw + 8, fs + 6, 3);
+      ctx.fillStyle = 'rgba(10,7,4,0.86)';
+      ctx.fill();
       ctx.fillStyle = labelColor;
       ctx.textBaseline = 'alphabetic';
-      spaced(ctx, label, left ? lineX0(from) : lineX1, yy - 6, 1.26, left ? 'left' : 'right');
+      spaced(ctx, label, lx, yy - 6, sp, 'left');
       ctx.globalAlpha = 1;
     };
     const takeA = show(ease(seg(t, 9.1, 9.7)));
-    line(py(geo.y(geo.take)), SIGNAL, P.accent, !hitNow, takeA, 'ТЕЙК · 9,5R', P.accent, false, hitNow ? 1 : 0);
+    const hit = this.hitAt < 0 ? 0 : ease(seg(t, this.hitAt, this.hitAt + 0.5));
+    // на узком экране подписи у тейка и у входа теснятся: подпись тейка уступает место «тейк взят»,
+    // подпись стопа гаснет, когда стоп переехал в безубыток, а «безубыток» стоит правее
+    line(py(geo.y(geo.take)), SIGNAL, P.accent, !hitNow, takeA, 'ТЕЙК · 9,5R', P.accent, true, hitNow ? 1 : 0, this.narrow ? 1 - hit : 1);
     line(py(geo.y(geo.entry)), ENTRY - 1, '#ffd38a', false, show(ease(seg(t, 6.3, 6.8))), 'ВХОД', '#ffd38a', true);
     const be = ease(seg(t, 12, 12.8));
     const stopY = py(geo.y(geo.stop)) + (py(geo.y(geo.entry)) - py(geo.y(geo.stop))) * be;
-    line(stopY, ENTRY - 1, STOP_LINE, true, ease(seg(t, 9.1, 9.7)) * fade, 'СТОП · 1R', STOP_TEXT, false);
+    line(stopY, ENTRY - 1, STOP_LINE, true, ease(seg(t, 9.1, 9.7)) * fade, 'СТОП · 1R', STOP_TEXT, false, 0, this.narrow ? 1 - be : 1);
 
     // метки: безубыток и тейк взят — над точкой
-    const tag = (x: number, y: number, text: string, a: number, bg: string, fg: string, border?: string) => {
+    const tag = (x: number, y: number, text: string, a: number, bg: string, fg: string, border?: string, below = false) => {
       if (a <= 0) return;
-      ctx.font = `9px ${MONO}`;
-      const w = Array.from(text).reduce((s, ch) => s + charW(ctx, ch), 0) + 1.08 * (text.length - 1) + 14;
-      const h = 9 * 1.5 + 6;
-      const x0 = x - w / 2, y0 = y - h * 1.5;
+      ctx.font = `${fs}px ${MONO}`;
+      const w = Array.from(text).reduce((s, ch) => s + charW(ctx, ch), 0) + fs * 0.12 * (text.length - 1) + 14;
+      const h = fs * 1.5 + 6;
+      // метка не выходит за край графика (на узком экране «безубыток» стоит у правого края)
+      const x0 = Math.min(Math.max(x - w / 2, c.x + 3), c.x + c.w - w - 3), y0 = below ? y + 7 : y - h * 1.5;
       ctx.globalAlpha = a;
       rr(ctx, x0, y0, w, h, 4);
       ctx.fillStyle = bg; ctx.fill();
       if (border) { ctx.strokeStyle = border; ctx.stroke(); }
       ctx.fillStyle = fg;
       ctx.textBaseline = 'middle';
-      spaced(ctx, text, x0 + 7, y0 + h / 2 + 0.5, 1.08);
+      spaced(ctx, text, x0 + 7, y0 + h / 2 + 0.5, fs * 0.12);
       ctx.globalAlpha = 1;
     };
-    tag(px(geo.x(N - 12)), py(geo.y(geo.entry)), 'БЕЗУБЫТОК', show(ease(seg(t, 12.6, 13.1))), BE_BG, P.fg, P.border);
-    const hit = this.hitAt < 0 ? 0 : ease(seg(t, this.hitAt, this.hitAt + 0.5));
+    // на узком экране «безубыток» — под линией у правого края: над линией там подпись «вход»
+    tag(px(geo.x(this.narrow ? N - 6 : N - 12)), py(geo.y(geo.entry)), 'БЕЗУБЫТОК', show(ease(seg(t, 12.6, 13.1))), BE_BG, P.fg, P.border, this.narrow);
     tag(px(geo.x(N - 9)), py(geo.y(geo.take)), 'ТЕЙК ВЗЯТ', show(hit), P.accent, '#111');
 
     // точка цены — на закрытии последней видимой свечи

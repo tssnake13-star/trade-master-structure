@@ -99,7 +99,7 @@ export default function useLandingFx() {
       el.dataset.in = '';
       // несколько графиков в одной роли (список сделок) сканируются по очереди, как прежде карточки
       el.querySelectorAll<HTMLElement>('[data-scan], [data-shine]').forEach((s, i) => {
-        s.style.setProperty('--sd', `${d + 380 + i * 70}ms`);
+        s.style.setProperty('--sd', `${d + 380 + i * 120}ms`);
         if (s.hasAttribute('data-scan')) s.dataset.scanning = '';
         else s.dataset.shining = '';
       });
