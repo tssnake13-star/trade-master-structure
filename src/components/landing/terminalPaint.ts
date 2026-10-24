@@ -288,7 +288,7 @@ export class TerminalPainter {
     // 24.10.2026, Сергей: «график закрывает слово вход и тейк в конце… особенно на телефоне». Подписи — на тёмной
     // плашке поверх свечей, тейк подписан у левого конца линии (там цена ещё внизу), на телефоне шрифт крупнее
     const fs = this.narrow ? 10.5 : 9;
-    const line = (y: number, from: number, color: string, dash: boolean, a: number, label: string, labelColor: string, left: boolean, glow = 0, labelA = 1) => {
+    const line = (y: number, from: number, color: string, dash: boolean, a: number, label: string, labelColor: string, left: boolean, glow = 0, labelA = 1, below = false) => {
       if (a <= 0) return;
       ctx.globalAlpha = a;
       const yy = Math.round(y) + 0.5;
@@ -308,12 +308,13 @@ export class TerminalPainter {
       const sp = fs * 0.14;
       const tw = Array.from(label).reduce((sum, ch) => sum + charW(ctx, ch), 0) + sp * (label.length - 1);
       const lx = left ? lineX0(from) : lineX1 - tw;
-      rr(ctx, lx - 4, yy - 7 - fs - 2, tw + 8, fs + 6, 3);
+      const top = below ? yy + 4 : yy - 7 - fs - 2;
+      rr(ctx, lx - 4, top, tw + 8, fs + 6, 3);
       ctx.fillStyle = 'rgba(10,7,4,0.86)';
       ctx.fill();
       ctx.fillStyle = labelColor;
       ctx.textBaseline = 'alphabetic';
-      spaced(ctx, label, lx, yy - 6, sp, 'left');
+      spaced(ctx, label, lx, top + fs + 3, sp, 'left');
       ctx.globalAlpha = 1;
     };
     const takeA = show(ease(seg(t, 9.1, 9.7)));
@@ -321,10 +322,12 @@ export class TerminalPainter {
     // на узком экране подписи у тейка и у входа теснятся: подпись тейка уступает место «тейк взят»,
     // подпись стопа гаснет, когда стоп переехал в безубыток, а «безубыток» стоит правее
     line(py(geo.y(geo.take)), SIGNAL, P.accent, !hitNow, takeA, 'ТЕЙК · 9,5R', P.accent, true, hitNow ? 1 : 0, this.narrow ? 1 - hit : 1);
-    line(py(geo.y(geo.entry)), ENTRY - 1, '#ffd38a', false, show(ease(seg(t, 6.3, 6.8))), 'ВХОД', '#ffd38a', true);
     const be = ease(seg(t, 12, 12.8));
     const stopY = py(geo.y(geo.stop)) + (py(geo.y(geo.entry)) - py(geo.y(geo.stop))) * be;
     line(stopY, ENTRY - 1, STOP_LINE, true, ease(seg(t, 9.1, 9.7)) * fade, 'СТОП · 1R', STOP_TEXT, false, 0, this.narrow ? 1 - be : 1);
+    // 24.10.2026, Сергей: «слово „вход“ закрывается графиком, где лонг… надо ниже золотой линии» — подпись
+    // входа с пустой стороны: у покупки под линией (цена уходит вверх), у продажи над ней
+    line(py(geo.y(geo.entry)), ENTRY - 1, '#ffd38a', false, show(ease(seg(t, 6.3, 6.8))), 'ВХОД', '#ffd38a', true, 0, 1, dir > 0);
 
     // метки: безубыток и тейк взят — над точкой
     const tag = (x: number, y: number, text: string, a: number, bg: string, fg: string, border?: string, below = false) => {
@@ -343,8 +346,8 @@ export class TerminalPainter {
       spaced(ctx, text, x0 + 7, y0 + h / 2 + 0.5, fs * 0.12);
       ctx.globalAlpha = 1;
     };
-    // на узком экране «безубыток» — под линией у правого края: над линией там подпись «вход»
-    tag(px(geo.x(this.narrow ? N - 6 : N - 12)), py(geo.y(geo.entry)), 'БЕЗУБЫТОК', show(ease(seg(t, 12.6, 13.1))), BE_BG, P.fg, P.border, this.narrow);
+    // на узком экране «безубыток» — у правого края и с другой стороны линии, чем подпись «вход»
+    tag(px(geo.x(this.narrow ? N - 6 : N - 12)), py(geo.y(geo.entry)), 'БЕЗУБЫТОК', show(ease(seg(t, 12.6, 13.1))), BE_BG, P.fg, P.border, this.narrow && dir < 0);
     tag(px(geo.x(N - 9)), py(geo.y(geo.take)), 'ТЕЙК ВЗЯТ', show(hit), P.accent, '#111');
 
     // точка цены — на закрытии последней видимой свечи

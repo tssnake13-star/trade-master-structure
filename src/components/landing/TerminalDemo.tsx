@@ -291,7 +291,7 @@ export default function TerminalDemo({ onPhase }: { onPhase?: (phase: number, pr
             </svg>
             <div className="td-zone" data-zone style={zoneStyle}><span>накопление</span></div>
             <div className="td-line td-line--take" data-take style={lineAt(geo.take, SIGNAL)}><span>тейк · 9,5R</span></div>
-            <div className="td-line td-line--entry" data-entry style={lineAt(geo.entry, ENTRY - 1)}><span>вход</span></div>
+            <div className="td-line td-line--entry" data-entry data-below={dir > 0 ? '' : undefined} style={lineAt(geo.entry, ENTRY - 1)}><span>вход</span></div>
             <div className="td-line td-line--stop" data-stop style={lineAt(geo.stop, ENTRY - 1)}><span>стоп · 1R</span></div>
             <div className="td-tag td-tag--be" data-be style={{ ...pct(geo.x(N - 12), geo.y(geo.entry)) }}>безубыток</div>
             <div className="td-tag td-tag--take" data-taketag style={{ ...pct(geo.x(N - 9), geo.y(geo.take)) }}>тейк взят</div>

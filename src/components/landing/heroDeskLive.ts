@@ -55,6 +55,8 @@ export type Screen = {
   /** та же лицевая сторона строкой для SVG (заглушка «выключено», кромка во вступлении) */
   svg: string;
   topEdge: Path2D;
+  /** корпус перед кольцом: лицевая сторона с кромкой (сверху и по бокам 3 px кадра, снизу 5 px) */
+  body: Path2D;
 };
 
 /** контуры и отображение (u, v) → точка кадра для изогнутого экрана */
@@ -110,6 +112,11 @@ export function makeScreen(d: ScreenDef, inset = 2.2): Screen {
     return p;
   };
   const facePts = ring(d.x0, d.x1, 0);
+  // 24.10.2026: кромка корпуса под экраном толщиной ~4 px кадра — на неё ложились свет и дымка кольца
+  const clampX = (x: number) => Math.min(Math.max(x, d.x0), d.x1);
+  const bodyPts: Pt[] = [];
+  for (let i = 0; i <= 64; i++) { const x = d.x0 - 3 + ((d.x1 - d.x0 + 6) * i) / 64; bodyPts.push([x, top(clampX(x)) - 3]); }
+  for (let i = 64; i >= 0; i--) { const x = d.x0 - 3 + ((d.x1 - d.x0 + 6) * i) / 64; bodyPts.push([x, bot(clampX(x)) + 5]); }
   const activePts = ring(ax0, ax1, inset);
   const topPts: Pt[] = [];
   for (let i = 0; i <= 64; i++) {
@@ -118,12 +125,13 @@ export function makeScreen(d: ScreenDef, inset = 2.2): Screen {
   }
   // Path2D есть только в браузере, а страница для ботов собирается на сервере:
   // контуры создаются при первом обращении, строка для SVG — чистая математика
-  let face: Path2D | null = null, active: Path2D | null = null, edge: Path2D | null = null;
+  let face: Path2D | null = null, active: Path2D | null = null, edge: Path2D | null = null, body: Path2D | null = null;
   return {
     map,
     get face() { return (face ??= toPath(facePts)); },
     get active() { return (active ??= toPath(activePts)); },
     get topEdge() { return (edge ??= toPath(topPts, false)); },
+    get body() { return (body ??= toPath(bodyPts)); },
     svg: 'M' + facePts.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join('L') + 'Z',
   };
 }

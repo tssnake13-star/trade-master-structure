@@ -63,6 +63,11 @@ const D_DUST = 0.7;
 // проба 3D (?3d): 23.10.2026 Сергей посмотрел видео — «я не вижу изменений»: сдвиг был 40 px кадра.
 // Теперь камера ходит заметнее, а при прокрутке въезжает в комнату: стена с кольцом уходит вглубь,
 // стол приближается, мониторы стоят (они на глубине опоры PIVOT, поэтому графики не съезжают)
+// ножки мониторов перед кольцом — контуры по тёмным пикселям кадра (scratchpad/occluders.py, 24.10.2026)
+const ARMS = [
+  [[1370, 440], [1370, 499], [1397, 501], [1458, 539], [1419, 539], [1429, 543], [1419, 544], [1420, 549], [1427, 550], [1420, 553], [1535, 556], [1535, 440]],
+  [[1040, 440], [1040, 482], [1059, 483], [1087, 501], [1089, 511], [1112, 515], [1109, 529], [1069, 531], [1070, 548], [1040, 546], [1040, 559], [1175, 558], [1175, 542], [1137, 537], [1141, 527], [1175, 528], [1175, 519], [1141, 519], [1142, 515], [1162, 517], [1169, 507], [1175, 506], [1175, 440]],
+];
 const MAX_OFF = 70;
 const ZOOM0 = 0.28;
 const ZOOM_SCROLL = 0.3;
@@ -243,10 +248,14 @@ export default function HeroDeskScene({ variant, className }: Props) {
     const overCv = document.createElement('canvas');
     let monX = 0, monY = 0;
     // дымка не ложится на экраны: всё, кроме лицевой стороны мониторов
-    const outside = new Path2D();
-    outside.rect(-400, -400, 2500, 1800);
-    outside.addPath(SCREEN_L.face);
-    outside.addPath(SCREEN_R.face);
+    // 24.10.2026, Сергей: «кольцо при зажигании налезает на оба монитора снизу… режет неаккуратно» — дымка
+    // вырезается не только по экранам, но и по кромке корпусов и по ножкам: всё это стоит перед кольцом
+    const front = [SCREEN_L.body, SCREEN_R.body, ...ARMS.map((pts) => {
+      const p = new Path2D();
+      pts.forEach(([x, y], i) => (i ? p.lineTo(x, y) : p.moveTo(x, y)));
+      p.closePath();
+      return p;
+    })];
     const layout = () => {
       W = el.clientWidth; H = el.clientHeight;
       if (!W || !H) return;
@@ -283,11 +292,13 @@ export default function HeroDeskScene({ variant, className }: Props) {
       hz.clearRect(0, 0, hazeCv.width, hazeCv.height);
       hz.setTransform(s, 0, 0, s, F.tx * dpr, F.ty * dpr);
       hz.save();
-      hz.clip(outside, 'evenodd');
       const g = hz.createRadialGradient(RING.x, RING.y, 0, RING.x, RING.y, 460);
       g.addColorStop(0, 'rgba(243,177,79,0.22)'); g.addColorStop(0.6, 'rgba(200,134,47,0.07)'); g.addColorStop(1, 'rgba(0,0,0,0)');
       hz.fillStyle = g;
       hz.fillRect(RING.x - 460, RING.y - 460, 920, 920);
+      hz.globalCompositeOperation = 'destination-out';
+      hz.fillStyle = '#000';
+      for (const p of front) hz.fill(p);
       hz.restore();
 
       dotSpr = sprite(24 * dpr, (c) => {

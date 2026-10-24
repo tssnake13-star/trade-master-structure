@@ -416,6 +416,8 @@
 .td-line span { position: absolute; right: 0; top: -17px; padding: 1px 4px; border-radius: 3px; background: rgba(10,7,4,.86); font-family: 'Martian Mono', monospace; font-size: 9px; letter-spacing: .14em; text-transform: uppercase; }
 /* 24.10.2026: тейк подписан у левого конца линии — справа к концу круга свечи доходят до тейка и закрывали подпись */
 .td-line--take span { right: auto; left: 0; }
+/* 24.10.2026: у покупки подпись входа под линией — над ней цена уходит вверх и закрывала слово */
+.td-line--entry[data-below] span { top: 4px; }
 .td-line--entry { border-color: #ffd38a; color: #ffd38a; border-top-style: solid; }
 .td-line--entry span { right: auto; left: 0; }
 .td-line--stop { border-color: oklch(0.62 0.12 25); color: oklch(0.7 0.12 25); }
