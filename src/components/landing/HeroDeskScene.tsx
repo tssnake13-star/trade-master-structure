@@ -143,7 +143,6 @@ export default function HeroDeskScene({ variant, className }: Props) {
     const off = q<SVGSVGElement>('[data-off]');
     const dark = q<SVGSVGElement>('[data-dark]');
     const dark2 = q<HTMLDivElement>('[data-dark2]');
-    const rim = q<SVGSVGElement>('[data-rim]');
     const edge = q<HTMLDivElement>('[data-edge]');
     const card = q<HTMLDivElement>('[data-card]');
     const cx = chartsCv.getContext('2d');
@@ -237,7 +236,8 @@ export default function HeroDeskScene({ variant, className }: Props) {
       const light = ease(seg(p, 0.02, 0.3));
       fade(dark2, 0.78 * (1 - light));
       fade(dark, 1 - 0.75 * light);
-      fade(rim, 1 - ease(seg(p, 0.18, 0.42)));
+      // светящегося контура экранов во вступлении больше нет (24.10.2026, Сергей: «края мониторов подсвечиваются
+      // зачем-то… чтобы на мониторах просто постепенно появлялись графики»)
       screensOn = ease(seg(p, 0.3, 0.58));
       fade(off, 1 - screensOn);
       ringOn = seg(p, 0.6, 0.97);
@@ -620,13 +620,6 @@ export default function HeroDeskScene({ variant, className }: Props) {
             <rect x="0" y="0" width="1672" height="941" fill={`url(#hd-lamp-${variant})`} />
           </svg>
           <div data-dark2 className="hd-layer" style={{ background: 'var(--v3-bg)', opacity: 0.78 }} />
-          <svg data-rim {...svgProps}>
-            <defs><filter id={`hd-soft-${variant}`}><feGaussianBlur stdDeviation="2.2" /></filter></defs>
-            <g fill="none" stroke="#e9a54a" strokeWidth="2.4" filter={`url(#hd-soft-${variant})`}>
-              <path d={SCREEN_L.svg} />
-              <path d={SCREEN_R.svg} />
-            </g>
-          </svg>
           <div data-edge className="hd-layer" />
         </div>
         <canvas data-fx className="hd-layer" />
