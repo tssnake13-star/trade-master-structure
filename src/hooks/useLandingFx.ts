@@ -99,8 +99,11 @@ export default function useLandingFx() {
       el.dataset.in = '';
       // несколько графиков в одной роли (список сделок) сканируются по очереди, как прежде карточки
       el.querySelectorAll<HTMLElement>('[data-scan], [data-shine]').forEach((s, i) => {
-        s.style.setProperty('--sd', `${d + 380 + i * 120}ms`);
-        if (s.hasAttribute('data-scan')) s.dataset.scanning = '';
+        const scan = s.hasAttribute('data-scan');
+        // 24.10.2026, Сергей: «повторяется, но слишком быстро… медленнее нельзя?» — скан идёт по списку сделок
+        // волной сверху вниз, следующая строка через 0,45 с (было 0,12 с, и список вспыхивал почти весь сразу)
+        s.style.setProperty('--sd', `${d + 380 + i * (scan ? 450 : 120)}ms`);
+        if (scan) s.dataset.scanning = '';
         else s.dataset.shining = '';
       });
       const role = el.dataset.fx;
