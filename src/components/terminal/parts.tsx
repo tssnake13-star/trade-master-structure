@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useRef, type CSSProperties } from 'react';
 import { ACCENT, DIM, DOWN, FG, MONO, SANS, UP, card, label, fmtDate } from './theme';
 
 // Форма данных витрины — то, что кладёт мост с VPS (terminal_publish.py).
@@ -111,65 +111,50 @@ export interface MarketRow {
  *  (echo-fx.css). У родителя класс tm-sel или свой position. fit: out — кольцо вокруг кнопки, in — по её рамке (строки
  *  в прокрутке), seg — вокруг плашки переключателя. phase — сдвиг круга в секундах, чтобы лучи не крутились в ногу;
  *  period — круг в секундах (большим карточкам — медленнее, как на карточках сайта).
- *  25.10.2026, Сергей на планшете: «вокруг кнопки инструмента полоска… как будто подвисает… кнопка широкая… неадекватно
- *  ползёт». Раньше луч был конусом света, который крутится вокруг центра кнопки: на строке 770×36 он полкруга ползал
- *  по коротким торцам и проскакивал длинные стороны, а у концов строки света не хватало. Теперь по контуру кнопки
- *  (SVG-прямоугольник её размера и скругления) бежит черта с хвостом — четыре штриха, голова у всех в одной точке —
- *  с ровной скоростью по рамке на любой ширине. Круг не быстрее BEAM_SPEED px/с; размер берём с самой кнопки. */
-const BEAM_SPEED = 150;
-// штрихи хвоста: длина px — от длинного бледного к короткой белой голове (цвета — echo-fx.css, .tm-bt0…3)
-const BEAM_TAIL = [120, 56, 24, 7];
+ *  Сергей: «ползущая полоска на кнопке Инструмент, Скринер — идеальная… должна быть везде одинаковая» — луч тот же,
+ *  что у вкладки раздела (echo-fx.css). На длинной строке (шире WIDE высот: инструмент на планшете и телефоне) конус
+ *  вокруг центра идти ровно не может — Сергей: «как будто подвисает… неадекватно ползёт». Там по средней линии кольца
+ *  едет полоса с тем же хвостом (offset-path), скорость BAR_SPEED px/с; размер берём с самой кнопки. */
+const WIDE = 6;
+const BAR_SPEED = 170;
+const canRide = typeof CSS !== 'undefined' && typeof CSS.supports === 'function' && CSS.supports('offset-path', 'path("M 0 0 H 1")');
 export function Beam({ fit = 'out', crypto = false, phase = 0, period }: { fit?: 'out' | 'in' | 'seg'; crypto?: boolean; phase?: number; period?: number }) {
   const ref = useRef<HTMLSpanElement>(null);
   useLayoutEffect(() => {
     const el = ref.current;
-    const rects = el ? Array.from(el.querySelectorAll('rect')) : [];
-    if (!el || !rects.length) return;
-    const calm = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let anims: Animation[] = [];
+    const bar = el?.firstElementChild as HTMLElement | null;
+    if (!el || !bar) return;
     const fitTo = () => {
       const w = el.offsetWidth, h = el.offsetHeight;
       if (!w || !h) return;
-      const sw = fit === 'out' ? 2 : 1.5;
-      const iw = w - sw, ih = h - sw;
-      const r = Math.min(Math.max(0, (parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0) - sw / 2), iw / 2, ih / 2);
-      const p = 2 * (iw + ih) - (8 - 2 * Math.PI) * r; // периметр скруглённого прямоугольника
-      const ms = Math.max((period ?? 4.4) * 1000, (p / BEAM_SPEED) * 1000);
-      anims.forEach((a) => a.cancel());
-      anims = [];
-      rects.forEach((rc, i) => {
-        const len = Math.min(BEAM_TAIL[i], p * 0.42);
-        rc.setAttribute('x', String(sw / 2));
-        rc.setAttribute('y', String(sw / 2));
-        rc.setAttribute('width', String(iw));
-        rc.setAttribute('height', String(ih));
-        rc.setAttribute('rx', String(r));
-        rc.setAttribute('stroke-width', String(sw));
-        rc.setAttribute('stroke-dasharray', `${len} ${p - len}`);
-        // голова штриха на месте head: смещение = длина − пройденный путь
-        if (calm || typeof rc.animate !== 'function') {
-          rc.setAttribute('stroke-dashoffset', String(len));
-          return;
-        }
-        anims.push(rc.animate([{ strokeDashoffset: `${len}px` }, { strokeDashoffset: `${len - p}px` }], { duration: ms, iterations: Infinity, easing: 'linear', delay: -phase * 1000 }));
-      });
+      const wide = canRide && w / h > WIDE;
+      el.classList.toggle('tm-beam-wide', wide);
+      if (!wide) {
+        if (period) el.style.setProperty('--bp', `${period}s`);
+        else el.style.removeProperty('--bp');
+        return;
+      }
+      // средняя линия кольца: кольцо 2 px по краю коробки луча, скругление как у неё
+      const t = 1;
+      const r = Math.min(Math.max(0, (parseFloat(getComputedStyle(el).borderTopLeftRadius) || 0) - t), (h - 2 * t) / 2);
+      const x0 = t, y0 = t, x1 = w - t, y1 = h - t;
+      bar.style.setProperty(
+        'offset-path',
+        `path("M ${x0 + r} ${y0} H ${x1 - r} A ${r} ${r} 0 0 1 ${x1} ${y0 + r} V ${y1 - r} A ${r} ${r} 0 0 1 ${x1 - r} ${y1} ` +
+          `H ${x0 + r} A ${r} ${r} 0 0 1 ${x0} ${y1 - r} V ${y0 + r} A ${r} ${r} 0 0 1 ${x0 + r} ${y0} Z")`,
+      );
+      const perim = 2 * (x1 - x0 + y1 - y0) - (8 - 2 * Math.PI) * r;
+      el.style.setProperty('--bp', `${(perim / BAR_SPEED).toFixed(2)}s`);
     };
     fitTo();
     const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(fitTo);
     ro?.observe(el);
-    return () => {
-      ro?.disconnect();
-      anims.forEach((a) => a.cancel());
-    };
-  }, [fit, period, phase]);
+    return () => ro?.disconnect();
+  }, [period]);
   const cls = `tm-beam tm-beam-2${fit === 'out' ? '' : ` tm-beam-${fit}`}${crypto ? ' tm-beam-crypto' : ''}`;
   return (
-    <span ref={ref} className={cls} aria-hidden="true">
-      <svg className="tm-beam-svg">
-        {BEAM_TAIL.map((_, i) => (
-          <rect key={i} className={`tm-bt${i}`} />
-        ))}
-      </svg>
+    <span ref={ref} className={cls} style={{ '--bd': `${-phase}s`, ...(period ? { '--bp': `${period}s` } : null) } as CSSProperties} aria-hidden="true">
+      <i className="tm-beam-bar" />
     </span>
   );
 }
