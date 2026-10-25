@@ -752,7 +752,8 @@ export default function SchoolTerminal() {
         <TradingStyle />
       </div>
 
-      <nav className="tm-tabs" style={{ display: 'flex', gap: 6, padding: '12px 14px 0', overflowX: 'auto' }}>
+      {/* 25.10.2026: снизу место под свечение и кольцо луча выбранной вкладки — иначе прокрутка вкладок его срезает */}
+      <nav className="tm-tabs" style={{ display: 'flex', gap: 6, padding: '12px 14px 8px', overflowX: 'auto' }}>
         {/* 18.10.2026, его слово: в пробном режиме как с курсами — сначала то, что открыто (журнал решений первым),
             вкладки под замком — в конце и с замком */}
         {(trial
@@ -811,7 +812,9 @@ export default function SchoolTerminal() {
         ) : (
           sidebar
         )}
-        <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+        {/* 25.10.2026, Сергей: «в терминале вообще не вижу никаких изменений… анимация вообще не видна» — раздел
+            при переключении вкладки проявляется (key — заново на каждой вкладке) */}
+        <div key={section} className="tm-sec" style={{ minWidth: 0, display: 'flex', flexDirection: 'column' }}>
           {section === 'instrument' && instrument}
           {section === 'screener' && (trial ? <TrialLock what="Скринер" /> : <ScreenerCards doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />)}
           {section === 'top' && (trial ? <TrialLock what="ТОП-лист" /> : <ScreenerCards part="top" doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />)}

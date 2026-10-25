@@ -35,7 +35,17 @@
   transform: translate(-50%, -50%) rotate(0deg);
   animation: egSpin 8s linear infinite;
 }
-.tm-beam::before { animation-duration: 6s; }
+/* 25.10.2026, Сергей: «бегающее еле заметно» — у выбранной вкладки золотой фон, и золотой луч по её рамке сливался.
+   Луч — кольцом в 4 px вокруг вкладки, светлый, круг 3,6 с; сама вкладка мягко светится */
+.tm-beam { inset: -4px; padding: 2px; border-radius: 11px; }
+.tm-beam::before {
+  background: conic-gradient(from 0deg, transparent 0deg 240deg, rgba(225, 168, 77, 0.4) 290deg, rgba(255, 226, 170, 0.95) 335deg, #fff 352deg, transparent 360deg);
+  animation-duration: 3.6s;
+}
+.tm-pill-on { animation: tmPillGlow 2.6s ease-in-out infinite; }
+@keyframes tmPillGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(225, 168, 77, 0); } 50% { box-shadow: 0 0 12px 1px rgba(225, 168, 77, 0.5); } }
+/* раздел при переключении вкладки проявляется */
+.tm-sec { animation: egPage 0.45s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
 @keyframes egSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
 
 /* ---- глаз моргает раз в 7 с, зрачок светится (значок Eye: path — веко, circle — зрачок) ---- */
@@ -88,7 +98,7 @@
   z-index: -1;
   pointer-events: none;
   overflow: hidden;
-  opacity: 0.55;
+  opacity: 0.9;
   -webkit-mask: radial-gradient(ellipse at 30% 50%, #000 0%, transparent 75%);
   mask: radial-gradient(ellipse at 30% 50%, #000 0%, transparent 75%);
 }
@@ -96,11 +106,26 @@
   content: '';
   position: absolute;
   inset: -22px;
-  background-image: linear-gradient(rgba(225, 168, 77, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(225, 168, 77, 0.07) 1px, transparent 1px);
+  background-image: linear-gradient(rgba(225, 168, 77, 0.13) 1px, transparent 1px), linear-gradient(90deg, rgba(225, 168, 77, 0.13) 1px, transparent 1px);
   background-size: 22px 22px;
   animation: tmGrid 9s linear infinite;
 }
 @keyframes tmGrid { to { transform: translate(22px, 22px); } }
+/* по шапке раз в 7 с проходит полоса света — как скан по сделкам на главной */
+.tm-head-live::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 26%;
+  z-index: -1;
+  pointer-events: none;
+  background: linear-gradient(90deg, transparent, rgba(225, 168, 77, 0.1), rgba(255, 236, 200, 0.18), rgba(225, 168, 77, 0.1), transparent);
+  transform: translateX(-120%);
+  animation: tmSweep 7s ease-in-out infinite;
+}
+@keyframes tmSweep { 0%, 40% { transform: translateX(-120%); } 100% { transform: translateX(480%); } }
 .tm-dot-live { position: relative; }
 .tm-dot-live::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 1px solid currentColor; animation: tmPing 1.8s ease-out infinite; }
 @keyframes tmPing { from { transform: scale(0.6); opacity: 0.9; } to { transform: scale(1.9); opacity: 0; } }
@@ -228,7 +253,8 @@
 @keyframes egExit { 0% { opacity: 0; } 30% { opacity: 1; filter: drop-shadow(0 0 6px rgba(63, 185, 143, 1)); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .eg-orbit, .tm-beam, .tm-grid, .tm-scan { display: none; }
+  .eg-orbit, .tm-beam, .tm-grid, .tm-scan, .tm-head-live::after { display: none; }
+  .tm-pill-on, .tm-sec { animation: none !important; }
   .eg-blink > *, .tm-dot-live::after, .tm-boot *, .tm-eye-open svg > * { animation: none !important; }
   .eg-page, .eg-fill, .eg-shine::after, .eg-stamp, .eg-thump, .eg-shake, .eg-hint-flash, .eg-eye-draw *, .eg-rise, .eg-word,
   .eg-new::after, .eg-badge, .eg-badge::after, .eg-vstamp, .eg-exit-flash { animation: none !important; }
