@@ -227,11 +227,15 @@ function PricesTab() {
       {per ? <span style={{ fontSize: 12, color: DIM, fontFamily: MONO }}>{per}</span> : null}
     </div>
   );
-  const study: [string, string, { price: string; oldPrice?: string; period: string }][] = [
+  // 25.10.2026, его слово: «выделить годовую подписку и практикум… как на сайте» — на сайте практикум подсвечен лучом
+  // (PackageCards, featured); здесь у него та же золотая рамка и луч, что у годовой подписки
+  const study: [string, string, { price: string; oldPrice?: string; period: string }, boolean?][] = [
     ['Trade System', 'Курс TRADE SYSTEM 2.0 и полный алгоритм системы. Проходите сами, в своём темпе.', STUDY_PRICES.tradeSystem],
-    ['Практикум', 'Живое занятие раз в неделю, разбор ваших сделок и обратная связь по каждому решению. Набор потоками, от 3 человек.', STUDY_PRICES.practicum],
+    ['Практикум', 'Живое занятие раз в неделю, разбор ваших сделок и обратная связь по каждому решению. Набор потоками, от 3 человек.', STUDY_PRICES.practicum, true],
     ['VIP', 'Все пять этапов обучения и год сопровождения, ECHO-GATE INSIDE на год, индикаторы, скрипты и таблицы системы. Hunter Bot и Risk Sentinel остаются у вас навсегда.', STUDY_PRICES.vip],
   ];
+  // луч по рамке выделенной карточки — медленный, как на карточках сайта; у двух карточек разные фазы
+  const beam = (on: boolean, phase: number) => (on ? <Beam fit="in" period={8} phase={phase} /> : null);
   return (
     <div style={{ lineHeight: 1.5 }}>
       {/* автор — блок «Автор» сайта, теми же словами, коротко */}
@@ -304,9 +308,10 @@ function PricesTab() {
         Терминал находит сделку, по каждому допуску я даю вердикт. Вы отмечаете точку входа и нажимаете СТАРТ, дальше сделку ведёт советник.
       </div>
       {ECOSYSTEM.map((e) => (
-        <div key={e.period} style={card(e.featured)}>
+        <div key={e.period} className={e.featured ? 'tm-sel' : undefined} style={card(e.featured)}>
           {price(e.price, e.oldPrice, e.period)}
           {e.tgNote || e.saving ? <div style={{ fontSize: 12.5, color: DIM, marginTop: 4 }}>{[e.tgNote, e.saving].filter(Boolean).join(' ')}</div> : null}
+          {beam(e.featured, 0)}
         </div>
       ))}
       <div style={{ fontSize: 12.5, color: DIM, margin: '4px 0 6px' }}>
@@ -316,11 +321,12 @@ function PricesTab() {
         Торговли без убытков не бывает, и я её не обещаю. Убыточные сделки бывают и подряд, зато риск каждой известен до входа.
       </div>
       {head('Обучение')}
-      {study.map(([name, what, p]) => (
-        <div key={name} style={card()}>
+      {study.map(([name, what, p, hot]) => (
+        <div key={name} className={hot ? 'tm-sel' : undefined} style={card(hot)}>
           <div style={{ fontSize: 15, fontWeight: 700, color: FG, marginBottom: 2 }}>{name}</div>
           {price(p.price, p.oldPrice, p.period)}
           <div style={{ fontSize: 12.5, color: DIM, marginTop: 4 }}>{what}</div>
+          {beam(!!hot, 4)}
         </div>
       ))}
       <div style={{ marginTop: 16, textAlign: 'center' }}>

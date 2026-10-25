@@ -49,7 +49,7 @@
    и в сделках, выбранная сделка. Светится только вкладка раздела, она главная; у остальных свечения нет, круг 4,4 с,
    и каждый луч в своей фазе (--bd), чтобы на экране они не крутились в ногу */
 .tm-sel { position: relative; isolation: isolate; }
-.tm-beam-2::before { animation-duration: 4.4s; animation-delay: var(--bd, 0s); }
+.tm-beam-2::before { animation-duration: var(--bp, 4.4s); animation-delay: var(--bd, 0s); }
 /* кольцо по своей рамке — у строк в прокрутке наружное кольцо срезалось бы */
 .tm-beam-in { inset: -1px; padding: 1.5px; border-radius: inherit; }
 /* плашка переключателя — кольцо в зазоре между плашкой и рамкой дорожки */

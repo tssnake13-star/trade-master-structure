@@ -109,10 +109,11 @@ export interface MarketRow {
  *  и для списка, и для шапки, и для клетки главного блока, и для карточки группы. */
 /** 25.10.2026, его слово: «то, что выбрано, должно сопровождаться этой бегающей штучкой» — луч по рамке выбранного
  *  (echo-fx.css). У родителя класс tm-sel или свой position. fit: out — кольцо вокруг кнопки, in — по её рамке (строки
- *  в прокрутке), seg — вокруг плашки переключателя. phase — сдвиг круга в секундах, чтобы лучи не крутились в ногу. */
-export function Beam({ fit = 'out', crypto = false, phase = 0 }: { fit?: 'out' | 'in' | 'seg'; crypto?: boolean; phase?: number }) {
+ *  в прокрутке), seg — вокруг плашки переключателя. phase — сдвиг круга в секундах, чтобы лучи не крутились в ногу;
+ *  period — круг в секундах (большим карточкам — медленнее, как на карточках сайта). */
+export function Beam({ fit = 'out', crypto = false, phase = 0, period }: { fit?: 'out' | 'in' | 'seg'; crypto?: boolean; phase?: number; period?: number }) {
   const cls = `tm-beam tm-beam-2${fit === 'out' ? '' : ` tm-beam-${fit}`}${crypto ? ' tm-beam-crypto' : ''}`;
-  return <span className={cls} style={{ '--bd': `${-phase}s` } as CSSProperties} aria-hidden="true" />;
+  return <span className={cls} style={{ '--bd': `${-phase}s`, ...(period ? { '--bp': `${period}s` } : null) } as CSSProperties} aria-hidden="true" />;
 }
 
 export const ALPHA_TIP = 'индекс доллара — главный поводырь долларовых пар';
