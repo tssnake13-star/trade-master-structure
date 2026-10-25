@@ -19,6 +19,8 @@
  * сверху, снизу, на правой боковой». Панель сверху, шкала цены справа и шкала времени снизу сняты: свечи
  * идут во весь экран, свеча, уезжающая за левый край, обрезается по контуру экрана.
  *
+ * 25.10.2026: живой график остался на правом мониторе, на левом — снимок настоящего терминала (drawShot).
+ *
  * Рисуется на canvas в координатах картинки (1672×941): вызывающий уже выставил ctx.setTransform.
  */
 
@@ -156,6 +158,53 @@ function grain() {
   }
   grainTile = c;
   return c;
+}
+
+/** стекло экрана: блик, затемнение к краям, зерно, свет на верхней кромке — одно на живой график и на снимок */
+export function drawGlass(ctx: CanvasRenderingContext2D, sc: Screen) {
+  ctx.save();
+  ctx.clip(sc.active);
+  const g0 = sc.map(0.05, 0), g1 = sc.map(0.75, 1);
+  const sheen = ctx.createLinearGradient(g0[0], g0[1], g1[0], g1[1]);
+  sheen.addColorStop(0, 'rgba(255,255,255,0)');
+  sheen.addColorStop(0.32, 'rgba(255,255,255,0.045)');
+  sheen.addColorStop(0.42, 'rgba(255,255,255,0.012)');
+  sheen.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = sheen;
+  ctx.fill(sc.active);
+  ctx.strokeStyle = 'rgba(0,0,0,0.22)';
+  ctx.lineWidth = 14;
+  ctx.stroke(sc.active);
+  ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+  ctx.lineWidth = 5;
+  ctx.stroke(sc.active);
+  const pat = ctx.createPattern(grain(), 'repeat');
+  if (pat) {
+    ctx.globalAlpha = 0.045;
+    ctx.fillStyle = pat;
+    ctx.fill(sc.active);
+    ctx.globalAlpha = 1;
+  }
+  ctx.restore();
+  ctx.strokeStyle = 'rgba(205,190,165,0.32)';
+  ctx.lineWidth = 0.8;
+  ctx.stroke(sc.topEdge);
+}
+
+/**
+ * Экран со снимком вместо живого графика. 25.10.2026, Сергей: «нужен реальный скрин… не нарисованный… то, что
+ * реально человек увидит» — на левом мониторе настоящий терминал ECHO-GATE INSIDE, снятый с сайта. Снимок заранее
+ * натянут на изогнутый экран (scratchpad/make_hero_terminal.py, та же раскладка, что у графиков в makeScreen) и лежит
+ * в рамке box кадра; пока картинка не пришла, экран тёмный.
+ */
+export function drawShot(ctx: CanvasRenderingContext2D, sc: Screen, img: CanvasImageSource | null, box: { x: number; y: number; w: number; h: number }) {
+  ctx.fillStyle = '#040507';
+  ctx.fill(sc.face);
+  if (!img) return;
+  ctx.save();
+  ctx.clip(sc.active);
+  ctx.drawImage(img, box.x, box.y, box.w, box.h);
+  ctx.restore();
 }
 
 export class LiveScreen {
@@ -307,34 +356,7 @@ export class LiveScreen {
 
   /** неподвижное стекло поверх графика: блик, затемнение к краям, зерно, свет на верхней кромке */
   drawOver(ctx: CanvasRenderingContext2D) {
-    const sc = this.screen;
-    ctx.save();
-    ctx.clip(sc.active);
-    const g0 = sc.map(0.05, 0), g1 = sc.map(0.75, 1);
-    const sheen = ctx.createLinearGradient(g0[0], g0[1], g1[0], g1[1]);
-    sheen.addColorStop(0, 'rgba(255,255,255,0)');
-    sheen.addColorStop(0.32, 'rgba(255,255,255,0.045)');
-    sheen.addColorStop(0.42, 'rgba(255,255,255,0.012)');
-    sheen.addColorStop(1, 'rgba(255,255,255,0)');
-    ctx.fillStyle = sheen;
-    ctx.fill(sc.active);
-    ctx.strokeStyle = 'rgba(0,0,0,0.22)';
-    ctx.lineWidth = 14;
-    ctx.stroke(sc.active);
-    ctx.strokeStyle = 'rgba(0,0,0,0.25)';
-    ctx.lineWidth = 5;
-    ctx.stroke(sc.active);
-    const pat = ctx.createPattern(grain(), 'repeat');
-    if (pat) {
-      ctx.globalAlpha = 0.045;
-      ctx.fillStyle = pat;
-      ctx.fill(sc.active);
-      ctx.globalAlpha = 1;
-    }
-    ctx.restore();
-    ctx.strokeStyle = 'rgba(205,190,165,0.32)';
-    ctx.lineWidth = 0.8;
-    ctx.stroke(sc.topEdge);
+    drawGlass(ctx, this.screen);
   }
 
   /** живая часть кадра: зоны, уровни, свечи. dt — сколько прошло с прошлого кадра */

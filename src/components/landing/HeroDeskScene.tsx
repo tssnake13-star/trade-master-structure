@@ -4,7 +4,8 @@ import ringLightUrl from '@/assets/hero-ring-light.webp';
 import ringOffUrl from '@/assets/hero-ring-off.webp';
 import ringBloomUrl from '@/assets/hero-ring-bloom.webp';
 import depthUrl from '@/assets/hero-depth.webp';
-import { LiveScreen, makeScreen, type LiveEvent, type ScreenDef } from './heroDeskLive';
+import terminalShotUrl from '@/assets/hero-terminal.webp';
+import { LiveScreen, drawGlass, drawShot, makeScreen, type LiveEvent, type ScreenDef } from './heroDeskLive';
 import { createDepthPhoto, FOCUS, PIVOT } from './heroDepth';
 
 /**
@@ -17,6 +18,10 @@ import { createDepthPhoto, FOCUS, PIVOT } from './heroDepth';
  * с кольцом (4.webp из переписки): кольцо, дым и стол — настоящая фотография, на экранах наш
  * терминал по точным изогнутым контурам (heroDeskLive.ts). Картинки готовит
  * scratchpad/make_hero_assets.py: кадр с погашенными экранами, свет кольца и «кольцо выключено».
+ *
+ * 25.10.2026, Сергей: «нужен реальный скрин… не нарисованный… то, что реально человек увидит». На левом мониторе —
+ * настоящий терминал ECHO-GATE INSIDE: снимок с сайта (вкладка «Инструмент», без строки администратора), заранее
+ * натянутый на изогнутый экран (scratchpad/make_hero_terminal.py → hero-terminal.webp). Живой график — на правом.
  *
  * Вступление идёт само, медленно (8 с): в комнате загорается свет, мониторы плавно включаются,
  * камера отъезжает, кольцо прорисовывается по кругу: заплатка «кольцо выключено» снимается
@@ -45,6 +50,8 @@ const LEFT: ScreenDef = { x0: 819, x1: 1151.5, top: [-0.0001549, 0.238506, 216.3
 const RIGHT: ScreenDef = { x0: 1157.5, x1: 1581, top: [-0.0002235, 0.4116427, 107.5255], bot: [7.72e-5, -0.1567598, 561.3228], chin: 0.0139 };
 // рамка обоих мониторов: в ней лежат заготовки экранов
 const MON_BOX = { x: 812, y: 196, w: 776, h: 330 };
+// снимок терминала на левом мониторе: рамка кадра, в которой он натянут (та же в make_hero_terminal.py)
+const TERM_BOX = { x: 819, y: 285, w: 333, h: 200 };
 // кольцо на кадре и рамка картинок света кольца
 const RING = { x: 1214.7, y: 312.4, r: 268.7 };
 const RING_BOX = { x: 922, y: 19, w: 585, h: 586 };
@@ -221,10 +228,10 @@ export default function HeroDeskScene({ variant, className }: Props) {
       window.clearTimeout(cardTimer);
       cardTimer = window.setTimeout(() => card.classList.remove('is-on'), 4600);
     };
-    const screens = [
-      new LiveScreen(SCREEN_L, 74, 1700, 7, onEvent),
-      new LiveScreen(SCREEN_R, 96, 1300, 21, onEvent),
-    ];
+    // живой график — на правом мониторе, на левом снимок терминала (termShot, рисуется в заготовку-подложку)
+    const live = new LiveScreen(SCREEN_R, 96, 1300, 21, onEvent);
+    const termShot = new Image();
+    let termReady = false;
 
     // погасший до нуля слой прячем совсем: видеокарте не нужно его складывать с остальными
     const fade = (node: HTMLElement | SVGElement, o: number) => {
@@ -298,7 +305,13 @@ export default function HeroDeskScene({ variant, className }: Props) {
         const c = cv.getContext('2d');
         if (!c) continue;
         c.setTransform(s, 0, 0, s, F.tx * dpr - monX, F.ty * dpr - monY);
-        for (const sc of screens) if (part === 'under') sc.drawUnder(c); else sc.drawOver(c);
+        if (part === 'under') {
+          drawShot(c, SCREEN_L, termReady ? termShot : null, TERM_BOX);
+          live.drawUnder(c);
+        } else {
+          drawGlass(c, SCREEN_L);
+          live.drawOver(c);
+        }
       }
 
       // дымка в свете кольца — один раз, дальше у слоя меняется только прозрачность
@@ -334,6 +347,9 @@ export default function HeroDeskScene({ variant, className }: Props) {
     layout();
     const ro = new ResizeObserver(layout);
     ro.observe(el);
+    // снимок терминала пришёл — перерисовать заготовку подложки
+    termShot.onload = () => { termReady = true; layout(); };
+    termShot.src = terminalShotUrl;
 
     /** бегущий блик: свет кольца в окне вокруг головы, вырезанный пятнами головы и хвоста */
     const drawComet = (ang: number, alpha: number) => {
@@ -440,7 +456,7 @@ export default function HeroDeskScene({ variant, className }: Props) {
       if (screensOn <= 0) return;
       cx.drawImage(underCv, monX, monY);
       cx.setTransform(F.k * dpr, 0, 0, F.k * dpr, F.tx * dpr, F.ty * dpr);
-      for (const sc of screens) sc.drawLive(cx, now, dt);
+      live.drawLive(cx, now, dt);
       cx.setTransform(1, 0, 0, 1, 0, 0);
       cx.drawImage(overCv, monX, monY);
     };
@@ -485,6 +501,7 @@ export default function HeroDeskScene({ variant, className }: Props) {
       still();
       ringLight.addEventListener('load', still);
       ringOff.addEventListener('load', still);
+      termShot.addEventListener('load', still);
       depth?.whenReady.then(still).catch(() => {});
       return () => { ro.disconnect(); };
     }
@@ -535,7 +552,7 @@ export default function HeroDeskScene({ variant, className }: Props) {
       drawRing(now);
       drawFx(now);
       breathe(now);
-      if (screensOn > 0.95 && now - cardAt > 7000) screens[cardN % 2].nudge();
+      if (screensOn > 0.95 && now - cardAt > 7000) live.nudge();
 
       if (use3d && depth && !cam3d) {
         // пар без 3D: камера стоит, фото «течёт» только в маске пара; сдвиг за мышью — общий, как у обычного фото
