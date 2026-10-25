@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { ACCENT, DIM, DOWN, FG, MONO, SANS, UP, card, label, fmtDate } from './theme';
 
 // Форма данных витрины — то, что кладёт мост с VPS (terminal_publish.py).
@@ -106,6 +107,14 @@ export interface MarketRow {
  *  крупно написать по-английски». Отсюда «поводырь ALPHA»: ALPHA жирно, золотом и в 1,4 раза
  *  крупнее слов рядом — размер берётся от окружающего текста, поэтому одна метка годится
  *  и для списка, и для шапки, и для клетки главного блока, и для карточки группы. */
+/** 25.10.2026, его слово: «то, что выбрано, должно сопровождаться этой бегающей штучкой» — луч по рамке выбранного
+ *  (echo-fx.css). У родителя класс tm-sel или свой position. fit: out — кольцо вокруг кнопки, in — по её рамке (строки
+ *  в прокрутке), seg — вокруг плашки переключателя. phase — сдвиг круга в секундах, чтобы лучи не крутились в ногу. */
+export function Beam({ fit = 'out', crypto = false, phase = 0 }: { fit?: 'out' | 'in' | 'seg'; crypto?: boolean; phase?: number }) {
+  const cls = `tm-beam tm-beam-2${fit === 'out' ? '' : ` tm-beam-${fit}`}${crypto ? ' tm-beam-crypto' : ''}`;
+  return <span className={cls} style={{ '--bd': `${-phase}s` } as CSSProperties} aria-hidden="true" />;
+}
+
 export const ALPHA_TIP = 'индекс доллара — главный поводырь долларовых пар';
 export function GuideAlpha() {
   return (

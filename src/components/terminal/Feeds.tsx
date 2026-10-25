@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { mondayOfSignal, type JournalVideo } from '@/lib/journalVideos';
 import { ACCENT, DIM, DOWN, FG, MONO, UP, BORDER, card, label, fmtWhen, fromBotTime, pill, marketOfSym, type MarketKey } from './theme';
 import type { HistoryDoc } from './History';
+import { Beam } from './parts';
 import { VideoReviews, WeekHeader } from './Reviews';
 import type { TimeItem } from './TimeMachine';
 import { newestMs, readSeen, timeMs, writeSeen } from '@/lib/journalSeen';
@@ -72,8 +73,10 @@ export function MarketSwitch({ value, onChange, counts, locked }: { value: Marke
   return (
     <div style={{ display: 'flex', gap: 6, marginBottom: 12 }}>
       {(['fx', 'crypto'] as MarketKey[]).map((m) => (
-        <button key={m} onClick={() => onChange(m)} style={pill(value === m)}>
+        <button key={m} onClick={() => onChange(m)} className={value === m ? 'tm-sel' : undefined} style={pill(value === m)}>
           {m === 'fx' ? 'Форекс' : 'Крипта'} · {locked === m ? '🔒' : counts[m]}
+          {/* 25.10.2026, его слово: по выбранному бежит луч */}
+          {value === m ? <Beam phase={1.9} /> : null}
         </button>
       ))}
     </div>

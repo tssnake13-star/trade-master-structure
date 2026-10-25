@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useRef, useState, type C
 import { supabase } from '@/integrations/supabase/client';
 import { ACCENT, BORDER, CARD, DIM, DOWN, FG, MONO, UP, card, label, fmtWhen, marketOfSym, type MarketKey } from './theme';
 import { JournalCalendar, MarketSwitch } from './Feeds';
+import { Beam } from './parts';
 import { GEN } from './screenerParse';
 import LiveChart from './LiveChart';
 import type { Layer, Scene, ScenePanel, SBar } from './scene';
@@ -573,6 +574,7 @@ export function TimeMachine({ doc, symbols, onOpen }: { doc?: { items?: TimeItem
               setIdx(i);
               hide();
             }}
+            className={i === idx ? 'tm-sel' : undefined}
             // другие решения того же дня, что и открытое, — в пунктирной рамке: видно, что в этот день их было несколько
             style={{ flex: '0 0 auto', textAlign: 'left', background: CARD, border: i === idx ? `1px solid ${ACCENT}` : dayOfTm(x.time) === dayOfTm(it.time) ? `1px dashed ${ACCENT}99` : `1px solid ${BORDER}`, borderRadius: 8, padding: '7px 10px', cursor: 'pointer', color: FG }}
           >
@@ -580,6 +582,8 @@ export function TimeMachine({ doc, symbols, onOpen }: { doc?: { items?: TimeItem
             <div style={{ fontSize: 13, marginTop: 2 }}>
               {x.instrument} <span style={{ ...sideTag(x.side), fontSize: 9, padding: '1px 5px' }}>{x.side}</span>
             </div>
+            {/* 25.10.2026: луч по рамке открытой сделки — по своей рамке, ленту листают вбок */}
+            {i === idx ? <Beam fit="in" phase={0.3} /> : null}
           </button>
         ))}
       </div>

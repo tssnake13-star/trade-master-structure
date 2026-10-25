@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { Bitcoin, Moon, Search } from 'lucide-react';
 import { ACCENT, BORDER, CRYPTO, CRYPTO_TEXT, DIM, DOWN, FG, MONO, SANS, UP, card, label } from './theme';
-import { ALPHA_TIP, CritMarks, SymbolName, type MarketRow } from './parts';
+import { ALPHA_TIP, Beam, CritMarks, SymbolName, type MarketRow } from './parts';
 import { GEN } from './screenerParse';
 import { SCEN_META, groupRows, scenarioRows, type ScenBlock } from './sidebarRows';
 
@@ -106,7 +106,10 @@ function MarketSwitch({ market, onChange }: { market: Market; onChange: (m: Mark
           transform: `translateX(${market === 'crypto' ? '100%' : '0'})`,
           transition: 'transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1), background-color 180ms',
         }}
-      />
+      >
+        {/* 25.10.2026, его слово: по выбранному бежит луч — едет вместе с плашкой, у крипты её цвета */}
+        <Beam fit="seg" crypto={market === 'crypto'} phase={0.8} />
+      </span>
       {items.map(([m, icon]) => {
         const on = market === m;
         return (
@@ -147,7 +150,7 @@ function MarketSwitch({ market, onChange }: { market: Market; onChange: (m: Mark
 }
 
 /** Переключатель вида: с 04.10.2026 — второй, под рынком, поэтому тише: тёмная плашка, светлое слово. */
-function ModeSwitch({ mode, onChange }: { mode: SideMode; onChange: (m: SideMode) => void }) {
+function ModeSwitch({ mode, onChange, market }: { mode: SideMode; onChange: (m: SideMode) => void; market: Market }) {
   return (
     <div
       className="tm-seg"
@@ -168,7 +171,9 @@ function ModeSwitch({ mode, onChange }: { mode: SideMode; onChange: (m: SideMode
           transform: `translateX(${mode === 'scen' ? '100%' : '0'})`,
           transition: 'transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1)',
         }}
-      />
+      >
+        <Beam fit="seg" crypto={market === 'crypto'} phase={2.0} />
+      </span>
       {MODES.map(([m, name]) => (
         <button
           key={m}
@@ -202,7 +207,7 @@ function ModeSwitch({ mode, onChange }: { mode: SideMode; onChange: (m: SideMode
 function InstrumentRow({ r, on, guide, tip, edge, market, onOpen }: { r: MarketRow; on: boolean; guide: boolean; tip?: string; edge?: string; market: Market; onOpen: (sym: string) => void }) {
   return (
     <button
-      className="tm-side-row"
+      className={on ? 'tm-side-row tm-sel' : 'tm-side-row'}
       aria-current={on ? 'true' : undefined}
       onClick={() => onOpen(r.symbol)}
       style={{
@@ -228,6 +233,8 @@ function InstrumentRow({ r, on, guide, tip, edge, market, onOpen }: { r: MarketR
       <SymbolName symbol={r.symbol} guide={guide} tip={tip} color={LOOK[market].text} />
       <CritMarks r={r} />
       <span style={{ fontFamily: MONO, fontSize: 11, color: DIM, minWidth: 62, textAlign: 'right' }}>{r.price_text || '—'}</span>
+      {/* 25.10.2026: луч по рамке выбранной строки — по своей рамке, наружное кольцо прокрутка срезала бы */}
+      {on ? <Beam fit="in" crypto={market === 'crypto'} phase={3.3} /> : null}
     </button>
   );
 }
@@ -443,7 +450,7 @@ export default function TerminalSidebar({
     >
       <style>{SIDE_CSS}</style>
       <MarketSwitch market={market} onChange={setMarket} />
-      <ModeSwitch mode={mode} onChange={setMode} />
+      <ModeSwitch mode={mode} onChange={setMode} market={market} />
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '4px 6px 10px' }}>
         <Search size={14} color={DIM} />
         <input

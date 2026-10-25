@@ -44,6 +44,20 @@
 }
 .tm-pill-on { animation: tmPillGlow 2.6s ease-in-out infinite; }
 @keyframes tmPillGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(225, 168, 77, 0); } 50% { box-shadow: 0 0 12px 1px rgba(225, 168, 77, 0.5); } }
+/* 25.10.2026, его слово: «везде, где выбрано, должна бегать вот эта штучка… чтобы хоть какое-то движение было» — тот же
+   луч на всём выбранном: рынок, группы и сценарии, строка инструмента, вкладки справа, вид графика, рынок в журнале
+   и в сделках, выбранная сделка. Светится только вкладка раздела, она главная; у остальных свечения нет, круг 4,4 с,
+   и каждый луч в своей фазе (--bd), чтобы на экране они не крутились в ногу */
+.tm-sel { position: relative; isolation: isolate; }
+.tm-beam-2::before { animation-duration: 4.4s; animation-delay: var(--bd, 0s); }
+/* кольцо по своей рамке — у строк в прокрутке наружное кольцо срезалось бы */
+.tm-beam-in { inset: -1px; padding: 1.5px; border-radius: inherit; }
+/* плашка переключателя — кольцо в зазоре между плашкой и рамкой дорожки */
+.tm-beam-seg { inset: -2.5px; padding: 1.5px; border-radius: 8.5px; }
+/* рынок крипты — луч её цвета */
+.tm-beam-crypto::before {
+  background: conic-gradient(from 0deg, transparent 0deg 240deg, rgba(127, 119, 221, 0.45) 290deg, rgba(210, 205, 250, 0.95) 335deg, #fff 352deg, transparent 360deg);
+}
 /* раздел при переключении вкладки проявляется */
 .tm-sec { animation: egPage 0.45s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
 @keyframes egSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }

@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ArrowLeft, Lock } from 'lucide-react';
 import { ACCENT, BG, BLUE, BORDER, DIM, DISCLAIMER, FG, MONO, SANS, UP, card, label, pill, fmtDate } from '@/components/terminal/theme';
-import { ALPHA_TIP, CycleCard, Lines, type MarketRow } from '@/components/terminal/parts';
+import { ALPHA_TIP, Beam, CycleCard, Lines, type MarketRow } from '@/components/terminal/parts';
 import TerminalSidebar from '@/components/terminal/Sidebar';
 import { Brand, Decision, TradingStyle } from '@/components/terminal/Decision';
 import { FalseExitFeed, TrendFeed, VerdictsFeed, type FeedDocs, type Verdict } from '@/components/terminal/Feeds';
@@ -564,8 +564,10 @@ export default function SchoolTerminal() {
     <div style={{ ...card, padding: 12 }}>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
         {tabs.map((t) => (
-          <button key={t} onClick={() => setTab(t)} style={{ ...pill(tab === t), padding: '5px 9px' }}>
+          <button key={t} onClick={() => setTab(t)} className={tab === t ? 'tm-sel' : undefined} style={{ ...pill(tab === t), padding: '5px 9px' }}>
             {t}
+            {/* 25.10.2026, его слово: по всему выбранному бежит луч, как по вкладке раздела */}
+            {tab === t ? <Beam phase={3.8} /> : null}
           </button>
         ))}
       </div>
@@ -622,22 +624,26 @@ export default function SchoolTerminal() {
       <div style={{ ...card, padding: 12 }}>
         <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
           {KINDS.map(([k, name]) => (
-            <button key={k} onClick={() => setKind(k)} style={pill(kind === k)}>
+            <button key={k} onClick={() => setKind(k)} className={kind === k ? 'tm-sel' : undefined} style={pill(kind === k)}>
               {name}
+              {kind === k ? <Beam phase={1.4} /> : null}
             </button>
           ))}
           <span style={{ ...label, marginLeft: 'auto' }}>{KINDS.find(([k]) => k === kind)?.[2]}</span>
         </div>
         <div style={{ display: 'flex', gap: 6, marginBottom: 10, flexWrap: 'wrap', alignItems: 'center' }}>
-          <button onClick={() => setLive(true)} style={{ ...pill(live), padding: '4px 9px' }}>
+          <button onClick={() => setLive(true)} className={live ? 'tm-sel' : undefined} style={{ ...pill(live), padding: '4px 9px' }}>
             живой график
+            {live ? <Beam phase={2.7} /> : null}
           </button>
-          <button onClick={() => setLive(false)} style={{ ...pill(!live), padding: '4px 9px' }}>
+          <button onClick={() => setLive(false)} className={!live ? 'tm-sel' : undefined} style={{ ...pill(!live), padding: '4px 9px' }}>
             картинка как в боте
+            {!live ? <Beam phase={2.7} /> : null}
           </button>
           {live && scene && phone ? (
-            <button onClick={() => setShowLayers(!showLayers)} style={{ ...pill(showLayers), padding: '4px 9px' }}>
+            <button onClick={() => setShowLayers(!showLayers)} className={showLayers ? 'tm-sel' : undefined} style={{ ...pill(showLayers), padding: '4px 9px' }}>
               слои {showLayers ? '▴' : '▾'}
+              {showLayers ? <Beam phase={0.5} /> : null}
             </button>
           ) : null}
           {live && scene && (showLayers || !phone)
@@ -782,13 +788,21 @@ export default function SchoolTerminal() {
       </nav>
       {/* 25.09.2026, его слово: вкладки только для него — отдельно от общих кнопок, своей строкой */}
       {adminSections.length ? (
-        <nav className="tm-tabs" style={{ display: 'flex', gap: 6, padding: '8px 14px 0', overflowX: 'auto', alignItems: 'center' }}>
+        // 25.10.2026: снизу место под свечение и кольцо луча, как у общих вкладок
+        <nav className="tm-tabs" style={{ display: 'flex', gap: 6, padding: '8px 14px 8px', overflowX: 'auto', alignItems: 'center' }}>
           <span style={{ ...label, display: 'flex', alignItems: 'center', gap: 5, marginRight: 4, whiteSpace: 'nowrap' }}>
             <Lock size={11} color={ACCENT} /> администратор
           </span>
           {adminSections.map(([s, name]) => (
-            <button key={s} onClick={() => go(s)} style={{ ...pill(section === s), borderStyle: section === s ? 'solid' : 'dashed' }}>
+            <button
+              key={s}
+              onClick={() => go(s)}
+              className={section === s ? 'tm-pill-on' : undefined}
+              style={{ ...pill(section === s), borderStyle: section === s ? 'solid' : 'dashed' }}
+            >
               {name}
+              {/* его вкладка раздела — главная, как общие: луч и свечение */}
+              {section === s ? <span className="tm-beam" aria-hidden="true" /> : null}
             </button>
           ))}
         </nav>
