@@ -20,7 +20,8 @@ const LevelsSection = () => {
         <RouteChooser showPrices={false} heading="h2" clickPrefix="landing" />
 
         <div className="mt-10 md:mt-14">
-          <PackageCards showPrices={false} choiceNote="bottom" />
+          {/* 25.10.2026: «Как устроен выбор» — в колонке под VIP (side), а не отдельной строкой под карточками */}
+          <PackageCards showPrices={false} choiceNote="side" />
         </div>
 
         {/* 11.10.2026 отсюда сняли схему «Два пути. Один алгоритм.» (два пути показывались трижды подряд).

@@ -180,7 +180,7 @@ export default function PackageCards({
   showPrices,
   ctaHref = TELEGRAM_LINKS.bot,
   choiceNote = 'top',
-}: { showPrices: boolean; ctaHref?: string; choiceNote?: 'top' | 'bottom' }) {
+}: { showPrices: boolean; ctaHref?: string; choiceNote?: 'top' | 'bottom' | 'side' }) {
   const ts = PACKAGES[0];
 
   // строка «что входит»
@@ -221,13 +221,13 @@ export default function PackageCards({
       ? `Ближайший поток стартует ${stream}. Беру не всех: поток идёт от 3 человек, а если наберётся меньше, предложу индивидуальный формат на те же 60 дней или перенос на следующий поток. Напишите, скажу, подходит ли вам этот формат.`
       : p.admission;
 
-  // стандартная вертикальная карточка — практикум / Trade OS Plus / VIP
-  const stdCard = (p: Pkg) => (
+  // стандартная вертикальная карточка — практикум / Trade OS Plus / VIP; grow — карточка добирает высоту колонки
+  const stdCard = (p: Pkg, grow = false) => (
     <div
       key={p.name}
       id={`pkg-${p.clickId}`}
       data-beam={p.featured ? '' : undefined}
-      className="relative flex flex-col p-6 md:p-7"
+      className={`relative flex flex-col p-6 md:p-7${grow ? ' flex-1' : ''}`}
       style={{
         background: p.featured
           ? 'radial-gradient(120% 80% at 50% 0%, hsl(var(--accent) / 0.08), hsl(var(--card)) 60%)'
@@ -301,17 +301,20 @@ export default function PackageCards({
     </div>
   );
 
-  // «Как устроен выбор»: с 08.10.2026 и на /access, и на лендинге стоит под карточками (выбор наверху делает RouteChooser)
-  const choiceNoteBlock = (
+  // «Как устроен выбор»: с 08.10.2026 и на /access, и на лендинге стоит под карточками (выбор наверху делает RouteChooser).
+  // side — в колонке под VIP (25.10.2026, Сергей: «VIP табличка полупустая… уменьшить и под ней разместить текст, как
+  // устроен выбор… немножко места сэкономим»): на компьютере VIP была выше своего содержимого вдвое, под ней пустовало
+  // ~500 px, а блок стоял ниже отдельной строкой. В узкой колонке оба пути идут друг под другом, не в два столбика
+  const choiceNoteBlock = (side = false) => (
     <>
     {/* Два пути (Сергей, 07.10.2026). Курс и практикум — разные ступени,
         а не версии одного продукта: решение о ступени принимается на берегу.
         Доплата работает наверх, в VIP. */}
     {/* 23.10.2026, Сергей: «написано слишком много текста. Один абзац… разделить на два столбика»
         и «принципы из книги „Пиши, сокращай“». Те же условия, по одному в строке, в две колонки по путям. */}
-    <div className="mb-3 p-4 md:p-5" style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}>
+    <div className={side ? 'p-4 md:p-5' : 'mb-3 p-4 md:p-5'} style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}>
       <div className="text-mono" style={{ ...MONO, color: LABEL }}>Как устроен выбор</div>
-      <div className="mt-3 grid md:grid-cols-2 gap-x-8 gap-y-5 text-sm text-foreground/85 leading-relaxed">
+      <div className={`mt-3 grid ${side ? '' : 'md:grid-cols-2 '}gap-x-8 gap-y-5 text-sm text-foreground/85 leading-relaxed`}>
         <div>
           <div className="text-foreground font-medium">Торговать по системе</div>
           <ul className="mt-2 space-y-1.5 list-disc pl-4 marker:text-muted-foreground">
@@ -336,7 +339,7 @@ export default function PackageCards({
 
   return (
     <>
-      {choiceNote === 'top' && choiceNoteBlock}
+      {choiceNote === 'top' && choiceNoteBlock()}
 
       {/* путь 01 — подписка для всех, главный продукт */}
       <div id="echo-gate" data-beam="" data-fx="card" className="mb-3 p-6 md:p-7" style={{ background: 'radial-gradient(120% 80% at 50% 0%, hsl(var(--accent) / 0.08), hsl(var(--card)) 60%)', border: '1px solid hsl(var(--accent) / 0.45)' }}>
@@ -499,13 +502,24 @@ export default function PackageCards({
           </div>
         </div>
 
-        {/* Практикум + VIP под Trade System. На телефоне в одну колонку. */}
-        <div className="grid gap-3 md:grid-cols-2">
-          {PACKAGES.slice(1).map(stdCard)}
-        </div>
+        {/* Практикум + VIP под Trade System. На телефоне в одну колонку. При side под VIP стоит «Как устроен выбор»:
+            VIP добирает высоту ряда (распорка уводит её цену и кнопку вниз), блок выбора — своей высоты */}
+        {choiceNote === 'side' ? (
+          <div className="grid gap-3 md:grid-cols-2">
+            {stdCard(PACKAGES[1])}
+            <div className="flex flex-col gap-3">
+              {PACKAGES.slice(2).map((p) => stdCard(p, true))}
+              {choiceNoteBlock(true)}
+            </div>
+          </div>
+        ) : (
+          <div className="grid gap-3 md:grid-cols-2">
+            {PACKAGES.slice(1).map((p) => stdCard(p))}
+          </div>
+        )}
       </div>
 
-      {choiceNote === 'bottom' && <div className="mt-3">{choiceNoteBlock}</div>}
+      {choiceNote === 'bottom' && <div className="mt-3">{choiceNoteBlock()}</div>}
     </>
   );
 }
