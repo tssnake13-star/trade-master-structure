@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import DOMPurify from 'dompurify';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, ArrowRight, MessageCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, ArrowRight, MessageCircle, CheckCircle, Lock } from 'lucide-react';
 import YouTubePlayer from '@/components/school/YouTubePlayer';
 import FloatingWatermark from '@/components/school/FloatingWatermark';
 import ConstellationBg from '@/components/ConstellationBg';
 import RichText from '@/components/RichText';
+import '@/styles/echo-fx.css';
 
 interface LessonData {
   id: string;
@@ -144,6 +145,13 @@ export default function SchoolLesson() {
     load();
   }, [userId, id, role]);
 
+  // 25.10.2026, идея 2 «Блок пройден»: нажали «Завершить блок» — на кнопку ложится штамп, «Следующее» открывается с лучом
+  // по рамке; блок, который открылся, в кабинете тоже один раз подсвечивается (CourseLadder, eg_unlocked).
+  // Идея 4: «Следующее», пока закрыто, отвечает на нажатие — замок вздрагивает
+  const [justDone, setJustDone] = useState(false);
+  const [nudgeNext, setNudgeNext] = useState(0);
+  useEffect(() => { setJustDone(false); setNudgeNext(0); }, [id]);
+
   const markCompleteSilent = async () => {
     if (!user || !lesson || isCompleted) return;
     await supabase.from('lesson_progress').insert({ user_id: user.id, lesson_id: lesson.id });
@@ -208,7 +216,7 @@ export default function SchoolLesson() {
         </div>
       </header>
 
-      <main className="flex-1 max-w-4xl mx-auto w-full px-4 sm:px-8 py-10 sm:py-14">
+      <main key={id} className="eg-page flex-1 max-w-4xl mx-auto w-full px-4 sm:px-8 py-10 sm:py-14">
         {/* Lesson header */}
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 18 }}>
           ◆ Занятие {String(currentIndex + 1).padStart(2, '0')} из {String(totalLessons).padStart(2, '0')}
@@ -361,15 +369,20 @@ export default function SchoolLesson() {
               )}
             </div>
           ) : (
+            <div className={`relative${justDone ? ' eg-thump' : ''}`}>
             <button
               onClick={async () => {
                 if (isCompleted || marking) return;
                 setMarking(true);
                 await markCompleteSilent();
                 setMarking(false);
+                setJustDone(true);
+                if (nextLessonId && (role === 'admin' || nextGranted)) {
+                  try { sessionStorage.setItem('eg_unlocked', nextLessonId); } catch { /* без хранилища — без подсветки в кабинете */ }
+                }
               }}
               disabled={isCompleted || marking}
-              className="flex items-center justify-center gap-2 py-3.5 transition hover:brightness-110"
+              className="w-full flex items-center justify-center gap-2 py-3.5 transition hover:brightness-110"
               style={{
                 backgroundColor: isCompleted ? 'transparent' : ACCENT,
                 border: isCompleted ? `1px solid ${ACCENT}` : 'none',
@@ -382,12 +395,17 @@ export default function SchoolLesson() {
             >
               <CheckCircle size={14} /> {isCompleted ? 'Блок завершён' : marking ? '...' : 'Завершить блок'}
             </button>
+            {justDone ? (
+              <span className="eg-stamp-wrap" aria-hidden="true"><span className="eg-stamp">Блок пройден</span></span>
+            ) : null}
+            </div>
           )}
 
           <button
-            onClick={handleNext}
-            disabled={!nextLessonId || !isNextUnlocked}
-            className="flex items-center justify-center gap-2 py-3.5 transition"
+            onClick={() => (isNextUnlocked ? handleNext() : setNudgeNext(Date.now()))}
+            disabled={!nextLessonId}
+            aria-disabled={!isNextUnlocked}
+            className={`flex items-center justify-center gap-2 py-3.5 transition${justDone && isNextUnlocked ? ' eg-live' : ''}`}
             style={{
               border: `1px solid ${BORDER}`, borderRadius: 8, backgroundColor: 'transparent',
               color: nextLessonId && isNextUnlocked ? FG : '#444',
@@ -396,7 +414,13 @@ export default function SchoolLesson() {
               cursor: nextLessonId && isNextUnlocked ? 'pointer' : 'default',
             }}
           >
-            Следующее <ArrowRight size={14} />
+            Следующее{' '}
+            {nextLessonId && !isNextUnlocked ? (
+              <Lock key={nudgeNext} size={13} className={nudgeNext ? 'eg-shake' : undefined} />
+            ) : (
+              <ArrowRight size={14} className={justDone ? 'eg-rise' : undefined} style={justDone ? ({ '--d': '0.6s' } as CSSProperties) : undefined} />
+            )}
+            {justDone && isNextUnlocked ? <span className="eg-orbit eg-once" aria-hidden="true" /> : null}
           </button>
         </div>
 

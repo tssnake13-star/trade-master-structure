@@ -826,7 +826,7 @@ export default function SchoolTerminal() {
               </span>
             </div>
           ) : null}
-          {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} outcomes={feeds.outcomes} videos={videos} symbols={symbols} onOpen={openSymbol} privateCrypto={isAdmin ? feeds.verdicts_crypto || { items: [] } : undefined} />}
+          {section === 'verdicts' && <VerdictsFeed doc={feeds.verdicts} outcomes={feeds.outcomes} videos={videos} symbols={symbols} onOpen={openSymbol} privateCrypto={isAdmin ? feeds.verdicts_crypto || { items: [] } : undefined} seenKey={user?.id} fx />}
           {/* пробному лента timemachine базой не отдаётся (правило market_feed_select) — замок, а не пустая вкладка */}
           {section === 'timemachine' &&
             (trial ? (

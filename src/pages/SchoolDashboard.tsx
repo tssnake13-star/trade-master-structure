@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState, type CSSProperties } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import DashboardBanners from '@/components/school/DashboardBanners';
 import { Lock, Settings, LogOut, ArrowRight, Menu, Ticket, Home as HomeIcon, MessageCircle, Eye } from 'lucide-react';
 import logoVideoFallback from '@/assets/logo-header.mp4';
@@ -11,6 +12,8 @@ import { setOwnVisitFlag } from '@/lib/analytics';
 import RichText from '@/components/RichText';
 import StructureField from '@/components/landing/StructureField';
 import '@/styles/echo-fx.css';
+import { useCountUp } from '@/hooks/useCountUp';
+import { countNew, newDecisionsText, newestMs, readSeen, writeSeen } from '@/lib/journalSeen';
 
 // v3 structure background for the cabinet — full-screen, faint, centred.
 const CabinetBg = () => (
@@ -125,25 +128,65 @@ function DashSkeleton() {
 }
 
 // Hero title with *italic accent* / ~muted~ markup
-function renderHeroTitle(text: string) {
+function renderHeroTitle(text: string, animate = false) {
   const parts: React.ReactNode[] = [];
   const regex = /(\*[^*]+\*|~[^~]+~)/g;
   let last = 0;
   let i = 0;
+  // 25.10.2026, идея 12 «приветствие»: при первом входе за сеанс слова заголовка проявляются по очереди
+  let n = 0;
+  const words = (s: string): ReactNode =>
+    animate
+      ? s.split(/(\s+)/).map((w, k) => (w.trim() ? <span key={k} className="eg-word" style={{ '--i': n++ } as CSSProperties}>{w}</span> : w))
+      : s;
   for (const m of text.matchAll(regex)) {
     const idx = m.index ?? 0;
-    if (idx > last) parts.push(<span key={i++} style={{ opacity: 0.55 }}>{text.slice(last, idx)}</span>);
+    if (idx > last) parts.push(<span key={i++} style={{ opacity: 0.55 }}>{words(text.slice(last, idx))}</span>);
     const token = m[0];
     if (token.startsWith('*')) {
-      parts.push(<em key={i++} style={{ color: ACCENT, fontStyle: 'italic' }}>{token.slice(1, -1)}</em>);
+      parts.push(<em key={i++} style={{ color: ACCENT, fontStyle: 'italic' }}>{words(token.slice(1, -1))}</em>);
     } else {
-      parts.push(<span key={i++} style={{ opacity: 0.55 }}>{token.slice(1, -1)}</span>);
+      parts.push(<span key={i++} style={{ opacity: 0.55 }}>{words(token.slice(1, -1))}</span>);
     }
     last = idx + token.length;
   }
-  if (last < text.length) parts.push(<span key={i++} style={{ opacity: 0.55 }}>{text.slice(last)}</span>);
-  return parts.length ? parts : <span style={{ opacity: 0.55 }}>{text}</span>;
+  if (last < text.length) parts.push(<span key={i++} style={{ opacity: 0.55 }}>{words(text.slice(last))}</span>);
+  return parts.length ? parts : <span style={{ opacity: 0.55 }}>{words(text)}</span>;
 }
+
+/** 25.10.2026, идея 12: подпись над приветствием — по времени суток ученика */
+const dayGreeting = (d: Date) => {
+  const h = d.getHours();
+  return h >= 5 && h < 12 ? 'Доброе утро' : h >= 12 && h < 18 ? 'Добрый день' : h >= 18 && h < 23 ? 'Добрый вечер' : 'Доброй ночи';
+};
+
+/** 25.10.2026, идея 5: часть экрана проигрывается один раз, когда до неё долистали */
+function useInViewOnce<T extends Element>() {
+  const ref = useRef<T>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || inView) return;
+    if (typeof IntersectionObserver === 'undefined') { setInView(true); return; }
+    const io = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setInView(true); io.disconnect(); }
+    }, { rootMargin: '0px 0px -12% 0px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [inView]);
+  return [ref, inView] as const;
+}
+
+/** приветствие проигрывается при первом входе за сеанс, дальше стоит */
+const firstInSession = (key: string) => {
+  try {
+    if (sessionStorage.getItem(key)) return false;
+    sessionStorage.setItem(key, '1');
+    return true;
+  } catch {
+    return false;
+  }
+};
 
 // ---------- helpers ----------
 function nextLiveStream(now: Date) {
@@ -263,6 +306,27 @@ export default function SchoolDashboard() {
       });
     return () => { alive = false; };
   }, [user, role]);
+  // 25.10.2026, идея 8 «цифра на кнопке с глазом»: сколько решений журнала ученик ещё не видел (что он видел, журнал
+  // запоминает в этом браузере — src/lib/journalSeen.ts). Пробному журнал отдаётся с задержкой, как в самом терминале
+  const [newCount, setNewCount] = useState(0);
+  useEffect(() => {
+    if (!user || eyeState !== 'open') return;
+    let alive = true;
+    const db = supabase as unknown as SupabaseClient;
+    const items: PromiseLike<{ time: string }[]> = eyeTrial && role !== 'admin'
+      ? db.rpc('terminal_trial_verdicts').then(({ data }) => (data as { items?: { time: string }[] } | null)?.items || [])
+      : db.from('market_feed').select('data').eq('key', 'verdicts').maybeSingle()
+        .then(({ data }) => (data as { data?: { items?: { time: string }[] } } | null)?.data?.items || []);
+    items.then((list) => {
+      if (!alive || !list.length) return;
+      const seen = readSeen(user.id);
+      // первый раз новым ничего не считается: запоминаем самое свежее решение
+      if (seen == null) { writeSeen(user.id, newestMs(list)); return; }
+      setNewCount(countNew(list, seen));
+    });
+    return () => { alive = false; };
+  }, [user, eyeState, eyeTrial, role]);
+  const openJournal = () => { setMobileSidebarOpen(false); navigate('/school/terminal?s=verdicts'); };
   const logoVideo = useSiteAsset(SITE_ASSET_KEYS.schoolDashboardLogo, logoVideoFallback);
   const now = useNow(1000);
 
@@ -635,7 +699,7 @@ export default function SchoolDashboard() {
         {eyeState && (
           <div className="px-3 pb-3">
             <button
-              onClick={() => { if (eyeState !== 'open') return; setMobileSidebarOpen(false); navigate('/school/terminal'); }}
+              onClick={() => { if (eyeState !== 'open') return; if (newCount > 0) { openJournal(); return; } setMobileSidebarOpen(false); navigate('/school/terminal'); }}
               disabled={eyeState !== 'open'}
               className={`w-full text-left rounded-md px-3 py-3 transition-all${eyeState === 'open' ? ' hover:bg-white/5 eg-live' : ''}`}
               style={{
@@ -674,6 +738,9 @@ export default function SchoolDashboard() {
                 </div>
               </div>
               {eyeState === 'open' ? <span className="eg-orbit" aria-hidden="true" /> : null}
+              {eyeState === 'open' && newCount > 0 ? (
+                <span className="eg-badge" title={`В журнале ${newDecisionsText(newCount)}`}>{newCount}</span>
+              ) : null}
             </button>
           </div>
         )}
@@ -771,7 +838,8 @@ export default function SchoolDashboard() {
         </header>
 
         {/* Body */}
-        <div className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-8 py-8 sm:py-12">
+        {/* 25.10.2026, идея 11: экран проявляется из размытия, при переходе главная ↔ курс — заново (key) */}
+        <div key={selectedCourse || 'home'} className="eg-page flex-1 max-w-6xl w-full mx-auto px-4 sm:px-8 py-8 sm:py-12">
           {/* Баннеры видны и на странице курса, вверху: человек, который проходит
               бесплатный курс, до главной кабинета может и не вернуться. */}
           {selectedCourseData && selectedAccessible && <DashboardBanners accessMap={accessMap} />}
@@ -853,6 +921,8 @@ export default function SchoolDashboard() {
               onOpenLesson={(id) => navigate(`/school/lesson/${id}`)}
               onSelectCourse={selectCourse}
               userId={user?.id}
+              newCount={eyeState === 'open' ? newCount : 0}
+              onOpenJournal={openJournal}
               t={t}
             />
           )}
@@ -919,6 +989,9 @@ export function SelectedCourseView({
   onOpenCourse: (id: string) => void;
   t: TFn;
 }) {
+  // 25.10.2026, идея 1: полоса прогресса доливается, цифры набегают
+  const doneShown = useCountUp(progress.completed);
+  const pctShown = useCountUp(pct);
   return (
     <>
       <div className="mb-8">
@@ -936,10 +1009,10 @@ export function SelectedCourseView({
         {progress.total > 0 && (
           <div className="mt-6 flex items-center gap-4">
             <div className="flex-1" style={{ height: 2, backgroundColor: BORDER, overflow: 'hidden' }}>
-              <div style={{ width: `${pct}%`, height: '100%', backgroundColor: ACCENT, transition: 'width 0.4s' }} />
+              <div className="eg-fill" style={{ width: `${pct}%`, height: '100%', backgroundColor: ACCENT, transition: 'width 0.4s' }} />
             </div>
             <span style={{ fontFamily: MONO, fontSize: 11, color: '#666', fontVariantNumeric: 'tabular-nums' }}>
-              {progress.completed}/{progress.total} · {pct}%
+              {doneShown}/{progress.total} · {pctShown}%
             </span>
           </div>
         )}
@@ -966,7 +1039,7 @@ export function SelectedCourseView({
 export function PaidHome({
   welcomeTitle, profileName, tmCourse, tmLessons, tmProgress, tmNextLesson,
   programCountdown, programEnd, daysInSystem, timeInSystem, isAdmin, upcomingLives, liveCountdown, recentActivity,
-  courses, progress, now, onOpenLesson, onSelectCourse, userId, t,
+  courses, progress, now, onOpenLesson, onSelectCourse, userId, newCount = 0, onOpenJournal, t,
 }: {
   welcomeTitle: string;
   profileName: string;
@@ -988,9 +1061,16 @@ export function PaidHome({
   onOpenLesson: (id: string) => void;
   onSelectCourse: (id: string) => void;
   userId?: string;
+  newCount?: number;
+  onOpenJournal?: () => void;
   t: TFn;
 }) {
   const greetingName = profileName ? profileName.split(' ')[0] : t('paid_hero_default_name');
+  // 25.10.2026, идея 12: подпись — по времени суток, если в админке не задана своя; слова заголовка — по очереди
+  const [greetAnim] = useState(() => firstInSession('eg_greet'));
+  const eyebrowText = t('paid_hero_eyebrow') === 'С возвращением' ? dayGreeting(now) : t('paid_hero_eyebrow');
+  // 25.10.2026, идея 1: «завершено» набегает с нуля
+  const completedShown = useCountUp(tmProgress?.completed ?? 0);
   const heroText = t('paid_hero_title_template', { name: greetingName });
   const remaining = tmProgress ? Math.max(0, tmProgress.total - tmProgress.completed) : 0;
   const completed = tmProgress?.completed ?? 0;
@@ -1002,10 +1082,10 @@ export function PaidHome({
       {/* Hero */}
       <div className="mb-12 tly-rise">
         <div style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.22em', textTransform: 'uppercase', color: ACCENT, marginBottom: 14 }}>
-          {t('paid_hero_eyebrow')}
+          {eyebrowText}
         </div>
         <h1 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(38px, 5.5vw, 64px)', lineHeight: 1.02, letterSpacing: '-0.025em', color: FG }}>
-          {renderHeroTitle(heroText)}
+          {renderHeroTitle(heroText, greetAnim)}
         </h1>
         <p className="mt-4" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '52ch' }}>
           {(() => {
@@ -1023,6 +1103,17 @@ export function PaidHome({
               : `Вы прошли ${tmPct}% основной программы. Ниже нажмите Открыть, чтобы быстро продолжить обучение.`;
           })()}
         </p>
+        {/* 25.10.2026, идея 12: под приветствием — что нового в журнале решений с прошлого раза */}
+        {newCount > 0 && onOpenJournal ? (
+          <button
+            onClick={onOpenJournal}
+            className="eg-rise mt-4 inline-flex items-center gap-2 hover:brightness-125 transition"
+            style={{ '--d': '0.7s', fontFamily: MONO, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT, background: 'none', border: 'none', padding: 0, cursor: 'pointer' } as CSSProperties}
+          >
+            <span className="eg-new-dot">в журнале {newDecisionsText(newCount)}</span>
+            <ArrowRight size={13} />
+          </button>
+        ) : null}
       </div>
 
       {/* Continue card + progress ring (bento) */}
@@ -1051,7 +1142,11 @@ export function PaidHome({
                   <span>{t('continue_meta_video')}</span>
                   <span>{t('continue_meta_pdf')}</span>
                 </div>
-                <div className="flex items-center gap-2 transition-transform group-hover:translate-x-1" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: ACCENT }}>
+                {/* 25.10.2026, идея 3: «Открыть» — золотая кнопка, по ней раз в 6 с проходит блик */}
+                <div
+                  className="eg-shine flex items-center gap-2 transition-transform group-hover:translate-x-1"
+                  style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500, backgroundColor: ACCENT, color: '#0a0a0a', padding: '9px 16px', borderRadius: 6 }}
+                >
                   {t('continue_open')} <ArrowRight size={14} />
                 </div>
               </div>
@@ -1095,7 +1190,7 @@ export function PaidHome({
         <div style={{ padding: '20px 22px', border: `1px solid ${BORDER}`, backgroundColor: CARD }}>
           <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555', marginBottom: 14 }}>{t('kpi_completed_label')}</div>
           <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 34, lineHeight: 1, color: FG, fontVariantNumeric: 'tabular-nums' }}>
-            {completed}<span style={{ color: '#666', fontSize: 20 }}> / {tmTotal}</span>
+            {completedShown}<span style={{ color: '#666', fontSize: 20 }}> / {tmTotal}</span>
           </div>
         </div>
         <div style={{ padding: '20px 22px', border: `1px solid ${BORDER}`, backgroundColor: CARD }}>
@@ -1368,7 +1463,10 @@ export function FreeHome({
               <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 22, color: FG, marginBottom: 8 }}>
                 {freeNext.title}
               </h2>
-              <div className="flex items-center gap-2 transition-transform group-hover:translate-x-1" style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: ACCENT }}>
+              <div
+                className="eg-shine inline-flex items-center gap-2 transition-transform group-hover:translate-x-1"
+                style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500, backgroundColor: ACCENT, color: '#0a0a0a', padding: '9px 16px', borderRadius: 6 }}
+              >
                 {t('free_continue_open')} <ArrowRight size={14} />
               </div>
             </button>
@@ -1466,6 +1564,20 @@ function CourseLadder({
   onOpenEcosystem?: () => void;
   t: TFn;
 }) {
+  // 25.10.2026, идея 4: нажали на закрытый блок — его замок вздрагивает, подпись «что нужно» загорается
+  const [nudge, setNudge] = useState<{ id: string; n: number } | null>(null);
+  // 25.10.2026, идея 2: блок, который открылся «Завершить блок» на уроке (SchoolLesson), — по его рамке один раз бежит луч
+  const [fresh] = useState(() => {
+    try {
+      const v = sessionStorage.getItem('eg_unlocked');
+      if (v) sessionStorage.removeItem('eg_unlocked');
+      return v;
+    } catch {
+      return null;
+    }
+  });
+  // 25.10.2026, идея 5: финальный узел «Курс пройден» проигрывается, когда до него долистали
+  const [bridgeRef, bridgeIn] = useInViewOnce<HTMLDivElement>();
   const total = lessons.length;
   if (total === 0) return null;
   const currentIdx = lessons.findIndex((l, i) => unlockedSortOrders.includes(i + 1) && !completedIds.has(l.id));
@@ -1503,13 +1615,13 @@ function CourseLadder({
                 fontFamily: MONO, fontWeight: 700, fontSize: 14, fontVariantNumeric: 'tabular-nums',
               }}
             >
-              {done ? '✓' : unlocked ? pad(num) : <Lock size={15} />}
+              {done ? '✓' : unlocked ? pad(num) : <Lock key={nudge?.id === l.id ? nudge.n : 0} size={15} className={nudge?.id === l.id ? 'eg-shake' : undefined} />}
             </span>
 
             {current ? (
               <button
                 onClick={() => onOpen(l.id)}
-                className="w-full text-left"
+                className={`w-full text-left${fresh === l.id ? ' eg-live' : ''}`}
                 style={{
                   marginTop: -4, padding: '18px 20px', border: `1px solid ${ACCENT}`,
                   backgroundColor: CARD, borderRadius: 10,
@@ -1532,6 +1644,7 @@ function CourseLadder({
                 <div className="flex items-center justify-between flex-wrap gap-3">
                   <span style={{ fontFamily: MONO, fontSize: 11, color: '#666' }}>{t('continue_meta_video')} · {t('continue_meta_pdf')}</span>
                   <span
+                    className="eg-shine"
                     style={{
                       display: 'inline-flex', alignItems: 'center', gap: 8,
                       fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
@@ -1541,16 +1654,21 @@ function CourseLadder({
                     {t('course_lesson_open')} <ArrowRight size={14} />
                   </span>
                 </div>
+                {fresh === l.id ? <span className="eg-orbit eg-once" aria-hidden="true" /> : null}
               </button>
             ) : (
               <button
-                onClick={() => (done || openable) && onOpen(l.id)}
-                disabled={!done && !openable}
+                onClick={() => (done || openable ? onOpen(l.id) : setNudge({ id: l.id, n: Date.now() }))}
+                aria-disabled={!done && !openable}
                 className="w-full text-left flex items-center justify-between gap-4"
                 style={{ minHeight: 44, cursor: done || openable ? 'pointer' : 'default' }}
               >
                 <div className="min-w-0">
-                  <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: done ? '#888' : openable ? ACCENT : '#55504a', marginBottom: 3 }}>
+                  <div
+                    key={nudge?.id === l.id ? nudge.n : 0}
+                    className={nudge?.id === l.id ? 'eg-hint-flash' : undefined}
+                    style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: done ? '#888' : openable ? ACCENT : '#55504a', marginBottom: 3 }}
+                  >
                     {/* вместо голого «закрыто» — что нужно, чтобы блок открылся */}
                     Блок {pad(num)}{done ? ' · пройден' : openable ? '' : ` · ${isFree ? t('course_lesson_locked_prev') : t('course_lesson_locked_mentor')}`}
                   </div>
@@ -1561,7 +1679,7 @@ function CourseLadder({
                 ) : openable ? (
                   <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: ACCENT, flexShrink: 0 }}>{t('course_lesson_open')}</span>
                 ) : (
-                  <Lock size={13} style={{ color: '#444', flexShrink: 0 }} />
+                  <Lock key={nudge?.id === l.id ? nudge.n : 0} size={13} className={nudge?.id === l.id ? 'eg-shake' : undefined} style={{ color: '#444', flexShrink: 0 }} />
                 )}
               </button>
             )}
@@ -1582,6 +1700,7 @@ function CourseLadder({
             ◆
           </span>
           <div
+            ref={bridgeRef}
             style={{
               marginTop: -4, padding: '20px 22px', border: `1px solid ${ACCENT}`,
               backgroundColor: CARD, borderRadius: 10,
@@ -1605,6 +1724,7 @@ function CourseLadder({
                   href="/#formats"
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="eg-live"
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: 8,
                     fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
@@ -1612,30 +1732,45 @@ function CourseLadder({
                   }}
                 >
                   Хочу в экосистему <ArrowRight size={14} />
+                  <span className="eg-orbit" aria-hidden="true" />
                 </a>
               </>
             ) : (
               /* Другие курсы: мост, ведущий в курс-экосистему */
               <>
-                <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 6 }}>
+                {/* глаз ECHO-GATE рисуется линией и открывается — тот же значок, что на кнопке в боковой панели */}
+                <svg
+                  className={bridgeIn ? 'eg-eye-draw' : 'eg-wait'}
+                  width={44} height={44} viewBox="0 0 24 24" fill="none" stroke={ACCENT} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round"
+                  style={{ display: 'block', marginBottom: 10, overflow: 'visible' }} aria-hidden="true"
+                >
+                  <g>
+                    <path pathLength={1} d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0" />
+                    <circle pathLength={1} cx="12" cy="12" r="3" />
+                  </g>
+                </svg>
+                <div className={bridgeIn ? 'eg-rise' : 'eg-wait'} style={{ '--d': '0.9s', fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 6 } as CSSProperties}>
                   Программа завершена
                 </div>
-                <h3 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 26, lineHeight: 1.15, color: FG, marginBottom: 10 }}>
+                <h3 className={bridgeIn ? 'eg-rise' : 'eg-wait'} style={{ '--d': '1s', fontFamily: DISPLAY, fontWeight: 350, fontSize: 26, lineHeight: 1.15, color: FG, marginBottom: 10 } as CSSProperties}>
                   Курс пройден. Дальше ECHO-GATE INSIDE.
                 </h3>
-                <p style={{ fontFamily: SANS, fontSize: 13, lineHeight: 1.55, color: '#a8a090', maxWidth: '56ch', marginBottom: 16 }}>
+                <p className={bridgeIn ? 'eg-rise' : 'eg-wait'} style={{ '--d': '1.15s', fontFamily: SANS, fontSize: 13, lineHeight: 1.55, color: '#a8a090', maxWidth: '56ch', marginBottom: 16 } as CSSProperties}>
                   Все блоки пройдены. Дальше можно подключить ECHO-GATE INSIDE: терминал,
                   мой вердикт по каждому допуску и советники на вашем счёте.
                 </p>
                 <button
                   onClick={onOpenEcosystem}
+                  className={`eg-live ${bridgeIn ? 'eg-rise' : 'eg-wait'}`}
                   style={{
+                    '--d': '1.3s',
                     display: 'inline-flex', alignItems: 'center', gap: 8,
                     fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
                     backgroundColor: ACCENT, color: '#0a0a0a', padding: '10px 18px', borderRadius: 6, cursor: 'pointer',
-                  }}
+                  } as CSSProperties}
                 >
                   Перейти в экосистему <ArrowRight size={14} />
+                  <span className="eg-orbit" aria-hidden="true" />
                 </button>
               </>
             )}

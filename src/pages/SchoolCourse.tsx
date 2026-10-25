@@ -6,6 +6,7 @@ import { ArrowLeft, Lock } from 'lucide-react';
 import ConstellationBg from '@/components/ConstellationBg';
 import { useDashboardTexts } from '@/lib/dashboardTexts';
 import RichText from '@/components/RichText';
+import '@/styles/echo-fx.css';
 
 interface Lesson {
   id: string;
@@ -108,7 +109,7 @@ export default function SchoolCourse() {
         </div>
       </header>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-8 py-5 sm:py-7">
+      <main className="eg-page max-w-5xl mx-auto px-4 sm:px-8 py-5 sm:py-7">
         <div className="mb-6">
           <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 10 }}>
             ◆ Программа

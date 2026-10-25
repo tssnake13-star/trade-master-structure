@@ -1,10 +1,11 @@
-import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { mondayOfSignal, type JournalVideo } from '@/lib/journalVideos';
 import { ACCENT, DIM, DOWN, FG, MONO, UP, BORDER, card, label, fmtWhen, fromBotTime, pill, marketOfSym, type MarketKey } from './theme';
 import type { HistoryDoc } from './History';
 import { VideoReviews, WeekHeader } from './Reviews';
 import type { TimeItem } from './TimeMachine';
+import { newestMs, readSeen, timeMs, writeSeen } from '@/lib/journalSeen';
 
 /**
  * Ленты терминала: скринер, тренд по накоплениям, резонанс, решения владельца.
@@ -549,7 +550,7 @@ function OutcomeBlock({ o }: { o?: Outcome }) {
 }
 
 // 18.10.2026: picUrl — терминал в Телеграме берёт картинки из открытого ящика tgpub, а не по подписанной ссылке
-export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picUrl, privateCrypto }: { doc?: FeedDocs['verdicts']; outcomes?: FeedDocs['outcomes']; videos?: JournalVideo[]; symbols: Set<string>; onOpen: Open; picUrl?: (path: string) => string; privateCrypto?: FeedDocs['verdicts_crypto'] }) {
+export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picUrl, privateCrypto, seenKey, fx = false }: { doc?: FeedDocs['verdicts']; outcomes?: FeedDocs['outcomes']; videos?: JournalVideo[]; symbols: Set<string>; onOpen: Open; picUrl?: (path: string) => string; privateCrypto?: FeedDocs['verdicts_crypto']; seenKey?: string; fx?: boolean }) {
   // 18.10.2026: администратору — и его решения по крипте «только мне» (privateCrypto); подписчику в этом режиме
   // журнал крипты под замком
   const all = [...(doc?.items || []), ...(privateCrypto?.items || [])].sort((a, b) => b.time.localeCompare(a.time));
@@ -557,6 +558,33 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
   const [mk, setMk] = useState<MarketKey>('fx');
   const items = cryptoLocked && mk === 'crypto' ? [] : all.filter((v) => marketOfSym(v.instrument) === mk);
   const counts = { fx: all.filter((v) => marketOfSym(v.instrument) === 'fx').length, crypto: all.filter((v) => marketOfSym(v.instrument) === 'crypto').length };
+  // 25.10.2026, идея 7 «новое в журнале» (веб-кабинет, fx): решения, которых ученик ещё не видел, — с золотой меткой
+  // и одним проходом скана; увиденным журнал считается через 2,5 с. Первый раз новым ничего не считается
+  const [seenAt] = useState(() => (fx ? readSeen(seenKey) : null));
+  const newest = newestMs(all);
+  useEffect(() => {
+    if (!fx || !seenKey || !newest) return;
+    if (seenAt == null) { writeSeen(seenKey, newest); return; }
+    const t = window.setTimeout(() => writeSeen(seenKey, newest), 2500);
+    return () => window.clearTimeout(t);
+  }, [fx, seenKey, newest, seenAt]);
+  // 25.10.2026, идея 10: плашка «ДОПУСК / ОТКАЗ» ставится штампом, когда карточка появляется на экране (один раз)
+  const listRef = useRef<HTMLDivElement>(null);
+  const itemsKey = items.map((v) => v.time).join('|');
+  useEffect(() => {
+    const root = listRef.current;
+    if (!fx || !root || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+      const el = e.target as HTMLElement;
+      if (e.isIntersecting) {
+        el.classList.remove('eg-vs-wait');
+        el.classList.add('eg-vstamp');
+        io.unobserve(el);
+      } else if (!el.classList.contains('eg-vstamp')) el.classList.add('eg-vs-wait');
+    }), { rootMargin: '0px 0px -8% 0px' });
+    root.querySelectorAll('[data-vstamp]').forEach((el) => { if (!el.classList.contains('eg-vstamp')) io.observe(el); });
+    return () => io.disconnect();
+  }, [fx, itemsKey]);
   // 25.09.2026: серии «Допуск-отказ» — плеер сверху; «разбор этой недели» у карточек включает серию в нём
   const [vid, setVid] = useState<string | null>(null);
   // 19.10.2026: день, выбранный в календаре, — его решения в списке подсвечены пару секунд
@@ -654,9 +682,11 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
       {cryptoLocked && mk === 'crypto' ? (
         <div style={{ ...card, padding: 14, color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>🔒 Журнал по крипте закрыт: решения по крипте Сергей сейчас ведёт только для себя. Сигналы по крипте подписчикам не приходят.</div>
       ) : !items.length ? <div style={{ color: DIM, fontSize: 13, marginBottom: 10 }}>{mk === 'crypto' ? 'Решений по крипте пока нет.' : 'Решений по форексу пока нет.'}</div> : null}
-      <div style={{ display: 'grid', gap: 10 }}>
-        {items.map((v, i) => {
+      <div ref={listRef} style={{ display: 'grid', gap: 10 }}>
+        {(() => { let newN = 0; return items.map((v, i) => {
           const ok = v.verdict === 'ДОПУСК';
+          const fresh = seenAt != null && timeMs(v.time) > seenAt;
+          const nIdx = fresh ? newN++ : 0;
           const long = v.side === 'LONG';
           const known = symbols.has(v.instrument);
           // неделя — по его времени (UTC+5), как у бота; первая карточка недели — с заголовком недели
@@ -668,7 +698,8 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
             {newWeek ? <WeekHeader monday={wk} video={wv} onPlay={() => wv && play(wv.id)} /> : null}
             <div
               data-day={i === 0 || dayOf(items[i - 1].time) !== dayOf(v.time) ? dayOf(v.time) : undefined}
-              style={{ ...card, padding: 12, scrollMarginTop: 12, transition: 'box-shadow .3s', ...(flash === dayOf(v.time) ? { boxShadow: `0 0 0 2px ${ACCENT}` } : null) }}
+              className={fresh ? 'eg-new' : undefined}
+              style={{ ...card, padding: 12, scrollMarginTop: 12, transition: 'box-shadow .3s', ...(flash === dayOf(v.time) ? { boxShadow: `0 0 0 2px ${ACCENT}` } : null), ...(fresh ? { '--n': nIdx } : null) } as CSSProperties}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                 {/* 10.10.2026, его слово: «дата и время сигнала в журнале — очень заметно, но не очень крупно» —
@@ -693,6 +724,7 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
                   <span style={{ fontSize: 10, fontWeight: 400, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT }}>сигнал</span>
                   {v.no_time ? dayOf(v.time).split('-').reverse().join('.') : fmtWhen(v.time)}
                 </span>
+                {fresh ? <span className="eg-new-dot">новое</span> : null}
                 {v.archive ? (
                   <span title="Решение до кнопок в боте — из моей таблицы решений" style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.1em', color: DIM, border: `1px dashed ${BORDER}`, borderRadius: 6, padding: '2px 7px' }}>
                     из таблицы решений
@@ -701,6 +733,7 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
                 <span style={{ fontFamily: MONO, fontSize: 14, color: FG }}>{v.instrument}</span>
                 <span style={{ fontFamily: MONO, fontSize: 11, color: long ? UP : DOWN }}>{v.side}</span>
                 <span
+                  data-vstamp={fx ? '' : undefined}
                   style={{
                     fontFamily: MONO,
                     fontSize: 10,
@@ -747,7 +780,7 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
             </div>
             </Fragment>
           );
-        })}
+        }); })()}
       </div>
       {full ? (
         <div

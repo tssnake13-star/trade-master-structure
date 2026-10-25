@@ -4,6 +4,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, Check, KeyRound, User as UserIcon } from 'lucide-react';
 import ConstellationBg from '@/components/ConstellationBg';
+import '@/styles/echo-fx.css';
 
 /**
  * SchoolProfile — «Профиль» ученика (/school/profile).
@@ -172,7 +173,7 @@ export default function SchoolProfile() {
         </div>
       </header>
 
-      <main className="max-w-2xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
+      <main className="eg-page max-w-2xl mx-auto px-4 sm:px-8 py-8 sm:py-12">
         <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.32em', textTransform: 'uppercase', color: ACCENT, marginBottom: 12 }}>
           ◆ Профиль
         </div>

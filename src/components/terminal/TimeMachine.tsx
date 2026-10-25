@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { ACCENT, BORDER, CARD, DIM, DOWN, FG, MONO, UP, card, label, fmtWhen, marketOfSym, type MarketKey } from './theme';
 import { JournalCalendar, MarketSwitch } from './Feeds';
@@ -62,6 +62,9 @@ export interface TmView {
 // 18.10.2026, его слово: «здесь живой график не нужен… в веб-версии тоже можно сделать статичную картинку» — и в кабинете
 // машина времени рисует статично
 export const TmViewCtx = createContext<TmView>({ still: true });
+
+// 25.10.2026, идея 6: за сколько «что было дальше» доходит до конца на всех трёх графиках
+const REVEAL_MS = 2400;
 
 type Open = (symbol: string) => void;
 
@@ -134,7 +137,7 @@ function exitLook(it: TimeItem): { tag: string; col: string } | null {
   return { tag: `тейк ${it.exit.slice(8, 10)}.${it.exit.slice(5, 7)}`, col: UP };
 }
 
-function Chart({ tf, show, when, keep, exitCol }: { tf: Tf; show: boolean; when: string; keep: number; exitCol?: string }) {
+function Chart({ tf, show, when, keep, exitCol, rev = 1 }: { tf: Tf; show: boolean; when: string; keep: number; exitCol?: string; rev?: number }) {
   // ⛔ 21.10.2026: окно — свечи до решения и «после» до свечи выхода, одно в обоих видах; шкала цены «как было» — только
   // по свечам до решения, иначе по пустому месту видно, куда цена пойдёт
   const B = tf.bars.slice(0, tf.cut + keep);
@@ -152,7 +155,8 @@ function Chart({ tf, show, when, keep, exitCol }: { tf: Tf; show: boolean; when:
   const X = (i: number) => pl + (i + 0.5) * step;
   const Y = (p: number) => pt + ((hi - p) / (hi - lo)) * (H - pt - pb);
   const w = Math.max(1, step * 0.62);
-  const n = show ? B.length : tf.cut;
+  // 25.10.2026, идея 6: «что было дальше» проигрывается — видна доля rev свечей после решения
+  const n = show ? tf.cut + Math.ceil(keep * rev) : tf.cut;
   const xc = X(tf.cut) - step / 2;
   const dg = hi > 1000 ? 0 : hi > 100 ? 1 : hi > 10 ? 3 : 4;
   const day = (s: string) => `${s.slice(8, 10)}.${s.slice(5, 7)}`;
@@ -184,7 +188,7 @@ function Chart({ tf, show, when, keep, exitCol }: { tf: Tf; show: boolean; when:
           </g>
         );
       })}
-      {show && exitCol && keep > 0 ? <line x1={X(B.length - 1) + step / 2} x2={X(B.length - 1) + step / 2} y1={pt} y2={H - pb} stroke={exitCol} strokeWidth={2} /> : null}
+      {show && exitCol && keep > 0 && rev >= 1 ? <line className="eg-exit-flash" x1={X(B.length - 1) + step / 2} x2={X(B.length - 1) + step / 2} y1={pt} y2={H - pb} stroke={exitCol} strokeWidth={2} /> : null}
       <line x1={xc} x2={xc} y1={pt} y2={H - pb} stroke={ACCENT} strokeWidth={2} strokeDasharray="5 4" />
       <rect x={xc - 60} y={pt} width={120} height={19} rx={4} fill={ACCENT} />
       <text x={xc} y={pt + 13} fill="#0a0a0a" fontSize={12} fontWeight={700} textAnchor="middle">решение {when}</text>
@@ -359,25 +363,28 @@ function cleanH4(p: TmPanel): TmPanel {
 /** Панель рисунка бота на момент сигнала: до решения — свечи бота, после — ещё и свечи «что было дальше» до свечи
  *  выхода; золотая черта — момент решения, зелёная — тейк. Окно одно и то же в обоих видах, чтобы «после»
  *  не прыгало. */
-function scenePanel(sc: { panels: TmPanel[] } | null, tf: string, show: boolean, all = true, it?: TimeItem): Scene | null {
+function scenePanel(sc: { panels: TmPanel[] } | null, tf: string, show: boolean, all = true, it?: TimeItem, rev = 1): Scene | null {
   const P0 = sc?.panels.find((x) => x.tf === tf);
   const P = P0 && tf === 'H4' && !all ? cleanH4(P0) : P0;
   if (!P || !P.bars?.length) return null;
-  const after = (P.after || []).slice(0, keepAfter(P.after || [], tf, it ? cutOf(it) : undefined, it?.tf?.H4));
+  const afterAll = (P.after || []).slice(0, keepAfter(P.after || [], tf, it ? cutOf(it) : undefined, it?.tf?.H4));
+  // 25.10.2026, идея 6: «что было дальше» проигрывается — видна доля rev свечей «после»; окно и шкала — по всем свечам,
+  // чтобы график не прыгал, пока свечи появляются
+  const after = afterAll.slice(0, Math.ceil(afterAll.length * rev));
   const n = P.bars.length;
   const bars = show ? [...P.bars, ...after] : P.bars;
-  const x1 = Math.max(P.xlim[1], n - 0.5 + after.length + 1);
+  const x1 = Math.max(P.xlim[1], n - 0.5 + afterAll.length + 1);
   let lo = P.ylim[0], hi = P.ylim[1];
-  if (show) after.forEach((b) => { lo = Math.min(lo, b[3]); hi = Math.max(hi, b[2]); });
+  if (show) afterAll.forEach((b) => { lo = Math.min(lo, b[3]); hi = Math.max(hi, b[2]); });
   const line = { k: 'line' as const, p: [[n - 0.5, lo], [n - 0.5, hi]] as [number, number][], c: ACCENT, a: 1, w: 2, d: [4, 3], z: 9, L: 'other' as Layer };
   const ex = it ? exitLook(it) : null;
   // линия выхода — по правому краю свечи выхода: «после» идёт между золотой и зелёной
-  const out = show && ex && after.length ? [{ ...line, p: [[n - 0.5 + after.length, lo], [n - 0.5 + after.length, hi]] as [number, number][], c: ex.col, d: null }] : [];
+  const out = show && ex && afterAll.length && rev >= 1 ? [{ ...line, p: [[n - 0.5 + afterAll.length, lo], [n - 0.5 + afterAll.length, hi]] as [number, number][], c: ex.col, d: null }] : [];
   // окно одно в обоих видах: до правого края, куда дойдут свечи «после» (edge задаёт окно по умолчанию)
   return { v: 1, title: null, texts: [], panels: [{ ...P, bars, xlim: [P.xlim[0], x1], edge: x1, ylim: [lo, hi], shapes: [...P.shapes, line, ...out] }] };
 }
 
-function TfBox({ title, k, it, tf, show, when, live, loading, tools, notes = false, children }: { title: string; k: string; it: TimeItem; tf?: Tf; show: boolean; when: string; live?: Scene | null; loading?: boolean; tools?: ReactNode; notes?: boolean; children?: ReactNode }) {
+function TfBox({ title, k, it, tf, show, when, live, loading, tools, notes = false, children, rev = 1 }: { title: string; k: string; it: TimeItem; tf?: Tf; show: boolean; when: string; live?: Scene | null; loading?: boolean; tools?: ReactNode; notes?: boolean; children?: ReactNode; rev?: number }) {
   const view = useContext(TmViewCtx);
   const [fs, setFs] = useState(false);
   if (!live && !loading && (!tf || !tf.bars.length)) return null;
@@ -402,7 +409,7 @@ function TfBox({ title, k, it, tf, show, when, live, loading, tools, notes = fal
         ) : null}
       </div>
       {/* 18.10.2026: пока грузится рисунок бота, простые свечи не показываем — иначе график «меняется» на глазах */}
-      {live ? chart : loading ? <div style={{ color: DIM, fontSize: 13, padding: '40px 0', textAlign: 'center' }}>загружаю рисунок…</div> : tf ? <Chart tf={tf} show={show} when={when} keep={keepAfter(tf.bars.slice(tf.cut), k, cutOf(it), it.tf?.H4)} exitCol={ex?.col} /> : null}
+      {live ? chart : loading ? <div style={{ color: DIM, fontSize: 13, padding: '40px 0', textAlign: 'center' }}>загружаю рисунок…</div> : tf ? <Chart tf={tf} show={show} when={when} keep={keepAfter(tf.bars.slice(tf.cut), k, cutOf(it), it.tf?.H4)} exitCol={ex?.col} rev={rev} /> : null}
       {children}
       {fs && live ? (
         <div style={{ position: 'fixed', inset: 0, zIndex: 1000, background: '#080808', overflow: 'auto', padding: 12 }}>
@@ -420,7 +427,7 @@ function TfBox({ title, k, it, tf, show, when, live, loading, tools, notes = fal
   );
 }
 
-function Layout({ it, show, side, onOpen, symbols, hidePic }: { it: TimeItem; show: boolean; side: ReactNode; onOpen: Open; symbols: Set<string>; hidePic?: boolean }) {
+function Layout({ it, show, side, onOpen, symbols, hidePic, rev = 1 }: { it: TimeItem; show: boolean; side: ReactNode; onOpen: Open; symbols: Set<string>; hidePic?: boolean; rev?: number }) {
   const wide = typeof window === 'undefined' ? true : window.innerWidth >= 900;
   const when = fmtWhen(it.time).slice(0, 5);
   const ex = exitLook(it);
@@ -445,14 +452,14 @@ function Layout({ it, show, side, onOpen, symbols, hidePic }: { it: TimeItem; sh
             </button>
           </div>
         ) : null}
-        <TfBox title={`${it.instrument} · H4`} k="H4" it={it} tf={it.tf?.H4} show={show} when={when} live={scenePanel(sc, 'H4', show, all, it)} loading={loading} tools={allBtn} notes={notes}>
+        <TfBox title={`${it.instrument} · H4`} k="H4" it={it} tf={it.tf?.H4} show={show} when={when} live={scenePanel(sc, 'H4', show, all, it, rev)} loading={loading} tools={allBtn} notes={notes} rev={rev}>
           <Rows rows={[['Сигнал', 'триггер на H4 — с него пришла карточка'], ...(it.h4?.rows || [])]} />
           {hidePic ? null : <Pic it={it} />}
         </TfBox>
-        <TfBox title={`${it.instrument} · дневка`} k="D1" it={it} tf={it.tf?.D1} show={show} when={when} live={scenePanel(sc, 'D1', show, true, it)} loading={loading} notes={notes}>
+        <TfBox title={`${it.instrument} · дневка`} k="D1" it={it} tf={it.tf?.D1} show={show} when={when} live={scenePanel(sc, 'D1', show, true, it, rev)} loading={loading} notes={notes} rev={rev}>
           <Rows rows={dayRows(it)} />
         </TfBox>
-        <TfBox title={`${it.instrument} · неделя`} k="W1" it={it} tf={it.tf?.W1} show={show} when={when} live={scenePanel(sc, 'W1', show, true, it)} loading={loading} notes={notes}>
+        <TfBox title={`${it.instrument} · неделя`} k="W1" it={it} tf={it.tf?.W1} show={show} when={when} live={scenePanel(sc, 'W1', show, true, it, rev)} loading={loading} notes={notes} rev={rev}>
           <Rows rows={weekRows(it)} />
         </TfBox>
         <div style={{ color: DIM, fontSize: 12, lineHeight: 1.55 }}>
@@ -498,10 +505,32 @@ export function TimeMachine({ doc, symbols, onOpen }: { doc?: { items?: TimeItem
   const counts = { fx: all.filter((x) => marketOfSym(x.instrument) === 'fx').length, crypto: all.filter((x) => marketOfSym(x.instrument) === 'crypto').length };
   const [idx, setIdx] = useState(0);
   const [shown, setShown] = useState(false);
+  // 25.10.2026, идея 6 «что было дальше проигрывается»: по кнопке свечи после решения появляются одна за другой
+  // (все три графика за REVEAL_MS), линия выхода вспыхивает в конце, итог — когда рынок «дошёл» до него
+  const [rev, setRev] = useState(1);
+  const revTimer = useRef(0);
+  useEffect(() => () => window.clearInterval(revTimer.current), []);
+  const hide = () => {
+    window.clearInterval(revTimer.current);
+    setShown(false);
+    setRev(1);
+  };
+  const reveal = () => {
+    window.clearInterval(revTimer.current);
+    setShown(true);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { setRev(1); return; }
+    const t0 = performance.now();
+    setRev(0);
+    revTimer.current = window.setInterval(() => {
+      const p = Math.min(1, (performance.now() - t0) / REVEAL_MS);
+      setRev(p);
+      if (p >= 1) window.clearInterval(revTimer.current);
+    }, 60);
+  };
   const pick = (m: MarketKey) => {
     setMk(m);
     setIdx(0);
-    setShown(false);
+    hide();
   };
   if (!all.length) return <Empty />;
   if (!items.length)
@@ -528,7 +557,7 @@ export function TimeMachine({ doc, symbols, onOpen }: { doc?: { items?: TimeItem
           const i = x ? items.indexOf(x) : items.findIndex((y) => dayOfTm(y.time) === day);
           if (i < 0) return;
           setIdx(i);
-          setShown(false);
+          hide();
           window.setTimeout(() => {
             document.getElementById('tm-pick-' + i)?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
             document.getElementById('tm-picks')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -542,7 +571,7 @@ export function TimeMachine({ doc, symbols, onOpen }: { doc?: { items?: TimeItem
             key={keyOf(x)}
             onClick={() => {
               setIdx(i);
-              setShown(false);
+              hide();
             }}
             // другие решения того же дня, что и открытое, — в пунктирной рамке: видно, что в этот день их было несколько
             style={{ flex: '0 0 auto', textAlign: 'left', background: CARD, border: i === idx ? `1px solid ${ACCENT}` : dayOfTm(x.time) === dayOfTm(it.time) ? `1px dashed ${ACCENT}99` : `1px solid ${BORDER}`, borderRadius: 8, padding: '7px 10px', cursor: 'pointer', color: FG }}
@@ -557,12 +586,19 @@ export function TimeMachine({ doc, symbols, onOpen }: { doc?: { items?: TimeItem
       <Layout
         it={it}
         show={shown}
+        rev={rev}
         symbols={symbols}
         onOpen={onOpen}
         side={
           <>
             <Stamp it={it} />
-            {shown ? <Result it={it} /> : <button style={btn()} onClick={() => setShown(true)}>Что было дальше →</button>}
+            {!shown ? (
+              <button style={btn()} onClick={reveal}>Что было дальше →</button>
+            ) : rev >= 1 ? (
+              <div className="eg-rise"><Result it={it} /></div>
+            ) : (
+              <div style={{ ...label, color: ACCENT, marginTop: 12 }}>рынок идёт дальше…</div>
+            )}
           </>
         }
       />

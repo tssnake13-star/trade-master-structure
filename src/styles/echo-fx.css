@@ -105,7 +105,132 @@
 .tm-dot-live::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 1px solid currentColor; animation: tmPing 1.8s ease-out infinite; }
 @keyframes tmPing { from { transform: scale(0.6); opacity: 0.9; } to { transform: scale(1.9); opacity: 0; } }
 
+/* ==========================================================================
+   Идеи для кабинета (25.10.2026), Сергей по странице идей (claude.ai/artifact/SyW8CxNLjpGAbJBFLkjSnc): «Делай все,
+   кроме 9». Номера — как на странице: 1 прогресс, 2 штамп «Блок пройден», 3 блик на «Открыть», 4 замок отвечает,
+   5 курс пройден, 6 «что было дальше» по свече (TimeMachine.tsx), 7 новое в журнале, 8 цифра на кнопке с глазом,
+   10 штамп допуска, 11 мягкий переход, 12 приветствие.
+   ========================================================================== */
+
+/* 11 · экран кабинета проявляется из размытия (только при входе, без «хвоста»: после анимации стиль прежний) */
+.eg-page { animation: egPage 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
+@keyframes egPage { from { opacity: 0; filter: blur(6px); transform: translateY(6px); } }
+
+/* 1 · полоса прогресса доливается */
+.eg-fill { transform-origin: left; animation: egFill 1.4s cubic-bezier(0.16, 1, 0.3, 1) 0.15s backwards; }
+@keyframes egFill { from { transform: scaleX(0); } }
+
+/* 3 · блик по кнопке «Открыть» раз в 6 с */
+.eg-shine { position: relative; overflow: hidden; isolation: isolate; }
+.eg-shine::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 45%;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent 0%, rgba(255, 244, 222, 0.55) 50%, transparent 100%);
+  transform: translateX(-160%) skewX(-18deg);
+  animation: egShine 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+@keyframes egShine { 0%, 68% { transform: translateX(-160%) skewX(-18deg); } 100% { transform: translateX(330%) skewX(-18deg); } }
+
+/* 2 · штамп «Блок пройден» ложится на кнопку, следующая открывается с лучом по рамке */
+.eg-stamp-wrap { position: absolute; inset: 0; display: grid; place-items: center; pointer-events: none; z-index: 3; }
+.eg-stamp {
+  font-family: 'Space Mono', ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #e1a84d;
+  border: 2px solid #e1a84d;
+  border-radius: 6px;
+  padding: 6px 11px;
+  background: rgba(8, 8, 8, 0.82);
+  transform: rotate(-8deg);
+  animation: egStamp 0.45s cubic-bezier(0.2, 1.45, 0.4, 1) 0.1s backwards;
+}
+@keyframes egStamp { from { opacity: 0; transform: rotate(-16deg) scale(1.9); } }
+.eg-thump { animation: egThump 0.3s ease 0.45s; }
+@keyframes egThump { 30% { transform: translate(1px, 1px); } 60% { transform: translate(-1px, 0); } }
+.eg-once { opacity: 0; animation: egOnce 2.2s ease 0.5s; }
+@keyframes egOnce { 0% { opacity: 0; } 15%, 80% { opacity: 1; } 100% { opacity: 0; } }
+
+/* 4 · закрытый блок: замок вздрагивает, подпись «что нужно» загорается */
+.eg-shake { transform-box: fill-box; transform-origin: center; animation: egShake 0.55s ease; }
+@keyframes egShake { 20% { transform: translateX(-3px) rotate(-8deg); } 40% { transform: translateX(3px) rotate(8deg); } 60% { transform: translateX(-2px) rotate(-4deg); } 80% { transform: translateX(2px) rotate(4deg); } }
+.eg-hint-flash { animation: egHint 1.6s ease; }
+@keyframes egHint { 15%, 70% { color: #e1a84d; } }
+
+/* 5 · курс пройден: глаз рисуется и открывается, строки проявляются; 12 · приветствие по словам */
+.eg-eye-draw path,
+.eg-eye-draw circle { stroke-dasharray: 1; animation: tmDraw 0.8s ease-out 0.1s backwards; }
+.eg-eye-draw circle { animation-delay: 0.4s; }
+.eg-eye-draw g { transform-box: view-box; transform-origin: 12px 12px; animation: tmOpen 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.9s backwards; }
+/* пока не долистали — скрыто, чтобы появление не начиналось с уже видимого */
+.eg-wait { opacity: 0; }
+.eg-rise { animation: egRise 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards; animation-delay: var(--d, 0s); }
+@keyframes egRise { from { opacity: 0; transform: translateY(8px); filter: blur(5px); } }
+.eg-word { display: inline-block; animation: egRise 0.55s cubic-bezier(0.16, 1, 0.3, 1) backwards; animation-delay: calc(0.15s + var(--i) * 110ms); }
+
+/* 7 · новое в журнале: золотая метка и один проход скана по карточке */
+.eg-new { position: relative; overflow: hidden; }
+.eg-new::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent 0%, rgba(225, 168, 77, 0.1) 60%, rgba(225, 168, 77, 0.5) 93%, #fff8ea 96.5%, transparent 100%);
+  transform: translateY(-100%);
+  opacity: 0;
+  animation: egRowScan 1.1s linear backwards;
+  animation-delay: calc(0.4s + var(--n, 0) * 1.1s);
+}
+@keyframes egRowScan { 0% { transform: translateY(-94%); opacity: 1; } 85% { opacity: 1; } 100% { transform: translateY(100%); opacity: 0; } }
+.eg-new-dot { display: inline-flex; align-items: center; gap: 6px; font-family: 'Space Mono', ui-monospace, monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: #e1a84d; }
+.eg-new-dot::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #e1a84d; box-shadow: 0 0 8px rgba(225, 168, 77, 0.8); }
+
+/* 8 · цифра новых решений на кнопке с глазом */
+.eg-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  z-index: 3;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  background: #e1a84d;
+  color: #0a0a0a;
+  font-family: 'Space Mono', ui-monospace, monospace;
+  font-size: 11px;
+  font-weight: 700;
+  animation: egPop 0.45s cubic-bezier(0.2, 1.45, 0.4, 1) 0.4s backwards;
+}
+.eg-badge::after { content: ''; position: absolute; inset: -3px; border-radius: 13px; border: 1px solid #e1a84d; opacity: 0; animation: egPing 1.2s ease-out 0.85s; }
+@keyframes egPop { from { opacity: 0; transform: scale(0.4); } }
+@keyframes egPing { from { opacity: 0.9; transform: scale(0.8); } to { opacity: 0; transform: scale(1.8); } }
+
+/* 10 · плашка допуска и отказа ставится штампом, когда карточка появляется на экране */
+.eg-vs-wait { opacity: 0; }
+.eg-vstamp { display: inline-block; animation: egVStamp 0.45s cubic-bezier(0.2, 1.45, 0.4, 1) backwards; }
+@keyframes egVStamp { from { opacity: 0; transform: rotate(-12deg) scale(1.8); } }
+
+/* 6 · линия выхода вспыхивает, когда «что было дальше» дошло до неё */
+.eg-exit-flash { animation: egExit 1s ease; }
+@keyframes egExit { 0% { opacity: 0; } 30% { opacity: 1; filter: drop-shadow(0 0 6px rgba(63, 185, 143, 1)); } }
+
 @media (prefers-reduced-motion: reduce) {
   .eg-orbit, .tm-beam, .tm-grid, .tm-scan { display: none; }
   .eg-blink > *, .tm-dot-live::after, .tm-boot *, .tm-eye-open svg > * { animation: none !important; }
+  .eg-page, .eg-fill, .eg-shine::after, .eg-stamp, .eg-thump, .eg-shake, .eg-hint-flash, .eg-eye-draw *, .eg-rise, .eg-word,
+  .eg-new::after, .eg-badge, .eg-badge::after, .eg-vstamp, .eg-exit-flash { animation: none !important; }
+  .eg-vs-wait, .eg-wait { opacity: 1; }
 }
