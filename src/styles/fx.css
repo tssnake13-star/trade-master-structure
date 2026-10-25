@@ -189,6 +189,8 @@ html.fx-on [data-beam] { border-color: hsl(var(--accent) / 0.32) !important; }
 .fx-orbit::before {
   background: conic-gradient(from 0deg, transparent 0deg 296deg, hsl(var(--accent) / 0.6) 330deg, hsl(var(--accent)) 348deg, #fff 356deg, transparent 360deg);
   animation-duration: 4.6s;
+  /* 25.10.2026: у кнопок «Сотрудничества» свои фазы (--od), чтобы соседние лучи не крутились в ногу */
+  animation-delay: var(--od, 0s);
 }
 
 /* ---- лампа над разделом «Сотрудничество» (Aceternity «Lamp Section Header») ---- */

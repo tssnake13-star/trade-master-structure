@@ -129,12 +129,15 @@ export default function RouteChooser({
             </span>
             <span className="text-mono" style={{ ...MONO, color: 'hsl(var(--muted-foreground))' }}>{echoPrice.per}</span>
           </span>
+          {/* 25.10.2026, Сергей: «кнопки выделить… если две кнопки, на одну — чтобы ползала (луч), на второй — блик,
+              чтобы переливалась»: по «Попробовать 7 дней» бежит луч, как в первом экране, по «Подробнее» — блик */}
           <div className="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
             <a
               href={TELEGRAM_LINKS.trial}
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackClick(`${clickPrefix}_route_trial`)}
+              data-orbit=""
               className="cta-trial btn-primary group inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium"
             >
               Попробовать 7 дней
@@ -142,7 +145,7 @@ export default function RouteChooser({
             <a
               href="#echo-gate"
               onClick={() => trackClick(`${clickPrefix}_route_echo_gate`)}
-              className="group inline-flex items-center gap-1.5 text-mono"
+              className="cta-shine-text group inline-flex items-center gap-1.5 text-mono"
               style={{ ...MONO, color: LABEL }}
             >
               Подробнее

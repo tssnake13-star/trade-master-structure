@@ -283,13 +283,17 @@ export default function PackageCards({
         </div>
       )}
 
+      {/* 25.10.2026, Сергей: «две кнопки — на одну луч, на второй блик»: практикум и VIP стоят рядом, у практикума
+          (его карточку и так обводит луч) по кнопке скользит блик, вокруг кнопки VIP бежит луч */}
       <a
         href={p.ctaHref ?? ctaHref}
         target="_blank"
         rel="noopener noreferrer"
         onClick={() => trackClick(`package_${p.clickId}`)}
+        data-orbit={p.featured ? undefined : ''}
+        style={p.featured ? ({ '--shd': '1.6s' } as React.CSSProperties) : ({ '--od': '-2.1s' } as React.CSSProperties)}
         className={`mt-6 inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium transition-all duration-300 group ${
-          p.featured ? 'btn-primary' : 'btn-secondary'
+          p.featured ? 'btn-primary cta-shine' : 'btn-secondary'
         }`}
       >
         {p.ctaText ?? (p.featured ? 'Получить доступ' : 'Выбрать')}
@@ -387,12 +391,14 @@ export default function PackageCards({
         </div>
         <div className="mt-5 flex flex-col sm:flex-row sm:items-center gap-3">
           {/* 20.10.2026: цены стоят на карточке и на главной, поэтому кнопка везде одна — оформить подписку в личке */}
+          {/* 25.10.2026, Сергей: «две кнопки — на одну луч, на второй блик»: по «Оформить подписку» скользит блик,
+              вокруг «Попробовать 7 дней» бежит луч, как у этой кнопки везде на странице */}
           <a
             href={TELEGRAM_LINKS.dm}
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackClick('package_echo_gate')}
-            className="btn-primary inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium group"
+            className="btn-primary cta-shine inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium group"
           >
             Оформить подписку
           </a>
@@ -403,6 +409,8 @@ export default function PackageCards({
             target="_blank"
             rel="noopener noreferrer"
             onClick={() => trackClick('package_echo_gate_trial')}
+            data-orbit=""
+            style={{ '--od': '-1.2s' } as React.CSSProperties}
             className="cta-trial btn-secondary inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium group"
           >
             Попробовать 7 дней
@@ -481,6 +489,9 @@ export default function PackageCards({
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => trackClick('package_trade_system')}
+              // 25.10.2026: кнопка одна — вокруг неё бежит луч
+              data-orbit=""
+              style={{ '--od': '-3.3s' } as React.CSSProperties}
               className="btn-secondary inline-flex items-center justify-center gap-2 px-6 py-3.5 text-sm font-medium group flex-shrink-0"
             >
               {ts.ctaText ?? 'Выбрать'}
