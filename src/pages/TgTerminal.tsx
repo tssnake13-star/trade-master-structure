@@ -3,7 +3,9 @@ import { useParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { ACCENT, BG, BORDER, DIM, FG, MONO, pill } from '@/components/terminal/theme';
 import { Decision } from '@/components/terminal/Decision';
-import type { MarketRow } from '@/components/terminal/parts';
+import { Beam, type MarketRow } from '@/components/terminal/parts';
+import Boot, { type BootSteps } from '@/components/terminal/Boot';
+import '@/styles/echo-fx.css';
 import { VerdictsFeed, type FeedDocs } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
 import { TimeMachine, TmViewCtx, type TimeItem } from '@/components/terminal/TimeMachine';
@@ -36,6 +38,12 @@ const TABS: Record<Bot, [Tab, string, string][]> = {
 };
 // вкладки, открытые и после пробы, и до вопросов: журнал решений и цены
 const ALWAYS_OPEN: Tab[] = ['dec', 'price'];
+// строки запуска (Boot): терминал в боте грузится одним запросом по подписи Телеграма — свои шаги
+const BOOT_LINES: [keyof BootSteps, string][] = [
+  ['access', 'вход через Telegram'],
+  ['market', 'проверка доступа'],
+  ['feeds', 'рынок и журнал решений'],
+];
 const SU = String(import.meta.env.VITE_SUPABASE_URL || '').replace(/\/$/, '');
 
 interface TgData {
@@ -130,12 +138,15 @@ export function Picker({ rows, cur, onPick }: { rows: MarketRow[]; cur: MarketRo
           onPick(x.symbol);
           setOpen(false);
         }}
+        className={on ? 'tm-sel' : undefined}
         style={{ ...pill(on), display: 'inline-flex', alignItems: 'center', gap: 5, padding: '6px 9px',
                  ...(lead ? { border: `1.5px solid ${ACCENT}`, color: on ? '#0a0a0a' : ACCENT, fontWeight: 700 } : null) }}
       >
         {lead ? <span style={{ fontSize: 10 }}>★</span> : null}
         {x.symbol}
         {x.side ? <span style={{ color: on ? '#0a0a0a' : col, fontSize: 9 }}>{x.side === 'LONG' ? '▲' : '▼'}</span> : null}
+        {/* 25.10.2026, его «да» на список из веб-версии: по выбранному бежит луч, как в кабинете */}
+        {on ? <Beam phase={0.6} /> : null}
       </button>
     );
   };
@@ -150,8 +161,9 @@ export function Picker({ rows, cur, onPick }: { rows: MarketRow[]; cur: MarketRo
         <div style={{ border: `1px solid ${BORDER}`, borderTop: 'none', borderRadius: '0 0 8px 8px', padding: '10px 10px 10px' }}>
           <div style={{ display: 'flex', gap: 6 }}>
             {([['groups', 'Группы'], ['scen', 'Сценарии']] as const).map(([k, n]) => (
-              <button key={k} onClick={() => setMode(k)} style={{ ...pill(mode === k), flex: 1, padding: '8px 6px' }}>
+              <button key={k} onClick={() => setMode(k)} className={mode === k ? 'tm-sel' : undefined} style={{ ...pill(mode === k), flex: 1, padding: '8px 6px' }}>
                 {n}
+                {mode === k ? <Beam phase={2.0} /> : null}
               </button>
             ))}
           </div>
@@ -356,11 +368,16 @@ export default function TgTerminal() {
   });
   const [sym, setSym] = useState<string | null>(null);
   const [kind, setKind] = useState<keyof MarketRow>('chart_cycles');
+  // 25.10.2026, его «да» на список из веб-версии: пока терминал грузится — запуск с глазом, строки загораются по настоящим
+  // шагам (Telegram отдал подпись, база проверила вход и прислала данные), без искусственной паузы; потом скан открывает окно
+  const [boot, setBoot] = useState<BootSteps>({ access: false, market: false, feeds: false });
+  const [scan, setScan] = useState(false);
   const fresh = useMemo(() => bot === 'school' && new URLSearchParams(window.location.search).get('n') === '1', [bot]);
   // 20.10.2026 машина времени была только в пробе, и после пробы её вкладку прятали. ⛔ 21.10.2026, его слово «Верни
   // машину времени в веб-версию… переименуй в сделки до и после»: «Сделки до и после» снова в подписке (веб-кабинет) —
   // после пробы вкладка снова с замком «доступ после подписки». Тренажёра нет совсем (его слово вечером 20.10.2026)
   const tabs = TABS[bot];
+  const tabIdx = tabs.findIndex(([k]) => k === tab);
   useEffect(() => {
     if (!tabs.some(([k]) => k === tab)) setTab('dec');
   }, [tabs, tab]);
@@ -383,6 +400,7 @@ export default function TgTerminal() {
         if (alive) setD({ ok: false, reason: 'no_init' });
         return;
       }
+      if (alive) setBoot((s) => ({ ...s, access: true }));
       const { data, error } = await (supabase.rpc as unknown as (f: string, a: object) => Promise<{ data: TgData | null; error: unknown }>)(
         'tg_terminal',
         // 18.10.2026: у школьного бота в адресе кнопки — пропуск на его 7 дней (school_bot.terminal_url), база его сверяет
@@ -391,12 +409,21 @@ export default function TgTerminal() {
       // 18.10.2026: «no_init» с непустой подписью — база ещё не знает ключ этого бота (мост не прошёл круг), а не
       // «открыто не из бота»: так и пишем
       const res = error || !data ? { ok: false, reason: 'net' } : data;
-      if (alive) setD(res.reason === 'no_init' ? { ...res, reason: 'no_key' } : res);
+      if (!alive) return;
+      setBoot({ access: true, market: true, feeds: !!res.ok });
+      setD(res.reason === 'no_init' ? { ...res, reason: 'no_key' } : res);
+      if (res.ok && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) setScan(true);
     });
     return () => {
       alive = false;
     };
   }, [bot]);
+  // скан идёт 1,5 с и убирается
+  useEffect(() => {
+    if (!scan) return;
+    const t = window.setTimeout(() => setScan(false), 1600);
+    return () => window.clearTimeout(t);
+  }, [scan]);
 
   const rows = useMemo(() => d?.rows || [], [d]);
   const symbols = useMemo(() => new Set(rows.map((r) => r.symbol)), [rows]);
@@ -416,6 +443,10 @@ export default function TgTerminal() {
       <div style={{ flex: 1, padding: 12, minWidth: 0, paddingBottom: withTabs ? 'calc(78px + env(safe-area-inset-bottom))' : 12 }}>{body}</div>
       {withTabs ? (
         <div style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 50, display: 'flex', background: '#0f0e0d', borderTop: `1px solid ${BORDER}`, paddingBottom: 'env(safe-area-inset-bottom)' }}>
+          {/* 25.10.2026: под выбранной вкладкой светящаяся полоска с бегущим бликом (echo-fx.css, .tg-tab-ind) */}
+          {tabIdx >= 0 ? (
+            <span className="tg-tab-ind" aria-hidden="true" style={{ width: `${100 / tabs.length}%`, transform: `translateX(${tabIdx * 100}%)` }} />
+          ) : null}
           {tabs.map(([k, n, i]) => (
             <div key={k} onClick={() => { setTab(k); window.scrollTo(0, 0); }} style={{ flex: 1, textAlign: 'center', padding: '8px 2px 10px', fontSize: tabs.length > 4 ? 10 : 10.5, lineHeight: 1.2, color: tab === k ? ACCENT : DIM, cursor: 'pointer', fontFamily: MONO }}>
               <div style={{ fontSize: 17 }}>{d?.limited && !ALWAYS_OPEN.includes(k) ? '🔒' : i}</div>
@@ -427,7 +458,7 @@ export default function TgTerminal() {
     </div>
   );
 
-  if (!d) return shell(<div style={{ color: DIM, padding: 20, textAlign: 'center' }}>Загружаю терминал…</div>, false);
+  if (!d) return <Boot steps={boot} lines={BOOT_LINES} />;
   if (!d.ok) {
     const msg =
       d.reason === 'no_init'
@@ -503,8 +534,9 @@ export default function TgTerminal() {
         <Decision r={r} narrow />
         <div style={{ display: 'flex', gap: 6, margin: '14px 0 8px', flexWrap: 'wrap' }}>
           {KINDS.filter(([k]) => r[k]).map(([k, n]) => (
-            <button key={k} onClick={() => setKind(k)} style={pill(kind === k)}>
+            <button key={k} onClick={() => setKind(k)} className={kind === k ? 'tm-sel' : undefined} style={pill(kind === k)}>
               {n}
+              {kind === k ? <Beam phase={1.4} /> : null}
             </button>
           ))}
         </div>
@@ -533,7 +565,9 @@ export default function TgTerminal() {
             ) : null}
           </div>
         ) : null}
-        <VerdictsFeed doc={d.feeds?.verdicts} outcomes={d.feeds?.outcomes} videos={videos} symbols={symbols} onOpen={open} picUrl={(p) => pub(p)} privateCrypto={d.admin ? d.feeds?.verdicts_crypto || { items: [] } : undefined} />
+        {/* 25.10.2026: как в кабинете — новые с прошлого захода решения с меткой «новое», плашки допуска и отказа
+            ставятся штампом (fx); что человек уже видел, помнит этот телефон, отдельно для каждого бота */}
+        <VerdictsFeed doc={d.feeds?.verdicts} outcomes={d.feeds?.outcomes} videos={videos} symbols={symbols} onOpen={open} picUrl={(p) => pub(p)} privateCrypto={d.admin ? d.feeds?.verdicts_crypto || { items: [] } : undefined} seenKey={`tg-${bot}`} fx />
       </>
     );
   } else if (tab === 'tm') {
@@ -541,5 +575,11 @@ export default function TgTerminal() {
   } else if (tab === 'price') {
     body = <PricesTab />;
   }
-  return <TmViewCtx.Provider value={view}>{shell(body)}</TmViewCtx.Provider>;
+  return (
+    <TmViewCtx.Provider value={view}>
+      {/* 25.10.2026: раздел проявляется при переключении вкладки; после запуска скан открывает окно сверху вниз */}
+      {shell(<div key={tab} className="tm-sec">{body}</div>)}
+      {scan ? <div className="tm-scan" aria-hidden="true" /> : null}
+    </TmViewCtx.Provider>
+  );
 }

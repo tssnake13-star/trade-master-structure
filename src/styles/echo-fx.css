@@ -289,8 +289,23 @@
   100% { transform: translateY(100%); opacity: 0; }
 }
 
+/* ---- терминал в Telegram (25.10.2026, его «да» на список «что перенести из веб-версии»): под выбранной вкладкой
+   нижнего меню светящаяся полоска, по ней бежит блик; к новой вкладке полоска переезжает. Кольцо луча вокруг значка
+   внизу смотрелось бы чужим — в меню Telegram так не принято ---- */
+.tg-tab-ind { position: absolute; left: 0; bottom: calc(4px + env(safe-area-inset-bottom)); height: 2px; pointer-events: none; transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+.tg-tab-ind::before,
+.tg-tab-ind::after { content: ''; position: absolute; left: 30%; right: 30%; top: 0; height: 2px; border-radius: 2px; }
+.tg-tab-ind::before { background: #e1a84d; box-shadow: 0 0 8px 1px rgba(225, 168, 77, 0.65); }
+.tg-tab-ind::after {
+  background: linear-gradient(90deg, transparent, #fff8ea, transparent) no-repeat;
+  background-size: 45% 100%;
+  animation: tgGlint 2.6s ease-in-out infinite;
+}
+@keyframes tgGlint { 0% { background-position: -85% 0; } 60%, 100% { background-position: 185% 0; } }
+
 @media (prefers-reduced-motion: reduce) {
-  .eg-orbit, .tm-beam, .tm-grid, .tm-scan, .tm-head-live::after, .tm-row-scan { display: none; }
+  .eg-orbit, .tm-beam, .tm-grid, .tm-scan, .tm-head-live::after, .tm-row-scan, .tg-tab-ind::after { display: none; }
+  .tg-tab-ind { transition: none; }
   .tm-pill-on, .tm-sec { animation: none !important; }
   .eg-blink > *, .tm-dot-live::after, .tm-boot *, .tm-eye-open svg > * { animation: none !important; }
   .eg-page, .eg-fill, .eg-shine::after, .eg-stamp, .eg-thump, .eg-shake, .eg-hint-flash, .eg-eye-draw *, .eg-rise, .eg-word,

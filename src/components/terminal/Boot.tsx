@@ -13,8 +13,9 @@ const LINES: [keyof BootSteps, string][] = [
   ['feeds', 'журнал решений и скринер'],
 ];
 
-export default function Boot({ steps }: { steps: BootSteps }) {
-  const done = LINES.filter(([k]) => steps[k]).length;
+/** lines — свои подписи строк (терминал в Telegram грузится одним запросом, у него свои шаги) */
+export default function Boot({ steps, lines = LINES }: { steps: BootSteps; lines?: [keyof BootSteps, string][] }) {
+  const done = lines.filter(([k]) => steps[k]).length;
   return (
     <div className="tm-boot" role="status" aria-label="Загружаю терминал">
       <div className="tm-boot-box">
@@ -31,7 +32,7 @@ export default function Boot({ steps }: { steps: BootSteps }) {
           ))}
         </div>
         <div className="tm-boot-lines">
-          {LINES.map(([k, name], i) => (
+          {lines.map(([k, name], i) => (
             <div key={k} style={{ '--i': i } as CSSProperties}>
               <span>{name}</span>
               <em data-ok={steps[k] ? '' : undefined}>{steps[k] ? 'готово' : '…'}</em>
@@ -39,7 +40,7 @@ export default function Boot({ steps }: { steps: BootSteps }) {
           ))}
         </div>
         <div className="tm-boot-bar">
-          <i style={{ transform: `scaleX(${(0.1 + (0.9 * done) / LINES.length).toFixed(3)})` }} />
+          <i style={{ transform: `scaleX(${(0.1 + (0.9 * done) / lines.length).toFixed(3)})` }} />
         </div>
       </div>
     </div>
