@@ -13,6 +13,8 @@ import { TimeMachine, type TimeItem } from '@/components/terminal/TimeMachine';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { ScreenerCards } from '@/components/terminal/Screener';
 import StatusStrip from '@/components/terminal/Status';
+import Boot, { type BootSteps } from '@/components/terminal/Boot';
+import '@/styles/echo-fx.css';
 import { GEN } from '@/components/terminal/screenerParse';
 import LiveChart from '@/components/terminal/LiveChart';
 import { HistoryOf, HistoryView } from '@/components/terminal/History';
@@ -33,6 +35,10 @@ html { scrollbar-color: rgba(225,168,77,0.55) ${BG}; }
 .tm-page .tm-tabs { scrollbar-width: none; -ms-overflow-style: none; }
 .tm-page .tm-tabs::-webkit-scrollbar { display: none; width: 0; height: 0; }
 `;
+
+// запуск терминала (25.10.2026): первый раз за сеанс — не короче 1,5 с, чтобы глаз успел нарисоваться и открыться
+const BOOT_MIN = 1500;
+const BOOT_SEEN = 'eg_boot_seen';
 
 /**
  * SchoolTerminal — ECHO-GATE INSIDE, под ним «Глаз системы» (/school/terminal).
@@ -175,6 +181,13 @@ export default function SchoolTerminal() {
   const [lockedList, setLockedList] = useState<{ symbol: string; title: string | null }[]>([]);
   const [hiddenVerdicts, setHiddenVerdicts] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
+  // 25.10.2026, его выбор «A-C-D вместе»: пока грузятся данные — запуск (строки готовности по настоящим запросам),
+  // потом скан открывает окно (scan), дальше окно живёт. Первый раз за сеанс запуск стоит не меньше BOOT_MIN,
+  // чтобы глаз успел нарисоваться и открыться; потом — ровно столько, сколько грузятся данные
+  const [boot, setBoot] = useState<BootSteps>({ access: false, market: false, feeds: false });
+  const bootAt = useRef(typeof performance === 'undefined' ? 0 : performance.now());
+  const [bootHold, setBootHold] = useState(true);
+  const [scan, setScan] = useState(false);
   const [query, setQuery] = useState('');
   const [tab, setTab] = useState<Tab>('Анализ');
   const [kind, setKind] = useState<Kind>('cycles');
@@ -290,14 +303,23 @@ export default function SchoolTerminal() {
   // его пишет загрузка лент
   const feedAt = useRef<Record<string, string | null>>({});
   const load = useCallback(async () => {
+    // строка готовности на экране запуска загорается, когда пришёл свой запрос
+    const step = <T,>(p: PromiseLike<T>, k: keyof BootSteps) =>
+      Promise.resolve(p).then((r) => {
+        setBoot((b) => (b[k] ? b : { ...b, [k]: true }));
+        return r;
+      });
     const [accessRes, metaRes, rowsRes, feedRes, videoRes] = await Promise.all([
-      user
-        // '*' — чтобы читать is_trial и не падать, пока столбца ещё нет в базе
-        ? db.from('terminal_access').select('*').eq('user_id', user.id).maybeSingle()
-        : Promise.resolve({ data: null }),
+      step(
+        user
+          // '*' — чтобы читать is_trial и не падать, пока столбца ещё нет в базе
+          ? db.from('terminal_access').select('*').eq('user_id', user.id).maybeSingle()
+          : Promise.resolve({ data: null }),
+        'access',
+      ),
       db.from('market_meta').select('updated_at, bars_at, build').maybeSingle(),
-      db.from('market_snapshot').select('*').order('sort_order').order('symbol'),
-      feedQuery(),
+      step(db.from('market_snapshot').select('*').order('sort_order').order('symbol'), 'market'),
+      step(feedQuery(), 'feeds'),
       db.from('site_settings').select('value').eq('key', JOURNAL_VIDEOS_KEY).maybeSingle(),
     ]);
     setVideos(parseJournalVideos((videoRes.data as { value?: string } | null)?.value));
@@ -330,6 +352,27 @@ export default function SchoolTerminal() {
     if (!user) return;
     load();
   }, [user, load]);
+
+  // запуск → скан → окно. Данные пришли: первый раз за сеанс дожидаемся BOOT_MIN с открытия, потом снимаем запуск
+  // и пускаем скан (1,5 с, см. echo-fx.css .tm-scan)
+  useEffect(() => {
+    if (authLoading || loading) return;
+    let first = true;
+    try {
+      first = !sessionStorage.getItem(BOOT_SEEN);
+      sessionStorage.setItem(BOOT_SEEN, '1');
+    } catch { /* без хранилища — как в первый раз */ }
+    const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const wait = first && !calm ? Math.max(0, BOOT_MIN - (performance.now() - bootAt.current)) : 0;
+    let t2 = 0;
+    const t1 = window.setTimeout(() => {
+      setBootHold(false);
+      if (calm) return;
+      setScan(true);
+      t2 = window.setTimeout(() => setScan(false), 1600);
+    }, wait);
+    return () => { window.clearTimeout(t1); window.clearTimeout(t2); };
+  }, [authLoading, loading]);
 
   // Раз в минуту смотрим только время расчёта — строка крошечная. Сошлось —
   // ничего не трогаем, изменилось — перечитываем витрину целиком.
@@ -451,13 +494,7 @@ export default function SchoolTerminal() {
 
   const present = useMemo(() => layersOf(scene), [scene]);
 
-  if (authLoading || loading) {
-    return (
-      <div style={{ minHeight: '100vh', backgroundColor: BG, color: DIM, display: 'grid', placeItems: 'center', fontFamily: SANS }}>
-        загружаю рынок…
-      </div>
-    );
-  }
+  if (authLoading || loading || bootHold) return <Boot steps={boot} />;
 
   if (!rows.length && !trial) {
     // 07.10.2026: у кого пробный доступ закончился, видят «срок закончился», а не «не открыт»
@@ -651,16 +688,22 @@ export default function SchoolTerminal() {
       <style>{SCROLL_CSS}</style>
       {/* 21.09.2026, его слово: бегущая по экрану почта здесь лишняя — «на видео такая защита
           прокатит, а здесь зачем». В уроках с видео она осталась. */}
+      {/* 25.10.2026, «скан»: после запуска золотая черта открывает окно сверху вниз */}
+      {scan ? <div className="tm-scan" aria-hidden="true" /> : null}
 
-      <header style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', padding: '14px 18px', borderBottom: `1px solid ${BORDER}` }}>
+      {/* 25.10.2026, «живой терминал»: в шапке еле заметно плывёт сетка */}
+      <header className="tm-head-live" style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap', padding: '14px 18px', borderBottom: `1px solid ${BORDER}` }}>
+        <span className="tm-grid" aria-hidden="true" />
         <button
           onClick={() => navigate('/school/dashboard')}
           style={{ display: 'flex', alignItems: 'center', gap: 6, color: DIM, background: 'none', border: 'none', cursor: 'pointer', fontFamily: MONO, fontSize: 11 }}
         >
           <ArrowLeft size={14} /> кабинет
         </button>
-        {/* название — его, 21.09.2026: как плитка в кабинете — глаз на две строки */}
-        <Brand />
+        {/* название — его, 21.09.2026: как плитка в кабинете — глаз на две строки; на скане глаз открывается */}
+        <div className={scan ? 'tm-eye-open' : undefined}>
+          <Brand />
+        </div>
         <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
           <StatusStrip updatedAt={meta?.updated_at || null} feeds={feeds} now={now} />
           {until ? <span style={label}>{trial ? 'пробный доступ до' : 'подписка до'} {fmtDate(until)}</span> : null}
@@ -725,10 +768,13 @@ export default function SchoolTerminal() {
             <button
               key={s}
               onClick={() => go(s)}
+              className={section === s ? 'tm-pill-on' : undefined}
               style={{ ...pill(section === s), ...(locked && section !== s ? { opacity: 0.55, borderStyle: 'dashed' } : null), display: 'inline-flex', alignItems: 'center', gap: 5 }}
             >
               {locked ? <Lock size={10} /> : null}
               {name}
+              {/* 25.10.2026, «живой терминал»: по выбранной вкладке бежит луч */}
+              {section === s ? <span className="tm-beam" aria-hidden="true" /> : null}
             </button>
           );
         })}

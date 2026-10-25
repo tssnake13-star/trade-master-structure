@@ -10,6 +10,7 @@ import { useDashboardTexts, type DashboardTextKey } from '@/lib/dashboardTexts';
 import { setOwnVisitFlag } from '@/lib/analytics';
 import RichText from '@/components/RichText';
 import StructureField from '@/components/landing/StructureField';
+import '@/styles/echo-fx.css';
 
 // v3 structure background for the cabinet — full-screen, faint, centred.
 const CabinetBg = () => (
@@ -636,7 +637,7 @@ export default function SchoolDashboard() {
             <button
               onClick={() => { if (eyeState !== 'open') return; setMobileSidebarOpen(false); navigate('/school/terminal'); }}
               disabled={eyeState !== 'open'}
-              className={`w-full text-left rounded-md px-3 py-3 transition-all${eyeState === 'open' ? ' hover:bg-white/5' : ''}`}
+              className={`w-full text-left rounded-md px-3 py-3 transition-all${eyeState === 'open' ? ' hover:bg-white/5 eg-live' : ''}`}
               style={{
                 border: `1px solid ${eyeState === 'open' ? `${ACCENT}55` : BORDER}`,
                 backgroundColor: eyeState === 'open' ? 'rgba(225,168,77,0.06)' : 'transparent',
@@ -645,8 +646,10 @@ export default function SchoolDashboard() {
               }}
             >
               <div className="flex items-center" style={{ gap: 10 }}>
+                {/* 25.10.2026, его выбор «живой глаз»: глаз раз в 7 с моргает, зрачок светится, по рамке медленно
+                    бежит луч (echo-fx.css). Только с открытым доступом: закрытая кнопка никуда не ведёт */}
                 {eyeState === 'open'
-                  ? <Eye size={36} strokeWidth={1.5} style={{ color: ACCENT, flexShrink: 0, margin: '0 -3px' }} />
+                  ? <Eye size={36} strokeWidth={1.5} className="eg-blink" style={{ color: ACCENT, flexShrink: 0, margin: '0 -3px' }} />
                   : <Lock size={36} strokeWidth={1.5} style={{ color: '#6f6a62', flexShrink: 0, margin: '0 -3px' }} />}
                 <div style={{ minWidth: 0 }}>
                   <div style={{ fontFamily: SANS, fontSize: 12.5, fontWeight: 600, lineHeight: 1.2, whiteSpace: 'nowrap', color: eyeState === 'open' ? FG : '#8a8175' }}>
@@ -670,6 +673,7 @@ export default function SchoolDashboard() {
                   })()}
                 </div>
               </div>
+              {eyeState === 'open' ? <span className="eg-orbit" aria-hidden="true" /> : null}
             </button>
           </div>
         )}

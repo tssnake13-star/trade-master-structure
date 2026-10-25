@@ -66,7 +66,8 @@ export default function StatusStrip({ updatedAt, feeds, now }: { updatedAt: stri
       style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '4px 14px', fontFamily: MONO, fontSize: 11, color: DIM }}
     >
       <span style={{ ...item, display: 'inline-flex', alignItems: 'center', gap: 6, color }}>
-        <span style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: color, boxShadow: `0 0 6px ${color}` }} />
+        {/* 25.10.2026, «живой терминал»: точка «по графику» дышит (echo-fx.css); задержка и «нет данных» стоят */}
+        <span className={color === UP ? 'tm-dot-live' : undefined} style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: color, boxShadow: `0 0 6px ${color}` }} />
         {word}
       </span>
       <span style={item}>данные {fmtWhen(updatedAt)}</span>

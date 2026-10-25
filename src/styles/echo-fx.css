@@ -1,0 +1,111 @@
+/* ==========================================================================
+   Кабинет школы и терминал ECHO-GATE INSIDE — анимация (25.10.2026)
+   Сергей выбрал по странице вариантов (claude.ai/artifact/JasrRSfKkV2UdBzc8Rv45T): «Живой глаз и A-C-D вместе».
+   Кнопка в боковой панели кабинета — медленный луч по рамке, глаз раз в 7 с моргает, зрачок светится.
+   Терминал — «запуск» (пока грузятся данные), «скан» открывает окно, потом окно «живёт».
+   Приёмы: Magic UI Border Beam и Animated Grid Pattern, Animata Mask Reveal. Двигаются только сдвиг,
+   поворот и прозрачность; при настройке «меньше движения» всё стоит.
+   ========================================================================== */
+
+/* ---- луч по рамке: кнопка ECHO-GATE INSIDE в кабинете и выбранная вкладка терминала ---- */
+.eg-live,
+.tm-pill-on { position: relative; isolation: isolate; }
+.eg-orbit,
+.tm-beam {
+  position: absolute;
+  inset: -1px;
+  padding: 1.5px;
+  border-radius: inherit;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 2;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+}
+.eg-orbit::before,
+.tm-beam::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 520px;
+  height: 520px;
+  background: conic-gradient(from 0deg, transparent 0deg 296deg, rgba(225, 168, 77, 0.6) 330deg, #e1a84d 348deg, #fff 356deg, transparent 360deg);
+  transform: translate(-50%, -50%) rotate(0deg);
+  animation: egSpin 8s linear infinite;
+}
+.tm-beam::before { animation-duration: 6s; }
+@keyframes egSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
+
+/* ---- глаз моргает раз в 7 с, зрачок светится (значок Eye: path — веко, circle — зрачок) ---- */
+.eg-blink > * { transform-box: view-box; transform-origin: 12px 12px; animation: egBlink 7s ease-in-out infinite; }
+.eg-blink circle { animation: egBlink 7s ease-in-out infinite, egPupil 3.5s ease-in-out infinite; }
+@keyframes egBlink { 0%, 90%, 100% { transform: scaleY(1); } 92.5% { transform: scaleY(0.08); } }
+@keyframes egPupil { 0%, 100% { fill: transparent; } 50% { fill: rgba(225, 168, 77, 0.35); } }
+
+/* ---- A · запуск терминала: глаз рисуется и открывается, строки готовности по настоящим запросам ---- */
+.tm-boot { min-height: 100vh; display: grid; place-items: center; background: #080808; color: #8a8175; }
+.tm-boot-box { display: grid; justify-items: center; gap: 14px; padding: 24px; }
+.tm-boot-eye { width: 76px; height: 76px; color: #e1a84d; overflow: visible; }
+.tm-boot-eye path,
+.tm-boot-eye circle { stroke-dasharray: 1; animation: tmDraw 0.7s ease-out backwards; }
+.tm-boot-eye circle { animation-delay: 0.25s; }
+.tm-boot-eye g { transform-box: view-box; transform-origin: 12px 12px; animation: tmOpen 0.4s cubic-bezier(0.16, 1, 0.3, 1) 0.7s backwards; }
+@keyframes tmDraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes tmOpen { from { transform: scaleY(0.06); } to { transform: scaleY(1); } }
+.tm-boot-title { font-family: 'Syne', system-ui, sans-serif; font-size: 20px; font-weight: 600; letter-spacing: 0.02em; color: #e8e0d0; }
+.tm-boot-title span { display: inline-block; white-space: pre; animation: tmLetter 0.3s cubic-bezier(0.16, 1, 0.3, 1) backwards; animation-delay: calc(0.75s + var(--i) * 28ms); }
+@keyframes tmLetter { from { opacity: 0; transform: translateY(6px); filter: blur(4px); } to { opacity: 1; transform: none; filter: none; } }
+.tm-boot-lines { display: grid; gap: 6px; font-family: 'Space Mono', ui-monospace, monospace; font-size: 11px; min-width: 240px; }
+.tm-boot-lines div { display: flex; justify-content: space-between; gap: 18px; animation: tmUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) backwards; animation-delay: calc(0.9s + var(--i) * 150ms); }
+.tm-boot-lines em { font-style: normal; color: #6f6a62; }
+.tm-boot-lines em[data-ok] { color: #e1a84d; }
+@keyframes tmUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.tm-boot-bar { width: 240px; height: 2px; border-radius: 2px; background: #232323; overflow: hidden; }
+.tm-boot-bar i { display: block; height: 100%; background: linear-gradient(90deg, rgba(225, 168, 77, 0.4), #e1a84d); transform-origin: left; transition: transform 0.5s ease; }
+
+/* ---- C · скан: золотая черта сверху вниз открывает окно, глаз в шапке открывается ---- */
+.tm-scan { position: fixed; inset: 0; z-index: 60; pointer-events: none; background: #080808; animation: tmScanDown 1.5s cubic-bezier(0.45, 0, 0.25, 1) forwards; }
+.tm-scan::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #e1a84d 18%, #fff8ea 50%, #e1a84d 82%, transparent);
+  box-shadow: 0 0 18px 4px rgba(225, 168, 77, 0.45), 0 -40px 60px -10px rgba(225, 168, 77, 0.18);
+}
+@keyframes tmScanDown { from { transform: translateY(0); } to { transform: translateY(100%); } }
+.tm-eye-open svg > * { transform-box: view-box; transform-origin: 12px 12px; animation: tmOpen 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.2s backwards; }
+
+/* ---- D · живой терминал: сетка в шапке плывёт, точка «по графику» дышит ---- */
+.tm-head-live { position: relative; isolation: isolate; overflow: hidden; }
+.tm-grid {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  opacity: 0.55;
+  -webkit-mask: radial-gradient(ellipse at 30% 50%, #000 0%, transparent 75%);
+  mask: radial-gradient(ellipse at 30% 50%, #000 0%, transparent 75%);
+}
+.tm-grid::before {
+  content: '';
+  position: absolute;
+  inset: -22px;
+  background-image: linear-gradient(rgba(225, 168, 77, 0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(225, 168, 77, 0.07) 1px, transparent 1px);
+  background-size: 22px 22px;
+  animation: tmGrid 9s linear infinite;
+}
+@keyframes tmGrid { to { transform: translate(22px, 22px); } }
+.tm-dot-live { position: relative; }
+.tm-dot-live::after { content: ''; position: absolute; inset: -4px; border-radius: 50%; border: 1px solid currentColor; animation: tmPing 1.8s ease-out infinite; }
+@keyframes tmPing { from { transform: scale(0.6); opacity: 0.9; } to { transform: scale(1.9); opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .eg-orbit, .tm-beam, .tm-grid, .tm-scan { display: none; }
+  .eg-blink > *, .tm-dot-live::after, .tm-boot *, .tm-eye-open svg > * { animation: none !important; }
+}
