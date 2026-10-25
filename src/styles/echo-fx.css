@@ -266,8 +266,31 @@
 .eg-exit-flash { animation: egExit 1s ease; }
 @keyframes egExit { 0% { opacity: 0; } 30% { opacity: 1; filter: drop-shadow(0 0 6px rgba(63, 185, 143, 1)); } }
 
+/* 25.10.2026, его выбор «а» вместо бегающих цен: глаз системы просматривает рынок. По списку инструментов сверху вниз
+   идёт тонкий скан — строка за строкой, как блик по сделкам на главной: яркая черта (94% полосы) проходит строку
+   за 0,13 с, и в тот же миг следующая строка начинает сверху (очередь 0,13 с — Sidebar.tsx, SCAN_STEP). Круг 8 с.
+   Цены не меняются: они на время обновления данных, подпись над списком.
+   ⚠️ Круг должен быть длиннее, чем 0,13 с × (число строк + 1), иначе новый проход начнётся раньше конца прежнего
+   (8 с хватает на 60 строк). */
+.tm-row-scan { position: absolute; inset: 0; border-radius: inherit; overflow: hidden; pointer-events: none; }
+.tm-row-scan::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(225, 168, 77, 0.06) 45%, rgba(225, 168, 77, 0.3) 86%, #fff1d2 94%, transparent 100%);
+  animation: tmRowScan 8s linear var(--sd, 0s) infinite both;
+}
+@keyframes tmRowScan {
+  0% { transform: translateY(-94%); opacity: 0; }
+  0.1% { opacity: 1; }
+  1.625% { transform: translateY(6%); opacity: 1; }
+  2.6% { opacity: 0; }
+  3.3% { transform: translateY(100%); }
+  100% { transform: translateY(100%); opacity: 0; }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .eg-orbit, .tm-beam, .tm-grid, .tm-scan, .tm-head-live::after { display: none; }
+  .eg-orbit, .tm-beam, .tm-grid, .tm-scan, .tm-head-live::after, .tm-row-scan { display: none; }
   .tm-pill-on, .tm-sec { animation: none !important; }
   .eg-blink > *, .tm-dot-live::after, .tm-boot *, .tm-eye-open svg > * { animation: none !important; }
   .eg-page, .eg-fill, .eg-shine::after, .eg-stamp, .eg-thump, .eg-shake, .eg-hint-flash, .eg-eye-draw *, .eg-rise, .eg-word,

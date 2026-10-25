@@ -547,6 +547,7 @@ export default function SchoolTerminal() {
       onOpen={openSymbol}
       wide={wide}
       trial={trial}
+      pricesAt={meta?.updated_at || null}
     />
   );
 

@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Bitcoin, Moon, Search } from 'lucide-react';
-import { ACCENT, BORDER, CRYPTO, CRYPTO_TEXT, DIM, DOWN, FG, MONO, SANS, UP, card, label } from './theme';
+import { ACCENT, BORDER, CRYPTO, CRYPTO_TEXT, DIM, DOWN, FG, MONO, SANS, UP, card, fmtWhen, label } from './theme';
 import { ALPHA_TIP, Beam, CritMarks, SymbolName, type MarketRow } from './parts';
 import { GEN } from './screenerParse';
 import { SCEN_META, groupRows, scenarioRows, type ScenBlock } from './sidebarRows';
@@ -18,6 +18,12 @@ import { SCEN_META, groupRows, scenarioRows, type ScenBlock } from './sidebarRow
 
 const PLATE = '#191613';
 const sideColor = (s: MarketRow['side']) => (s === 'LONG' ? UP : s === 'SHORT' ? DOWN : BORDER);
+
+// 25.10.2026, его выбор «а» вместо бегающих цен: скан идёт по списку строка за строкой (echo-fx.css, .tm-row-scan).
+// Очередь между строками равна времени, за которое черта проходит строку, — иначе черта рвётся или двоится
+const SCAN_START = 0.8;
+const SCAN_STEP = 0.13;
+const scanAt = (n: number) => ({ '--sd': `${(SCAN_START + n * SCAN_STEP).toFixed(2)}s` }) as CSSProperties;
 
 const SIDE_CSS = `
 .tm-seg button:focus-visible { outline: 1px solid ${ACCENT}; outline-offset: 2px; }
@@ -203,8 +209,9 @@ function ModeSwitch({ mode, onChange, market }: { mode: SideMode; onChange: (m: 
 }
 
 /** Строка инструмента — одна на оба вида. edge — цветная полоска стороны слева (вид «сценарии»).
- *  market — чьими цветами подсвечивать выбранную строку и подпись «поводырь». */
-function InstrumentRow({ r, on, guide, tip, edge, market, onOpen }: { r: MarketRow; on: boolean; guide: boolean; tip?: string; edge?: string; market: Market; onOpen: (sym: string) => void }) {
+ *  market — чьими цветами подсвечивать выбранную строку и подпись «поводырь». scan — место строки в списке сверху:
+ *  по нему скан приходит в строку в свою очередь. */
+function InstrumentRow({ r, on, guide, tip, edge, market, onOpen, scan }: { r: MarketRow; on: boolean; guide: boolean; tip?: string; edge?: string; market: Market; onOpen: (sym: string) => void; scan: number }) {
   return (
     <button
       className={on ? 'tm-side-row tm-sel' : 'tm-side-row'}
@@ -233,6 +240,7 @@ function InstrumentRow({ r, on, guide, tip, edge, market, onOpen }: { r: MarketR
       <SymbolName symbol={r.symbol} guide={guide} tip={tip} color={LOOK[market].text} />
       <CritMarks r={r} />
       <span style={{ fontFamily: MONO, fontSize: 11, color: DIM, minWidth: 62, textAlign: 'right' }}>{r.price_text || '—'}</span>
+      <span className="tm-row-scan" style={scanAt(scan)} aria-hidden="true" />
       {/* 25.10.2026: луч по рамке выбранной строки — по своей рамке, наружное кольцо прокрутка срезала бы */}
       {on ? <Beam fit="in" crypto={market === 'crypto'} phase={3.3} /> : null}
     </button>
@@ -297,8 +305,10 @@ function SubCap({ text, n }: { text: string; n: number }) {
 }
 
 function ScenarioList({ blocks, searching, selected, market, onOpen }: { blocks: ScenBlock[]; searching: boolean; selected: string | null; market: Market; onOpen: (sym: string) => void }) {
+  // строки рисуются сверху вниз в порядке вызовов row — по нему и очередь скана
+  let n = 0;
   const row = (r: MarketRow) => (
-    <InstrumentRow key={r.symbol} r={r} on={selected === r.symbol} guide={!!r.extra?.leads} tip={leadTip(r)} edge={sideColor(r.side)} market={market} onOpen={onOpen} />
+    <InstrumentRow key={r.symbol} r={r} on={selected === r.symbol} guide={!!r.extra?.leads} tip={leadTip(r)} edge={sideColor(r.side)} market={market} onOpen={onOpen} scan={n++} />
   );
   const any = blocks.some((b) => b.rows.length);
   if (!any && searching) return null; // «не найдено» и подсказку про другой рынок пишет сама панель
@@ -365,6 +375,7 @@ export default function TerminalSidebar({
   onOpen,
   wide,
   trial = false,
+  pricesAt = null,
 }: {
   rows: MarketRow[];
   list: MarketRow[];
@@ -374,6 +385,7 @@ export default function TerminalSidebar({
   onOpen: (sym: string) => void;
   wide: boolean;
   trial?: boolean;
+  pricesAt?: string | null;
 }) {
   const [mode, setMode] = useState<SideMode>(readMode);
   useEffect(() => {
@@ -419,6 +431,15 @@ export default function TerminalSidebar({
       .map(([k, rs]): [string, MarketRow[]] => [k, k === 'DXY' ? rs : rs.filter((r) => !inDxy.has(r.symbol))])
       .filter(([, rs]) => rs.length > 0);
   }, [rows, listM, trial]);
+  // очередь скана в виде «группы»: с какой строки списка начинается каждая группа
+  const scanBase = useMemo(() => {
+    let n = 0;
+    return groupedList.map(([, rs]) => {
+      const b = n;
+      n += rs.length;
+      return b;
+    });
+  }, [groupedList]);
   const blocks = useMemo(() => scenarioRows(rowsM, listM), [rowsM, listM]);
   // 03.10.2026: на компьютере список листается внутри — выбранный инструмент держим в поле видимости списка
   // (двигается только сам список, страница стоит на месте)
@@ -465,6 +486,12 @@ export default function TerminalSidebar({
       <div style={{ ...label, letterSpacing: '0.08em', textTransform: 'none', padding: '0 8px 4px', lineHeight: 1.5 }}>
         Н — неделя, Д — дневка: итог критериев · П — подтверждение дневки · ↑ вверх · ↓ вниз · ~ спор или нет
       </div>
+      {/* 25.10.2026, его выбор «а»: по списку идёт скан, а цены стоят — пишем прямо, на какое время они */}
+      {pricesAt ? (
+        <div style={{ ...label, letterSpacing: '0.08em', textTransform: 'none', padding: '0 8px 4px', lineHeight: 1.5, color: DIM }}>
+          цены на {fmtWhen(pricesAt)}, обновляются раз в сутки
+        </div>
+      ) : null}
       <div
         key={`${market}-${mode}`}
         ref={scroller}
@@ -488,10 +515,10 @@ export default function TerminalSidebar({
           </div>
         ) : null}
         {mode === 'groups' ? (
-          groupedList.map(([g, rs]) => (
+          groupedList.map(([g, rs], gi) => (
             <div key={g} style={{ marginBottom: 6 }}>
               <div style={{ ...label, color: LOOK[market].text, padding: '10px 8px 4px' }}>{GEN[g] ? `Группа ${GEN[g]}` : 'Группа без поводыря'}</div>
-              {rs.map((r) => (
+              {rs.map((r, i) => (
                 <InstrumentRow
                   key={r.symbol}
                   r={r}
@@ -500,6 +527,7 @@ export default function TerminalSidebar({
                   tip={leadTip(r)}
                   market={market}
                   onOpen={onOpen}
+                  scan={scanBase[gi] + i}
                 />
               ))}
             </div>
