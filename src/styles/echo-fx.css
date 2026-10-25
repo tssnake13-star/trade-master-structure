@@ -49,15 +49,27 @@
    и в сделках, выбранная сделка. Светится только вкладка раздела, она главная; у остальных свечения нет, круг 4,4 с,
    и каждый луч в своей фазе (--bd), чтобы на экране они не крутились в ногу */
 .tm-sel { position: relative; isolation: isolate; }
-.tm-beam-2::before { animation-duration: var(--bp, 4.4s); animation-delay: var(--bd, 0s); }
+/* 25.10.2026, Сергей на планшете: «вокруг кнопки инструмента полоска… как будто подвисает… кнопка широкая… неадекватно
+   ползёт». Конус света вокруг центра на строке 770×36 полкруга ползал по коротким торцам, длинные стороны проскакивал,
+   у концов строки его не хватало. У луча Beam теперь по контуру кнопки бежит черта с хвостом (SVG, четыре штриха,
+   движение задаёт Beam в parts.tsx — ровная скорость по рамке). Маска кольца ему не нужна: штрихи и есть кольцо */
+.tm-beam-2 { -webkit-mask: none; mask: none; padding: 0; overflow: visible; }
+.tm-beam-2::before { content: none; }
+.tm-beam-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 0 2.5px rgba(225, 168, 77, 0.55)); }
+.tm-beam-svg rect { fill: none; stroke-linecap: round; }
+.tm-bt0 { stroke: rgba(225, 168, 77, 0.16); }
+.tm-bt1 { stroke: rgba(225, 168, 77, 0.42); }
+.tm-bt2 { stroke: rgba(255, 226, 170, 0.85); }
+.tm-bt3 { stroke: #fff; }
 /* кольцо по своей рамке — у строк в прокрутке наружное кольцо срезалось бы */
 .tm-beam-in { inset: -1px; padding: 1.5px; border-radius: inherit; }
 /* плашка переключателя — кольцо в зазоре между плашкой и рамкой дорожки */
 .tm-beam-seg { inset: -2.5px; padding: 1.5px; border-radius: 8.5px; }
 /* рынок крипты — луч её цвета */
-.tm-beam-crypto::before {
-  background: conic-gradient(from 0deg, transparent 0deg 240deg, rgba(127, 119, 221, 0.45) 290deg, rgba(210, 205, 250, 0.95) 335deg, #fff 352deg, transparent 360deg);
-}
+.tm-beam-crypto .tm-beam-svg { filter: drop-shadow(0 0 2.5px rgba(127, 119, 221, 0.6)); }
+.tm-beam-crypto .tm-bt0 { stroke: rgba(127, 119, 221, 0.18); }
+.tm-beam-crypto .tm-bt1 { stroke: rgba(127, 119, 221, 0.48); }
+.tm-beam-crypto .tm-bt2 { stroke: rgba(210, 205, 250, 0.9); }
 /* раздел при переключении вкладки проявляется */
 .tm-sec { animation: egPage 0.45s cubic-bezier(0.16, 1, 0.3, 1) backwards; }
 @keyframes egSpin { to { transform: translate(-50%, -50%) rotate(360deg); } }
