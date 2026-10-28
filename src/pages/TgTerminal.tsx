@@ -232,7 +232,7 @@ function PricesTab() {
   const study: [string, string, { price: string; oldPrice?: string; period: string }, boolean?][] = [
     ['Trade System', 'Видеообучение TRADE SYSTEM 2.0 и полный алгоритм системы. Проходите сами, в своём темпе.', STUDY_PRICES.tradeSystem],
     ['Практикум', 'Живое занятие раз в неделю, разбор ваших сделок и обратная связь по каждому решению. Набор потоками, от 3 человек.', STUDY_PRICES.practicum, true],
-    ['VIP', 'Все пять этапов обучения и год сопровождения, ECHO-GATE INSIDE на год, индикаторы, скрипты и таблицы системы. Hunter Bot и Risk Sentinel остаются у вас навсегда.', STUDY_PRICES.vip],
+    ['VIP', 'Все пять этапов обучения и год сопровождения, ECHO-GATE INSIDE на год, индикаторы, скрипты и таблицы системы. Hunter_Bot и Risk Sentinel остаются у вас навсегда.', STUDY_PRICES.vip],
   ];
   // луч по рамке выделенной карточки — медленный, как на карточках сайта; у двух карточек разные фазы
   const beam = (on: boolean, phase: number) => (on ? <Beam fit="in" period={8} phase={phase} /> : null);

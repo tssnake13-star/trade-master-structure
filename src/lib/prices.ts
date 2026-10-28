@@ -13,7 +13,7 @@
  * 6 × 149 = $894, 12 × 149 = $1788. Цену 3 месяцев не трогать.
  *
  * ⚠️ С 07.10.2026 подписка открыта всем, не только выпускникам, и советники
- * Echo Gate, Hunter Bot и Risk Sentinel входят во все сроки (решение Сергея:
+ * Echo Gate, Hunter_Bot и Risk Sentinel входят во все сроки (решение Сергея:
  * без советника нет кнопки, а на ней держится обещание «2 действия»).
  * Правило 29.09 «советники только с 6 месяцев» отменено.
  *
@@ -34,10 +34,10 @@ export type EcoTier = {
 };
 
 export const ECOSYSTEM: EcoTier[] = [
-  { price: '$199', period: 'первый месяц', desc: 'Один раз на человека: ECHO-GATE INSIDE и те же советники Echo Gate, Hunter Bot и Risk Sentinel на месяц.', saving: 'Продлите на 3 месяца в течение этого месяца: $199 засчитаются, доплата $248.', tgNote: 'Один раз на человека: тот же терминал, мой вердикт и те же советники.', featured: false },
-  { price: '$447', period: '3 месяца', desc: 'ECHO-GATE INSIDE и советники Echo Gate, Hunter Bot и Risk Sentinel в аренду на 3 месяца.', tgNote: '$149 в месяц.', featured: false },
-  { price: '$840', oldPrice: '$894', period: '6 месяцев', desc: 'ECHO-GATE INSIDE и советники Echo Gate, Hunter Bot и Risk Sentinel в аренду на полгода.', saving: '$140 в месяц вместо $149, экономия $54.', featured: false },
-  { price: '$1490', oldPrice: '$1788', period: '12 месяцев', desc: 'ECHO-GATE INSIDE и советники Echo Gate, Hunter Bot и Risk Sentinel в аренду на год.', saving: 'Около $124 в месяц вместо $149, экономия $298.', featured: true },
+  { price: '$199', period: 'первый месяц', desc: 'Один раз на человека: ECHO-GATE INSIDE и те же советники Echo Gate, Hunter_Bot и Risk Sentinel на месяц.', saving: 'Продлите на 3 месяца в течение этого месяца: $199 засчитаются, доплата $248.', tgNote: 'Один раз на человека: тот же терминал, мой вердикт и те же советники.', featured: false },
+  { price: '$447', period: '3 месяца', desc: 'ECHO-GATE INSIDE и советники Echo Gate, Hunter_Bot и Risk Sentinel в аренду на 3 месяца.', tgNote: '$149 в месяц.', featured: false },
+  { price: '$840', oldPrice: '$894', period: '6 месяцев', desc: 'ECHO-GATE INSIDE и советники Echo Gate, Hunter_Bot и Risk Sentinel в аренду на полгода.', saving: '$140 в месяц вместо $149, экономия $54.', featured: false },
+  { price: '$1490', oldPrice: '$1788', period: '12 месяцев', desc: 'ECHO-GATE INSIDE и советники Echo Gate, Hunter_Bot и Risk Sentinel в аренду на год.', saving: 'Около $124 в месяц вместо $149, экономия $298.', featured: true },
 ];
 
 /** Обучение. VIP на главной без цены, на /access и в терминале школьного бота с ценой. */

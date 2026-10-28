@@ -13,8 +13,8 @@ const items = [
   },
   {
     tag: 'Исполнение',
-    name: 'Hunter Bot · Risk Sentinel',
-    desc: 'Hunter Bot открывает и ведёт сделку по вашему распоряжению. Risk Sentinel держит риск в рамках и блокирует торговлю, если лимит недели или месяца превышен.',
+    name: 'Hunter_Bot · Risk Sentinel',
+    desc: 'Hunter_Bot открывает и ведёт сделку по вашему распоряжению. Risk Sentinel держит риск в рамках и блокирует торговлю, если лимит недели или месяца превышен.',
   },
 ];
 
@@ -41,7 +41,7 @@ const IncludedSection = () => {
 
         {/* 07.10.2026: подписка для всех, роботы работают в ней и без обучения */}
         <p className="mt-6 text-sm md:text-base text-muted-foreground max-w-3xl">
-          Echo Gate, Hunter Bot и Risk Sentinel работают в подписке ECHO-GATE INSIDE, и обучение
+          Echo Gate, Hunter_Bot и Risk Sentinel работают в подписке ECHO-GATE INSIDE, и обучение
           для неё не нужно: один урок «Точка входа», дальше от вас 2 действия. Хотите понять
           систему сами, начните с курса или практикума.
         </p>

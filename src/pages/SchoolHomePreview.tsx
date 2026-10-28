@@ -30,7 +30,7 @@ const MAIN: Course = { id: 'demo-tm45', title: 'TRADE MASTER 5.0', subtitle: 'О
 const EXTRA: Course = { id: 'demo-echo', title: 'Echo Gate · Допуск', subtitle: 'Углублённый блок по системе фильтрации входов', is_free: false, sort_order: 3 };
 const FREE: Course = { id: 'demo-free', title: 'TLT · Допуск к сделке', subtitle: 'Вводная программа · 5 блоков', is_free: true, sort_order: 1 };
 
-const MAIN_TITLES = ['Архитектура рынка', 'Психология капитала', 'Echo Gate — допуск к сделке', 'Контекст и структура', 'Точки разворота', 'Фильтрация контекста', 'Hunter Bot — автоматизация входа', 'Risk Sentinel — защита капитала'];
+const MAIN_TITLES = ['Архитектура рынка', 'Психология капитала', 'Echo Gate — допуск к сделке', 'Контекст и структура', 'Точки разворота', 'Фильтрация контекста', 'Hunter_Bot — автоматизация входа', 'Risk Sentinel — защита капитала'];
 const MAIN_LESSONS: Lesson[] = MAIN_TITLES.map((title, i) => ({ id: `m-l${i + 1}`, course_id: MAIN.id, title, description: null, sort_order: i + 1 }));
 const MAIN_COMPLETED = new Set(MAIN_LESSONS.slice(0, 5).map((l) => l.id));
 const MAIN_PROGRESS = { completed: 5, total: 8 };

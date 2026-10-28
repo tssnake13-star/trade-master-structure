@@ -60,7 +60,7 @@ const STAGES: { n: string; title: string; meta: string; state: StageState; desc?
   { n: '04', title: 'Контекст и структура', meta: 'Модуль 2 · 3 урока', state: 'done' },
   { n: '05', title: 'Точки разворота', meta: 'Модуль 2 · 2 урока', state: 'done' },
   { n: '06', title: 'Фильтрация контекста', meta: 'Модуль 3 · 4 урока', state: 'current', desc: DEMO.nextDesc },
-  { n: '07', title: 'Hunter Bot — автоматизация входа', meta: 'Модуль 3 · 5 уроков', state: 'locked' },
+  { n: '07', title: 'Hunter_Bot — автоматизация входа', meta: 'Модуль 3 · 5 уроков', state: 'locked' },
   { n: '08', title: 'Risk Sentinel — защита капитала', meta: 'Модуль 4 · 3 урока', state: 'locked' },
 ];
 

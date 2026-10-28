@@ -150,7 +150,7 @@ const PACKAGES: Pkg[] = [
       'Все пять этапов обучения и год сопровождения',
       'ECHO-GATE INSIDE на год',
       'Индикаторы, скрипты и таблицы системы',
-      'Hunter Bot и Risk Sentinel — навсегда, остаются у вас',
+      'Hunter_Bot и Risk Sentinel — навсегда, остаются у вас',
     ],
     guarantee: [
       {
@@ -355,7 +355,7 @@ export default function PackageCards({
           Советники работают на вашем счёте:
           <ul className="mt-1.5 space-y-1">
             <li><b className="text-foreground/90">Echo Gate</b> присылает разрешённые входы;</li>
-            <li><b className="text-foreground/90">Hunter Bot</b> входит в сделку, ставит стоп и тейк, переводит в безубыток;</li>
+            <li><b className="text-foreground/90">Hunter_Bot</b> входит в сделку, ставит стоп и тейк, переводит в безубыток;</li>
             <li><b className="text-foreground/90">Risk Sentinel</b> держит лимиты риска.</li>
           </ul>
         </div>

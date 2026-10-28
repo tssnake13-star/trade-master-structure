@@ -41,7 +41,7 @@ const TITLES = [
   'Контекст и структура',
   'Точки разворота',
   'Фильтрация контекста',
-  'Hunter Bot — автоматизация входа',
+  'Hunter_Bot — автоматизация входа',
   'Risk Sentinel — защита капитала',
 ];
 const DEMO_LESSONS: Lesson[] = TITLES.map((title, i) => ({
