@@ -9,6 +9,9 @@ export const TELEGRAM_LINKS = {
   trial: 'https://tradeliketyo.com/trial',
 } as const;
 
+// Сериал «Допуск или отказ» — плейлист на YouTube (Сергей 28.10.2026). Сколько серий вышло, наружу не называть.
+export const SERIES_PLAYLIST = 'https://www.youtube.com/playlist?list=PLr1eBwnp9d3lSQHSxs0MgoblTfLz0tTbH';
+
 // Navigation items
 export const NAV_ITEMS = [
   { label: 'Для кого', href: '#filter' },

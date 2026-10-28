@@ -1,3 +1,5 @@
+import { SERIES_PLAYLIST } from '@/lib/constants';
+import { trackClick } from '@/lib/analytics';
 import Words from '@/components/fx/Words';
 
 /*
@@ -59,6 +61,16 @@ export function SeriesSection() {
             Каждую неделю выходит видео с разбором моих решений за неделю: какие сделки я взял, от каких отказался
             и почему.
           </p>
+          <a
+            href={SERIES_PLAYLIST}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-orbit=""
+            onClick={() => trackClick('author_series')}
+            className="btn-secondary mt-8 px-6 py-3.5 text-[15px]"
+          >
+            Смотреть сериал на YouTube
+          </a>
         </div>
       </div>
     </section>
