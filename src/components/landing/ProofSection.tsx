@@ -21,7 +21,6 @@ import Words from '@/components/fx/Words';
  */
 
 // 20.10.2026: список — в lib/testimonials.ts (его же показывает вкладка «Цены» терминала школьного бота)
-const cases = STUDENT_CASES;
 
 
 const TelegramIcon = () => (
@@ -30,7 +29,11 @@ const TelegramIcon = () => (
   </svg>
 );
 
-const CaseCard = ({ item, onOpen, mobile }: { item: typeof cases[0]; onOpen: () => void; mobile?: boolean }) => (
+// в Telegram эти двое подписаны латиницей; на странице — по-русски, как в прототипе (28.10.2026)
+const DISPLAY_NAME: Record<string, string> = { Lesia: 'Леся', Pavel: 'Павел' };
+const shownName = (n: string) => DISPLAY_NAME[n] ?? n;
+
+const CaseCard = ({ item, onOpen, mobile }: { item: (typeof STUDENT_CASES)[number]; onOpen: () => void; mobile?: boolean }) => (
   <button
     onClick={onOpen}
     className={`${mobile ? 'snap-center shrink-0' : 'hover:-translate-y-1 hover:shadow-lg hover:shadow-black/20'} p-4 bg-card border border-border rounded-xl text-left transition-all duration-200 hover:border-muted-foreground/50 cursor-pointer group flex flex-col`}
@@ -38,7 +41,7 @@ const CaseCard = ({ item, onOpen, mobile }: { item: typeof cases[0]; onOpen: () 
   >
     <div className="flex items-center gap-2 mb-3">
       <User className="w-4 h-4 text-muted-foreground" />
-      <span className="font-medium text-foreground text-sm">{item.name}</span>
+      <span className="font-medium text-foreground text-sm">{shownName(item.name)}</span>
     </div>
     <p className="text-xs text-muted-foreground mb-2">{item.before}</p>
     <p className="text-sm text-foreground leading-relaxed">«{item.quote}»</p>
@@ -50,8 +53,10 @@ const CaseCard = ({ item, onOpen, mobile }: { item: typeof cases[0]; onOpen: () 
   </button>
 );
 
-const ProofSection = () => {
-  const [selectedCase, setSelectedCase] = useState<typeof cases[0] | null>(null);
+// 28.10.2026: на «Микроскопе» и «Об авторе» разные отзывы — names задаёт, чьи и в каком порядке
+const ProofSection = ({ title, names }: { title?: string; names?: string[] }) => {
+  const cases = names ? names.map((n) => STUDENT_CASES.find((c) => c.name === n)).filter((c): c is (typeof STUDENT_CASES)[number] => !!c) : STUDENT_CASES;
+  const [selectedCase, setSelectedCase] = useState<(typeof STUDENT_CASES)[number] | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -68,11 +73,11 @@ const ProofSection = () => {
   }, []);
 
   return (
-    <section id="proof" className="py-12 md:py-20 bg-card/50 section-animate">
+    <section id="proof" className="py-12 md:py-20 section-animate">
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="text-foreground">
-            <Words>Знания у них <span className="mute">уже были.</span> Не хватало <em>системы.</em></Words>
+            {title ? <Words>{title}</Words> : <Words>Знания у них уже были. Не хватало системы.</Words>}
           </h2>
 
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
@@ -107,7 +112,7 @@ const ProofSection = () => {
           </div>
 
           {/* Desktop — grid */}
-          <div className="mt-8 md:mt-10 hidden md:grid md:grid-cols-4 gap-3 md:gap-4">
+          <div className={`mt-8 md:mt-10 hidden md:grid ${cases.length === 3 ? 'md:grid-cols-3' : 'md:grid-cols-4'} gap-3 md:gap-4`}>
             {cases.map((item, index) => (
               <CaseCard key={index} item={item} onOpen={() => setSelectedCase(item)} />
             ))}
@@ -116,18 +121,18 @@ const ProofSection = () => {
           <Dialog open={!!selectedCase} onOpenChange={() => setSelectedCase(null)}>
             <DialogContent className="max-w-lg p-0 bg-card border-border overflow-hidden">
               <DialogTitle className="sr-only">
-                {selectedCase?.name ? `Отзыв: ${selectedCase.name}` : 'Отзыв'}
+                {selectedCase?.name ? `Отзыв: ${shownName(selectedCase.name)}` : 'Отзыв'}
               </DialogTitle>
               {selectedCase && (
                 <div className="relative">
                   <div className="p-4 border-b border-border flex items-center gap-2">
                     <User className="w-4 h-4 text-muted-foreground" />
-                    <span className="font-medium text-foreground">{selectedCase.name}</span>
+                    <span className="font-medium text-foreground">{shownName(selectedCase.name)}</span>
                   </div>
                   <div className="max-h-[70vh] overflow-y-auto">
                     <img
                       src={selectedCase.image}
-                      alt={`Отзыв ${selectedCase.name}`}
+                      alt={`Отзыв ${shownName(selectedCase.name)}`}
                       className="w-full h-auto"
                     />
                   </div>

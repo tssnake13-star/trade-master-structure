@@ -49,7 +49,7 @@ void main() {
   float f = abs(dot(normalize(vN), normalize(vV)));
   float front = smoothstep(uDraw + 0.02, uDraw - 0.16, vArc.x);
   float caps = smoothstep(0.0, 0.035, vArc.y) * smoothstep(1.0, 0.965, vArc.y);
-  vec3 warm = vec3(1.0, 0.6, 0.22);
+  vec3 warm = vec3(1.0, 0.74, 0.42);  // латунь «Ночного кабинета» (28.10.2026), было янтарное 1.0, 0.6, 0.22
   vec3 hot = vec3(1.0, 0.93, 0.78);
   vec3 c;
   if (uKind < 0.5) {
@@ -78,7 +78,7 @@ void main() {
   float top = smoothstep(0.25, 0.95, n.y);
   float front = smoothstep(uDraw + 0.02, uDraw - 0.16, vArc.x);
   float b = clamp(vB, 0.0, 1.0);
-  vec3 c = mix(vec3(0.78, 0.82, 0.9), vec3(1.0, 0.72, 0.36), b);
+  vec3 c = mix(vec3(0.78, 0.82, 0.9), vec3(1.0, 0.8, 0.5), b);
   float a = (0.025 + 0.4 * rim + 0.1 * top) * (0.55 + 0.45 * b) * front;
   gl_FragColor = vec4(c * a, a);
 }`;
@@ -139,7 +139,7 @@ void main() {
   float r = length(vQ);
   float ring = exp(-pow((r - 0.53) / 0.17, 2.0));
   float a = (0.05 + 0.11 * ring) * smoothstep(1.0, 0.72, r) * uHaze;
-  vec3 c = vec3(0.95, 0.66, 0.29) * a;
+  vec3 c = vec3(0.9, 0.73, 0.45) * a;
   gl_FragColor = vec4(c, a);
 }`;
 

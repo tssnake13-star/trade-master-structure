@@ -37,7 +37,8 @@ function loadYouTubeApi(): Promise<void> {
   return apiPromise;
 }
 
-export default function SchoolMapVideo() {
+// showCaption=false — когда над роликом свой заголовок раздела (страница «Микроскоп», 28.10.2026)
+export default function SchoolMapVideo({ showCaption = true }: { showCaption?: boolean }) {
   const holder = useRef<HTMLDivElement>(null);
   const player = useRef<any>(null);
   const [state, setState] = useState<'idle' | 'loading' | 'playing' | 'ended'>('idle');
@@ -76,9 +77,11 @@ export default function SchoolMapVideo() {
 
   return (
     <div className="smv">
-      <p className="smv-caption">
-        Не знаете, какой путь ваш? <span>Карта школы за 4,5 минуты</span>
-      </p>
+      {showCaption && (
+        <p className="smv-caption">
+          Не знаете, какой путь ваш? <span>Карта школы за 4,5 минуты</span>
+        </p>
+      )}
       {/* 23.10.2026: свечение за роликом дышит (Сергей: «чтобы это свечение было динамичное… пульсировала»);
           пока ролик идёт, свет стоит ровно и не отвлекает */}
       <div className="smv-stage" data-state={state}>

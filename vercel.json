@@ -2,8 +2,8 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "redirects": [
-    { "source": "/access", "destination": "/#formats", "permanent": true },
-    { "source": "/access/", "destination": "/#formats", "permanent": true },
+    { "source": "/access", "destination": "/#paths", "permanent": true },
+    { "source": "/access/", "destination": "/#paths", "permanent": true },
     { "source": "/reels", "destination": "https://t.me/New_TradeLikeTYO_bot?start=reels", "permanent": false },
     { "source": "/razbor", "destination": "https://t.me/New_TradeLikeTYO_bot?start=razbor", "permanent": false },
     { "source": "/kurs", "destination": "https://t.me/New_TradeLikeTYO_bot?start=kurs", "permanent": false },

@@ -1,141 +1,63 @@
-import '@/styles/v3-skin.css';
 import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-import useScrollAnimate from '@/hooks/useScrollAnimate';
-import { trackPageview, observeSections } from '@/lib/analytics';
-import Header from '@/components/landing/Header';
-import StickyHeader from '@/components/landing/StickyHeader';
-import SideNav from '@/components/landing/SideNav';
+import { useLocation, useNavigate } from 'react-router-dom';
+import SiteLayout from '@/components/site/SiteLayout';
 import HeroSectionV3 from '@/components/landing/HeroSectionV3';
-import StructureField from '@/components/landing/StructureField';
 import InstrumentTicker from '@/components/landing/InstrumentTicker';
-import CoreProblemSection from '@/components/landing/CoreProblemSection';
-import FourQuestionsSection from '@/components/landing/FourQuestionsSection';
-import SystemStatsSection from '@/components/landing/SystemStatsSection';
-import ProofSection from '@/components/landing/ProofSection';
 import TradesSection from '@/components/landing/TradesSection';
-import TransformationSection from '@/components/landing/TransformationSection';
-import FitSection from '@/components/landing/FitSection';
-import ComparisonSection from '@/components/landing/ComparisonSection';
-import FAQSection from '@/components/landing/FAQSection';
-import LevelsSection from '@/components/landing/LevelsSection';
-import AuthorSection from '@/components/landing/AuthorSection';
-import PrincipleSection from '@/components/landing/PrincipleSection';
 import DualCTASection from '@/components/landing/DualCTASection';
-import Footer from '@/components/landing/Footer';
 import WordmarkKinetic from '@/components/preview-next/WordmarkKinetic';
-import useLandingFx from '@/hooks/useLandingFx';
-import ScrollProgress from '@/components/fx/ScrollProgress';
+import { PainsSection, StepsSection, NumbersSection, PathsSection, AuthorTeaser } from '@/components/site/MainSections';
 
-/** Блоки, по которым считаем, до чего люди доскролливают (воронка внимания). */
-const TRACKED_SECTIONS = [
-  'hero', 'problem', 'filter', 'week', 'proof', 'stats', 'trades',
-  'difference', 'questions', 'formats', 'author', 'faq',
-];
+/**
+ * Главная (28.10.2026, сайт из нескольких страниц, «Ночной кабинет»). Сергей: «первая страница — по болям…
+ * отдельную страницу под бинокль, под микроскоп… отдельная страница об авторе». Главная — развилка:
+ * каждый раздел коротко и ведёт на свою страницу.
+ *
+ * Прежняя главная одной страницей (13.09–28.10.2026) — в истории git; её разделы-файлы оставлены.
+ */
+
+// Старые ссылки на разделы прежней главной (из бота, кабинета, описаний роликов) ведут туда, где эти разделы теперь
+const LEGACY_HASH: Record<string, string> = {
+  formats: '/#paths',
+  'echo-gate': '/binocular#prices',
+  week: '/binocular#week',
+  questions: '/binocular#questions',
+  difference: '/binocular#difference',
+  faq: '/binocular#faq',
+  proof: '/microscope#proof',
+  filter: '/binocular#fit',
+};
 
 const Index = () => {
-  useScrollAnimate();
-  // 23.10.2026: разделы собираются по частям, свет на карточках, лучи (styles/fx.css)
-  useLandingFx();
-
-  // Переход по якорю (/#formats, /#echo-gate): со старого адреса /access, из кабинета, из бота.
-  // При переходе внутри сайта браузер сам к якорю не прокручивает, а при открытии страницы
-  // секция может ещё не отрисоваться — ждём её до 2 с.
   const { hash } = useLocation();
+  const navigate = useNavigate();
   useEffect(() => {
-    if (!hash) return;
-    const id = decodeURIComponent(hash.slice(1));
-    let tries = 0;
-    const timer = window.setInterval(() => {
-      const el = document.getElementById(id);
-      // отступ под закреплённую шапку, иначе заголовок раздела уходит под неё
-      if (el) { window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 64 }); window.clearInterval(timer); }
-      else if (++tries > 20) window.clearInterval(timer);
-    }, 100);
-    return () => window.clearInterval(timer);
-  }, [hash]);
-
-  useEffect(() => {
-    trackPageview('/');
-    // секции появляются после первого рендера — подписываемся с небольшой задержкой
-    let disconnect: (() => void) | null = null;
-    const timer = window.setTimeout(() => { disconnect = observeSections(TRACKED_SECTIONS); }, 400);
-    return () => {
-      window.clearTimeout(timer);
-      disconnect?.();
-    };
-  }, []);
+    const to = LEGACY_HASH[decodeURIComponent(hash.slice(1))];
+    if (to && to !== `/${hash}`) navigate(to, { replace: true });
+  }, [hash, navigate]);
 
   return (
-    <div className="min-h-screen bg-background landing-skin v3-skin relative isolate">
-      {/* site-wide "Структура" ambient field — behind all content (hero keeps its own) */}
-      <StructureField position="fixed" zIndex={-1} opacity={0.6} mask="radial-gradient(130% 110% at 50% 42%, #000 38%, transparent 90%)" />
-      <ScrollProgress />
-      <Header />
-      <StickyHeader />
-      <SideNav />
-      <main>
-        {/* Перестроено 13.09.2026 под «ПОРТРЕТ КЛИЕНТА.md». Логика пути:
-            это для меня? → да, это про меня → точно для меня → как это впишется
-            в мою жизнь → это работает? → чем отличается → что я получаю →
-            попробовать бесплатно → сколько стоит → кто автор → последние сомнения.
-            По аналитике 14.08–13.09 половина уходит сразу после первого экрана,
-            поэтому фильтр и распорядок подняты наверх. */}
-
-        {/* Это для меня? */}
-        <HeroSectionV3 />
-        <InstrumentTicker />
-        {/* Полоса цифр (StatsCounter) с 11.10.2026 в блоке «Автор»: повторяла первый экран и «Результаты» */}
-
-        {/* Да, это про меня */}
-        <CoreProblemSection />
-
-        {/* Точно ли для меня — отсев до лички */}
-        <FitSection />
-
-        {/* Как это впишется в мою жизнь — УТП простым языком */}
-        <TransformationSection />
-
-        {/* Мысль-делитель */}
-        <WordmarkKinetic text="Система, " emphasis="не эмоция" />
-
-        {/* Это работает? */}
-        <ProofSection />
-        <SystemStatsSection />
-        <TradesSection />
-
-        {/* Чем это отличается от того, что я уже пробовал */}
-        <ComparisonSection />
-
-        {/* Что я получаю. Блоки «Архитектура» (Trend Hunter, H4, W1/D1) и
-            «Чему вы учитесь» («соберите свою систему») сняты: первый — приманка
-            для коллекционера инструментов, второй продаёт свободу трактовки,
-            а клиент хочет правило. Файлы оставлены. */}
-        {/* 11.10.2026, сайт говорит одно: «Попробуйте мою систему, не изучая её». Сняты с главной
-            (Сергей: «в целом согласен, действуй»), файлы оставлены:
-            «08 · Что входит» повторял «Неделю по системе» (терминал, вердикт, 2 действия, советник);
-            «10 · Защита капитала» стал строкой в «Неделе»; «11 · Путь» (5 этапов обучения) живёт на /access;
-            «★ Вердикт» остался строкой в «Сотрудничестве» и вторым входом на /access. */}
-        <FourQuestionsSection />
-        {/* «Два этапа: школа, потом экосистема только выпускникам» снят 07.10.2026:
-            спорил с линейкой «два пути». Файл оставлен. */}
-
-        {/* Мысль-делитель */}
-        <WordmarkKinetic text="Допуск, " emphasis="не сигнал" />
-
-        {/* Сколько стоит и кто автор */}
-        <LevelsSection />
-        <AuthorSection />
-        <PrincipleSection />
-
-        {/* Последние сомнения перед действием */}
-        <FAQSection />
-
-        <DualCTASection />
-        {/* видео с логотипом снято 11.10.2026: стояло после последней кнопки и много весило */}
-      </main>
-      <Footer />
-    </div>
+    <SiteLayout
+      path="/"
+      title="TRADE LIKE TYO — торгуйте по моей системе, не изучая её"
+      description="Программа каждый день смотрит весь рынок, я говорю, какую сделку беру и почему, вы отмечаете вход и нажимаете кнопку, дальше сделку ведёт робот. 7 дней бесплатно."
+      sections={['hero', 'pains', 'how', 'stats', 'trades', 'paths', 'author']}
+    >
+      <HeroSectionV3 />
+      <InstrumentTicker />
+      <PainsSection />
+      <StepsSection />
+      <WordmarkKinetic text="Система, " emphasis="не эмоция" />
+      <NumbersSection
+        title="Решения, которые нельзя подделать"
+        lede="Каждое моё решение записано до того, как цена пошла: беру или не беру, и почему. Убытки тоже. Дневник решений открыт всем."
+        caption="Мой счёт: депозит $50 000, риск 0,25% на сделку, январь 2025 — сентябрь 2026. Прошлый результат не гарантирует будущий."
+      />
+      <TradesSection />
+      <PathsSection />
+      <AuthorTeaser />
+      <DualCTASection />
+    </SiteLayout>
   );
 };
 

@@ -5,12 +5,19 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { AuthProvider } from '@/contexts/AuthContext';
 import Index from './pages/Index';
+import Binocular from './pages/Binocular';
+import Microscope from './pages/Microscope';
+import Author from './pages/Author';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
 
 // /privacy и /terms (07.10.2026): документы должны читаться и без скриптов,
 // их открывают проверяющие роботы рекламных площадок и ИИ-читатели.
+// 28.10.2026: страницы сайта /binocular, /microscope, /author — тем же приёмом, что и главная
 const PAGES: Record<string, ComponentType> = {
+  '/binocular': Binocular,
+  '/microscope': Microscope,
+  '/author': Author,
   '/privacy': Privacy,
   '/terms': Terms,
 };

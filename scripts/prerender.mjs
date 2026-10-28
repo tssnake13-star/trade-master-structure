@@ -38,6 +38,28 @@ console.log(`✓ pre-rendered bots variant → dist/prerendered.html (${appHtml.
 // Документы /privacy и /terms (07.10.2026) — тот же приём: роботы рекламных площадок,
 // которые проверяют ссылку на политику, и ИИ-читатели получают текст, а не оболочку.
 // Свои title, description, canonical и og:url; разметка FAQ с главной сюда не идёт.
+// 28.10.2026: страницы сайта из нескольких страниц — бинокль, микроскоп, об авторе. Разметка FAQ с главной
+// сюда тоже не идёт: у этих страниц свои вопросы.
+const SITE_PAGES = [
+  {
+    route: '/binocular',
+    file: 'binocular-prerendered.html',
+    title: 'Бинокль — торговать по системе Сергея Тё, не изучая её · TRADE LIKE TYO',
+    description: 'Подписка ECHO-GATE INSIDE: программа смотрит весь рынок, Сергей даёт вердикт по каждой сделке, робот ведёт сделку, страж счёта держит лимиты. 7 дней бесплатно, первый месяц $199.',
+  },
+  {
+    route: '/microscope',
+    file: 'microscope-prerendered.html',
+    title: 'Микроскоп — обучение системе Сергея Тё · TRADE LIKE TYO',
+    description: 'Научитесь видеть рынок сами: 5 этапов до реального рынка, курс Trade System, практикум со мной и VIP. Правило первого блока на практикуме.',
+  },
+  {
+    route: '/author',
+    file: 'author-prerendered.html',
+    title: 'Сергей Тё — 15 лет в рынке · TRADE LIKE TYO',
+    description: 'Практикующий трейдер, архитектор торговых систем. Путь до своей системы, главный принцип, счёт и отзывы учеников.',
+  },
+];
 const LEGAL_PAGES = [
   {
     route: '/privacy',
@@ -52,7 +74,7 @@ const LEGAL_PAGES = [
     description: 'Правила пользования сайтом, личным кабинетом и терминалом ECHO-GATE INSIDE, условия оплаты, доступа и возврата.',
   },
 ];
-for (const page of LEGAL_PAGES) {
+for (const page of [...SITE_PAGES, ...LEGAL_PAGES]) {
   const app = render(page.route);
   const html = template
     .replace('<div id="root"></div>', () => `<div id="root">${app}</div>`)

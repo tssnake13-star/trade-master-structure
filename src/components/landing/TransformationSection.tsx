@@ -24,38 +24,24 @@ import { useCallback, useRef } from 'react';
 import CurvedMonitor from './CurvedMonitor';
 import Words from '@/components/fx/Words';
 
+// 28.10.2026 (страница «Бинокль»): шаги простыми словами — программа, вы, робот и страж счёта
 const WEEK = [
   {
-    when: 'Терминал, каждый день',
+    when: 'Программа, каждый день',
     title: 'Находит сделку',
-    text: 'Считает рынок по правилам алгоритма и даёт допуск или отказ. Мой вердикт с причиной приходит сразу: в терминал и в Telegram.',
+    text: 'Проверяет рынок по одним и тем же правилам и пропускает сделку или отказывает ей. Мой вердикт с причиной приходит сразу: в программу и в Telegram.',
   },
   {
     when: 'Ваши 2 действия',
-    title: 'Точка входа и СТАРТ',
-    text: 'Отмечаете точку входа и нажимаете СТАРТ в советнике. Где ставить точку входа, объясняет один урок.',
+    title: 'Место входа и кнопка',
+    text: 'Отмечаете, где войти, и нажимаете кнопку. Где ставить место входа, объясняет один урок.',
   },
   {
     when: 'Сделка живёт днями',
-    title: 'Исполнение',
-    text: 'Советник входит, ставит стоп и тейк, переводит в безубыток. Лимиты держит Risk Sentinel, следить за каждым движением не нужно.',
+    title: 'Дальше ведёт робот',
+    text: 'Робот входит, ставит стоп и тейк, переводит сделку в ноль. Лимиты держит страж счёта, следить за каждым движением не нужно.',
   },
 ];
-
-const stops = [
-  'Открываете сделку, когда показалось, что пора',
-  'Ищете подтверждение уже после входа',
-  'Сидите у графика в ожидании входа',
-  'Берёте сделку, которой не было в вашем плане',
-];
-
-const gains = [
-  'Каждая сделка имеет причину',
-  'Каждый отказ тоже имеет причину',
-];
-
-// подписи шагов, «Теперь» и галочки — светлым: цвет на странице только у решения (облик, шаг 3)
-const MARK = 'hsl(var(--foreground))';
 
 const TransformationSection = () => {
   // 22.10.2026: над шагами — живое окно терминала; шаг, который сейчас показывается, подсвечен.
@@ -82,12 +68,11 @@ const TransformationSection = () => {
       <div className="container-landing">
         <div className="max-w-3xl">
           <h2 className="text-foreground">
-            <Words>Сделка живёт днями. <em>Следить за каждым движением не нужно.</em></Words>
+            <Words>Одна сделка от начала до конца</Words>
           </h2>
-          <p className="mt-4 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '58ch' }}>
-            Свинг на трёх таймфреймах, W1, D1 и H4: сделка живёт днями, и сидеть у графика ради неё не нужно.
-            Так устроена неделя на подписке ECHO-GATE INSIDE. Первые 7 дней терминал можно смотреть
-            бесплатно: сначала 4 коротких вопроса в Telegram-боте.
+          <p className="mt-4 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '60ch' }}>
+            Программа нашла сделку и проверила её. Я сказал «беру». Вы отметили место входа и нажали кнопку. Дальше робот
+            вошёл, перевёл сделку в ноль и довёл до тейка.
           </p>
         </div>
 
@@ -101,79 +86,17 @@ const TransformationSection = () => {
         {/* неделя в трёх шагах */}
         <div ref={stepsRef} className="mt-3 grid md:grid-cols-3 gap-3 max-w-5xl">
           {WEEK.map((w, i) => (
-            <div key={w.title} className="td-step border border-border rounded-xl bg-card p-5 md:p-6">
+            <div key={w.title} className="td-step border border-border rounded-md bg-card p-5 md:p-6">
               <span className="td-step-bar" aria-hidden="true" />
-              <div className="font-ui text-[12.5px] tracking-[0.01em]" style={{ color: MARK }}>
+              <div className="ns-step-n">
                 {i + 1}. {w.when}
               </div>
-              <div className="text-2xl mt-3 text-foreground">{w.title}</div>
+              <div className="text-2xl mt-3 text-foreground font-semibold" style={{ letterSpacing: '-0.02em' }}>{w.title}</div>
               <p className="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">{w.text}</p>
             </div>
           ))}
         </div>
 
-        {/* 11.10.2026: блок «10 · Защита капитала» снят с главной, его мысль и лимиты живут здесь строкой */}
-        <div
-          className="mt-3 max-w-5xl rounded-xl p-5 md:p-6"
-          style={{ border: '1px solid hsl(var(--border))', background: 'hsl(var(--card))' }}
-        >
-          <p className="text-base md:text-lg text-foreground font-medium">
-            Плохую неделю останавливает лимит, а не сила воли.
-          </p>
-          <p className="mt-1.5 text-sm md:text-base text-muted-foreground leading-relaxed">
-            Risk Sentinel следит за риском по всем позициям и сам блокирует новые сделки при −4% за неделю
-            или −8% за месяц.
-          </p>
-        </div>
-
-        {/* контраст: что уходит → что остаётся */}
-        <div className="mt-12 md:mt-16 grid md:grid-cols-2 gap-x-12 gap-y-10 max-w-4xl">
-          <div>
-            <div className="section-label">Больше не</div>
-            <ul className="space-y-4">
-              {stops.map((s) => (
-                <li key={s} className="flex items-start gap-3">
-                  <span aria-hidden className="mt-1 flex-shrink-0 text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>✕</span>
-                  <span className="text-base md:text-lg text-muted-foreground">{s}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="md:self-center md:border-l md:border-border md:pl-12">
-            <div className="section-label" style={{ color: MARK, opacity: 1 }}>Теперь</div>
-            <ul className="space-y-5">
-              {gains.map((g) => (
-                <li key={g} className="flex items-start gap-3">
-                  <span aria-hidden className="mt-0.5 flex-shrink-0" style={{ color: MARK }}>✓</span>
-                  <span className="text-xl md:text-2xl leading-snug text-foreground">{g}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* центральный тезис проекта одной фразой */}
-        <div
-          className="mt-16 md:mt-24 max-w-4xl mx-auto text-center"
-          style={{
-            borderTop: '1px solid hsl(var(--border))',
-            borderBottom: '1px solid hsl(var(--border))',
-            paddingTop: '2.5rem',
-            paddingBottom: '2.5rem',
-          }}
-        >
-          <span className="section-label" style={{ display: 'inline-block' }}>
-            Два пути, один алгоритм
-          </span>
-          {/* 11.10.2026: первым идёт подписка, школа вторым путём для тех, кто захочет глубже */}
-          <p className="text-3xl md:text-5xl leading-[1.12] tracking-tight text-foreground">
-            ECHO-GATE INSIDE считает рынок за вас:
-            от вас 2 действия.
-            <br className="hidden md:block" />{' '}
-            Захотите решать сами, школа этому научит.
-          </p>
-        </div>
       </div>
     </section>
   );

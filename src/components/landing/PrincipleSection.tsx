@@ -8,10 +8,17 @@ const PrincipleSection = () => {
           <span className="section-label">Главный принцип</span>
           {/* 23.10.2026: цитата проявляется по словам медленнее заголовков. Маркер под «умеет остановиться»
               снят в тот же день (Сергей: «желтая какая-то рамка… портит весь вид»), золото — с обликом, шаг 1 */}
-          <p data-fx="quote" className="text-2xl md:text-4xl leading-tight tracking-tight text-foreground">
+          <p data-fx="quote" className="text-2xl md:text-4xl leading-tight tracking-tight text-foreground font-semibold">
             <Words>
-              Профессионал отличается не анализом. А тем, что умеет остановиться. Когда система говорит «нет» — он не входит.
+              Профессионал отличается не анализом. А тем, что умеет остановиться.
             </Words>
+          </p>
+          {/* 28.10.2026 (страница «Об авторе»): «Мои лучшие сделки…» переливается бликом */}
+          <p className="mt-8 text-base md:text-lg leading-relaxed text-muted-foreground" style={{ maxWidth: '60ch' }}>
+            Когда система говорит «нет», он не входит.{' '}
+            <span className="cta-shine-text font-medium">Мои лучшие сделки — те, которые я не совершил.</span>{' '}
+            Поэтому я не учу угадывать входы. Я выстраиваю систему, которая принимает решение, и вы перестаёте действовать
+            на ощущениях.
           </p>
         </div>
       </div>

@@ -6,6 +6,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
+import Binocular from "./pages/Binocular";
+import Microscope from "./pages/Microscope";
+import Author from "./pages/Author";
 import NotFound from "./pages/NotFound";
 import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
@@ -48,11 +51,16 @@ const App = () => (
           <Suspense fallback={<PageFallback />}>
           <Routes>
             <Route path="/" element={<Index />} />
+            {/* 28.10.2026: сайт из нескольких страниц (Сергей: «отдельную страницу под бинокль, под микроскоп…
+                отдельная страница об авторе») */}
+            <Route path="/binocular" element={<Binocular />} />
+            <Route path="/microscope" element={<Microscope />} />
+            <Route path="/author" element={<Author />} />
             {/* 18.10.2026: терминал внутри Телеграма — кнопка «Терминал» в меню ботов */}
             <Route path="/tg/:bot" element={<TgTerminal />} />
-            {/* 22.10.2026 страница цен убрана: цены в «09 · Сотрудничество», схему путей объясняет ролик «Карта школы».
-                Старые ссылки на /access (описания YouTube, уроки) ведут туда же; на сервере то же правило в vercel.json */}
-            <Route path="/access" element={<Navigate to="/#formats" replace />} />
+            {/* 22.10.2026 страница цен убрана. С 28.10.2026 старые ссылки на /access (описания YouTube, уроки) ведут
+                в «Два пути» главной: оттуда обе страницы с ценами. На сервере то же правило в vercel.json */}
+            <Route path="/access" element={<Navigate to="/#paths" replace />} />
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/preview-redesign" element={<PreviewRedesign />} />

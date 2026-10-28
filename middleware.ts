@@ -12,16 +12,20 @@ import { rewrite, next } from '@vercel/edge';
 //     прочитать страницу» — ChatGPT по ссылке на цены видел пустую оболочку).
 //   · since 07.10.2026 the same for the documents /privacy and /terms (ad platforms check
 //     the privacy policy link with their own robots).
+//   · since 28.10.2026 the same for the site pages /binocular, /microscope, /author.
 // Real browsers opening the page get the light client-side shell (index.html).
 // A real browser navigation is recognised by Fetch Metadata headers, which every
 // modern browser sends and plain HTTP clients don't. Both variants carry the same
 // scripts, so a human who lands on a pre-rendered file still gets the full working app.
 export const config = {
-  matcher: ['/', '/privacy', '/terms'],
+  matcher: ['/', '/binocular', '/microscope', '/author', '/privacy', '/terms'],
 };
 
 const PRERENDERED: Record<string, string> = {
   '/': '/prerendered.html',
+  '/binocular': '/binocular-prerendered.html',
+  '/microscope': '/microscope-prerendered.html',
+  '/author': '/author-prerendered.html',
   '/privacy': '/privacy-prerendered.html',
   '/terms': '/terms-prerendered.html',
 };

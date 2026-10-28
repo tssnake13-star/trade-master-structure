@@ -71,20 +71,21 @@ const faq = [
   },
 ];
 
-const FAQSection = () => {
+// 28.10.2026: у каждой страницы сайта свои вопросы (бинокль — о подписке, микроскоп — об обучении)
+const FAQSection = ({ title = 'Частые вопросы', items = faq }: { title?: string; items?: { q: string; a: string }[] }) => {
   const [open, setOpen] = useState<number | null>(0);
 
   return (
-    <section id="faq" className="section-animate py-12 md:py-20 bg-card/50 border-y border-border">
+    <section id="faq" className="section-animate py-12 md:py-20 ns-band">
       <div className="container-landing">
         <div className="max-w-3xl">
           <h2 className="text-foreground">
-            <Words>Частые <em>вопросы</em></Words>
+            <Words>{title}</Words>
           </h2>
         </div>
 
         <div className="mt-8 md:mt-10 max-w-3xl">
-          {faq.map((item, i) => {
+          {items.map((item, i) => {
             const isOpen = open === i;
             return (
               <div key={i} className="border-b border-border">

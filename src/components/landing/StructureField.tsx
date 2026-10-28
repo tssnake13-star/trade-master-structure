@@ -16,11 +16,14 @@ export default function StructureField({
   opacity = 1,
   mask = DEFAULT_MASK,
   zIndex = 0,
+  rgb = GOLD,
 }: {
   position?: 'absolute' | 'fixed';
   opacity?: number;
   mask?: string;
   zIndex?: number;
+  /** цвет линий и узлов «r,g,b»; сайт «Ночной кабинет» (28.10.2026) рисует латунью, кабинет — прежним золотом */
+  rgb?: string;
 } = {}) {
   const ref = useRef<HTMLCanvasElement>(null);
 
@@ -57,7 +60,7 @@ export default function StructureField({
       ctx.clearRect(0, 0, w, h);
 
       // faint terminal grid
-      ctx.strokeStyle = `rgba(${GOLD},0.03)`;
+      ctx.strokeStyle = `rgba(${rgb},0.03)`;
       ctx.lineWidth = 1;
       for (let x = 0; x < w; x += 70) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
       for (let y = 0; y < h; y += 70) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
@@ -65,7 +68,7 @@ export default function StructureField({
       // horizontal "levels" — slow breathing dashed lines
       levels.forEach((y, i) => {
         const a = 0.06 + 0.04 * Math.sin(t * 0.5 + i);
-        ctx.strokeStyle = `rgba(${GOLD},${a})`;
+        ctx.strokeStyle = `rgba(${rgb},${a})`;
         ctx.setLineDash([6, 10]); ctx.lineWidth = 1;
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
         ctx.setLineDash([]);
@@ -84,7 +87,7 @@ export default function StructureField({
           const dx = nodes[i].x - nodes[j].x, dy = nodes[i].y - nodes[j].y;
           const d = Math.hypot(dx, dy);
           if (d < 240) {
-            ctx.strokeStyle = `rgba(${GOLD},${(1 - d / 240) * 0.22})`;
+            ctx.strokeStyle = `rgba(${rgb},${(1 - d / 240) * 0.22})`;
             ctx.lineWidth = 1;
             ctx.beginPath(); ctx.moveTo(nodes[i].x, nodes[i].y); ctx.lineTo(nodes[j].x, nodes[j].y); ctx.stroke();
           }
@@ -95,9 +98,9 @@ export default function StructureField({
       // single most expensive per-frame op and the main cause of scroll flicker.
       for (const n of nodes) {
         ctx.beginPath(); ctx.arc(n.x, n.y, 6, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${GOLD},0.12)`; ctx.fill();
+        ctx.fillStyle = `rgba(${rgb},0.12)`; ctx.fill();
         ctx.beginPath(); ctx.arc(n.x, n.y, 2.4, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${GOLD},0.7)`; ctx.fill();
+        ctx.fillStyle = `rgba(${rgb},0.7)`; ctx.fill();
       }
     };
 
@@ -133,7 +136,7 @@ export default function StructureField({
       window.removeEventListener('resize', onResize);
       document.removeEventListener('visibilitychange', onVisibility);
     };
-  }, []);
+  }, [rgb]);
 
   return (
     <canvas

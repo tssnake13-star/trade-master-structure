@@ -12,14 +12,15 @@ export type Palette = { border: string; card: string; accent: string; muted: str
 
 const MONO = '"Martian Mono", ui-monospace, monospace';
 const SERIF = 'Literata, Georgia, serif';
-const CHART_BG = '#0a0704'; // oklch(0.13 0.01 70)
+// 28.10.2026: ночные тона «Ночного кабинета» вместо тёплых коричневых (было #0a0704, #191511, #100d09, #0e0a07)
+const CHART_BG = '#070C17';
 const STOP_LINE = '#c46761'; // oklch(0.62 0.12 25)
 const STOP_TEXT = '#df7f78'; // oklch(0.7 0.12 25)
-const BE_BG = '#191511'; // oklch(0.2 0.01 70)
-const PILL_BG = '#100d09'; // oklch(0.16 0.01 70)
-const TOAST_BG = '#0e0a07'; // oklch(0.15 0.01 70)
-const UP = '#dea85c';
-const DOWN = '#6c7078';
+const BE_BG = '#121A2C';
+const PILL_BG = '#0C1322';
+const TOAST_BG = '#0B1220';
+const UP = '#CDAA6E'; // латунь; было #dea85c
+const DOWN = '#56627A';
 
 type Box = { x: number; y: number; w: number; h: number };
 
@@ -313,7 +314,7 @@ export class TerminalPainter {
       const lx = left ? lineX0(from) : lineX1 - tw;
       const top = below ? yy + 4 : yy - 7 - fs - 2;
       rr(ctx, lx - 4, top, tw + 8, fs + 6, 3);
-      ctx.fillStyle = 'rgba(10,7,4,0.86)';
+      ctx.fillStyle = 'rgba(6,10,18,0.86)';
       ctx.fill();
       ctx.fillStyle = labelColor;
       ctx.textBaseline = 'alphabetic';

@@ -16,27 +16,27 @@ const columns = [
       'Чужой человек в канале',
       'Зависимость от канала',
       'Никто',
-      'Не нужна — и не появляется',
+      'Не нужна и не появляется',
     ],
   },
   {
     title: 'Обычное обучение',
     accent: false,
     values: [
-      'Вы сами — под эмоциями',
+      'Вы сами, под эмоциями',
       'Конспекты и теория',
       'Сила воли',
       'Держится на мотивации',
     ],
   },
   {
-    title: 'Система TLT',
+    title: 'Бинокль',
     accent: true,
     values: [
-      'Алгоритм допуска — Echo Gate',
-      'Изучили систему — она ваша; подписка — на её срок',
-      'Risk Sentinel блокирует новые сделки при −4% за неделю',
-      'Встроена в исполнение',
+      'Программа проверяет, я даю вердикт с причиной',
+      'Подписка работает на свой срок. Изучите систему, и она останется вашей',
+      'Страж счёта останавливает новые сделки на лимите',
+      'Встроена в исполнение: сделку ведёт робот',
     ],
   },
 ];
@@ -49,10 +49,10 @@ const ComparisonSection = () => {
       <div className="container-landing">
         <div className="max-w-3xl">
           <h2 className="text-foreground">
-            <Words>Это не <em>сигналы</em>. И не <span className="mute">«ещё один курс»</span>.</Words>
+            <Words>Это не сигналы. И не ещё один курс.</Words>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '58ch' }}>
-            Опытные трейдеры обычно сравнивают три варианта. Разница — по сути:
+            Обычно сравнивают три варианта. Разница по сути:
           </p>
         </div>
 
@@ -61,7 +61,7 @@ const ComparisonSection = () => {
             <div
               key={col.title}
               data-beam={col.accent ? '' : undefined}
-              className="rounded-xl p-5 md:p-6 border bg-card"
+              className="rounded-md p-5 md:p-6 border bg-card"
               style={
                 col.accent
                   ? { borderColor: ACCENT, background: `linear-gradient(180deg, hsl(var(--accent) / 0.08) 0%, hsl(var(--card)) 70%)` }
@@ -92,7 +92,7 @@ const ComparisonSection = () => {
 
         <p className="mt-6 text-base md:text-lg text-foreground font-medium" style={{ maxWidth: '64ch' }}>
           Поэтому здесь безопаснее: я торгую с риском 0,25% на сделку, максимальная просадка
-          за 21 месяц — <span className="text-foreground">2,23%</span>. Ваш риск выбираете вы.
+          за 21 месяц <span className="text-foreground">2,23%</span>. Ваш риск выбираете вы.
         </p>
       </div>
     </section>

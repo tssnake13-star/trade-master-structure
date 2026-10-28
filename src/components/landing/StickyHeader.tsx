@@ -26,7 +26,7 @@ const StickyHeader = () => {
           target="_blank"
           rel="noopener noreferrer"
           onClick={() => trackClick('sticky_trial')}
-          className="cta-trial flex items-center justify-center gap-3 w-full py-2.5 bg-foreground text-background font-semibold rounded-lg hover:bg-foreground/90 transition-colors"
+          className="cta-trial flex items-center justify-center gap-3 w-full py-2.5 bg-foreground text-background font-semibold rounded-[3px] hover:bg-foreground/90 transition-colors"
           style={{ animation: 'ctaGlow 2s ease-in-out infinite' }}
         >
           {/* 08.10.2026 «бинокль впереди»: кнопка зовёт в 7 дней терминала. Ведёт через бота
@@ -34,8 +34,8 @@ const StickyHeader = () => {
               Вторая строка снимает страх платить до клика. Про карту не пишем нигде
               (Сергей 18.10.2026: «больше не упоминай это выражение»). */}
           <span className="flex flex-col items-center leading-tight">
-            <span>Попробовать терминал 7 дней</span>
-            <span className="text-xs font-normal opacity-75">после 4 вопросов, бесплатно</span>
+            <span>7 дней бесплатно</span>
+            <span className="text-xs font-normal opacity-75">сначала 4 коротких вопроса в Telegram</span>
           </span>
         </a>
       </div>
