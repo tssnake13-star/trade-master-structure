@@ -49,7 +49,7 @@ const ComparisonSection = () => {
       <div className="container-landing">
         <div className="max-w-3xl">
           <h2 className="text-foreground">
-            <Words>Это не сигналы. И не ещё один курс.</Words>
+            <Words>Это не сигналы. И не очередное обучение.</Words>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '58ch' }}>
             Обычно сравнивают три варианта. Разница по сути:

@@ -158,7 +158,7 @@ export function PathsSection() {
             </p>
             <div className="flex-grow min-h-6" />
             <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 items-baseline">
-              <span className="text-foreground">Курс <b className="ns-num text-[28px] ml-1">{STUDY_PRICES.tradeSystem.price}</b></span>
+              <span className="text-foreground">Видеообучение <b className="ns-num text-[28px] ml-1">{STUDY_PRICES.tradeSystem.price}</b></span>
               <span className="text-foreground">Практикум <b className="ns-num text-[28px] ml-1">{STUDY_PRICES.practicum.price}</b></span>
               <span className="ns-cap">VIP, стоимость скажу лично</span>
             </div>
@@ -189,8 +189,8 @@ export function AuthorTeaser() {
               15 лет в рынке. Торгую по той же системе, которую даю вам попробовать.
             </p>
             <p className="mt-4 text-base md:text-[17px] leading-relaxed text-muted-foreground" style={{ maxWidth: '54ch' }}>
-              Первые 3 года я только терял, ещё 2 года был около нуля. Потом пришёл к Герчику и начал делать то, что он
-              говорит. Сегодня у меня своя система: 387 сделок за 21 месяц, и каждое решение записано в дневник до
+              Первые 3 года я только терял, ещё 2 года был около нуля. Потом пришёл учиться к опытному трейдеру и начал
+              делать то, что он говорит. Сегодня у меня своя система: 387 сделок за 21 месяц, и каждое решение записано в дневник до
               движения цены.
             </p>
             <blockquote className="mt-8 text-[22px] md:text-[26px] font-medium leading-snug text-foreground" style={{ letterSpacing: '-0.02em', maxWidth: '30ch' }}>

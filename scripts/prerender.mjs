@@ -51,7 +51,7 @@ const SITE_PAGES = [
     route: '/microscope',
     file: 'microscope-prerendered.html',
     title: 'Микроскоп — обучение системе Сергея Тё · TRADE LIKE TYO',
-    description: 'Научитесь видеть рынок сами: 5 этапов до реального рынка, курс Trade System, практикум со мной и VIP. Правило первого блока на практикуме.',
+    description: 'Научитесь видеть рынок сами: 5 этапов до реального рынка, видеообучение Trade System, практикум со мной и VIP. Правило первого блока на практикуме.',
   },
   {
     route: '/author',

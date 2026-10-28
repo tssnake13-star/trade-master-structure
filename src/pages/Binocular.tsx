@@ -35,7 +35,7 @@ export default function Binocular() {
               className="cta-trial v3h-btn v3h-btn--solid">
               7 дней бесплатно
             </a>
-            <a href="#prices" className="v3h-btn v3h-btn--ghost"><span className="cta-shine-text">Цены ниже ↓</span></a>
+            <a href="#prices" className="v3h-btn v3h-btn--ghost"><span className="cta-shine-text">Стоимость ниже ↓</span></a>
           </>
         }
         aside={
@@ -65,7 +65,7 @@ export default function Binocular() {
       <FAQSection title="Вопросы о подписке" items={BINOCULAR_FAQ} />
       <NextPages
         items={[
-          { to: '/microscope', title: 'Микроскоп', text: 'Хотите сами понимать, почему цена идёт туда, куда идёт? Обучение: курс, практикум и VIP.' },
+          { to: '/microscope', title: 'Микроскоп', text: 'Хотите сами понимать, почему цена идёт туда, куда идёт? Видеообучение, практикум и VIP.' },
           { to: '/author', title: 'Об авторе', text: '15 лет в рынке, путь к своей системе и отзывы учеников.' },
         ]}
       />

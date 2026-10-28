@@ -159,7 +159,7 @@ export function SubscriptionPricesSection() {
       <div className="fx-lamp" data-fx="lamp" aria-hidden="true" />
       <div className="container-landing relative">
         <div className="max-w-3xl">
-          <h2 className="text-foreground"><Words>Цены подписки</Words></h2>
+          <h2 className="text-foreground"><Words>Стоимость подписки</Words></h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
             Внутри во всех сроках одно и то же: программа, мой вердикт по каждой сделке, робот и страж счёта, 2 урока и
             живой разбор с подписчиками по вторникам в Telegram.
