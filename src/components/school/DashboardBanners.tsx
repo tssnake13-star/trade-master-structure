@@ -19,10 +19,11 @@ import { TELEGRAM_LINKS } from '@/lib/constants';
  *   тридцать дней зачёта не продлеваются: обещали тридцать, значит тридцать.
  */
 
-const ACCENT = '#e1a84d';
-const DISPLAY = "'Cormorant', Georgia, 'Times New Roman', serif";
-const MONO = "'Space Mono', ui-monospace, monospace";
-const SANS = "'Syne', system-ui, sans-serif";
+// 29.10.2026: баннеры живут в кабинете v2 — латунь и шрифты «Ночного кабинета» (было золото #e1a84d, Cormorant, Space Mono, Syne)
+const ACCENT = '#CDAA6E';
+const DISPLAY = "'Geologica', 'Segoe UI', system-ui, sans-serif";
+const MONO = "'IBM Plex Mono', ui-monospace, monospace";
+const SANS = "'Geologica', 'Segoe UI', system-ui, sans-serif";
 
 /**
  * Зачёт оплаченного при переходе выше. Те же числа, что на странице цен.
@@ -71,17 +72,18 @@ function startOfToday(): Date {
 }
 
 const card: React.CSSProperties = {
-  border: `1px solid ${ACCENT}44`,
-  background: 'linear-gradient(180deg, rgba(225,168,77,0.07), rgba(225,168,77,0.02))',
-  borderRadius: 12,
+  border: `1px solid ${ACCENT}55`,
+  background: 'radial-gradient(120% 120% at 0% 0%, rgba(205,170,110,0.12), rgba(9,15,28,0.56) 60%)',
+  backdropFilter: 'blur(18px) saturate(1.2)',
+  WebkitBackdropFilter: 'blur(18px) saturate(1.2)',
+  borderRadius: 16,
   padding: '20px 22px',
 };
 
 const label: React.CSSProperties = {
-  fontFamily: MONO,
-  fontSize: 10,
-  letterSpacing: '0.22em',
-  textTransform: 'uppercase',
+  fontFamily: SANS,
+  fontSize: 13,
+  fontWeight: 600,
   color: ACCENT,
 };
 
@@ -91,14 +93,12 @@ const cta: React.CSSProperties = {
   gap: 8,
   marginTop: 16,
   backgroundColor: ACCENT,
-  color: '#0a0a0a',
-  borderRadius: 8,
-  padding: '11px 22px',
-  fontFamily: MONO,
-  fontSize: 11,
-  letterSpacing: '0.16em',
-  textTransform: 'uppercase',
-  fontWeight: 500,
+  color: '#0A0E18',
+  borderRadius: 999,
+  padding: '10px 18px',
+  fontFamily: SANS,
+  fontSize: 14,
+  fontWeight: 600,
 };
 
 export default function DashboardBanners({ accessMap }: {
@@ -180,15 +180,15 @@ export default function DashboardBanners({ accessMap }: {
       {showUpgrade && (
         <div style={card}>
           <div style={label}>Зачёт оплаченного</div>
-          <h3 className="mt-2.5" style={{ fontFamily: SANS, fontSize: 19, lineHeight: 1.25, color: '#f0e8d8' }}>
+          <h3 className="mt-2.5" style={{ fontFamily: SANS, fontSize: 19, lineHeight: 1.25, color: '#E6ECF5' }}>
             У вас осталось {daysLeft} {plural(daysLeft, 'день', 'дня', 'дней')}, чтобы перейти
             в VIP с доплатой {VIP_TOPUP}
           </h3>
-          <p className="mt-2.5" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '62ch' }}>
+          <p className="mt-2.5" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#C6D0E0', maxWidth: '62ch' }}>
             Оплаченные {TRADE_SYSTEM_PRICE} засчитываются полностью в течение {UPGRADE_WINDOW_DAYS} дней
             после покупки. Дальше VIP будет стоить полную цену.
           </p>
-          <p className="mt-1.5" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '62ch' }}>
+          <p className="mt-1.5" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#C6D0E0', maxWidth: '62ch' }}>
             За год вы проходите все пять этапов подготовки и выходите на реальный рынок. ECHO-GATE INSIDE
             на год входит, а инструменты остаются у вас навсегда.
           </p>
@@ -207,12 +207,12 @@ export default function DashboardBanners({ accessMap }: {
       {showStream && (
         <div style={card}>
           <div style={label}>Набор в практикум</div>
-          <h3 className="mt-2.5" style={{ fontFamily: SANS, fontSize: 19, lineHeight: 1.25, color: '#f0e8d8' }}>
+          <h3 className="mt-2.5" style={{ fontFamily: SANS, fontSize: 19, lineHeight: 1.25, color: '#E6ECF5' }}>
             {beforeStart
               ? `Ближайший поток практикума стартует ${formatStartDate(streamDate)}`
               : 'Следующий поток практикума уже скоро'}
           </h3>
-          <p className="mt-2.5" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '62ch' }}>
+          <p className="mt-2.5" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#C6D0E0', maxWidth: '62ch' }}>
             60 дней работы со мной: живое занятие раз в неделю, разбор ваших сделок лично,
             закрытая группа.{' '}
             {beforeStart
@@ -228,10 +228,10 @@ export default function DashboardBanners({ accessMap }: {
                 { v: streamCountdown.s, l: 'секунд' },
               ].map((x, i) => (
                 <div key={i} style={{ textAlign: 'center' }}>
-                  <div style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 40, lineHeight: 1, color: '#e8e0d0', fontVariantNumeric: 'tabular-nums' }}>
+                  <div style={{ fontFamily: DISPLAY, fontWeight: 700, fontSize: 36, lineHeight: 1, color: '#E6ECF5', fontVariantNumeric: 'tabular-nums' }}>
                     {String(x.v).padStart(2, '0')}
                   </div>
-                  <div style={{ fontFamily: MONO, fontSize: 9, color: '#666', marginTop: 4 }}>{x.l}</div>
+                  <div style={{ fontFamily: MONO, fontSize: 11, color: '#94A1B8', marginTop: 4 }}>{x.l}</div>
                 </div>
               ))}
             </div>

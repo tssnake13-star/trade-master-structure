@@ -14,6 +14,8 @@ import StructureField from '@/components/landing/StructureField';
 import '@/styles/echo-fx.css';
 import { useCountUp } from '@/hooks/useCountUp';
 import { countNew, newDecisionsText, newestMs, readSeen, writeSeen } from '@/lib/journalSeen';
+import Cabinet from '@/components/cabinet2/Cabinet';
+import { useJournal } from '@/components/cabinet2/journal';
 
 // v3 structure background for the cabinet — full-screen, faint, centred.
 const CabinetBg = () => (
@@ -327,6 +329,8 @@ export default function SchoolDashboard() {
     return () => { alive = false; };
   }, [user, eyeState, eyeTrial, role]);
   const openJournal = () => { setMobileSidebarOpen(false); navigate('/school/terminal?s=verdicts'); };
+  // 29.10.2026, кабинет v2: решения и итоги из того же журнала, что в терминале (только настоящие данные)
+  const journal = useJournal({ userId: user?.id, open: eyeState === 'open', trial: eyeTrial, admin: role === 'admin' });
   const logoVideo = useSiteAsset(SITE_ASSET_KEYS.schoolDashboardLogo, logoVideoFallback);
   const now = useNow(1000);
 
@@ -588,385 +592,47 @@ export default function SchoolDashboard() {
   const initial = (profileName || profileEmail || '?').trim().charAt(0).toUpperCase();
 
   // ============= RENDER =============
+  // 29.10.2026: кабинет v2 — «Ночной кабинет» со стеклом, вкладки «каплей», терминал отдельной кнопкой с глазом
+  // (components/cabinet2). Прежняя разметка с боковой панелью — в истории git; PaidHome, FreeHome и
+  // SelectedCourseView ниже остались для страниц-превью.
   return (
-    <div data-school-skin className="min-h-screen flex flex-col sm:flex-row relative z-10" style={{ backgroundColor: BG, color: FG }}>
-      <CabinetBg />
-      {mobileSidebarOpen && (
-        <div className="sm:hidden fixed inset-0 z-40" style={{ backgroundColor: 'rgba(0,0,0,0.7)' }} onClick={() => setMobileSidebarOpen(false)} />
-      )}
-
-      {/* ==================== SIDEBAR ==================== */}
-      <aside
-        className={`fixed sm:sticky top-0 left-0 h-full sm:h-screen z-50 flex flex-col flex-shrink-0 border-r transition-transform duration-300 ease-in-out
-          ${mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'} sm:translate-x-0 sm:sticky sm:top-0`}
-        style={{ width: 248, borderColor: BORDER, backgroundColor: '#0a0a0a' }}
-      >
-        {/* Header — clickable, resets selection */}
-        <button
-          onClick={() => { selectCourse(null); setMobileSidebarOpen(false); }}
-          className="border-b flex items-center gap-3 p-4 text-left hover:bg-white/[0.02] transition"
-          style={{ borderColor: BORDER }}
-        >
-          <div style={{ width: 52, height: 52, overflow: 'hidden', borderRadius: 6, flexShrink: 0, backgroundColor: '#000' }}>
-            <video key={logoVideo} src={logoVideo} autoPlay loop muted playsInline className="w-full h-full object-cover" />
-          </div>
-          <div className="min-w-0">
-            {/* wordmark: TRADE·LIKE·TYO with LIKE in gold (replaces plain brand text) */}
-            <div style={{ fontFamily: MONO, fontWeight: 700, fontSize: 15, letterSpacing: '0.04em', textTransform: 'uppercase', color: FG, whiteSpace: 'nowrap' }}>
-              TRADE<span style={{ color: ACCENT }}>LIKE</span>TYO
-            </div>
-          </div>
-        </button>
-
-        {/* Nav: Главная */}
-        <nav className="px-3 pt-4 pb-2">
-          <button
-            onClick={() => { selectCourse(null); setMobileSidebarOpen(false); }}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md transition"
-            style={{
-              backgroundColor: selectedCourse === null ? '#141414' : 'transparent',
-              borderLeft: selectedCourse === null ? `2px solid ${ACCENT}` : '2px solid transparent',
-              fontFamily: MONO, fontSize: 12, color: FG,
-            }}
-          >
-            <HomeIcon size={14} style={{ color: selectedCourse === null ? ACCENT : '#666' }} />
-            <span>{t('sidebar_home')}</span>
-          </button>
-        </nav>
-
-        {/* Programs */}
-        <div className="px-5 pt-4 pb-2">
-          <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.22em', textTransform: 'uppercase', color: '#555' }}>
-            {t('sidebar_programs_label')}
-          </div>
-        </div>
-        <nav className="overflow-y-auto px-3 space-y-1 pb-4">
-          {/* 12.10.2026, его слово: курсы с доступом — сверху, закрытые с замком — снизу; внутри каждой части
-              прежний порядок курсов (сортировка устойчивая) */}
-          {[...courses].sort((a, b) => Number(hasAccess(b)) - Number(hasAccess(a))).map(c => {
-            const accessible = hasAccess(c);
-            const cp = progress[c.id] || { completed: 0, total: 0 };
-            const cpct = cp.total > 0 ? Math.round((cp.completed / cp.total) * 100) : 0;
-            const isSelected = selectedCourse === c.id;
-
-            return (
-              <button
-                key={c.id}
-                onClick={() => accessible && selectCourse(c.id)}
-                disabled={!accessible}
-                className="w-full text-left rounded-md px-3 py-2.5 transition-all"
-                style={{
-                  backgroundColor: isSelected ? '#141414' : 'transparent',
-                  borderLeft: isSelected ? `2px solid ${ACCENT}` : '2px solid transparent',
-                  opacity: accessible ? 1 : 0.45,
-                  cursor: accessible ? 'pointer' : 'default',
-                }}
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="truncate" style={{ fontFamily: MONO, fontSize: 12, color: accessible ? FG : '#555' }}>
-                    {c.title}
-                  </span>
-                  {!accessible && <Lock size={11} style={{ color: '#444', flexShrink: 0 }} />}
-                </div>
-                {accessible && cp.total > 0 && (
-                  <div className="mt-2">
-                    <div style={{ height: 3, backgroundColor: BORDER, borderRadius: 2, overflow: 'hidden' }}>
-                      <div style={{ width: `${cpct}%`, height: '100%', backgroundColor: ACCENT, transition: 'width 0.4s' }} />
-                    </div>
-                    <div style={{ fontFamily: MONO, fontSize: 9, color: '#555', marginTop: 4, fontVariantNumeric: 'tabular-nums' }}>
-                      {cp.completed}/{cp.total}
-                    </div>
-                  </div>
-                )}
-                {!accessible && (
-                  <div style={{ fontFamily: MONO, fontSize: 9, color: expiredAccess.has(c.id) ? '#8a7048' : '#444', marginTop: 4 }}>
-                    {expiredAccess.has(c.id) ? t('sidebar_locked_expired') : t('sidebar_locked')}
-                  </div>
-                )}
-              </button>
-            );
-          })}
-        </nav>
-
-        {/* ECHO-GATE INSIDE, под ним «Глаз системы» — рынок в кабинете (название его,
-            21.09.2026: сначала «Глаз системы», потом подпись «рынок глазами системы», вечером
-            он вернул подписью «Глаз системы»). Отдельная подписка, отдельный экран. Как курс:
-            без доступа виден с замком и не открывается. Название и подпись видны всем, слова
-            «закрыто» нет — его слово: «там же замок висит, и так понятно». Его слово 18:20:
-            «глаз под словом трейд, сам глаз на две строчки, но чтобы не растягивался» — значок
-            36 слева от обеих строк, пропорции свои; название 12,5: в 13 рядом с таким значком
-            не остаётся ни пикселя запаса, в 12,5 — 4 (замерено с теми же шрифтами). */}
-        {eyeState && (
-          <div className="px-3 pb-3">
-            <button
-              onClick={() => { if (eyeState !== 'open') return; if (newCount > 0) { openJournal(); return; } setMobileSidebarOpen(false); navigate('/school/terminal'); }}
-              disabled={eyeState !== 'open'}
-              className={`w-full text-left rounded-md px-3 py-3 transition-all${eyeState === 'open' ? ' hover:bg-white/5 eg-live' : ''}`}
-              style={{
-                border: `1px solid ${eyeState === 'open' ? `${ACCENT}55` : BORDER}`,
-                backgroundColor: eyeState === 'open' ? 'rgba(225,168,77,0.06)' : 'transparent',
-                opacity: eyeState === 'open' ? 1 : 0.8,
-                cursor: eyeState === 'open' ? 'pointer' : 'default',
-              }}
-            >
-              <div className="flex items-center" style={{ gap: 10 }}>
-                {/* 25.10.2026, его выбор «живой глаз»: глаз раз в 7 с моргает, зрачок светится, по рамке медленно
-                    бежит луч (echo-fx.css). Только с открытым доступом: закрытая кнопка никуда не ведёт */}
-                {eyeState === 'open'
-                  ? <Eye size={36} strokeWidth={1.5} className="eg-blink" style={{ color: ACCENT, flexShrink: 0, margin: '0 -3px' }} />
-                  : <Lock size={36} strokeWidth={1.5} style={{ color: '#6f6a62', flexShrink: 0, margin: '0 -3px' }} />}
-                <div style={{ minWidth: 0 }}>
-                  <div style={{ fontFamily: SANS, fontSize: 12.5, fontWeight: 600, lineHeight: 1.2, whiteSpace: 'nowrap', color: eyeState === 'open' ? FG : '#8a8175' }}>
-                    ECHO-GATE INSIDE
-                  </div>
-                  <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', marginTop: 4, lineHeight: 1.3,
-                                color: eyeState === 'open' ? '#8a8175' : '#6f6a62' }}>
-                    глаз системы
-                  </div>
-                  {eyeState === 'expired' && (
-                    <div style={{ fontFamily: MONO, fontSize: 9, color: '#8a7048', marginTop: 4 }}>{t('sidebar_locked_expired')}</div>
-                  )}
-                  {eyeState === 'open' && eyeTrial && (() => {
-                    const left = eyeUntil ? Math.max(1, Math.ceil((new Date(eyeUntil).getTime() - now.getTime()) / 86400000)) : 0;
-                    const word = left === 1 ? 'день' : left < 5 ? 'дня' : 'дней';
-                    return (
-                      <div style={{ fontFamily: MONO, fontSize: 9, color: left && left <= 2 ? '#e8a05a' : ACCENT, marginTop: 4 }}>
-                        {left ? `пробный доступ · ${left === 1 ? 'остался' : 'осталось'} ${left} ${word}` : 'пробный доступ'}
-                      </div>
-                    );
-                  })()}
-                </div>
-              </div>
-              {eyeState === 'open' ? <span className="eg-orbit" aria-hidden="true" /> : null}
-              {eyeState === 'open' && newCount > 0 ? (
-                <span className="eg-badge" title={`В журнале ${newDecisionsText(newCount)}`}>{newCount}</span>
-              ) : null}
-            </button>
-          </div>
-        )}
-
-        {/* Profile */}
-        <div className="border-t p-3 space-y-2" style={{ borderColor: BORDER }}>
-          {/* карточка профиля — теперь ведёт на страницу смены имени/пароля */}
-          <div
-            role="button"
-            tabIndex={0}
-            onClick={() => { setMobileSidebarOpen(false); navigate('/school/profile'); }}
-            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setMobileSidebarOpen(false); navigate('/school/profile'); } }}
-            className="flex items-center gap-3 px-2 py-2 rounded hover:bg-white/5 transition cursor-pointer"
-            title="Профиль и пароль"
-          >
-            <div
-              className="flex items-center justify-center flex-shrink-0"
-              style={{
-                width: 36, height: 36, borderRadius: '50%',
-                background: 'linear-gradient(135deg, #2a2a2a, #1a1a1a)',
-                color: ACCENT, fontFamily: DISPLAY, fontStyle: 'italic', fontSize: 18, fontWeight: 400,
-              }}
-            >
-              {initial}
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="truncate" style={{ fontFamily: SANS, fontSize: 12, color: FG }}>
-                {profileName || profileEmail || t('sidebar_default_name')}
-              </div>
-              <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: isFreeUser ? '#666' : COOL, marginTop: 2 }}>
-                {isFreeUser ? t('sidebar_status_intro') : t('sidebar_status_active')}
-              </div>
-            </div>
-            {role === 'admin' && (
-              <button
-                onClick={(e) => { e.stopPropagation(); navigate('/school/admin'); }}
-                className="p-1.5 hover:bg-white/5 rounded transition"
-                title="Админ"
-              >
-                <Settings size={22} style={{ color: '#666' }} />
-              </button>
-            )}
-          </div>
-          <button
-            onClick={signOut}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded text-xs hover:bg-white/5 transition"
-            style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.1em', color: '#666' }}
-          >
-            <LogOut size={13} /> {t('sidebar_signout')}
-          </button>
-        </div>
-      </aside>
-
-      {/* ==================== MAIN ==================== */}
-      <main className="flex-1 min-h-screen flex flex-col">
-        {/* Top bar */}
-        <header
-          className="sticky top-0 z-30 border-b"
-          style={{
-            borderColor: BORDER,
-            backgroundColor: 'rgba(8,8,8,0.85)',
-            backdropFilter: 'blur(12px)',
-            WebkitBackdropFilter: 'blur(12px)',
-          }}
-        >
-          <div className="flex items-center justify-between px-4 sm:px-6 py-3">
-            <div className="flex items-center gap-2">
-              <button onClick={() => setMobileSidebarOpen(true)} className="sm:hidden p-1.5 hover:bg-white/5 rounded transition">
-                <Menu size={18} style={{ color: FG }} />
-              </button>
-              <span className="inline-block" style={{
-                width: 6, height: 6, borderRadius: '50%',
-                backgroundColor: isFreeUser ? '#888' : ACCENT,
-                animation: isFreeUser ? 'none' : 'tlyPulse 2.4s ease-out infinite',
-              }} />
-              <span style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#888' }}>
-                {isFreeUser ? t('header_status_intro') : t('header_status_live')} · {t('header_status_suffix')}
-              </span>
-            </div>
-            <div className="hidden sm:flex items-center gap-5">
-              <span style={{ fontFamily: MONO, fontSize: 11, color: '#666' }}>
-                {now.toLocaleDateString('ru-RU', { day: '2-digit', month: 'short', year: 'numeric' })}
-              </span>
-              <a
-                href="https://t.me/tradeliketyo"
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#888' }}
-                className="hover:text-foreground transition"
-              >
-                {t('header_support')}
-              </a>
-            </div>
-          </div>
-        </header>
-
-        {/* Body */}
-        {/* 25.10.2026, идея 11: экран проявляется из размытия, при переходе главная ↔ курс — заново (key) */}
-        <div key={selectedCourse || 'home'} className="eg-page flex-1 max-w-6xl w-full mx-auto px-4 sm:px-8 py-8 sm:py-12">
-          {/* Баннеры видны и на странице курса, вверху: человек, который проходит
-              бесплатный курс, до главной кабинета может и не вернуться. */}
-          {selectedCourseData && selectedAccessible && <DashboardBanners accessMap={accessMap} />}
-
-          {/* ----- Selected course detail view ----- */}
-          {selectedCourseData && selectedAccessible && (
-            <SelectedCourseView
-              course={selectedCourseData}
-              lessons={selectedLessons}
-              unlockedSortOrders={selectedUnlockedSortOrders}
-              completedIds={completedIds}
-              progress={selectedProgress}
-              pct={selectedPct}
-              nextLesson={selectedNext}
-              onOpen={(id) => navigate(`/school/lesson/${id}`)}
-              onOpenCourse={(id) => { selectCourse(id); try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { /* ignore */ } }}
-              t={t}
-            />
-          )}
-
-          {selectedCourseData && !selectedAccessible && (() => {
-            // две разные ситуации: доступ закончился vs его никогда не оформляли
-            const expiredAt = expiredAccess.get(selectedCourseData.id);
-            const isExpired = !!expiredAt;
-            const dateStr = expiredAt ? expiredAt.toLocaleDateString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
-            return (
-              <div className="flex flex-col items-center justify-center py-20 sm:py-24 px-4 text-center">
-                <Lock size={26} style={{ color: isExpired ? ACCENT : '#333' }} className="mb-5" />
-                <div style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.28em', textTransform: 'uppercase', color: '#666', marginBottom: 12 }}>
-                  {selectedCourseData.title}
-                </div>
-                <h2 style={{ fontFamily: DISPLAY, fontWeight: 350, fontSize: 'clamp(24px, 3.4vw, 34px)', lineHeight: 1.1, letterSpacing: '-0.02em', color: FG }}>
-                  {isExpired ? t('locked_expired_title') : t('locked_unpaid_title')}
-                </h2>
-                <p className="mt-4" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '46ch' }}>
-                  {isExpired ? t('locked_expired_text', { date: dateStr }) : t('locked_unpaid_text')}
-                </p>
-                <a
-                  href="https://t.me/tradeliketyo"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-7 inline-flex items-center gap-2 transition hover:brightness-110"
-                  style={{
-                    backgroundColor: ACCENT, color: '#0a0a0a', borderRadius: 8, padding: '13px 26px',
-                    fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
-                  }}
-                >
-                  <MessageCircle size={14} />
-                  {isExpired ? t('locked_expired_cta') : t('locked_unpaid_cta')}
-                </a>
-              </div>
-            );
-          })()}
-
-          {/* Баннеры набора и зачёта — только на главной кабинета и только
-              зарегистрированным. На публичные страницы они не выносятся. */}
-          {!selectedCourse && <DashboardBanners accessMap={accessMap} />}
-
-          {/* ----- Home view ----- */}
-          {!selectedCourse && !isFreeUser && (
-            <PaidHome
-              welcomeTitle={welcomeTitle}
-              profileName={profileName}
-              tmCourse={tmCourse}
-              tmLessons={tmLessons}
-              tmProgress={tmProgress}
-              tmNextLesson={tmNextLesson}
-              programCountdown={programCountdown}
-              programEnd={programEnd}
-              daysInSystem={daysInSystem}
-              timeInSystem={timeInSystem}
-              isAdmin={role === 'admin'}
-              upcomingLives={upcomingLives}
-              liveCountdown={liveCountdown}
-              recentActivity={recentActivity}
-              courses={courses.filter(c => hasAccess(c))}
-              progress={progress}
-              now={now}
-              onOpenLesson={(id) => navigate(`/school/lesson/${id}`)}
-              onSelectCourse={selectCourse}
-              userId={user?.id}
-              newCount={eyeState === 'open' ? newCount : 0}
-              onOpenJournal={openJournal}
-              t={t}
-            />
-          )}
-
-          {!selectedCourse && isFreeUser && (
-            <FreeHome
-              courses={courses}
-              mainCourseId={mainCourseId}
-              progress={progress}
-              accessMap={accessMap}
-              hasAccess={hasAccess}
-              role={role}
-              completedIds={completedIds}
-              getCourseLessons={getCourseLessons}
-              getUnlockedLessons={getUnlockedLessons}
-              getFirstIncomplete={getFirstIncomplete}
-              upcomingLives={upcomingLives}
-              liveCountdown={liveCountdown}
-              now={now}
-              onOpenLesson={(id) => navigate(`/school/lesson/${id}`)}
-              onSelectCourse={selectCourse}
-              userId={user?.id}
-              t={t}
-            />
-          )}
-        </div>
-
-        {/* Footer */}
-        <footer className="border-t px-4 sm:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-2" style={{ borderColor: BORDER }}>
-          <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#555' }}>
-            {t('footer_copyright')}
-          </span>
-          <a
-            href="https://t.me/tradeliketyo"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: '#666' }}
-            className="hover:text-foreground transition"
-          >
-            {t('footer_telegram')}
-          </a>
-        </footer>
-      </main>
-    </div>
+    <Cabinet
+      t={t}
+      logo={logoVideo}
+      isAdmin={role === 'admin'}
+      isFreeUser={isFreeUser}
+      userId={user?.id}
+      name={profileName}
+      email={profileEmail}
+      initial={initial}
+      courses={courses}
+      accessMap={accessMap}
+      hasAccess={hasAccess}
+      expiredAccess={expiredAccess}
+      progress={progress}
+      lessonsOf={getCourseLessons}
+      unlockedOf={getUnlockedSortOrders}
+      firstIncomplete={getFirstIncomplete}
+      completedIds={completedIds}
+      mainCourse={tmCourse}
+      mainProgress={tmProgress}
+      mainNext={tmNextLesson}
+      programEnd={programEnd}
+      daysInSystem={daysInSystem}
+      upcomingLives={upcomingLives}
+      recentActivity={recentActivity}
+      eye={{ state: eyeState, trial: eyeTrial, until: eyeUntil, newCount: eyeState === 'open' ? newCount : 0 }}
+      journal={journal}
+      seenMs={readSeen(user?.id)}
+      selectedCourse={selectedCourse}
+      onSelectCourse={selectCourse}
+      onOpenLesson={(id) => navigate(`/school/lesson/${id}`)}
+      onOpenTerminal={() => navigate('/school/terminal')}
+      onOpenJournal={openJournal}
+      onProfile={() => navigate('/school/profile')}
+      onAdmin={() => navigate('/school/admin')}
+      onSignOut={signOut}
+    />
   );
 }
 

@@ -40,7 +40,9 @@
 }
 .cv2 *, .cv2 *::before, .cv2 *::after { box-sizing: border-box; }
 .cv2 [hidden] { display: none !important; }
-.cv2 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+/* :where — сброс без веса, иначе он перебивал заливку .cv2-btn-brass у <button> */
+.cv2 :where(button) { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+.cv2 :where(h1, h2, h3, h4, p) { font-family: var(--font); }
 .cv2 :focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; border-radius: 8px; }
 .cv2 .num { font-variant-numeric: tabular-nums; }
 .cv2 .mono { font-family: var(--mono); }
@@ -144,10 +146,42 @@
 .cv2-ring .val { stroke: var(--brass); transition: stroke-dashoffset 1.4s var(--ease); }
 .cv2-ring b { position: absolute; inset: 0; display: grid; place-items: center; font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
 
+@keyframes cv2Ring { from { stroke-dashoffset: var(--c); } }
+
+/* программы */
+.cv2-prog { display: block; width: 100%; text-align: left; padding: 14px 16px; border-radius: 14px; border: 1px solid var(--line); background: rgba(230, 236, 245, 0.03); transition: border-color .25s, background .25s, transform .25s var(--ease); }
+.cv2-prog:hover { border-color: var(--line-2); background: rgba(230, 236, 245, 0.06); transform: translateY(-2px); }
+.cv2-prog[data-locked] { opacity: 0.55; }
+.cv2-prog b { font-size: 15px; font-weight: 600; }
+
+/* блоки программы — лестница */
+.cv2-steps { display: grid; gap: 10px; margin-top: 18px; }
+.cv2-step { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 14px; align-items: center; width: 100%; text-align: left; padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: rgba(230, 236, 245, 0.03); transition: border-color .25s, background .25s; }
+.cv2-step:hover { border-color: var(--line-2); }
+.cv2-step .n { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; font: 600 13px var(--mono); border: 1.5px solid var(--line-2); color: var(--mut); }
+.cv2-step.done .n { border-color: var(--ok); color: var(--ok); background: rgba(63, 185, 143, 0.1); }
+.cv2-step.now { border-color: rgba(205, 170, 110, 0.55); background: radial-gradient(120% 120% at 0% 0%, rgba(205, 170, 110, 0.12), rgba(230, 236, 245, 0.03) 60%); }
+.cv2-step.now .n { border-color: var(--brass); background: var(--brass); color: var(--brass-ink); }
+.cv2-step.open .n { border-color: rgba(205, 170, 110, 0.6); color: var(--brass); }
+.cv2-step.lock { opacity: 0.5; cursor: default; }
+.cv2-step small { display: block; font: 11px var(--mono); color: var(--mut); margin-bottom: 3px; }
+.cv2-step.now small { color: var(--brass); }
+.cv2-step b { font-size: 16px; font-weight: 600; }
+.cv2-step .go { font-size: 13px; color: var(--brass); white-space: nowrap; }
+.cv2-shake { animation: cv2Shake .4s; }
+@keyframes cv2Shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
+
+/* меню профиля */
+.cv2-menu { position: absolute; right: 0; top: calc(100% + 8px); min-width: 220px; padding: 6px; border-radius: 14px; z-index: 40; }
+.cv2-menu button, .cv2-menu a { display: flex; align-items: center; gap: 10px; width: 100%; padding: 9px 12px; border-radius: 10px; font-size: 14px; color: var(--soft); text-decoration: none; }
+.cv2-menu button:hover, .cv2-menu a:hover { background: rgba(230, 236, 245, 0.06); color: var(--ink); }
+.cv2-menu .who { padding: 9px 12px 10px; border-bottom: 1px solid var(--line); margin-bottom: 4px; font-size: 13px; color: var(--mut); }
+.cv2-menu .who b { display: block; color: var(--ink); font-size: 14px; }
+
 /* строки дневника */
-.cv2-row { display: grid; grid-template-columns: 96px 100px 82px minmax(0, 1fr); gap: 14px; align-items: center; padding: 11px 10px; border-radius: 12px; font-size: 14px; transition: background .25s; }
+.cv2-row { display: grid; grid-template-columns: 128px 92px 82px minmax(0, 1fr); gap: 14px; align-items: center; padding: 11px 10px; border-radius: 12px; font-size: 14px; transition: background .25s; }
 .cv2-row:hover { background: rgba(230, 236, 245, 0.04); }
-.cv2-row time { font: 12.5px var(--mono); color: var(--mut); }
+.cv2-row time { font: 12.5px var(--mono); color: var(--mut); white-space: nowrap; }
 .cv2-row .why { color: var(--soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .cv2-row.fresh { animation: cv2Fresh 2.6s var(--ease) both; }
 @keyframes cv2Fresh { 0% { opacity: 0; transform: translateY(-10px); background: rgba(205, 170, 110, 0.18); } 25% { opacity: 1; transform: none; } 100% { background: transparent; } }
@@ -180,10 +214,12 @@
   .cv2-bar { flex-wrap: wrap; }
   .cv2-bar .cv2-tabs { order: 3; width: 100%; margin-inline: 0; }
 }
+@media (max-width: 860px) { .cv2-panel-grid { grid-template-columns: 1fr !important; } }
 @media (max-width: 640px) {
   .cv2-brand small, .cv2-btn-label, .cv2-eye-t { display: none; }
   .cv2-eye-btn { padding: 5px 8px; }
-  .cv2-row { grid-template-columns: 70px 1fr auto; }
+  .cv2-row { grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; }
+  .cv2-card-head { flex-wrap: wrap; }
   .cv2-row .why { grid-column: 1 / -1; white-space: normal; }
   .cv2-big { font-size: 34px; }
 }
