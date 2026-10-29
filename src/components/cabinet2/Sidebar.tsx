@@ -57,7 +57,7 @@ export default function Sidebar({
             const pct = p.total ? Math.round((p.completed / p.total) * 100) : 0;
             return (
               <button key={c.id} type="button" className="cv2-side-item course" aria-current={selected === c.id || undefined}
-                data-locked={!ok || undefined} onClick={() => onSelect(c.id)}>
+                data-locked={!ok || undefined} title={c.title} onClick={() => onSelect(c.id)}>
                 <span className="row"><span className="tt">{c.title}</span>{!ok && <Lock size={13} />}</span>
                 {ok && p.total > 0 && (
                   <>
