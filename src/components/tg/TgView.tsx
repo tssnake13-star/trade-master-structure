@@ -12,7 +12,7 @@ import { TimeMachine, TmViewCtx } from '@/components/terminal/TimeMachine';
 import { parseJournalVideos } from '@/lib/journalVideos';
 import TgPicker from './TgPicker';
 import TgPrices from './TgPrices';
-import { AFTER_QUIZ, ALWAYS_OPEN, BOOT_LINES, BOT_URL, NextBtn, SERGEY_URL, TABS, go, type Bot, type Tab, type TgData } from './tgCommon';
+import { AFTER_QUIZ, ALWAYS_OPEN, BOOT_LINES, BOT_URL, NextBtn, PC_NOTE, SERGEY_URL, TABS, go, type Bot, type Tab, type TgData } from './tgCommon';
 import '@/styles/echo-fx.css';
 import '@/styles/cabinet-v2.css';
 import '@/styles/terminal-v2.css';
@@ -90,7 +90,8 @@ export default function TgView({ bot, d, fresh, scan = false, pubUrl, sceneUrl, 
   // закреплено (fixed: sticky ломается от overflow у страницы), снизу у содержимого запас под него (tg-v2.css)
   const nav = (
     <nav className="tg-nav" aria-label="Разделы терминала">
-      <div className="tg-nav-in" role="tablist" aria-label="Разделы терминала" style={{ '--n': tabs.length } as CSSProperties}>
+      {/* 29.10.2026: пять вкладок (школьный бот) — подписи мельче, чтобы «Инструмент» не рвался посреди слова (tg-v2.css) */}
+      <div className={tabs.length >= 5 ? 'tg-nav-in many' : 'tg-nav-in'} role="tablist" aria-label="Разделы терминала" style={{ '--n': tabs.length } as CSSProperties}>
         {tabIdx >= 0 ? (
           <span className="tg-nav-ind" aria-hidden="true" style={{ transform: `translateX(${tabIdx * 100}%)` }}>
             <span className="cv2-drop" />
@@ -178,7 +179,7 @@ export default function TgView({ bot, d, fresh, scan = false, pubUrl, sceneUrl, 
         <p className="tg-lock-t">
           {fresh ? 'Журнал решений открыт всем.' : 'Журнал моих решений открыт всем — вкладка «Решения».'}
           <br />
-          {fresh ? AFTER_QUIZ : 'Инструменты и «Сделки до и после» — доступ после подписки.'}
+          {fresh ? AFTER_QUIZ : 'Инструменты, скринер, ТОП-лист и «Сделки до и после» — доступ после подписки.'}
         </p>
         {fresh ? <NextBtn label="Ответить на 4 вопроса в боте" url={BOT_URL} /> : <NextBtn label="Доступ после подписки — написать Сергею" url={SERGEY_URL} />}
       </div>
@@ -188,12 +189,9 @@ export default function TgView({ bot, d, fresh, scan = false, pubUrl, sceneUrl, 
       <div>
         {bot === 'school' ? (
           <div className="tg-note">
-            {/* 18.10.2026, его слово: «все инструменты в веб-версии» — обман, там у нового человека та же проба; «лучше
-                написать: все инструменты после подписки» */}
-            Инструменты для примера: так система разбирает рынок — неделя, шаг 1; дневка, шаг 2. Все инструменты — после подписки.{' '}
-            <button type="button" className="tg-link" onClick={() => go(SERGEY_URL)}>
-              Написать Сергею
-            </button>
+            {/* 29.10.2026, его слово «открой всё на 7 дней»: в пробе все инструменты, как у подписчика (было: 3 для примера
+                и «все инструменты — после подписки»). Эта вкладка открыта только в пробе, после неё — замок */}
+            7 дней пробы: все инструменты, как у подписчиков. {PC_NOTE}
           </div>
         ) : null}
         <TgPicker rows={rows} cur={r} onPick={setSym} />
@@ -210,7 +208,16 @@ export default function TgView({ bot, d, fresh, scan = false, pubUrl, sceneUrl, 
       <div className="tv2-panel tv2-empty">Инструментов пока нет.</div>
     );
   } else if (tab === 'scr') {
-    body = <ScreenerCards doc={d.feeds?.screener} symbols={symbols} onOpen={open} />;
+    // 29.10.2026: у школьного бота ТОП-лист и группы одной вкладкой — сначала ТОП-лист, под ним весь рынок по группам
+    body =
+      bot === 'school' && d.feeds?.screener ? (
+        <>
+          <ScreenerCards part="top" doc={d.feeds.screener} symbols={symbols} onOpen={open} />
+          <ScreenerCards doc={d.feeds.screener} symbols={symbols} onOpen={open} />
+        </>
+      ) : (
+        <ScreenerCards doc={d.feeds?.screener} symbols={symbols} onOpen={open} />
+      );
   } else if (tab === 'top') {
     body = <ScreenerCards part="top" doc={d.feeds?.screener} symbols={symbols} onOpen={open} />;
   } else if (tab === 'dec') {
@@ -218,8 +225,13 @@ export default function TgView({ bot, d, fresh, scan = false, pubUrl, sceneUrl, 
       <>
         {bot === 'school' ? (
           <div className="tg-note">
-            {/* 19.10.2026: в школьном боте решения старше 3 дней (tg_terminal) — человек должен знать, почему нет свежих */}
-            Здесь мои решения старше 3 дней. Подписчики получают их сразу, в момент решения.
+            {/* 19.10.2026: в школьном боте решения старше 3 дней (tg_terminal) — человек должен знать, почему нет свежих.
+                29.10.2026: в 7 дней пробы решения приходят сразу, задержка только после пробы */}
+            {d.limited ? (
+              'Здесь мои решения старше 3 дней. Подписчики получают их сразу, в момент решения.'
+            ) : (
+              <>7 дней пробы: мои решения приходят сюда сразу, в момент решения, как у подписчиков. {PC_NOTE}</>
+            )}
             {/* 20.10.2026, его «да» (пункт Б): человек попадает сразу сюда и вкладки с замком может не открыть */}
             {fresh && d.limited ? (
               <div className="tg-note-strong">

@@ -16,8 +16,11 @@ export type Tab = 'inst' | 'scr' | 'top' | 'dec' | 'tm' | 'price';
 // 29.10.2026: значки вкладок — линейные (lucide, TgView.tsx, ICON) вместо эмодзи: цветные эмодзи выбивались из палитры
 export const TABS: Record<Bot, [Tab, string][]> = {
   echo: [['inst', 'Инструмент'], ['scr', 'Скринер'], ['top', 'ТОП-лист'], ['dec', 'Решения']],
-  // 20.10.2026, его «вкладка «Цены» в терминале школьного бота, кнопки «Все цены» ведут в неё» (&tab=price)
-  school: [['dec', 'Решения'], ['inst', 'Инструмент'], ['tm', 'Сделки до и после'], ['price', 'Стоимость']],
+  // 20.10.2026, его «вкладка «Цены» в терминале школьного бота, кнопки «Все цены» ведут в неё» (&tab=price).
+  // 29.10.2026, его слово «открой всё на 7 дней»: в пробе и скринер с ТОП-листом, как у подписчика (после пробы — с замком).
+  // Одной вкладкой «Скринер» (сверху ТОП-лист, под ним группы, TgView.tsx): шесть вкладок на телефоне не помещаются —
+  // «Инструмент» и «Стоимость» рвутся посреди слова
+  school: [['dec', 'Решения'], ['inst', 'Инструмент'], ['scr', 'Скринер'], ['tm', 'Сделки до и после'], ['price', 'Стоимость']],
 };
 // вкладки, открытые и после пробы, и до вопросов: журнал решений и цены
 export const ALWAYS_OPEN: Tab[] = ['dec', 'price'];
@@ -42,7 +45,7 @@ export interface TgData {
 
 declare global {
   interface Window {
-    Telegram?: { WebApp?: { initData: string; ready: () => void; expand: () => void; openLink?: (u: string) => void; openTelegramLink?: (u: string) => void; setHeaderColor?: (c: string) => void; setBackgroundColor?: (c: string) => void } };
+    Telegram?: { WebApp?: { initData: string; ready: () => void; expand: () => void; openLink?: (u: string) => void; openTelegramLink?: (u: string) => void; setHeaderColor?: (c: string) => void; setBackgroundColor?: (c: string) => void; platform?: string; isVersionAtLeast?: (v: string) => boolean; requestFullscreen?: () => void } };
   }
 }
 
@@ -52,7 +55,11 @@ export const SERGEY_URL = 'https://t.me/tradeliketyo';
 export const SITE_URL = 'https://www.tradeliketyo.com/';
 // 20.10.2026, разбор воронки, пункт 5: бот ставит метку n=1 тому, кто ещё не ответил на 4 вопроса. Ему открыт журнал,
 // остальное откроется после вопросов. Метка только для текста, доступ решает база по пропуску
-export const AFTER_QUIZ = 'Проверка сделки, инструменты и «Сделки до и после» откроются на 7 дней после 4 коротких вопросов в боте.';
+// 29.10.2026: после вопросов на 7 дней открывается весь терминал, как у подписчика
+export const AFTER_QUIZ = 'Проверка сделки и весь терминал, как у подписчиков, откроются на 7 дней после 4 коротких вопросов в боте.';
+// 29.10.2026, его слово: «если хотите получить полное представление о системе, лучше посмотреть с компьютера» — тот же
+// терминал открывается кнопкой «Терминал» в Телеграме на компьютере, на большом экране
+export const PC_NOTE = 'Полную картину удобнее смотреть на большом экране: откройте этот бот в Telegram на компьютере, кнопка «Терминал» там тоже есть.';
 
 export function go(url: string) {
   const w = window.Telegram?.WebApp;

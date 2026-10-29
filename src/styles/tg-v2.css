@@ -77,6 +77,10 @@
 .tgv2 .tg-nav-in > button[data-locked] svg { color: var(--faint); }
 .tgv2 .tg-nav-in > button[aria-selected='true'][data-locked] svg { color: var(--brass); }
 .tgv2 .tg-nav-t { max-width: 100%; overflow-wrap: break-word; }
+/* 29.10.2026: пять вкладок (школьный бот, проба открыта целиком) — подпись 10px и кнопка уже по бокам: «Инструмент»
+   (60px) и «Стоимость» влезают в строку на экране 360px; где не влезают — перенос по слогам, а не посреди слова */
+.tgv2 .tg-nav-in.many > button { padding-left: 2px; padding-right: 2px; font-size: 10px; }
+.tgv2 .tg-nav-in.many .tg-nav-t { overflow-wrap: normal; hyphens: auto; }
 .tgv2 .tg-nav-in > button:focus-visible { outline-offset: -2px; border-radius: 14px; }
 
 /* ---------------- выбор инструмента ---------------- */

@@ -66,14 +66,15 @@ function timemachine(now: number): TimeItem[] {
 }
 
 /**
- * full — бот Echo-Gate: подписчик; школьный бот: 7 дней пробы (несколько инструментов, решения старше 3 дней).
+ * full — бот Echo-Gate: подписчик; школьный бот: 7 дней пробы (с 29.10.2026 всё, как у подписчика, решения сразу).
  * limited — школьный бот после пробы: открыт журнал решений и стоимость, остальное с замком.
  * quiz — школьный бот, ещё не ответил на 4 вопроса (метка n=1): то же, что limited, со своим текстом.
  * noaccess — экран без доступа: у Echo-Gate «подписка не найдена», у школьного — «журнал открыт всем».
  */
 export function tgDemo(bot: Bot, mode: TgDemoMode, now: number): { d: TgData; fresh: boolean } {
   if (mode === 'noaccess') return { d: { ok: false, reason: bot === 'echo' ? 'no_access' : 'school_expired' }, fresh: false };
-  const t = demoData(bot === 'echo' ? 'sub' : 'trial', now);
+  // 29.10.2026: школьные 7 дней пробы — всё, как у подписчика (tg_terminal), значит и демо подписчика
+  const t = demoData(bot === 'echo' || mode === 'full' ? 'sub' : 'trial', now);
   const d: TgData = {
     ok: true,
     pub: null,
