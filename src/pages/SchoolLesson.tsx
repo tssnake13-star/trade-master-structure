@@ -6,9 +6,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, ArrowRight, MessageCircle, CheckCircle, Lock } from 'lucide-react';
 import YouTubePlayer from '@/components/school/YouTubePlayer';
 import FloatingWatermark from '@/components/school/FloatingWatermark';
-import ConstellationBg from '@/components/ConstellationBg';
+import Room from '@/components/cabinet2/Room';
 import RichText from '@/components/RichText';
 import '@/styles/echo-fx.css';
+import '@/styles/cabinet-v2.css';
 
 interface LessonData {
   id: string;
@@ -26,13 +27,14 @@ interface VideoData {
   sort_order: number;
 }
 
-const ACCENT = '#caa472';
-const BG = '#080808';
-const FG = '#e8e0d0';
-const BORDER = '#1a1a1a';
-const MONO = "'Martian Mono', ui-monospace, monospace";
-const SANS = "'Hanken Grotesk', sans-serif";
-const DISPLAY = "'Bricolage Grotesque', system-ui, sans-serif";
+// 29.10.2026: кабинет v2 — латунь и шрифты «Ночного кабинета» (было #caa472, Martian Mono, Hanken, Bricolage)
+const ACCENT = '#CDAA6E';
+const BG = '#060A12';
+const FG = '#E6ECF5';
+const BORDER = 'rgba(200,215,240,0.11)';
+const MONO = "'IBM Plex Mono', ui-monospace, monospace";
+const SANS = "'Geologica', 'Segoe UI', system-ui, sans-serif";
+const DISPLAY = "'Geologica', 'Segoe UI', system-ui, sans-serif";
 
 function isYouTubeUrl(val: string): boolean { return /youtube\.com|youtu\.be/i.test(val); }
 function extractSrcFromIframe(html: string): string | null {
@@ -168,8 +170,8 @@ export default function SchoolLesson() {
 
   if (authLoading || loading || !lesson) {
     return (
-      <div data-school-skin className="min-h-screen flex items-center justify-center" style={{ backgroundColor: BG, color: FG }}>
-        <p style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#666' }}>Загрузка</p>
+      <div className="cv2 min-h-screen flex items-center justify-center" style={{ color: FG }}>
+        <p style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#94A1B8' }}>Загрузка</p>
       </div>
     );
   }
@@ -185,18 +187,18 @@ export default function SchoolLesson() {
   const playableVideos = videos.filter(v => v.video_url);
 
   return (
-    <div data-school-skin className="min-h-screen flex flex-col relative z-10" style={{ backgroundColor: BG, color: FG }}>
-      <ConstellationBg />
+    <div className="cv2 min-h-screen flex flex-col relative z-10" style={{ color: FG }}>
+      <Room />
       {/* Top bar */}
       <header
         className="sticky top-0 z-30 border-b backdrop-blur"
-        style={{ borderColor: BORDER, backgroundColor: 'rgba(8,8,8,0.85)', WebkitBackdropFilter: 'blur(12px)', backdropFilter: 'blur(12px)' }}
+        style={{ borderColor: BORDER, backgroundColor: 'rgba(6,10,18,0.72)', WebkitBackdropFilter: 'blur(12px)', backdropFilter: 'blur(12px)' }}
       >
         <div className="max-w-4xl mx-auto px-4 sm:px-8 py-4 flex items-center justify-between gap-4">
           <button
             onClick={() => navigate('/school/dashboard', { state: { selectedCourse: lesson.course_id } })}
             className="flex items-center gap-2 hover:opacity-70 transition min-w-0"
-            style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#888' }}
+            style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.14em', textTransform: 'uppercase', color: '#94A1B8' }}
           >
             <ArrowLeft size={14} className="flex-shrink-0" />
             <span className="truncate">{courseTitle}</span>
@@ -208,7 +210,7 @@ export default function SchoolLesson() {
               </span>
             )}
             {!isCompleted && (
-              <span className="hidden sm:inline" style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#666' }}>
+              <span className="hidden sm:inline" style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#94A1B8' }}>
                 В процессе
               </span>
             )}
@@ -229,7 +231,7 @@ export default function SchoolLesson() {
             {/* абзацы из админки сохраняются: пустая строка = новый абзац */}
             <RichText
               text={lesson.description}
-              style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#a8a090', maxWidth: '60ch' }}
+              style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#C6D0E0', maxWidth: '60ch' }}
               gap="0.85em"
             />
           </div>
@@ -240,7 +242,7 @@ export default function SchoolLesson() {
           <div className="flex-1" style={{ height: 2, backgroundColor: BORDER, overflow: 'hidden' }}>
             <div style={{ width: `${pct}%`, height: '100%', backgroundColor: ACCENT, transition: 'width 0.4s' }} />
           </div>
-          <span style={{ fontFamily: MONO, fontSize: 10, color: '#666', fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontFamily: MONO, fontSize: 10, color: '#94A1B8', fontVariantNumeric: 'tabular-nums' }}>
             {completedCount}/{totalLessons} · {pct}%
           </span>
         </div>
@@ -257,7 +259,7 @@ export default function SchoolLesson() {
                       fontSize: 10,
                       letterSpacing: '0.22em',
                       textTransform: 'uppercase',
-                      color: '#888',
+                      color: '#94A1B8',
                       marginBottom: 10,
                     }}
                   >
@@ -299,7 +301,7 @@ export default function SchoolLesson() {
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-3 w-full py-4 mb-6 transition hover:brightness-110"
               style={{
-                backgroundColor: ACCENT, color: '#0a0a0a', borderRadius: 8,
+                backgroundColor: ACCENT, color: '#0A0E18', borderRadius: 8,
                 fontFamily: MONO, fontSize: 12, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
               }}
             >
@@ -336,7 +338,7 @@ export default function SchoolLesson() {
             className="flex items-center justify-center gap-2 py-3.5 transition"
             style={{
               border: `1px solid ${BORDER}`, borderRadius: 8, backgroundColor: 'transparent',
-              color: prevLessonId ? FG : '#444',
+              color: prevLessonId ? FG : '#5E6A80',
               fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase',
               opacity: prevLessonId ? 1 : 0.4, cursor: prevLessonId ? 'pointer' : 'default',
             }}
@@ -350,7 +352,7 @@ export default function SchoolLesson() {
                 onClick={() => setShowTaskMessage(true)}
                 className="flex items-center justify-center gap-2 py-3.5 transition hover:brightness-110"
                 style={{
-                  backgroundColor: ACCENT, color: '#0a0a0a', borderRadius: 8,
+                  backgroundColor: ACCENT, color: '#0A0E18', borderRadius: 8,
                   fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
                   cursor: 'pointer',
                 }}
@@ -386,7 +388,7 @@ export default function SchoolLesson() {
               style={{
                 backgroundColor: isCompleted ? 'transparent' : ACCENT,
                 border: isCompleted ? `1px solid ${ACCENT}` : 'none',
-                color: isCompleted ? ACCENT : '#0a0a0a',
+                color: isCompleted ? ACCENT : '#0A0E18',
                 borderRadius: 8,
                 fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', fontWeight: 500,
                 cursor: isCompleted ? 'default' : 'pointer',
@@ -408,7 +410,7 @@ export default function SchoolLesson() {
             className={`flex items-center justify-center gap-2 py-3.5 transition${justDone && isNextUnlocked ? ' eg-live' : ''}`}
             style={{
               border: `1px solid ${BORDER}`, borderRadius: 8, backgroundColor: 'transparent',
-              color: nextLessonId && isNextUnlocked ? FG : '#444',
+              color: nextLessonId && isNextUnlocked ? FG : '#5E6A80',
               fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase',
               opacity: !nextLessonId ? 0.4 : isNextUnlocked ? 1 : 0.5,
               cursor: nextLessonId && isNextUnlocked ? 'pointer' : 'default',

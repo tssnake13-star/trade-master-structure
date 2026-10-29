@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { ArrowLeft, Check, KeyRound, User as UserIcon } from 'lucide-react';
-import ConstellationBg from '@/components/ConstellationBg';
+import Room from '@/components/cabinet2/Room';
 import '@/styles/echo-fx.css';
+import '@/styles/cabinet-v2.css';
 
 /**
  * SchoolProfile — «Профиль» ученика (/school/profile).
@@ -14,14 +15,15 @@ import '@/styles/echo-fx.css';
  * администратор. Аватарки нет: под неё нужен отдельный storage.
  */
 
-const ACCENT = '#e1a84d';
-const BG = '#080808';
-const FG = '#e8e0d0';
-const CARD = '#181410';
-const BORDER = '#1a1a1a';
-const MONO = "'Space Mono', ui-monospace, monospace";
-const SANS = "'Syne', system-ui, sans-serif";
-const DISPLAY = "'Cormorant', Georgia, 'Times New Roman', serif";
+// 29.10.2026: кабинет v2 — латунь и шрифты «Ночного кабинета»
+const ACCENT = '#CDAA6E';
+const BG = '#060A12';
+const FG = '#E6ECF5';
+const CARD = 'rgba(9,15,28,0.62)';
+const BORDER = 'rgba(200,215,240,0.11)';
+const MONO = "'IBM Plex Mono', ui-monospace, monospace";
+const SANS = "'Geologica', 'Segoe UI', system-ui, sans-serif";
+const DISPLAY = "'Geologica', 'Segoe UI', system-ui, sans-serif";
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -49,7 +51,7 @@ const btnStyle = (disabled: boolean): React.CSSProperties => ({
   padding: '13px 20px',
   borderRadius: 8,
   backgroundColor: ACCENT,
-  color: '#0a0a0a',
+  color: '#0A0E18',
   fontFamily: MONO,
   fontSize: 11,
   letterSpacing: '0.16em',
@@ -147,25 +149,25 @@ export default function SchoolProfile() {
 
   if (authLoading || loading) {
     return (
-      <div data-school-skin className="min-h-screen flex items-center justify-center" style={{ backgroundColor: BG, color: FG }}>
-        <p style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#666' }}>Загрузка</p>
+      <div className="cv2 min-h-screen flex items-center justify-center" style={{ color: FG }}>
+        <p style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#94A1B8' }}>Загрузка</p>
       </div>
     );
   }
 
   return (
-    <div data-school-skin className="min-h-screen relative z-10" style={{ backgroundColor: BG, color: FG }}>
-      <ConstellationBg />
+    <div className="cv2 min-h-screen relative z-10" style={{ color: FG }}>
+      <Room />
 
       <header
         className="sticky top-0 z-30 border-b backdrop-blur"
-        style={{ borderColor: BORDER, backgroundColor: 'rgba(8,8,8,0.85)', WebkitBackdropFilter: 'blur(12px)', backdropFilter: 'blur(12px)' }}
+        style={{ borderColor: BORDER, backgroundColor: 'rgba(6,10,18,0.72)', WebkitBackdropFilter: 'blur(12px)', backdropFilter: 'blur(12px)' }}
       >
         <div className="max-w-2xl mx-auto px-4 sm:px-8 py-4">
           <button
             onClick={() => navigate('/school/dashboard')}
             className="flex items-center gap-2 hover:opacity-70 transition"
-            style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#888' }}
+            style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.16em', textTransform: 'uppercase', color: '#94A1B8' }}
           >
             <ArrowLeft size={14} />
             Главная / <span style={{ color: ACCENT }}>Профиль</span>
@@ -205,7 +207,7 @@ export default function SchoolProfile() {
             placeholder="Имя и фамилия"
             style={inputStyle}
           />
-          {nameErr && <p className="mt-3" style={{ fontFamily: SANS, fontSize: 13, color: '#e85d3a' }}>{nameErr}</p>}
+          {nameErr && <p className="mt-3" style={{ fontFamily: SANS, fontSize: 13, color: '#E8875A' }}>{nameErr}</p>}
           {nameMsg && (
             <p className="mt-3 flex items-center gap-2" style={{ fontFamily: SANS, fontSize: 13, color: ACCENT }}>
               <Check size={14} /> {nameMsg}
@@ -242,7 +244,7 @@ export default function SchoolProfile() {
             autoComplete="new-password"
             style={inputStyle}
           />
-          {passErr && <p className="mt-3" style={{ fontFamily: SANS, fontSize: 13, color: '#e85d3a' }}>{passErr}</p>}
+          {passErr && <p className="mt-3" style={{ fontFamily: SANS, fontSize: 13, color: '#E8875A' }}>{passErr}</p>}
           {passMsg && (
             <p className="mt-3 flex items-center gap-2" style={{ fontFamily: SANS, fontSize: 13, color: ACCENT }}>
               <Check size={14} /> {passMsg}

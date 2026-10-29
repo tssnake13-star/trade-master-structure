@@ -5,15 +5,14 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useEffect } from 'react';
 import logoFallback from '@/assets/logo-tradeliketyo.png';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
-import ConstellationBg from '@/components/ConstellationBg';
+import '@/styles/cabinet-v2.css';
+import Room from '@/components/cabinet2/Room';
 
 function LogoBlock({ logo }: { logo: string }) {
   return (
     <div className="flex flex-col items-center mb-6">
-      <img src={logo} alt="TRADELIKETYO" className="rounded-xl object-cover" style={{ width: '12rem', height: '12rem' }} />
-      <span className="mt-5 text-[10px] uppercase tracking-[0.22em]" style={{ color: '#666', fontFamily: "'Martian Mono', ui-monospace, monospace" }}>
-        Вход в систему
-      </span>
+      <img src={logo} alt="TRADELIKETYO" className="rounded-xl object-cover" style={{ width: '7.5rem', height: '7.5rem' }} />
+      <span className="mt-4" style={{ color: 'var(--mut)', fontSize: 14 }}>Кабинет TRADE LIKE TYO</span>
     </div>
   );
 }
@@ -107,12 +106,11 @@ export default function SchoolAuth() {
 
   if (isForgot) {
     return (
-      <div data-school-skin className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#080808' }}>
-        <div className="w-full max-w-md">
+      <div className="cv2 min-h-screen flex items-center justify-center px-4">
+        <Room />
+        <div className="w-full max-w-md cv2-glass cv2-in" style={{ padding: 28 }}>
           <LogoBlock logo={logo} />
-          <h1 className="text-4xl mb-8 text-center tly-display" style={{ color: '#e8e0d0' }}>
-            Сброс <em>пароля</em>
-          </h1>
+          <h1 className="cv2-h1 mb-6 text-center">Сброс пароля</h1>
           <form onSubmit={handleForgotPassword} className="space-y-4">
             <input
               type="email"
@@ -120,23 +118,21 @@ export default function SchoolAuth() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-lg border text-sm"
-              style={{ backgroundColor: '#0a0a0a', borderColor: '#1f1f1f', color: '#e8e0d0', fontFamily: "'Hanken Grotesk', sans-serif" }}
+              className="cv2-input" style={{ padding: '12px 14px', fontSize: 15 }}
             />
-            {error && <p className="text-sm" style={{ color: '#e85d3a' }}>{error}</p>}
-            {success && <p className="text-sm" style={{ color: '#caa472' }}>{success}</p>}
+            {error && <p className="text-sm" style={{ color: '#E8875A' }}>{error}</p>}
+            {success && <p className="text-sm" style={{ color: '#CDAA6E' }}>{success}</p>}
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-lg font-medium text-sm transition-all"
-              style={{ backgroundColor: '#caa472', color: '#0a0a0a', fontFamily: "'Martian Mono', ui-monospace, monospace", fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.18em', fontWeight: 500, opacity: loading ? 0.6 : 1 }}
+              className="cv2-btn cv2-btn-brass w-full" style={{ padding: '13px 16px', fontSize: 15, opacity: loading ? 0.6 : 1 }}
             >
               {loading ? '...' : 'Отправить ссылку'}
             </button>
           </form>
           <p
             className="mt-6 text-center text-sm cursor-pointer"
-            style={{ color: '#666', fontFamily: "'Hanken Grotesk', sans-serif" }}
+            style={{ color: '#94A1B8', fontFamily: 'var(--font)' }}
             onClick={() => { setIsForgot(false); setError(''); setSuccess(''); }}
           >
             ← Вернуться ко входу
@@ -147,19 +143,18 @@ export default function SchoolAuth() {
   }
 
   return (
-    <div data-school-skin className="min-h-screen flex items-center justify-center px-4 relative z-10" style={{ backgroundColor: '#080808' }}>
-      <ConstellationBg />
-      <div className="w-full max-w-md">
+    <div className="cv2 min-h-screen flex items-center justify-center px-4">
+      {/* 29.10.2026: вход в кабинет v2 — та же комната за стеклом, форма в стеклянном окне */}
+      <Room />
+      <div className="w-full max-w-md cv2-glass cv2-in" style={{ padding: 28 }}>
         <LogoBlock logo={logo} />
         {!isLogin && (
-          <h1 className="text-4xl mb-8 text-center tly-display" style={{ color: '#e8e0d0' }}>
-            Регис<em>трация</em>
-          </h1>
+          <h1 className="cv2-h1 mb-6 text-center">Регистрация</h1>
         )}
         {/* 07.10.2026: при регистрации сам открывается пробный доступ к терминалу (триггер в базе).
             11.10.2026: до формы человек видит, что именно получит (разбор плана GPT, п.19) */}
         {!isLogin && (
-          <div className="-mt-4 mb-6 text-sm leading-relaxed px-2" style={{ color: '#a8a090' }}>
+          <div className="mb-6 text-sm leading-relaxed px-2" style={{ color: '#C6D0E0' }}>
             {/* 19.10.2026, его «все 7 пунктов согласен»: проба терминала — только через бота после 4 вопросов */}
             <p className="text-center">Регистрация бесплатная. Сразу откроется вводный курс.</p>
             <p className="mt-2 text-center">
@@ -180,8 +175,7 @@ export default function SchoolAuth() {
               value={fullName}
               onChange={e => setFullName(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-lg border text-sm"
-              style={{ backgroundColor: '#0a0a0a', borderColor: '#1f1f1f', color: '#e8e0d0', fontFamily: "'Hanken Grotesk', sans-serif" }}
+              className="cv2-input" style={{ padding: '12px 14px', fontSize: 15 }}
             />
           )}
           {!isLogin && showInvite && (
@@ -190,8 +184,7 @@ export default function SchoolAuth() {
               placeholder="Инвайт-код"
               value={inviteCode}
               onChange={e => setInviteCode(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border text-sm"
-              style={{ backgroundColor: '#0a0a0a', borderColor: '#1f1f1f', color: '#e8e0d0', fontFamily: "'Hanken Grotesk', sans-serif" }}
+              className="cv2-input" style={{ padding: '12px 14px', fontSize: 15 }}
             />
           )}
           <input
@@ -200,8 +193,7 @@ export default function SchoolAuth() {
             value={email}
             onChange={e => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-3 rounded-lg border text-sm"
-            style={{ backgroundColor: '#0a0a0a', borderColor: '#1f1f1f', color: '#e8e0d0', fontFamily: "'Hanken Grotesk', sans-serif" }}
+            className="cv2-input" style={{ padding: '12px 14px', fontSize: 15 }}
           />
           <input
             type="password"
@@ -210,18 +202,16 @@ export default function SchoolAuth() {
             onChange={e => setPassword(e.target.value)}
             required
             minLength={6}
-            className="w-full px-4 py-3 rounded-lg border text-sm"
-            style={{ backgroundColor: '#0a0a0a', borderColor: '#1f1f1f', color: '#e8e0d0', fontFamily: "'Hanken Grotesk', sans-serif" }}
+            className="cv2-input" style={{ padding: '12px 14px', fontSize: 15 }}
           />
 
-          {error && <p className="text-sm" style={{ color: '#e85d3a' }}>{error}</p>}
-          {!isLogin && success && <p className="text-sm" style={{ color: '#caa472' }}>{success}</p>}
+          {error && <p className="text-sm" style={{ color: '#E8875A' }}>{error}</p>}
+          {!isLogin && success && <p className="text-sm" style={{ color: '#CDAA6E' }}>{success}</p>}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-lg font-medium text-sm transition-all"
-            style={{ backgroundColor: '#caa472', color: '#0a0a0a', fontFamily: "'Martian Mono', ui-monospace, monospace", fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.18em', fontWeight: 500, opacity: loading ? 0.6 : 1 }}
+            className="cv2-btn cv2-btn-brass w-full" style={{ padding: '13px 16px', fontSize: 15, opacity: loading ? 0.6 : 1 }}
           >
             {loading ? '...' : isLogin ? 'Войти' : 'Создать аккаунт'}
           </button>
@@ -232,8 +222,8 @@ export default function SchoolAuth() {
             <button
               type="button"
               onClick={() => setShowInvite(true)}
-              className="underline underline-offset-2 hover:text-[#caa472] transition-colors"
-              style={{ color: '#77705f', fontFamily: "'Hanken Grotesk', sans-serif" }}
+              className="underline underline-offset-2 hover:text-[#CDAA6E] transition-colors"
+              style={{ color: '#7D8AA0', fontFamily: 'var(--font)' }}
             >
               Есть инвайт-код?
             </button>
@@ -242,18 +232,18 @@ export default function SchoolAuth() {
 
         {/* 07.10.2026: документы появились, ссылки открываются в новой вкладке, чтобы не терять заполненную форму */}
         {!isLogin && (
-          <p className="mt-3 text-center text-[11px] leading-snug px-2" style={{ color: '#77705f', fontFamily: "'Hanken Grotesk', sans-serif" }}>
+          <p className="mt-3 text-center text-[11px] leading-snug px-2" style={{ color: '#7D8AA0', fontFamily: 'var(--font)' }}>
             Регистрируясь, вы соглашаетесь с обработкой персональных данных в соответствии с{' '}
-            <a href="/privacy" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-[#caa472] transition-colors">политикой конфиденциальности</a>
+            <a href="/privacy" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-[#CDAA6E] transition-colors">политикой конфиденциальности</a>
             {' '}и принимаете{' '}
-            <a href="/terms" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-[#caa472] transition-colors">пользовательское соглашение</a>.
+            <a href="/terms" target="_blank" rel="noopener" className="underline underline-offset-2 hover:text-[#CDAA6E] transition-colors">пользовательское соглашение</a>.
           </p>
         )}
 
         {isLogin && (
           <p
             className="mt-4 text-center text-sm cursor-pointer"
-            style={{ color: '#666', fontFamily: "'Hanken Grotesk', sans-serif" }}
+            style={{ color: '#94A1B8', fontFamily: 'var(--font)' }}
             onClick={() => { setIsForgot(true); setError(''); }}
           >
             Забыли пароль?
@@ -262,7 +252,7 @@ export default function SchoolAuth() {
 
         <p
           className="mt-2 text-center text-sm cursor-pointer"
-          style={{ color: '#666', fontFamily: "'Hanken Grotesk', sans-serif" }}
+          style={{ color: '#94A1B8', fontFamily: 'var(--font)' }}
           onClick={() => { setIsLogin(!isLogin); setError(''); }}
         >
           {isLogin ? 'Нет аккаунта? Зарегистрироваться' : 'Уже есть аккаунт? Войти'}
