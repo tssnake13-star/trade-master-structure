@@ -13,14 +13,14 @@ export default function SiteFooter() {
             <p className="ns-brand">TRADE LIKE TYO</p>
             <p className="mt-2 text-sm text-muted-foreground">Система допуска к сделке</p>
           </div>
-          <nav className="flex flex-wrap gap-x-7 gap-y-3 text-[15px]" aria-label="Страницы сайта внизу">
+          <nav className="flex flex-wrap gap-x-7 gap-y-3 text-base" aria-label="Страницы сайта внизу">
             {SITE_PAGES.map((p) => (
               <Link key={p.to} to={p.to} className="text-muted-foreground hover:text-foreground transition-colors">
                 {p.label}
               </Link>
             ))}
           </nav>
-          <div className="flex flex-wrap gap-x-7 gap-y-3 text-[15px]">
+          <div className="flex flex-wrap gap-x-7 gap-y-3 text-base">
             <a href={TELEGRAM_LINKS.channel} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors">
               Telegram-канал
             </a>

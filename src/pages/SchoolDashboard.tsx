@@ -1718,7 +1718,7 @@ function CourseLadder({
                   ECHO-GATE INSIDE <span style={{ color: ACCENT }}>считает</span> рынок за вас: от вас 2 действия.
                 </h3>
                 <p style={{ fontFamily: SANS, fontSize: 12, lineHeight: 1.55, color: '#8a857c', maxWidth: '52ch', marginBottom: 18 }}>
-                  Echo Gate · Hunter_Bot · Risk Sentinel — инфраструктура исполнения на вашем счёте.
+                  Hunter_Bot и Risk Sentinel — роботы исполнения на вашем счёте.
                 </p>
                 <a
                   href="/#formats"

@@ -66,14 +66,25 @@
 .night-skin.v3-skin.landing-skin h3 { font-weight: 600; letter-spacing: -0.02em; }
 .night-skin.v3-skin.landing-skin h2,
 .night-skin.v3-skin.landing-skin .heading-section { font-size: clamp(32px, 4.2vw, 56px) !important; line-height: 1.04 !important; }
-.night-skin.v3-skin.landing-skin h3 { font-size: clamp(20px, 1.9vw, 26px); line-height: 1.2; }
+.night-skin.v3-skin.landing-skin h3 { font-size: clamp(22px, 2vw, 28px); line-height: 1.2; }
 .night-skin.v3-skin.landing-skin :is(h1, h2, h3) em { font-style: normal !important; color: inherit !important; }
 .night-skin.v3-skin.landing-skin .lede { font-family: var(--font-display); }
 
 /* подписи и цифры: подписи — моноширинным, кнопки и меню — Geologica */
 .night-skin.v3-skin.landing-skin :is(.section-label, .text-mono, .stat-label, .kicker) { font-family: var(--font-mono) !important; }
 .night-skin.v3-skin.landing-skin :is(.font-ui, .btn-primary, .btn-secondary, .v3h-btn, header a, .tabular-nums):not(.td *) { font-family: var(--font-ui); }
-.night-skin.v3-skin.landing-skin .section-label { font-size: 12.5px; letter-spacing: 0.02em; opacity: 0.75; }
+.night-skin.v3-skin.landing-skin .section-label { font-size: 14px; letter-spacing: 0.02em; opacity: 0.75; }
+
+/* Меню шапки и подвала — Geologica (29.10.2026). Правило прежней главной в v3-skin.css ставило ссылкам в шапке
+   моноширинный шрифт с !important и перебивало .ns-nav: меню выходило набранным IBM Plex Mono */
+.night-skin.v3-skin.landing-skin :is(header, footer) nav a { font-family: var(--font-ui) !important; font-size: 16px; letter-spacing: 0; }
+
+/* Шкала размеров (29.10.2026, проверка скилла design-taste-frontend: на главной было 16 размеров и 14 подписей
+   мельче 13 px). Теперь: 14 подписи · 16 и 18 текст · 20 · 28 · 40 · 56 заголовки и цифры · крупные заголовки
+   первых экранов. Мельче 14 px на страницах сайта ничего нет */
+.night-skin.landing-skin .text-xs { font-size: 14px; line-height: 1.5; }
+.night-skin .journal__title { font-size: 20px; }
+.night-skin .smv-time { font-size: 14px; }
 
 /* ---- кнопки: латунь с тёмным текстом и тонкий контур, углы 3 px ---- */
 .night-skin.v3-skin .btn-primary,
@@ -132,34 +143,34 @@
   .night-skin .v3h-h1 .v3h-line1,
   .night-skin .v3h-h1 .v3h-line2 { font-size: min(calc(4.375vw - 2.8px), 47.5px) !important; }
 }
-.night-skin .v3h-offer { font-family: var(--font-display); color: var(--v3-fg); font-size: clamp(18px, 1.6vw, 21px); max-width: 36ch; }
+.night-skin .v3h-offer { font-family: var(--font-display); color: var(--v3-fg); font-size: clamp(18px, 1.6vw, 20px); max-width: 36ch; }
 /* заголовок первого экрана внутренних страниц */
 .night-skin.v3-skin.landing-skin .ns-h1 { font-size: clamp(42px, 6vw, 84px); line-height: 0.98; letter-spacing: -0.035em !important; }
 .ns-honest { font-size: 14px; line-height: 1.5; color: var(--v3-mut); max-width: 46ch; }
 
 /* полоса фактов под первым экраном */
-.ns-facts { display: flex; flex-wrap: wrap; gap: 10px 28px; font-family: var(--font-mono); font-size: 12.5px; letter-spacing: 0.02em; color: var(--v3-mut); }
+.ns-facts { display: flex; flex-wrap: wrap; gap: 10px 28px; font-family: var(--font-mono); font-size: 14px; letter-spacing: 0.02em; color: var(--v3-mut); }
 .ns-facts span { display: inline-flex; align-items: center; gap: 10px; }
 .ns-facts span::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: var(--v3-gold); box-shadow: 0 0 8px var(--v3-gold); }
 
 /* ---- шапка: страницы сайта ---- */
 .ns-header { transition: background-color .35s ease, border-color .35s ease, backdrop-filter .35s ease; border-bottom: 1px solid transparent; }
 .ns-header[data-solid] { background: rgba(6, 10, 18, 0.72); border-bottom-color: var(--v3-line); backdrop-filter: blur(14px) saturate(1.2); -webkit-backdrop-filter: blur(14px) saturate(1.2); }
-.ns-brand { font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: 0.04em; color: var(--v3-fg); white-space: nowrap; }
-.ns-nav a { position: relative; font-family: var(--font-ui) !important; font-size: 15px; color: var(--v3-mut); transition: color .25s; padding: 6px 0; }
+.ns-brand { font-family: var(--font-display); font-weight: 700; font-size: 16px; letter-spacing: 0.04em; color: var(--v3-fg); white-space: nowrap; }
+.ns-nav a { position: relative; font-family: var(--font-ui) !important; font-size: 16px; color: var(--v3-mut); transition: color .25s; padding: 6px 0; }
 .ns-nav a:hover { color: var(--v3-fg); }
 .ns-nav a[aria-current="page"] { color: var(--v3-fg); }
 .ns-nav a[aria-current="page"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: -2px; height: 1.5px; background: var(--v3-gold); box-shadow: 0 0 10px var(--v3-gold); }
 
 /* ---- общие детали новых разделов ---- */
-.ns-kicker { font-family: var(--font-mono); font-size: 13px; letter-spacing: 0.02em; color: var(--v3-mut); }
+.ns-kicker { font-family: var(--font-mono); font-size: 14px; letter-spacing: 0.02em; color: var(--v3-mut); }
 .ns-panel { background: var(--ns-panel); border: 1px solid var(--v3-line); border-radius: 6px; }
 .ns-band { background: var(--ns-band); border-top: 1px solid var(--v3-line); border-bottom: 1px solid var(--v3-line); }
 /* «прозрачные окна»: стекло поверх фона страницы */
 .ns-glass { background: var(--ns-glass); border: 1px solid var(--ns-glass-line); border-radius: 8px; backdrop-filter: blur(16px) saturate(1.15); -webkit-backdrop-filter: blur(16px) saturate(1.15); }
 .ns-num { font-family: var(--font-display); font-weight: 700; letter-spacing: -0.035em; line-height: 1; color: var(--v3-fg); font-variant-numeric: tabular-nums; }
-.ns-cap { font-family: var(--font-mono); font-size: 12.5px; line-height: 1.55; letter-spacing: 0.01em; color: var(--v3-mut); }
-.ns-step-n { font-family: var(--font-mono); font-size: 13px; color: var(--v3-gold); }
+.ns-cap { font-family: var(--font-mono); font-size: 14px; line-height: 1.55; letter-spacing: 0.01em; color: var(--v3-mut); }
+.ns-step-n { font-family: var(--font-mono); font-size: 14px; color: var(--v3-gold); }
 .ns-link-arrow { display: inline-flex; align-items: center; gap: 8px; color: var(--v3-fg); border-bottom: 1px solid var(--ns-line-strong); padding-bottom: 3px; transition: border-color .25s, gap .25s; }
 .ns-link-arrow:hover { border-color: var(--v3-gold); gap: 12px; }
 

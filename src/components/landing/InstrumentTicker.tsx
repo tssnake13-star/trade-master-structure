@@ -28,7 +28,7 @@ const TickerRow = ({ ariaHidden = false }: { ariaHidden?: boolean }) => (
         <span
           className="text-mono"
           style={{
-            fontSize: 12.5,
+            fontSize: 14, // 29.10.2026: шкала размеров сайта, мельче 14 px подписей нет
             letterSpacing: '0.04em',
             color: 'hsl(var(--muted-foreground))',
             opacity: 0.6,

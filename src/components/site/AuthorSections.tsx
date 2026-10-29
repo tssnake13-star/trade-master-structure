@@ -67,7 +67,7 @@ export function SeriesSection() {
             rel="noopener noreferrer"
             data-orbit=""
             onClick={() => trackClick('author_series')}
-            className="btn-secondary mt-8 px-6 py-3.5 text-[15px]"
+            className="btn-secondary mt-8 px-6 py-3.5 text-base"
           >
             Смотреть сериал на YouTube
           </a>

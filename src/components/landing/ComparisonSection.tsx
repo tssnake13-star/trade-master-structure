@@ -69,7 +69,7 @@ const ComparisonSection = () => {
               }
             >
               <div
-                className="font-ui text-[12.5px] tracking-[0.01em] mb-5"
+                className="font-ui text-sm tracking-[0.01em] mb-5"
                 style={{ color: col.accent ? 'hsl(var(--foreground))' : 'hsl(var(--muted-foreground))' }}
               >
                 {col.title}
@@ -77,10 +77,10 @@ const ComparisonSection = () => {
               <ul className="space-y-4">
                 {col.values.map((v, i) => (
                   <li key={i}>
-                    <div className="font-ui text-[12.5px] tracking-[0.01em] text-muted-foreground/60 mb-1">
+                    <div className="font-ui text-sm tracking-[0.01em] text-muted-foreground/60 mb-1">
                       {CRITERIA[i]}
                     </div>
-                    <div className={`text-sm md:text-[15px] ${col.accent ? 'text-foreground' : 'text-muted-foreground'}`}>
+                    <div className={`text-sm md:text-base ${col.accent ? 'text-foreground' : 'text-muted-foreground'}`}>
                       {v}
                     </div>
                   </li>

@@ -65,9 +65,9 @@ export function StagesSection() {
         <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
           {STAGES.map((s, i) => (
             <div key={s.title} className="ns-panel p-5 md:p-6">
-              <div className="ns-num text-[44px]" style={{ color: 'var(--v3-gold)' }}>{i + 1}</div>
-              <h3 className="mt-4 text-foreground !text-[19px]">{s.title}</h3>
-              <p className="mt-2.5 text-[15px] leading-relaxed text-muted-foreground">{s.text}</p>
+              <div className="ns-num text-[40px]" style={{ color: 'var(--v3-gold)' }}>{i + 1}</div>
+              <h3 className="mt-4 text-foreground !text-[20px]">{s.title}</h3>
+              <p className="mt-2.5 text-base leading-relaxed text-muted-foreground">{s.text}</p>
             </div>
           ))}
         </div>
@@ -76,13 +76,13 @@ export function StagesSection() {
         <div className="mt-6 grid gap-4">
           {REACH.map((r) => (
             <div key={r.name} className="flex flex-wrap items-center gap-x-6 gap-y-2.5">
-              <div className="w-40 flex-shrink-0 text-[17px] font-semibold text-foreground">{r.name}</div>
+              <div className="w-40 flex-shrink-0 text-lg font-semibold text-foreground">{r.name}</div>
               <div className="ns-segs flex-[1_1_320px]" aria-label={`${r.name}: ${r.text}`}>
                 {r.segs.map((v, k) => (
                   <span key={k} data-on={v ? '' : undefined} data-half={v === 0.5 ? '' : undefined} style={{ '--k': k } as CSSProperties}><i /></span>
                 ))}
               </div>
-              <div className="flex-[1_1_260px] text-[15px] text-muted-foreground">{r.text}</div>
+              <div className="flex-[1_1_260px] text-base text-muted-foreground">{r.text}</div>
             </div>
           ))}
         </div>
@@ -152,14 +152,14 @@ export function StudyLevelsSection() {
                   : { border: '1px solid var(--v3-line)', background: 'var(--ns-panel)' }
               }
             >
-              <div className="ns-kicker">{l.tag}</div>
-              <h3 className="mt-2 text-foreground !text-[30px] !font-bold" style={{ letterSpacing: '-0.03em' }}>{l.name}</h3>
+              {/* 29.10.2026: подпись над названием убрана, «самостоятельно / вместе со мной / всё сразу» стоит в строке срока */}
+              <h3 className="text-foreground !text-[28px] !font-bold" style={{ letterSpacing: '-0.03em' }}>{l.name}</h3>
               <div className="mt-4 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                {l.price ? <span className="ns-num text-[44px]">{l.price}</span> : <span className="text-xl font-semibold text-foreground">Стоимость скажу лично</span>}
-                <span className="ns-cap">{l.period}</span>
+                {l.price ? <span className="ns-num text-[40px]">{l.price}</span> : <span className="text-xl font-semibold text-foreground">Стоимость скажу лично</span>}
+                <span className="ns-cap">{l.period}, {l.tag}</span>
               </div>
               <ul className="mt-6 space-y-3">
-                {l.points.map((pt) => <li key={pt} className="flex gap-2.5 text-[15px] text-foreground/90">{tick}<span>{pt}</span></li>)}
+                {l.points.map((pt) => <li key={pt} className="flex gap-2.5 text-base text-foreground/90">{tick}<span>{pt}</span></li>)}
               </ul>
               <div className="flex-grow" />
               <p className="mt-6 pt-4 border-t border-border text-sm leading-relaxed text-muted-foreground">{l.note}</p>
@@ -171,7 +171,7 @@ export function StudyLevelsSection() {
                 onClick={() => trackClick(`package_${l.id}`)}
                 data-orbit={l.featured ? undefined : ''}
                 style={l.featured ? ({ '--shd': '1.6s' } as CSSProperties) : ({ '--od': `${-1.1 - i * 1.1}s` } as CSSProperties)}
-                className={`mt-5 justify-center px-6 py-3.5 text-[15px] ${l.featured ? 'btn-primary cta-shine' : 'btn-secondary'}`}
+                className={`mt-5 justify-center px-6 py-3.5 text-base ${l.featured ? 'btn-primary cta-shine' : 'btn-secondary'}`}
               >
                 {l.cta}
               </a>
@@ -181,7 +181,7 @@ export function StudyLevelsSection() {
 
         <div className="mt-3 ns-panel p-6 md:p-7">
           <h3 className="text-foreground !text-[20px]">Как устроен выбор</h3>
-          <ul className="mt-4 space-y-2.5 text-[15px] leading-relaxed text-foreground/85 list-disc pl-5 marker:text-muted-foreground">
+          <ul className="mt-4 space-y-2.5 text-base leading-relaxed text-foreground/85 list-disc pl-5 marker:text-muted-foreground">
             <li>В VIP оплаченное засчитывается полностью: 30 дней после видеообучения, 67 дней после практикума.</li>
             <li>Прямые эфиры есть в практикуме и после него остаются с подпиской. В Trade System их нет.</li>
             <li>
@@ -201,10 +201,9 @@ export function FirstBlockSection() {
       <div className="container-landing">
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16 lg:items-start">
           <div className="lg:flex-1">
-            <span className="section-label">практикум</span>
             <h2 className="text-foreground"><Words>Правило первого блока</Words></h2>
             <p className="mt-5 text-base md:text-lg leading-relaxed text-foreground/90" style={{ maxWidth: '52ch' }}>
-              Первый блок вводный. Пройдите его целиком и решите. Не ваше — возвращаю деньги полностью, объяснять ничего не
+              На практикуме первый блок вводный. Пройдите его целиком и решите. Не ваше — возвращаю деньги полностью, объяснять ничего не
               нужно. Открыли второй блок, значит решение принято, и дальше мы идём до конца.
             </p>
           </div>

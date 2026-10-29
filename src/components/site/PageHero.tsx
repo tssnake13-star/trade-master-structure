@@ -7,7 +7,6 @@ import type { ReactNode } from 'react';
  */
 export default function PageHero({
   id = 'top',
-  kicker,
   title,
   lede,
   actions,
@@ -15,7 +14,6 @@ export default function PageHero({
   aside,
 }: {
   id?: string;
-  kicker?: ReactNode;
   title: ReactNode;
   lede?: ReactNode;
   actions?: ReactNode;
@@ -27,8 +25,8 @@ export default function PageHero({
       <div className="container-landing relative">
         <div className={`grid gap-10 lg:gap-14 items-center ${aside ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]' : ''}`}>
           <div className="ns-rise">
-            {kicker && <p className="ns-kicker">{kicker}</p>}
-            <h1 className="ns-h1 mt-5 text-foreground">{title}</h1>
+            {/* 29.10.2026: подпись над заголовком убрана (признак шаблона), её смысл стоит в первой фразе под ним */}
+            <h1 className="ns-h1 text-foreground">{title}</h1>
             {lede && <p className="mt-6 text-lg md:text-xl leading-relaxed text-foreground" style={{ maxWidth: '40ch' }}>{lede}</p>}
             {actions && <div className="mt-9 flex flex-wrap items-center gap-3">{actions}</div>}
             {note && <p className="mt-6 ns-honest">{note}</p>}

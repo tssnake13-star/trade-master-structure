@@ -91,7 +91,7 @@ const TransformationSection = () => {
               <div className="ns-step-n">
                 {i + 1}. {w.when}
               </div>
-              <div className="text-2xl mt-3 text-foreground font-semibold" style={{ letterSpacing: '-0.02em' }}>{w.title}</div>
+              <div className="text-[20px] mt-3 text-foreground font-semibold" style={{ letterSpacing: '-0.02em' }}>{w.title}</div>
               <p className="mt-2 text-sm md:text-base text-muted-foreground leading-relaxed">{w.text}</p>
             </div>
           ))}

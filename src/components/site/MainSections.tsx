@@ -36,7 +36,7 @@ export function PainsSection() {
             {PAINS.map((p) => (
               <div key={p.q} className="grid md:grid-cols-[minmax(0,0.85fr)_minmax(0,1.3fr)] gap-x-8 gap-y-2 py-6 border-b border-border">
                 <div className="text-lg md:text-xl font-semibold text-foreground" style={{ letterSpacing: '-0.01em' }}>«{p.q}»</div>
-                <p className="text-base md:text-[17px] leading-relaxed text-muted-foreground">{p.a}</p>
+                <p className="text-base md:text-lg leading-relaxed text-muted-foreground">{p.a}</p>
               </div>
             ))}
           </div>
@@ -70,12 +70,12 @@ export function StepsSection() {
                 <span className="ns-num text-[40px]">{i + 1}</span>
                 <span className="ns-step-n">{s.who}</span>
               </div>
-              <p className="mt-4 text-[15px] md:text-base leading-relaxed text-muted-foreground">{s.text}</p>
+              <p className="mt-4 text-base leading-relaxed text-muted-foreground">{s.text}</p>
             </div>
           ))}
         </div>
         <div className="mt-10">
-          <Link to="/binocular" data-orbit="" onClick={() => trackClick('main_how_binocular')} className="btn-secondary px-6 py-3.5 text-[15px]">
+          <Link to="/binocular" data-orbit="" onClick={() => trackClick('main_how_binocular')} className="btn-secondary px-6 py-3.5 text-base">
             Как работает бинокль, подробно
           </Link>
         </div>
@@ -128,11 +128,11 @@ export function PathsSection() {
             className="p-7 md:p-9 flex flex-col rounded-md"
             style={{ border: '1px solid hsl(var(--accent) / 0.45)', background: 'radial-gradient(120% 80% at 50% 0%, hsl(var(--accent) / 0.09), var(--ns-panel) 62%)' }}
           >
-            <div className="ns-kicker">подписка ECHO-GATE INSIDE</div>
-            <h3 className="mt-3 text-foreground !text-[40px] md:!text-[52px] !font-bold" style={{ letterSpacing: '-0.035em', lineHeight: 1 }}>Бинокль</h3>
-            <p className="mt-5 text-base md:text-[17px] leading-relaxed text-foreground/90">
-              Торговать по моей системе, не изучая её. Программа и мой вердикт по каждой сделке, а от вас 2 действия:
-              отметить место входа и нажать кнопку.
+            {/* 29.10.2026: подпись над заголовком («подписка ECHO-GATE INSIDE») убрана, она стала первыми словами текста */}
+            <h3 className="text-foreground !text-[40px] !font-bold" style={{ letterSpacing: '-0.035em', lineHeight: 1 }}>Бинокль</h3>
+            <p className="mt-5 text-base md:text-lg leading-relaxed text-foreground/90">
+              Подписка ECHO-GATE INSIDE. Торговать по моей системе, не изучая её: программа и мой вердикт по каждой
+              сделке, а от вас 2 действия, отметить место входа и нажать кнопку.
             </p>
             <div className="flex-grow min-h-6" />
             <div className="mt-7 flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -141,20 +141,19 @@ export function PathsSection() {
             </div>
             <div className="mt-7 flex flex-wrap gap-3">
               <a href={TELEGRAM_LINKS.trial} target="_blank" rel="noopener noreferrer" data-orbit="" style={{ '--od': '-1.4s' } as CSSProperties}
-                onClick={() => trackClick('main_paths_trial')} className="cta-trial btn-primary px-6 py-3.5 text-[15px]">
+                onClick={() => trackClick('main_paths_trial')} className="cta-trial btn-primary px-6 py-3.5 text-base">
                 7 дней бесплатно
               </a>
-              <Link to="/binocular" onClick={() => trackClick('main_paths_binocular')} className="btn-secondary px-6 py-3.5 text-[15px]">
+              <Link to="/binocular" onClick={() => trackClick('main_paths_binocular')} className="btn-secondary px-6 py-3.5 text-base">
                 <span className="cta-shine-text">Подробнее о бинокле</span>
               </Link>
             </div>
           </article>
 
           <article className="ns-panel p-7 md:p-9 flex flex-col">
-            <div className="ns-kicker">обучение</div>
-            <h3 className="mt-3 text-foreground !text-[40px] md:!text-[52px] !font-bold" style={{ letterSpacing: '-0.035em', lineHeight: 1 }}>Микроскоп</h3>
-            <p className="mt-5 text-base md:text-[17px] leading-relaxed text-foreground/90">
-              Изучить систему и решать самому: почему цена идёт туда, куда идёт, и где в неё входить.
+            <h3 className="text-foreground !text-[40px] !font-bold" style={{ letterSpacing: '-0.035em', lineHeight: 1 }}>Микроскоп</h3>
+            <p className="mt-5 text-base md:text-lg leading-relaxed text-foreground/90">
+              Обучение. Изучить систему и решать самому: почему цена идёт туда, куда идёт, и где в неё входить.
             </p>
             <div className="flex-grow min-h-6" />
             <div className="mt-7 flex flex-wrap gap-x-6 gap-y-2 items-baseline">
@@ -164,7 +163,7 @@ export function PathsSection() {
             </div>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link to="/microscope" data-orbit="" style={{ '--od': '-3s' } as CSSProperties} onClick={() => trackClick('main_paths_microscope')}
-                className="btn-secondary px-6 py-3.5 text-[15px]">
+                className="btn-secondary px-6 py-3.5 text-base">
                 Подробнее об обучении
               </Link>
             </div>
@@ -188,17 +187,17 @@ export function AuthorTeaser() {
             <p className="mt-5 text-lg md:text-xl text-foreground" style={{ maxWidth: '40ch' }}>
               15 лет в рынке. Торгую по той же системе, которую даю вам попробовать.
             </p>
-            <p className="mt-4 text-base md:text-[17px] leading-relaxed text-muted-foreground" style={{ maxWidth: '54ch' }}>
+            <p className="mt-4 text-base md:text-lg leading-relaxed text-muted-foreground" style={{ maxWidth: '54ch' }}>
               Первые 3 года я только терял, ещё 2 года был около нуля. Потом пришёл учиться к опытному трейдеру и начал
               делать то, что он говорит. Сегодня у меня своя система: 387 сделок за 21 месяц, и каждое решение записано в дневник до
               движения цены.
             </p>
-            <blockquote className="mt-8 text-[22px] md:text-[26px] font-medium leading-snug text-foreground" style={{ letterSpacing: '-0.02em', maxWidth: '30ch' }}>
+            <blockquote className="mt-8 text-[22px] md:text-[28px] font-medium leading-snug text-foreground" style={{ letterSpacing: '-0.02em', maxWidth: '30ch' }}>
               «<span className="cta-shine-text">Мои лучшие сделки — те, которые я не совершил</span>»
             </blockquote>
             <div className="mt-9">
               <Link to="/author" data-orbit="" style={{ '--od': '-2.2s' } as CSSProperties} onClick={() => trackClick('main_author')}
-                className="btn-secondary px-6 py-3.5 text-[15px]">
+                className="btn-secondary px-6 py-3.5 text-base">
                 Подробнее об авторе
               </Link>
             </div>

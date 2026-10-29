@@ -26,9 +26,8 @@ export default function Binocular() {
       sections={['top', 'week', 'roles', 'questions', 'robot', 'free', 'difference', 'prices', 'fit', 'faq', 'next']}
     >
       <PageHero
-        kicker="Бинокль · подписка ECHO-GATE INSIDE"
         title="Я смотрю весь рынок за вас."
-        lede="И про каждую сделку говорю, беру я её или нет, и почему. Вы нажимаете кнопку, дальше сделку ведёт робот."
+        lede="И про каждую сделку говорю, беру я её или нет, и почему. Это подписка ECHO-GATE INSIDE: вы нажимаете кнопку, дальше сделку ведёт робот."
         actions={
           <>
             <a href={TELEGRAM_LINKS.trial} target="_blank" rel="noopener noreferrer" data-orbit="" onClick={() => trackClick('binocular_hero_trial')}
@@ -43,9 +42,9 @@ export default function Binocular() {
             <figcaption className="flex items-center justify-between gap-3 px-2 pt-1 pb-2.5 ns-cap">
               <span className="flex items-center gap-2">
                 <i className="inline-block w-1.5 h-1.5 rounded-full" style={{ background: 'var(--v3-admit)', boxShadow: '0 0 8px var(--v3-admit)' }} />
-                ECHO-GATE INSIDE · программа
+                ECHO-GATE INSIDE
               </span>
-              <span>настоящий снимок, 25.10.2026</span>
+              <span>снимок 25.10.2026</span>
             </figcaption>
             <div className="overflow-hidden rounded-[5px]">
               <img src={terminalShot} alt="Экран программы ECHO-GATE INSIDE: список пар, решение по неделе и дневке, график" width={1456} height={812} className="w-full h-auto block" />

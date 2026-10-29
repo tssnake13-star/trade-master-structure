@@ -55,7 +55,7 @@ export default function SiteHeader() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackClick('header_trial')}
-                className="cta-trial hidden md:inline-flex items-center px-5 py-2.5 text-[15px] font-semibold rounded-[3px]"
+                className="cta-trial hidden md:inline-flex items-center px-5 py-2.5 text-base font-semibold rounded-[3px]"
               >
                 7 дней бесплатно
               </a>
@@ -82,7 +82,7 @@ export default function SiteHeader() {
         <div className={`relative h-full flex flex-col pt-24 px-6 transition-transform duration-300 ${open ? 'translate-y-0' : '-translate-y-3'}`}>
           <nav className="ns-nav flex flex-col gap-5" aria-label="Страницы сайта">
             {SITE_PAGES.map((p) => (
-              <NavLink key={p.to} to={p.to} end onClick={() => setOpen(false)} className="!text-[26px] !font-semibold self-start" tabIndex={open ? 0 : -1}>
+              <NavLink key={p.to} to={p.to} end onClick={() => setOpen(false)} className="!text-[28px] !font-semibold self-start" tabIndex={open ? 0 : -1}>
                 {p.label}
               </NavLink>
             ))}

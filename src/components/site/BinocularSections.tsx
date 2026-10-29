@@ -36,7 +36,7 @@ export function RolesSection() {
             <h3 className="text-foreground">Делает бинокль</h3>
             <ul className="mt-5 space-y-3.5">
               {BINOCULAR_DOES.map((t) => (
-                <li key={t} className="flex gap-3 text-base md:text-[17px] text-foreground/90">{tick}<span>{t}</span></li>
+                <li key={t} className="flex gap-3 text-base md:text-lg text-foreground/90">{tick}<span>{t}</span></li>
               ))}
             </ul>
           </div>
@@ -44,7 +44,7 @@ export function RolesSection() {
             <h3 className="text-foreground">Делаете вы</h3>
             <ul className="mt-5 space-y-3.5">
               {YOU_DO.map((t, i) => (
-                <li key={t} className="flex gap-3 text-base md:text-[17px] text-foreground/90">
+                <li key={t} className="flex gap-3 text-base md:text-lg text-foreground/90">
                   <span className="ns-step-n w-4 flex-shrink-0 mt-[2px]">{i + 1}</span><span>{t}</span>
                 </li>
               ))}
@@ -68,18 +68,16 @@ export function RobotGuardSection() {
         </div>
         <div className="mt-10 grid gap-3 md:grid-cols-2">
           <article className="ns-glass p-7 md:p-8">
-            <div className="ns-kicker">робот-исполнитель · ведёт сделку</div>
-            <h3 className="mt-2 text-foreground">Hunter_Bot</h3>
+            <h3 className="text-foreground">Hunter_Bot, робот-исполнитель</h3>
             <ul className="mt-5 space-y-3.5">
               {['Входит в сделку после вашей кнопки', 'Сам ставит стоп и тейк', 'Сам переводит сделку в ноль, когда цена прошла в вашу сторону'].map((t) => (
-                <li key={t} className="flex gap-3 text-base md:text-[17px] text-foreground/90">{tick}<span>{t}</span></li>
+                <li key={t} className="flex gap-3 text-base md:text-lg text-foreground/90">{tick}<span>{t}</span></li>
               ))}
             </ul>
           </article>
           <article className="ns-glass p-7 md:p-8">
-            <div className="ns-kicker">страж счёта · держит лимиты</div>
-            <h3 className="mt-2 text-foreground">Risk Sentinel</h3>
-            <p className="mt-4 text-base md:text-[17px] leading-relaxed text-foreground/90">
+            <h3 className="text-foreground">Risk Sentinel, страж счёта</h3>
+            <p className="mt-4 text-base md:text-lg leading-relaxed text-foreground/90">
               Не даст потерять больше, чем вы сами разрешили на неделю и на месяц. Лимит ставите вы, например 5% в неделю
               и 10% в месяц. У меня 4% и 8%.
             </p>
@@ -108,14 +106,14 @@ export function FreeWeekSection() {
         <div className="mt-10 grid gap-3 md:grid-cols-3">
           <article className="ns-panel p-6 md:p-7">
             <h3 className="text-foreground">Дневник решений</h3>
-            <p className="mt-3 text-[15px] md:text-base leading-relaxed text-muted-foreground">
+            <p className="mt-3 text-base leading-relaxed text-muted-foreground">
               Каждое моё решение записано до того, как цена пошла: беру или не беру, и почему. Убытки тоже. Открыт всем
               навсегда, с задержкой в 3 дня. У подписчиков решения приходят сразу.
             </p>
           </article>
           <article className="ns-panel p-6 md:p-7" style={{ borderColor: 'hsl(var(--accent) / 0.4)' }}>
             <h3 className="text-foreground">Проверь свою сделку</h3>
-            <p className="mt-3 text-[15px] md:text-base leading-relaxed text-muted-foreground">
+            <p className="mt-3 text-base leading-relaxed text-muted-foreground">
               Выберите пару и «покупка» или «продажа». Система сразу скажет, можно входить или нельзя, и почему.
               3 проверки в день.
             </p>
@@ -127,7 +125,7 @@ export function FreeWeekSection() {
           </article>
           <article className="ns-panel p-6 md:p-7">
             <h3 className="text-foreground">Сделки до и после</h3>
-            <p className="mt-3 text-[15px] md:text-base leading-relaxed text-muted-foreground">
+            <p className="mt-3 text-base leading-relaxed text-muted-foreground">
               Любое моё прошлое решение: график таким, каким он был в момент решения, и что было дальше.
             </p>
           </article>
@@ -177,9 +175,9 @@ export function SubscriptionPricesSection() {
                   : { border: '1px solid var(--v3-line)', background: 'var(--ns-panel)' }
               }
             >
-              <div className="ns-kicker" style={{ textTransform: 'none' }}>{e.period[0].toUpperCase() + e.period.slice(1)}</div>
+              <h3 className="text-foreground !text-[20px]">{e.period[0].toUpperCase() + e.period.slice(1)}</h3>
               <div className="mt-4 flex items-baseline gap-2.5">
-                <span className="ns-num text-[44px]">{e.price}</span>
+                <span className="ns-num text-[40px]">{e.price}</span>
                 {e.oldPrice && <span className="text-base line-through text-muted-foreground/70">{e.oldPrice}</span>}
               </div>
               <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{TIER_NOTE[e.period] ?? e.tgNote}</p>
@@ -216,7 +214,7 @@ export function StartAndFitSection() {
             <h2 className="text-foreground"><Words>Что нужно для старта</Words></h2>
             <ul className="mt-7 space-y-4">
               {['MT4 или MT5 у любого брокера', 'Компьютер, который работает круглосуточно, чтобы роботы не спали', 'Депозит и риск на сделку выбираете вы. Я торгую с риском 0,25%'].map((t) => (
-                <li key={t} className="flex gap-3 text-base md:text-[17px] text-foreground/90">{tick}<span>{t}</span></li>
+                <li key={t} className="flex gap-3 text-base md:text-lg text-foreground/90">{tick}<span>{t}</span></li>
               ))}
             </ul>
           </div>
@@ -229,7 +227,7 @@ export function StartAndFitSection() {
                 'Тому, кто пришёл с последними деньгами',
                 'Тому, кто ищет торговлю без убыточных сделок: они бывают, иногда несколько подряд',
               ].map((t) => (
-                <li key={t} className="flex gap-3 text-base md:text-[17px] text-muted-foreground">
+                <li key={t} className="flex gap-3 text-base md:text-lg text-muted-foreground">
                   <span aria-hidden="true" className="flex-shrink-0 mt-[1px] text-muted-foreground/70">✕</span><span>{t}</span>
                 </li>
               ))}

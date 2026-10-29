@@ -20,7 +20,6 @@ export default function Microscope() {
       sections={['top', 'stages', 'levels', 'rule', 'proof', 'map', 'faq', 'next']}
     >
       <PageHero
-        kicker="Микроскоп · обучение"
         title="Научитесь видеть рынок сами."
         lede="Почему цена идёт туда, куда идёт, и где в неё входить. Торговать по системе можно и без учёбы, для этого есть бинокль. Учатся те, кто хочет принимать решения сам."
         actions={

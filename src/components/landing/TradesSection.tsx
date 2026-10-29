@@ -59,7 +59,8 @@ const TradesSection = () => {
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="text-foreground">
-            <Words>Каждая из этих сделок <em>сначала получила допуск</em></Words>
+            {/* 29.10.2026: «Каждая из этих сделок сначала получила допуск» на телефоне шёл в три строки */}
+            <Words>Сначала допуск, потом сделка</Words>
           </h2>
           
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
