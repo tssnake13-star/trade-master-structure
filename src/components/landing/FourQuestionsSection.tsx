@@ -25,7 +25,8 @@ const FourQuestionsSection = () => {
       <div className="container-landing">
         <div className="max-w-3xl">
           <h2 className="text-foreground">
-            <Words>Сделка проходит 4 вопроса. <em>Иначе её нет.</em></Words>
+            {/* 29.10.2026, Сергей: «Сокращай» — прежний «Сделка проходит 4 вопроса. Иначе её нет.» на телефоне шёл в три строки */}
+            <Words>4 вопроса к каждой сделке</Words>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
             Программа задаёт их любой сделке одинаково: в понедельник утром и после трёх убытков подряд. Прошла все

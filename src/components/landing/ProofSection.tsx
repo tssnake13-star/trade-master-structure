@@ -77,7 +77,7 @@ const ProofSection = ({ title, names }: { title?: string; names?: string[] }) =>
       <div className="container-landing">
         <div className="max-w-4xl">
           <h2 className="text-foreground">
-            {title ? <Words>{title}</Words> : <Words>Знания у них уже были. Не хватало системы.</Words>}
+            {title ? <Words>{title}</Words> : <Words>Знания были. Не хватало системы.</Words>}
           </h2>
 
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
