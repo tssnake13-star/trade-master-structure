@@ -7,6 +7,7 @@ import lesiaImg from '@/assets/testimonials/lesia.jpg';
 import nikolayImg from '@/assets/testimonials/nikolay.jpg';
 import elenaNewImg from '@/assets/testimonials/elena-new.jpg';
 import pavelImg from '@/assets/testimonials/pavel.jpg';
+import dmitryImg from '@/assets/testimonials/dmitry.jpg';
 
 export interface StudentCase {
   name: string;
@@ -16,6 +17,13 @@ export interface StudentCase {
 }
 
 export const STUDENT_CASES: StudentCase[] = [
+  // 29.10.2026, Сергей: «везде поставь отзыв Леси на первом месте»
+  {
+    name: 'Lesia',
+    before: 'Путь длинный: курсы, годовые программы, практика, много-много практики.',
+    quote: 'Крайние 6 месяцев закрылись в «плюс».',
+    image: lesiaImg,
+  },
   {
     name: 'Елена М.',
     before: 'Несколько других школ. Растерянность при открытии сделок.',
@@ -47,15 +55,17 @@ export const STUDENT_CASES: StudentCase[] = [
     image: elenaImg,
   },
   {
-    name: 'Lesia',
-    before: 'Путь длинный: курсы, годовые программы, практика, много-много практики.',
-    quote: 'Крайние 6 месяцев закрылись в «плюс».',
-    image: lesiaImg,
-  },
-  {
     name: 'Сергей',
     before: 'С 2017 года торговал по горизонтальным уровням.',
     quote: 'Всё, чему Вы учите, прекрасно работает!',
     image: lesyaImg,
+  },
+  // 29.10.2026, Сергей: «не хватает одного отзыва, добавь отзыв Дмитрия» — сообщение в Workspace/TLT 2026,
+  // оригинал склеен из двух снимков экрана без правок
+  {
+    name: 'Дмитрий',
+    before: 'О результатах говорить ещё рано: прошёл только половину пути.',
+    quote: 'Я осознал, что трейдинг очень серьёзный и бескомпромиссный бизнес, а не хобби.',
+    image: dmitryImg,
   },
 ];
