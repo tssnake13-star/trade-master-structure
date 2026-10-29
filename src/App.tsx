@@ -34,6 +34,8 @@ const PreviewCandles = lazy(() => import("./pages/PreviewCandles"));
 const SchoolPreview = lazy(() => import("./pages/SchoolPreview"));
 const SchoolLadderPreview = lazy(() => import("./pages/SchoolLadderPreview"));
 const SchoolHomePreview = lazy(() => import("./pages/SchoolHomePreview"));
+// 29.10.2026: терминал v2 «в стиле приборов» на демо-данных — посмотреть без входа, пока он не выложен
+const TerminalPreview = lazy(() => import("./components/terminal2/Preview"));
 // 29.10.2026: кабинет v2 на демо-данных — посмотреть разметку без входа
 const CabinetPreview = lazy(() => import("./pages/CabinetPreview"));
 
@@ -71,6 +73,7 @@ const App = () => (
             <Route path="/school/preview" element={<SchoolPreview />} />
             <Route path="/school/ladder-preview" element={<SchoolLadderPreview />} />
             <Route path="/school/home-preview" element={<SchoolHomePreview />} />
+            <Route path="/school/terminal-preview" element={<TerminalPreview />} />
             <Route path="/school/cabinet-preview" element={<CabinetPreview />} />
             <Route path="/school" element={<SchoolAuth />} />
             <Route path="/school/dashboard" element={<SchoolDashboard />} />
