@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { DemoOnly } from '@/lib/demoGate';
 import Cabinet from '@/components/cabinet2/Cabinet';
 import type { Course, Lesson } from '@/pages/SchoolDashboard';
 import { useDashboardTexts } from '@/lib/dashboardTexts';
@@ -34,6 +35,10 @@ const PAIRS = ['EURUSD', 'GBPJPY', 'USDCAD', 'AUDJPY', 'EURGBP', 'NZDUSD', 'USDC
 const OUTCOMES: JOutcome[] = RES.map((result, i) => ({ time: day(80 - i * 7), instrument: PAIRS[i], side: i % 2 ? 'SELL' : 'BUY', result }));
 
 export default function CabinetPreview() {
+  return <DemoOnly><CabinetPreviewPage /></DemoOnly>;
+}
+
+function CabinetPreviewPage() {
   const { t } = useDashboardTexts();
   const [sel, setSel] = useState<string | null>(null);
   const courses = [FREE, MAIN, LOCKED];

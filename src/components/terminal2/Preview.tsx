@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { DemoOnly } from '@/lib/demoGate';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import type { Verdict } from '@/components/terminal/Feeds';
 import TerminalView from './TerminalView';
@@ -19,6 +20,10 @@ const MODES: [DemoMode | 'noaccess', string][] = [
 ];
 
 export default function TerminalPreview() {
+  return <DemoOnly><TerminalPreviewPage /></DemoOnly>;
+}
+
+function TerminalPreviewPage() {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const mode = (MODES.find(([m]) => m === params.get('demo'))?.[0] || 'sub') as DemoMode | 'noaccess';
