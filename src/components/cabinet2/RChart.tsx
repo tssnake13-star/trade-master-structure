@@ -21,7 +21,19 @@ export interface RPoint { label: string; value: number; note?: string }
  * под ней мягкая заливка, при наведении — вертикаль, точка и плашка с цифрой. Только настоящие итоги из журнала.
  */
 export default function RChart({ points, height = 250, compact = false }: { points: RPoint[]; height?: number; compact?: boolean }) {
-  const W = 800, H = height, pad = { l: 44, r: 12, t: 14, b: compact ? 10 : 26 };
+  // ширина рисунка = настоящая ширина карточки: на широком экране график длиннее, но не выше, и подписи не растут
+  const boxRef = useRef<HTMLDivElement>(null);
+  const [W, setW] = useState(800);
+  const H = height, pad = { l: 44, r: 12, t: 14, b: compact ? 10 : 26 };
+  useLayoutEffect(() => {
+    const el = boxRef.current;
+    if (!el) return;
+    const fit = () => { if (el.clientWidth) setW(Math.round(el.clientWidth)); };
+    fit();
+    const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(fit);
+    ro?.observe(el);
+    return () => ro?.disconnect();
+  }, [points.length < 2]);
   const lineRef = useRef<SVGPathElement>(null);
   const [hover, setHover] = useState<number | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
@@ -36,7 +48,7 @@ export default function RChart({ points, height = 250, compact = false }: { poin
     const ticks = Array.from({ length: 5 }, (_, k) => lo + ((hi - lo) * k) / 4);
     return { x, y, pts, lo, hi, ticks };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [points, H]);
+  }, [points, H, W]);
 
   // линия прорисовывается при каждой смене данных
   useLayoutEffect(() => {
@@ -65,8 +77,8 @@ export default function RChart({ points, height = 250, compact = false }: { poin
   };
 
   return (
-    <div style={{ position: 'relative', marginTop: 10 }}>
-      <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} style={{ display: 'block', width: '100%', height: 'auto', overflow: 'visible' }} role="img"
+    <div ref={boxRef} style={{ position: 'relative', marginTop: 10 }}>
+      <svg ref={svgRef} viewBox={`0 0 ${W} ${H}`} width={W} height={H} style={{ display: 'block', width: '100%', height: H, overflow: 'visible' }} role="img"
         aria-label={`Итог решений ${fmtR(points[last].value)}`}>
         <defs>
           <linearGradient id="cv2R" x1="0" y1="0" x2="0" y2="1">

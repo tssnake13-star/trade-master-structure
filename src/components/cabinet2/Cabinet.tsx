@@ -76,6 +76,14 @@ export default function Cabinet(p: CabinetProps) {
   const firstName = (p.name || '').trim().split(/\s+/)[0];
   const trialLeft = p.eye.trial && p.eye.until ? Math.max(1, Math.ceil((new Date(p.eye.until).getTime() - Date.now()) / 86400000)) : p.eye.trial ? 0 : null;
   const showR = eyeOpen && !p.eye.trial && p.journal.outcomes.length > 0;
+  // три блока после текущего — в карточку «Продолжить обучение»
+  const mainLessons = p.mainCourse ? p.lessonsOf(p.mainCourse.id) : [];
+  const mainUnlocked = p.mainCourse ? p.unlockedOf(p.mainCourse, mainLessons) : [];
+  const nextIdx = p.mainNext ? mainLessons.findIndex((l) => l.id === p.mainNext!.id) : -1;
+  const after = nextIdx < 0 ? [] : mainLessons.slice(nextIdx + 1, nextIdx + 4).map((lesson, k) => {
+    const num = nextIdx + 2 + k;
+    return { lesson, num, open: mainUnlocked.includes(num) };
+  });
 
   const pick = (id: string | null) => {
     p.onSelectCourse(id);
@@ -125,7 +133,8 @@ export default function Cabinet(p: CabinetProps) {
                   </div>
                   <DashboardBanners accessMap={p.accessMap} />
                   <div className={`cv2-grid${dim ? ' dim' : ''}`}>
-                    <ContinueCard course={p.mainCourse} progress={p.mainProgress} next={p.mainNext} onOpen={p.onOpenLesson} t={p.t} i={1} />
+                    <ContinueCard course={p.mainCourse} progress={p.mainProgress} next={p.mainNext} after={showR ? after : []} onOpen={p.onOpenLesson}
+                      onCourse={() => p.mainCourse && pick(p.mainCourse.id)} t={p.t} i={1} />
                     {showR ? <RCard outcomes={p.journal.outcomes} onDim={setDim} i={2} /> : <LiveCard upcoming={p.upcomingLives} i={2} span="s7" />}
                     {!p.isFreeUser && <KpiStrip daysInSystem={p.daysInSystem} programEnd={p.programEnd} progress={p.mainProgress} i={3} />}
                     <ProgramsCard courses={p.courses} hasAccess={p.hasAccess} progress={p.progress} expiredAccess={p.expiredAccess}

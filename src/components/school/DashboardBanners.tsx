@@ -186,7 +186,7 @@ export default function DashboardBanners({ accessMap }: {
           </h3>
           <p className="mt-2.5" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#C6D0E0', maxWidth: '62ch' }}>
             Оплаченные {TRADE_SYSTEM_PRICE} засчитываются полностью в течение {UPGRADE_WINDOW_DAYS} дней
-            после покупки. Дальше VIP будет стоить полную цену.
+            после покупки. Дальше VIP будет по полной стоимости.
           </p>
           <p className="mt-1.5" style={{ fontFamily: SANS, fontSize: 14, lineHeight: 1.6, color: '#C6D0E0', maxWidth: '62ch' }}>
             За год вы проходите все пять этапов подготовки и выходите на реальный рынок. ECHO-GATE INSIDE
@@ -205,7 +205,9 @@ export default function DashboardBanners({ accessMap }: {
       )}
 
       {showStream && (
-        <div style={card}>
+        // на широком экране отсчёт и кнопка справа от текста, а не под ним: плашка во всю ширину кабинета без пустой правой половины
+        <div style={card} className="xl:flex xl:items-center xl:justify-between xl:gap-10">
+          <div>
           <div style={label}>Набор в практикум</div>
           <h3 className="mt-2.5" style={{ fontFamily: SANS, fontSize: 19, lineHeight: 1.25, color: '#E6ECF5' }}>
             {beforeStart
@@ -219,8 +221,10 @@ export default function DashboardBanners({ accessMap }: {
               ? (showSeatsLeft ? `Осталось ${left} ${plural(left, 'место', 'места', 'мест')} из ${seats}.` : `Беру ${seats} человек.`)
               : 'Напишите, скажу дату ближайшего набора.'}
           </p>
+          </div>
+          <div className="xl:shrink-0 xl:flex xl:items-center xl:gap-8">
           {streamCountdown && (
-            <div className="flex gap-4 mt-4">
+            <div className="flex gap-4 mt-4 xl:mt-0">
               {[
                 { v: streamCountdown.d, l: 'дней' },
                 { v: streamCountdown.h, l: 'часов' },
@@ -237,10 +241,11 @@ export default function DashboardBanners({ accessMap }: {
             </div>
           )}
 
-          <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" style={cta} className="transition hover:brightness-110">
+          <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" style={cta} className="transition hover:brightness-110 xl:!mt-0">
             Узнать про поток
             <ArrowRight size={14} />
           </a>
+          </div>
         </div>
       )}
     </div>

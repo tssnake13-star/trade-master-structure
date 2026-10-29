@@ -25,7 +25,8 @@ html:has(.tv2) { scrollbar-color: rgba(200, 215, 240, 0.22) #060A12; }
 .tv2 ::-webkit-scrollbar-track { background: transparent; }
 
 .tv2 .tv2-page { padding-top: 8px; overflow-x: clip; }
-.tv2 .tv2-wrap { max-width: 1560px; margin: 0 auto; }
+/* рабочий экран — во всю ширину окна, как прежний терминал; предел только для сверхшироких мониторов */
+.tv2 .tv2-wrap { max-width: 2400px; margin: 0 auto; }
 .tv2 .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
 
 /* ---------------- шапка ---------------- */

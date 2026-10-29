@@ -30,8 +30,11 @@ export function Ring({ pct, size = 108 }: { pct: number; size?: number }) {
 }
 
 /* ---------- продолжить обучение ---------- */
-export function ContinueCard({ course, progress, next, onOpen, t, i = 0 }: {
-  course: Course | null; progress: { completed: number; total: number } | null; next: Lesson | null; onOpen: (id: string) => void; t: TFn; i?: number;
+export function ContinueCard({ course, progress, next, after = [], onOpen, onCourse, t, i = 0 }: {
+  course: Course | null; progress: { completed: number; total: number } | null; next: Lesson | null;
+  /** следующие блоки программы после текущего: номер, открыт ли */
+  after?: { lesson: Lesson; num: number; open: boolean }[];
+  onOpen: (id: string) => void; onCourse?: () => void; t: TFn; i?: number;
 }) {
   const pct = progress && progress.total ? (progress.completed / progress.total) * 100 : 0;
   const done = !!progress && progress.total > 0 && progress.completed >= progress.total;
@@ -59,6 +62,20 @@ export function ContinueCard({ course, progress, next, onOpen, t, i = 0 }: {
           )}
         </div>
       </div>
+      {/* дальше по программе — настоящие следующие блоки; карточка рядом с итогами в R не стоит пустой */}
+      {after.length > 0 && (
+        <div className="cv2-next">
+          <div className="cv2-sub">Дальше по программе</div>
+          {after.map(({ lesson, num, open }) => (
+            <button key={lesson.id} type="button" className="cv2-next-row" data-locked={!open || undefined}
+              onClick={() => (open ? onOpen(lesson.id) : onCourse?.())}>
+              <span className="n num">{String(num).padStart(2, '0')}</span>
+              <span className="tt">{lesson.title}</span>
+              {open ? <ArrowRight size={14} /> : <Lock size={13} />}
+            </button>
+          ))}
+        </div>
+      )}
     </article>
   );
 }

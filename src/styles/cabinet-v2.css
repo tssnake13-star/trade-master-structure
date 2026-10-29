@@ -66,7 +66,10 @@
 .cv2-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 
 /* кабинет: слева панель (главная, программы, глаз терминала, профиль), справа содержимое — как в прежнем кабинете */
-.cv2-shell { display: flex; gap: 16px; align-items: flex-start; max-width: 1400px; margin: 0 auto; }
+/* Панель у левого края окна, содержимое на всю ширину рядом с ней (Сергей 29.10.2026: «сузил кабинет… графики маленькие,
+   пустые места по бокам»). Раньше вся связка была колонкой 1400 px по центру окна. Только на очень широком экране
+   содержимое останавливается на 1680 px и встаёт по центру места рядом с панелью, а не окна */
+.cv2-shell { display: flex; gap: 16px; align-items: flex-start; }
 .cv2-side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 14px); width: 268px; flex-shrink: 0; height: calc(100vh - 28px); height: calc(100svh - 28px); display: flex; flex-direction: column; padding: 14px 12px; border-radius: 18px; overflow-x: hidden; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(230, 236, 245, 0.14) transparent; z-index: 40; }
 .cv2-side::-webkit-scrollbar { width: 6px; }
 .cv2-side::-webkit-scrollbar-thumb { background: rgba(230, 236, 245, 0.14); border-radius: 3px; }
@@ -92,7 +95,7 @@
 .cv2-side-me .who small { display: block; font-size: 11px; color: var(--mut); }
 .cv2-side-out { display: flex; align-items: center; gap: 8px; margin-top: 4px; padding: 8px 12px; border-radius: 10px; font-size: 13px; color: var(--mut); }
 .cv2-side-out:hover { color: var(--ink); background: rgba(230, 236, 245, 0.05); }
-.cv2-main { flex: 1; min-width: 0; }
+.cv2-main { flex: 1; min-width: 0; max-width: 1680px; margin-inline: auto; }
 .cv2-top { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 14px); z-index: 20; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 10px; border-radius: 16px; }
 .cv2-menu-btn { display: none !important; }
 @media (max-width: 900px) {
@@ -101,6 +104,16 @@
   .cv2-side-veil { position: fixed; inset: 0; z-index: 55; background: rgba(4, 6, 12, 0.6); }
   .cv2-menu-btn { display: grid !important; }
 }
+
+/* «Продолжить обучение»: следующие блоки программы внизу карточки */
+.cv2-next { margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--line); display: grid; gap: 2px; }
+.cv2-next > .cv2-sub { margin: 0 0 6px 10px; }
+.cv2-next-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; border-radius: 10px; text-align: left; font-size: 14px; color: var(--soft); transition: background .25s, color .25s; }
+.cv2-next-row:hover { background: rgba(230, 236, 245, 0.05); color: var(--ink); }
+.cv2-next-row .n { font: 12px var(--mono); color: var(--faint); }
+.cv2-next-row .tt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cv2-next-row svg { color: var(--faint); }
+.cv2-next-row[data-locked] { color: var(--mut); }
 
 /* «капля»: пилюля перетекает с кнопки на кнопку (ведущий край быстрее, задний догоняет) — useDrop */
 .cv2-drop-group { position: relative; display: inline-flex; gap: 2px; padding: 4px; border-radius: 999px; background: rgba(230, 236, 245, 0.035); border: 1px solid var(--line); }
