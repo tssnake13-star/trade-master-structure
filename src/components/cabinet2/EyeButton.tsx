@@ -15,6 +15,7 @@ export default function EyeButton({
   trialLeft,
   newCount,
   onClick,
+  wide = false,
 }: {
   open: boolean;
   expired?: boolean;
@@ -22,10 +23,12 @@ export default function EyeButton({
   trialLeft?: number | null;
   newCount: number;
   onClick: () => void;
+  /** во всю ширину левой панели кабинета */
+  wide?: boolean;
 }) {
   const word = (n: number) => (n === 1 ? 'день' : n < 5 ? 'дня' : 'дней');
   return (
-    <button type="button" className="cv2-eye-btn" onClick={onClick} disabled={!open} aria-label="Открыть терминал ECHO-GATE INSIDE">
+    <button type="button" className={`cv2-eye-btn${wide ? ' wide' : ''}`} onClick={onClick} disabled={!open} aria-label="Открыть терминал ECHO-GATE INSIDE">
       {open ? (
         <svg className="cv2-eye" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
           <path d={EYE_PATH} />

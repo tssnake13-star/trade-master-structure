@@ -210,10 +210,10 @@ export function VerdictsCard({ items, trial, seenMs, onOpenJournal, i = 0 }: {
 export function LockedEcosystemCard({ expired, i = 0 }: { expired: boolean; i?: number }) {
   return (
     <article className="cv2-card cv2-glass s8 cv2-in" style={inStyle(i)}>
-      <div className="cv2-card-head"><div><h3>Мои решения</h3><div className="cv2-sub">Журнал решений открывается с подпиской ECHO-GATE INSIDE</div></div><Lock size={18} style={{ color: 'var(--faint)' }} /></div>
+      <div className="cv2-card-head"><div><h3>ECHO-GATE INSIDE</h3><div className="cv2-sub">Терминал и мой вердикт по каждой сделке</div></div><Lock size={18} style={{ color: 'var(--faint)' }} /></div>
       <p style={{ color: 'var(--soft)', margin: '14px 0 0', maxWidth: '58ch' }}>
         {expired
-          ? 'Срок подписки закончился. Продлите её, и журнал с моими решениями снова откроется здесь и в терминале.'
+          ? 'Срок подписки закончился. Продлите её, и терминал с моими решениями снова откроется по кнопке с глазом.'
           : 'Программа каждый день смотрит весь рынок, я говорю, какую сделку беру и почему. Вы отмечаете вход и нажимаете кнопку, дальше сделку ведёт Hunter_Bot.'}
       </p>
       <a className="cv2-btn cv2-btn-brass" style={{ marginTop: 16 }} href={DM} target="_blank" rel="noopener noreferrer">
@@ -280,9 +280,9 @@ export function ProgramsCard({ courses, hasAccess, progress, expiredAccess, onSe
 }
 
 /* ---------- последняя активность ---------- */
-export function ActivityCard({ items, t, i = 0 }: { items: { lesson_id: string; completed_at: string; lesson?: Lesson }[]; t: TFn; i?: number }) {
+export function ActivityCard({ items, t, i = 0, span = 's4' }: { items: { lesson_id: string; completed_at: string; lesson?: Lesson }[]; t: TFn; i?: number; span?: string }) {
   return (
-    <article className="cv2-card cv2-glass s4 cv2-in" style={inStyle(i)}>
+    <article className={`cv2-card cv2-glass ${span} cv2-in`} style={inStyle(i)}>
       <div className="cv2-card-head"><div><h3>Последняя активность</h3></div></div>
       {items.length ? (
         <ul style={{ listStyle: 'none', padding: 0, margin: '10px 0 0' }}>

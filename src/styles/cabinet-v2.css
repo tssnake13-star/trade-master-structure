@@ -63,9 +63,49 @@
 .cv2-brand small { display: block; font-size: 12px; color: var(--mut); white-space: nowrap; }
 .cv2-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 
+/* кабинет: слева панель (главная, программы, глаз терминала, профиль), справа содержимое — как в прежнем кабинете */
+.cv2-shell { display: flex; gap: 16px; align-items: flex-start; max-width: 1400px; margin: 0 auto; }
+.cv2-side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 14px); width: 268px; flex-shrink: 0; height: calc(100vh - 28px); height: calc(100svh - 28px); display: flex; flex-direction: column; padding: 14px 12px; border-radius: 18px; overflow-y: auto; z-index: 40; }
+.cv2-side .cv2-brand { padding: 4px 6px 14px; margin-bottom: 8px; border-bottom: 1px solid var(--line); text-align: left; }
+.cv2-side-item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 9px 12px; border-radius: 12px; font-size: 14px; color: var(--soft); border: 1px solid transparent; transition: background .25s, border-color .25s, color .25s; }
+.cv2-side-item:hover { background: rgba(230, 236, 245, 0.05); color: var(--ink); }
+.cv2-side-item[aria-current] { background: rgba(205, 170, 110, 0.1); border-color: rgba(205, 170, 110, 0.42); color: var(--ink); }
+.cv2-side-item.course { display: block; }
+.cv2-side-item .row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.cv2-side-item .tt { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cv2-side-item .sub { display: block; margin-top: 5px; font: 11px var(--mono); color: var(--mut); }
+.cv2-side-item[data-locked] { opacity: 0.55; }
+.cv2-side-label { padding: 14px 12px 6px; font-size: 12px; color: var(--faint); }
+.cv2-side-list { display: grid; gap: 4px; }
+.cv2-eye-btn.wide { width: 100%; padding: 10px 12px; }
+.cv2-side-me { display: flex; align-items: center; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+.cv2-side-me .who { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; padding: 6px; border-radius: 12px; text-align: left; }
+.cv2-side-me .who:hover { background: rgba(230, 236, 245, 0.05); }
+.cv2-side-me .who b { display: block; font-size: 13.5px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cv2-side-me .who small { display: block; font-size: 11px; color: var(--mut); }
+.cv2-side-out { display: flex; align-items: center; gap: 8px; margin-top: 4px; padding: 8px 12px; border-radius: 10px; font-size: 13px; color: var(--mut); }
+.cv2-side-out:hover { color: var(--ink); background: rgba(230, 236, 245, 0.05); }
+.cv2-main { flex: 1; min-width: 0; }
+.cv2-top { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 14px); z-index: 20; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; padding: 8px 10px; border-radius: 16px; }
+.cv2-menu-btn { display: none !important; }
+@media (max-width: 900px) {
+  .cv2-side { position: fixed; left: 10px; top: 10px; bottom: 10px; height: auto; transform: translateX(calc(-100% - 20px)); transition: transform .35s var(--ease); z-index: 60; }
+  .cv2-side.open { transform: none; }
+  .cv2-side-veil { position: fixed; inset: 0; z-index: 55; background: rgba(4, 6, 12, 0.6); }
+  .cv2-menu-btn { display: grid !important; }
+}
+
 /* «капля»: пилюля перетекает с кнопки на кнопку (ведущий край быстрее, задний догоняет) — useDrop */
 .cv2-drop-group { position: relative; display: inline-flex; gap: 2px; padding: 4px; border-radius: 999px; background: rgba(230, 236, 245, 0.035); border: 1px solid var(--line); }
-.cv2-drop { position: absolute; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 999px; background: rgba(230, 236, 245, 0.1); border: 1px solid rgba(230, 236, 245, 0.16); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06); pointer-events: none; }
+.cv2-drop { position: absolute; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 999px; background: rgba(230, 236, 245, 0.1); border: 1px solid rgba(230, 236, 245, 0.16); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06); pointer-events: none; overflow: hidden; }
+/* 29.10.2026, Сергей: «нажатая кнопка должна бликовать… раз в 3 секунды или раз в 5… чтобы понимаешь, что именно выделено,
+   и не раздражало глаза» — по выбранной кнопке раз в 4,5 с проходит мягкий блик. У каждой группы свой сдвиг (--gd),
+   чтобы соседние группы не бликовали в ногу */
+.cv2-drop::after, .cv2-glint::after { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 45%; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(100deg, transparent 0%, rgba(255, 250, 235, 0.16) 32%, rgba(255, 248, 230, 0.62) 50%, rgba(255, 250, 235, 0.16) 68%, transparent 100%);
+  transform: translateX(-130%) skewX(-18deg); animation: cv2Glint 4.5s cubic-bezier(.45, 0, .2, 1) infinite; animation-delay: var(--gd, 0s); }
+.cv2-drop-group.brass .cv2-drop::after { background: linear-gradient(100deg, transparent 0%, rgba(255, 250, 238, 0.2) 32%, rgba(255, 253, 248, 0.85) 50%, rgba(255, 250, 238, 0.2) 68%, transparent 100%); }
+@keyframes cv2Glint { 0%, 72% { transform: translateX(-130%) skewX(-18deg); } 100% { transform: translateX(330%) skewX(-18deg); } }
 .cv2-drop-group > button { position: relative; z-index: 1; padding: 7px 15px; border-radius: 999px; font-size: 14px; color: var(--mut); white-space: nowrap; transition: color .3s; }
 .cv2-drop-group > button:hover { color: var(--soft); }
 .cv2-drop-group > button[aria-pressed='true'], .cv2-drop-group > button[aria-selected='true'] { color: var(--ink); }
@@ -218,6 +258,8 @@
 @media (max-width: 640px) {
   .cv2-brand small, .cv2-btn-label, .cv2-eye-t { display: none; }
   .cv2-eye-btn { padding: 5px 8px; }
+  .cv2-eye-btn.wide { padding: 10px 12px; }
+  .cv2-eye-btn.wide .cv2-eye-t { display: block; }
   .cv2-row { grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; }
   .cv2-card-head { flex-wrap: wrap; }
   .cv2-row .why { grid-column: 1 / -1; white-space: normal; }
@@ -225,4 +267,5 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .cv2 *, .cv2 *::before, .cv2 *::after { animation: none !important; transition: none !important; }
+  .cv2-drop::after, .cv2-glint::after { display: none; }
 }

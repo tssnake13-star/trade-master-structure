@@ -65,7 +65,7 @@ export default function Study({
   );
 }
 
-function CourseView({ course, lessons, unlocked, completedIds, progress, onOpenLesson, onOpenEcosystem, t }: {
+export function CourseView({ course, lessons, unlocked, completedIds, progress, onOpenLesson, onOpenEcosystem, t }: {
   course: Course; lessons: Lesson[]; unlocked: number[]; completedIds: Set<string>; progress: { completed: number; total: number };
   onOpenLesson: (id: string) => void; onOpenEcosystem: () => void; t: TFn;
 }) {
@@ -131,7 +131,7 @@ function CourseView({ course, lessons, unlocked, completedIds, progress, onOpenL
   );
 }
 
-function LockedCourse({ course, expiredAt, t }: { course: Course; expiredAt?: Date; t: TFn }) {
+export function LockedCourse({ course, expiredAt, t }: { course: Course; expiredAt?: Date; t: TFn }) {
   const date = expiredAt ? expiredAt.toLocaleDateString('ru-RU', { day: '2-digit', month: 'long', year: 'numeric' }) : '';
   return (
     <article className="cv2-card cv2-glass cv2-in" style={{ textAlign: 'center', padding: '56px 24px' }}>

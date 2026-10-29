@@ -405,3 +405,16 @@ button.tv2-chip:hover { border-color: var(--line-2) !important; }
   .tv2 .tv2-draw { stroke-dashoffset: 0; }
   .tv2 .tv2-scrim { opacity: 1; }
 }
+
+
+/* 29.10.2026, Сергей: «накопление, циклы, свинги, реверс тоже должны бликовать» — включённый слой бликует тем же бликом,
+   что выбранная кнопка в «капле» (cabinet-v2.css, .cv2-glint) */
+.tv2 .tv2-chip[aria-pressed='true'], .tv2 .tv2-chip.on { position: relative; overflow: hidden; isolation: isolate; }
+.tv2 .tv2-chip[aria-pressed='true']::after, .tv2 .tv2-chip.on::after {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 45%; pointer-events: none;
+  background: linear-gradient(100deg, transparent 0%, rgba(255, 250, 235, 0.16) 32%, rgba(255, 248, 230, 0.62) 50%, rgba(255, 250, 235, 0.16) 68%, transparent 100%);
+  transform: translateX(-130%) skewX(-18deg); animation: cv2Glint 4.5s cubic-bezier(.45, 0, .2, 1) infinite;
+}
+.tv2 .tv2-chip[aria-pressed='true']:nth-child(2n)::after { animation-delay: -1.3s; }
+.tv2 .tv2-chip[aria-pressed='true']:nth-child(3n)::after { animation-delay: -2.6s; }
+@media (prefers-reduced-motion: reduce) { .tv2 .tv2-chip::after { display: none; } }
