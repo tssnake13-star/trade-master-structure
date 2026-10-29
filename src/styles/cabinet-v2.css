@@ -51,7 +51,9 @@
 .cv2-room { position: fixed; inset: -30px; z-index: -1; background-position: 62% 35%; background-size: cover; background-repeat: no-repeat; filter: brightness(0.85); }
 .cv2-room::after { content: ''; position: absolute; inset: 0; background: radial-gradient(120% 90% at 70% 10%, rgba(6, 10, 18, 0.05), rgba(6, 10, 18, 0.74) 72%), linear-gradient(180deg, rgba(6, 10, 18, 0.12), rgba(6, 10, 18, 0.66)); }
 
-.cv2-page { position: relative; padding: 14px max(16px, env(safe-area-inset-right, 0px)) 64px max(16px, env(safe-area-inset-left, 0px)); }
+/* снизу тот же отступ, что сверху и у левой панели: в конце прокрутки колонка кончается вровень с панелью,
+   и прилипшая панель не уезжает вверх (Сергей 29.10.2026: «панель поднимается… логотип прячется», «внизу промежуток») */
+.cv2-page { position: relative; padding: 14px max(16px, env(safe-area-inset-right, 0px)) calc(14px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
 .cv2-wrap { max-width: 1320px; margin: 0 auto; }
 .cv2-glass { background: var(--glass); border: 1px solid var(--line); border-radius: var(--r); backdrop-filter: blur(18px) saturate(1.2); -webkit-backdrop-filter: blur(18px) saturate(1.2); }
 
@@ -71,6 +73,7 @@
 .cv2-side .cv2-brand { padding: 4px 6px 14px; margin-bottom: 8px; border-bottom: 1px solid var(--line); text-align: left; }
 .cv2-side-item { display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 9px 12px; border-radius: 12px; font-size: 14px; color: var(--soft); border: 1px solid transparent; transition: background .25s, border-color .25s, color .25s; }
 .cv2-side-item:hover { background: rgba(230, 236, 245, 0.05); color: var(--ink); }
+.cv2-side-item { position: relative; }
 .cv2-side-item[aria-current] { background: rgba(205, 170, 110, 0.1); border-color: rgba(205, 170, 110, 0.42); color: var(--ink); }
 .cv2-side-item.course { display: block; }
 .cv2-side-item .row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
@@ -101,15 +104,18 @@
 
 /* «капля»: пилюля перетекает с кнопки на кнопку (ведущий край быстрее, задний догоняет) — useDrop */
 .cv2-drop-group { position: relative; display: inline-flex; gap: 2px; padding: 4px; border-radius: 999px; background: rgba(230, 236, 245, 0.035); border: 1px solid var(--line); }
-.cv2-drop { position: absolute; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 999px; background: rgba(230, 236, 245, 0.1); border: 1px solid rgba(230, 236, 245, 0.16); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06); pointer-events: none; overflow: hidden; }
-/* 29.10.2026, Сергей: «нажатая кнопка должна бликовать… раз в 3 секунды или раз в 5… чтобы понимаешь, что именно выделено,
-   и не раздражало глаза» — по выбранной кнопке раз в 4,5 с проходит мягкий блик. У каждой группы свой сдвиг (--gd),
-   чтобы соседние группы не бликовали в ногу */
-.cv2-drop::after, .cv2-glint::after { content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 45%; pointer-events: none; border-radius: inherit;
-  background: linear-gradient(100deg, transparent 0%, rgba(255, 250, 235, 0.16) 32%, rgba(255, 248, 230, 0.62) 50%, rgba(255, 250, 235, 0.16) 68%, transparent 100%);
-  transform: translateX(-130%) skewX(-18deg); animation: cv2Glint 4.5s cubic-bezier(.45, 0, .2, 1) infinite; animation-delay: var(--gd, 0s); }
-.cv2-drop-group.brass .cv2-drop::after { background: linear-gradient(100deg, transparent 0%, rgba(255, 250, 238, 0.2) 32%, rgba(255, 253, 248, 0.85) 50%, rgba(255, 250, 238, 0.2) 68%, transparent 100%); }
-@keyframes cv2Glint { 0%, 72% { transform: translateX(-130%) skewX(-18deg); } 100% { transform: translateX(330%) skewX(-18deg); } }
+.cv2-drop { position: absolute; top: 4px; bottom: 4px; left: 0; width: 0; border-radius: 999px; background: rgba(230, 236, 245, 0.1); border: 1px solid rgba(230, 236, 245, 0.16); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06); pointer-events: none; }
+/* 29.10.2026, Сергей: «нажатая кнопка должна бликовать… чтобы понимаешь, что именно выделено». Сначала по кнопке
+   проходила полоса — «слишком заметно, что аж прям раздражает». Теперь так же, как у кнопки ECHO-GATE INSIDE
+   (.cv2-orbit): по рамке выбранной кнопки медленно бежит луч. У каждой группы свой сдвиг (--gd), чтобы лучи не шли в ногу */
+@property --cv2-a { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.cv2-drop::after, .cv2-side-item[aria-current]::after { content: ''; position: absolute; inset: -1px; padding: 1.5px; border-radius: inherit; pointer-events: none;
+  background: conic-gradient(from var(--cv2-a), transparent 0deg 296deg, rgba(205, 170, 110, 0.6) 330deg, var(--brass) 348deg, #fff 356deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: cv2Beam 8s linear infinite; animation-delay: var(--gd, 0s); }
+.cv2-drop-group.brass .cv2-drop::after { background: conic-gradient(from var(--cv2-a), transparent 0deg 296deg, rgba(255, 250, 238, 0.45) 330deg, rgba(255, 253, 248, 0.8) 348deg, #fff 356deg, transparent 360deg); }
+@keyframes cv2Beam { to { --cv2-a: 360deg; } }
 .cv2-drop-group > button { position: relative; z-index: 1; padding: 7px 15px; border-radius: 999px; font-size: 14px; color: var(--mut); white-space: nowrap; transition: color .3s; }
 .cv2-drop-group > button:hover { color: var(--soft); }
 .cv2-drop-group > button[aria-pressed='true'], .cv2-drop-group > button[aria-selected='true'] { color: var(--ink); }
@@ -271,5 +277,4 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .cv2 *, .cv2 *::before, .cv2 *::after { animation: none !important; transition: none !important; }
-  .cv2-drop::after, .cv2-glint::after { display: none; }
 }

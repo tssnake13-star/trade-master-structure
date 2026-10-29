@@ -334,17 +334,22 @@ button.tv2-chip:hover { border-color: var(--line-2) !important; }
 .tv2 .tm-side-scroll::-webkit-scrollbar-thumb { background: rgba(200, 215, 240, 0.2); }
 .tv2 .tv2-side input::placeholder { color: var(--faint); }
 
-/* лучи, скан и «новое» из echo-fx.css — латунью */
+/* лучи, скан и «новое» из echo-fx.css — латунью.
+   29.10.2026, Сергей: «мне нравится, как выделяется кнопка ECHO-GATE INSIDE в кабинете… точно так же сделай внутри
+   терминала… чуть менее заметно, не так режет глаз». Луч выбранного (рынок, группы и сценарии, строка инструмента,
+   рынок в журнале, выбранная сделка) теперь как у той кнопки: кольцо 1,5 px, короткий хвост, круг 8 с. Прежний луч
+   (2 px, длинный яркий хвост, круг 3,6 с) остаётся только в Телеграм-терминале */
+.tv2 .tm-beam { padding: 1.5px; }
+.tv2 .tm-beam-2::before { animation-duration: 8s; }
 .tv2 .tm-beam::before, .tv2 .eg-orbit::before {
-  background: conic-gradient(from 0deg, transparent 0deg 240deg, rgba(205, 170, 110, 0.4) 290deg, rgba(240, 222, 186, 0.95) 335deg, #fff 352deg, transparent 360deg);
+  background: conic-gradient(from 0deg, transparent 0deg 296deg, rgba(205, 170, 110, 0.6) 330deg, var(--brass) 348deg, #fff 356deg, transparent 360deg);
 }
 .tv2 .tm-beam-crypto::before {
-  background: conic-gradient(from 0deg, transparent 0deg 240deg, rgba(127, 119, 221, 0.45) 290deg, rgba(210, 205, 250, 0.95) 335deg, #fff 352deg, transparent 360deg);
+  background: conic-gradient(from 0deg, transparent 0deg 296deg, rgba(127, 119, 221, 0.6) 330deg, rgba(170, 163, 240, 1) 348deg, #fff 356deg, transparent 360deg);
 }
-.tv2 .tm-beam-wide .tm-beam-bar { background: linear-gradient(to right, transparent 0%, rgba(205, 170, 110, 0.4) 45%, rgba(240, 222, 186, 0.95) 84%, #fff 95%, rgba(255, 255, 255, 0) 100%); }
-.tv2 .tm-beam-crypto.tm-beam-wide .tm-beam-bar { background: linear-gradient(to right, transparent 0%, rgba(127, 119, 221, 0.45) 45%, rgba(210, 205, 250, 0.95) 84%, #fff 95%, rgba(255, 255, 255, 0) 100%); }
-.tv2 .tm-pill-on { animation-name: tv2PillGlow; }
-@keyframes tv2PillGlow { 0%, 100% { box-shadow: 0 0 0 0 rgba(205, 170, 110, 0); } 50% { box-shadow: 0 0 12px 1px rgba(205, 170, 110, 0.45); } }
+/* длинная строка: полоса по кольцу с тем же хвостом и вдвое медленнее прежнего, как круг у кнопки ECHO-GATE INSIDE */
+.tv2 .tm-beam-wide .tm-beam-bar { width: 90px; background: linear-gradient(to right, transparent 0%, rgba(205, 170, 110, 0.6) 50%, var(--brass) 80%, #fff 95%, rgba(255, 255, 255, 0) 100%); animation-duration: calc(var(--bp, 3.6s) * 2.2); }
+.tv2 .tm-beam-crypto.tm-beam-wide .tm-beam-bar { background: linear-gradient(to right, transparent 0%, rgba(127, 119, 221, 0.6) 50%, rgba(170, 163, 240, 1) 80%, #fff 95%, rgba(255, 255, 255, 0) 100%); }
 .tv2 .tm-row-scan::before { background: linear-gradient(180deg, transparent 0%, rgba(205, 170, 110, 0.05) 45%, rgba(205, 170, 110, 0.26) 86%, #f3e6cc 94%, transparent 100%); }
 .tv2 .eg-new::after { background: linear-gradient(180deg, transparent 0%, rgba(205, 170, 110, 0.1) 60%, rgba(205, 170, 110, 0.45) 93%, #f6ecd8 96.5%, transparent 100%); }
 .tv2 .eg-new-dot { color: var(--brass); font-family: var(--mono); }
@@ -407,14 +412,16 @@ button.tv2-chip:hover { border-color: var(--line-2) !important; }
 }
 
 
-/* 29.10.2026, Сергей: «накопление, циклы, свинги, реверс тоже должны бликовать» — включённый слой бликует тем же бликом,
-   что выбранная кнопка в «капле» (cabinet-v2.css, .cv2-glint) */
-.tv2 .tv2-chip[aria-pressed='true'], .tv2 .tv2-chip.on { position: relative; overflow: hidden; isolation: isolate; }
+/* 29.10.2026, Сергей: «накопление, циклы, свинги, реверс тоже должны бликовать», потом «точно так же, как в кабинете
+   выделяется терминал» — у включённого слоя по рамке бежит тот же луч, что у кнопки ECHO-GATE INSIDE и выбранной кнопки
+   в «капле» (cabinet-v2.css, cv2Beam) */
+.tv2 .tv2-chip[aria-pressed='true'], .tv2 .tv2-chip.on { position: relative; isolation: isolate; }
 .tv2 .tv2-chip[aria-pressed='true']::after, .tv2 .tv2-chip.on::after {
-  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 45%; pointer-events: none;
-  background: linear-gradient(100deg, transparent 0%, rgba(255, 250, 235, 0.16) 32%, rgba(255, 248, 230, 0.62) 50%, rgba(255, 250, 235, 0.16) 68%, transparent 100%);
-  transform: translateX(-130%) skewX(-18deg); animation: cv2Glint 4.5s cubic-bezier(.45, 0, .2, 1) infinite;
+  content: ''; position: absolute; inset: -1px; padding: 1.5px; border-radius: inherit; pointer-events: none;
+  background: conic-gradient(from var(--cv2-a), transparent 0deg 296deg, rgba(205, 170, 110, 0.6) 330deg, var(--brass) 348deg, #fff 356deg, transparent 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: cv2Beam 8s linear infinite;
 }
-.tv2 .tv2-chip[aria-pressed='true']:nth-child(2n)::after { animation-delay: -1.3s; }
-.tv2 .tv2-chip[aria-pressed='true']:nth-child(3n)::after { animation-delay: -2.6s; }
-@media (prefers-reduced-motion: reduce) { .tv2 .tv2-chip::after { display: none; } }
+.tv2 .tv2-chip[aria-pressed='true']:nth-child(2n)::after { animation-delay: -2.7s; }
+.tv2 .tv2-chip[aria-pressed='true']:nth-child(3n)::after { animation-delay: -5.3s; }

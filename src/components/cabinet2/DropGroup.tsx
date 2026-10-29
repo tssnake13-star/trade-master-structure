@@ -75,8 +75,8 @@ export default function DropGroup<K extends string>({
   }, [value]);
 
   const tabs = role === 'tablist';
-  // сдвиг блика по названию группы: у соседних групп блик проходит в разное время
-  const gd = `${-((Array.from(label).reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) % 997, 7) % 40) / 10)}s`;
+  // сдвиг луча по названию группы: у соседних групп луч по рамке идёт не в ногу (круг 8 с)
+  const gd = `${-((Array.from(label).reduce((h, ch) => (h * 31 + ch.charCodeAt(0)) % 997, 7) % 80) / 10)}s`;
   return (
     <div ref={box} className={`cv2-drop-group ${variant} ${className}`} role={role} aria-label={label} style={{ '--gd': gd } as CSSProperties}>
       <span ref={drop} className="cv2-drop" aria-hidden="true" />
