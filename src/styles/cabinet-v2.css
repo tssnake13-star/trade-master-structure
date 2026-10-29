@@ -111,7 +111,7 @@
 .cv2-next-row { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto; align-items: center; gap: 10px; width: 100%; padding: 9px 10px; border-radius: 10px; text-align: left; font-size: 14px; color: var(--soft); transition: background .25s, color .25s; }
 .cv2-next-row:hover { background: rgba(230, 236, 245, 0.05); color: var(--ink); }
 .cv2-next-row .n { font: 12px var(--mono); color: var(--faint); }
-.cv2-next-row .tt { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cv2-next-row .tt { min-width: 0; line-height: 1.35; overflow-wrap: break-word; }
 .cv2-next-row svg { color: var(--faint); }
 .cv2-next-row[data-locked] { color: var(--mut); }
 
@@ -231,6 +231,7 @@
 .cv2-step.now small { color: var(--brass); }
 .cv2-step b { font-size: 16px; font-weight: 600; }
 .cv2-step .go { font-size: 13px; color: var(--brass); white-space: nowrap; }
+.cv2-step .go svg { display: inline-block; }
 .cv2-shake { animation: cv2Shake .4s; }
 @keyframes cv2Shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
 
@@ -287,6 +288,10 @@
   .cv2-card-head { flex-wrap: wrap; }
   .cv2-row .why { grid-column: 1 / -1; white-space: normal; }
   .cv2-big { font-size: 34px; }
+  /* блок программы на телефоне: «Открыть / Повторить» под названием, тексту вся ширина строки */
+  .cv2-step { grid-template-columns: 40px minmax(0, 1fr); gap: 12px; align-items: start; }
+  .cv2-step .go { grid-column: 2; justify-self: start; margin-top: -4px; }
+  .cv2-step .go:empty { display: none; }
 }
 @media (prefers-reduced-motion: reduce) {
   .cv2 *, .cv2 *::before, .cv2 *::after { animation: none !important; transition: none !important; }

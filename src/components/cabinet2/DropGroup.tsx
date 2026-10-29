@@ -36,6 +36,15 @@ export default function DropGroup<K extends string>({
     const btn = g.querySelector<HTMLElement>(`[data-k="${CSS.escape(value)}"]`);
     if (!btn) return;
     const L = btn.offsetLeft, R = L + btn.offsetWidth;
+    // на телефоне строка вкладок листается вбок: выбранная вкладка всегда в кадре, иначе не видно, где вы
+    for (let p = g.parentElement; p && p !== document.body; p = p.parentElement) {
+      const ox = getComputedStyle(p).overflowX;
+      if (ox !== 'auto' && ox !== 'scroll') continue;
+      const b = btn.getBoundingClientRect(), r = p.getBoundingClientRect();
+      if (b.left < r.left + 8) p.scrollLeft += b.left - r.left - 8;
+      else if (b.right > r.right - 8) p.scrollLeft += b.right - r.right + 8;
+      break;
+    }
     const prev = last.current;
     last.current = { l: L, r: R };
     const st = d.style;

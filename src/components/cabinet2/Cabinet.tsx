@@ -111,8 +111,8 @@ export default function Cabinet(p: CabinetProps) {
               <button type="button" className="cv2-icon-btn cv2-menu-btn" onClick={() => setSideOpen(true)} aria-label="Открыть меню"><Menu size={17} /></button>
               <span className="cv2-chip"><span className="cv2-live" />{todayAstana()}</span>
               <span className="cv2-chip">{p.isFreeUser ? p.t('header_status_intro') : p.t('header_status_live')}</span>
-              <a className="cv2-btn cv2-btn-ghost" style={{ marginLeft: 'auto', padding: '7px 13px', fontSize: 13 }} href="https://t.me/tradeliketyo" target="_blank" rel="noopener noreferrer">
-                <MessageCircle size={14} /> {p.t('header_support')}
+              <a className="cv2-btn cv2-btn-ghost" style={{ marginLeft: 'auto', padding: '7px 13px', fontSize: 13 }} href="https://t.me/tradeliketyo" target="_blank" rel="noopener noreferrer" aria-label={p.t('header_support')}>
+                <MessageCircle size={14} /> <span className="cv2-btn-label">{p.t('header_support')}</span>
               </a>
             </header>
 

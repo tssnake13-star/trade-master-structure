@@ -168,7 +168,7 @@ export function KpiStrip({ daysInSystem, programEnd, progress, i = 0 }: {
     { label: 'До конца доступа', value: left != null ? <>{left}<span style={{ color: 'var(--faint)', fontSize: 22 }}> дн</span></> : '—' },
   ];
   return (
-    <div className="s12" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))', gap: 16 }}>
+    <div className="s12" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))', gap: 16 }}>
       {tiles.map((x, k) => (
         <div key={x.label} className="cv2-card cv2-glass cv2-in" style={inStyle(i + k)}>
           <div className="cv2-sub" style={{ marginTop: 0 }}>{x.label}</div>
