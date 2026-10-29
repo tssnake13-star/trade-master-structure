@@ -412,16 +412,5 @@ button.tv2-chip:hover { border-color: var(--line-2) !important; }
 }
 
 
-/* 29.10.2026, Сергей: «накопление, циклы, свинги, реверс тоже должны бликовать», потом «точно так же, как в кабинете
-   выделяется терминал» — у включённого слоя по рамке бежит тот же луч, что у кнопки ECHO-GATE INSIDE и выбранной кнопки
-   в «капле» (cabinet-v2.css, cv2Beam) */
-.tv2 .tv2-chip[aria-pressed='true'], .tv2 .tv2-chip.on { position: relative; isolation: isolate; }
-.tv2 .tv2-chip[aria-pressed='true']::after, .tv2 .tv2-chip.on::after {
-  content: ''; position: absolute; inset: -1px; padding: 1.5px; border-radius: inherit; pointer-events: none;
-  background: conic-gradient(from var(--cv2-a), transparent 0deg 296deg, rgba(205, 170, 110, 0.6) 330deg, var(--brass) 348deg, #fff 356deg, transparent 360deg);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
-  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-  animation: cv2Beam 8s linear infinite;
-}
-.tv2 .tv2-chip[aria-pressed='true']:nth-child(2n)::after { animation-delay: -2.7s; }
-.tv2 .tv2-chip[aria-pressed='true']:nth-child(3n)::after { animation-delay: -5.3s; }
+/* Слои графика (накопление, циклы, свинги, реверс) — без луча по рамке. 29.10.2026 луч на них ставили, Сергей посмотрел:
+   «убери выделение кнопок накопления, цикл, свинги, реверс. В остальном всё оставь». Выключенный слой зачёркнут (.tv2-chip.off) */
