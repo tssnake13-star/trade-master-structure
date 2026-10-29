@@ -38,6 +38,8 @@ const SchoolHomePreview = lazy(() => import("./pages/SchoolHomePreview"));
 const TerminalPreview = lazy(() => import("./components/terminal2/Preview"));
 // 29.10.2026: кабинет v2 на демо-данных — посмотреть разметку без входа
 const CabinetPreview = lazy(() => import("./pages/CabinetPreview"));
+// 29.10.2026: терминал в Телеграме в ночном облике v2 на демо-данных — посмотреть без Телеграма
+const TgPreview = lazy(() => import("./components/tg/TgPreview"));
 
 const queryClient = new QueryClient();
 
@@ -75,6 +77,7 @@ const App = () => (
             <Route path="/school/home-preview" element={<SchoolHomePreview />} />
             <Route path="/school/terminal-preview" element={<TerminalPreview />} />
             <Route path="/school/cabinet-preview" element={<CabinetPreview />} />
+            <Route path="/school/tg-preview/:bot" element={<TgPreview />} />
             <Route path="/school" element={<SchoolAuth />} />
             <Route path="/school/dashboard" element={<SchoolDashboard />} />
             <Route path="/school/course/:id" element={<SchoolCourse />} />

@@ -546,7 +546,7 @@ export function TimeMachine({ doc, symbols, onOpen }: { doc?: { items?: TimeItem
     <div>
       <MarketSwitch value={mk} onChange={pick} counts={counts} />
       <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>
-        Выбери решение — увидишь рынок таким, каким он был в момент решения. Решение записано в тот же день, задним числом его не поменять.
+        Выберите решение, и вы увидите рынок таким, каким он был в момент решения. Решение записано в тот же день, задним числом его не поменять.
       </div>
       <JournalCalendar
         items={items}
@@ -665,7 +665,7 @@ export function Trainer({ doc, symbols, onOpen }: { doc?: { items?: TimeItem[] }
     <div>
       <MarketSwitch value={mk} onChange={pick} counts={counts} />
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 14, flexWrap: 'wrap', marginBottom: 10 }}>
-        <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6 }}>Карточка из прошлого. Реши сам: допуск или отказ? Потом увидишь решение Сергея и что было дальше.</div>
+        <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6 }}>Карточка из прошлого. Решите сами: допуск или отказ? Потом вы увидите решение Сергея и что было дальше.</div>
         <div style={{ marginLeft: 'auto', fontFamily: MONO, fontSize: 12, color: DIM, whiteSpace: 'nowrap' }}>
           совпало с Сергеем: <b style={{ color: ACCENT, fontSize: 16 }}>{hit}</b> из <b style={{ color: ACCENT, fontSize: 16 }}>{done.length}</b> · карточка {Math.min(idx, items.length - 1) + 1} из {items.length}
         </div>
@@ -684,7 +684,7 @@ export function Trainer({ doc, symbols, onOpen }: { doc?: { items?: TimeItem[] }
           ) : (
             <>
               <div style={{ marginTop: 12, fontSize: 13, color: DIM }}>
-                Твой ответ: <b style={{ color: FG }}>{my}</b> ·{' '}
+                Ваш ответ: <b style={{ color: FG }}>{my}</b> ·{' '}
                 {my === it.verdict ? <span style={{ color: UP }}>совпало с Сергеем</span> : <span style={{ color: DOWN }}>у Сергея по-другому</span>}
               </div>
               <Stamp it={it} />
