@@ -86,6 +86,7 @@ const CLICK_NAMES: Record<string, string> = {
   // 19.10.2026: кнопки «7 дней» (?start=trial)
   hero_trial: 'Главный экран → 7 дней',
   header_trial: 'Шапка сайта → 7 дней',
+  header_login: 'Шапка сайта → Войти',
   sticky_trial: 'Нижняя кнопка на телефоне → 7 дней',
   final_trial: 'Финальный блок → 7 дней',
   trades_trial: 'Сделки → 7 дней',

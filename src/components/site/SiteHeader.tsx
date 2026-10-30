@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Menu, X } from 'lucide-react';
+import { LogIn, Menu, X } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
 import { trackClick } from '@/lib/analytics';
+import { useAuth } from '@/contexts/AuthContext';
 import logoVideoFallback from '@/assets/logo-header.mp4';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 import { SITE_PAGES } from './pages';
@@ -10,12 +11,16 @@ import { SITE_PAGES } from './pages';
 /**
  * Шапка сайта из нескольких страниц (28.10.2026). Сергей: «нужно сделать несколько страниц…
  * на каждой странице была ссылка или кнопка». Меню ведёт на страницы, а не к разделам одной страницы.
- * Справа одна кнопка — 7 дней бесплатно через бота. После первого экрана шапка становится стеклом.
+ * Справа кнопка 7 дней бесплатно через бота. После первого экрана шапка становится стеклом.
+ * 30.10.2026, Сергей: «сделай кнопку заметную» — рядом «Войти» золотым контуром (регистрация и вход в кабинет): видна сразу,
+ * но главным действием остаётся залитая кнопка пробы. Кто уже вошёл, видит «Кабинет».
  */
 export default function SiteHeader() {
   const [solid, setSolid] = useState(false);
   const [open, setOpen] = useState(false);
   const logoVideo = useSiteAsset(SITE_ASSET_KEYS.headerLogo, logoVideoFallback);
+  const { session } = useAuth();
+  const loginLabel = session ? 'Кабинет' : 'Войти';
 
   useEffect(() => {
     const onScroll = () => setSolid(window.scrollY > 40);
@@ -49,7 +54,11 @@ export default function SiteHeader() {
               ))}
             </nav>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 md:gap-3">
+              <Link to="/school" onClick={() => trackClick('header_login')} className="ns-login inline-flex items-center gap-2 px-3.5 md:px-5 py-2 md:py-2.5 text-base font-semibold rounded-[3px]">
+                <LogIn className="w-4 h-4" aria-hidden="true" />
+                {loginLabel}
+              </Link>
               <a
                 href={TELEGRAM_LINKS.trial}
                 target="_blank"

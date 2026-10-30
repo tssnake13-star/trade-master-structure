@@ -104,6 +104,10 @@
 .night-skin.v3-skin .v3h-btn--ghost:hover { border-color: var(--v3-mut); }
 .night-skin.v3-skin .v3h-btn { font-size: 16px; }
 
+/* «Войти» в шапке (30.10.2026): золотой контур, заметно, но слабее залитой кнопки пробы */
+.night-skin.v3-skin .ns-login { color: var(--v3-gold); border: 1px solid var(--v3-gold); background: rgba(205, 170, 110, 0.08); white-space: nowrap; transition: background 0.2s ease; }
+.night-skin.v3-skin .ns-login:hover { background: rgba(205, 170, 110, 0.2); color: var(--v3-gold); }
+
 /* знак «Допуск» — зелёным, «Отказ» — стальной контур */
 .night-skin.v3-skin .verdict--ok { color: #04140E; }
 
