@@ -25,7 +25,7 @@ export default function Binocular() {
     <SiteLayout
       path="/binocular"
       title="Бинокль — торговать по системе Сергея Тё, не изучая её · TRADE LIKE TYO"
-      description="Подписка ECHO-GATE INSIDE: программа смотрит весь рынок, Сергей даёт вердикт по каждой сделке, робот ведёт сделку, страж счёта держит лимиты. 7 дней бесплатно, первый месяц $199."
+      description="Подписка ECHO-GATE INSIDE: программа смотрит весь рынок, Сергей даёт вердикт по каждой сделке, робот ведёт сделку, страж счёта держит лимиты. 7 дней бесплатно, первый месяц $196."
       sections={['top', 'week', 'roles', 'questions', 'robot', 'free', 'difference', 'prices', 'fit', 'faq', 'next']}
     >
       <PageHero

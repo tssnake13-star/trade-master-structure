@@ -29,11 +29,11 @@ const SANS = "'Geologica', 'Segoe UI', system-ui, sans-serif";
  * Зачёт оплаченного при переходе выше. Те же числа, что на странице цен.
  * ⚠️ Доплата работает ТОЛЬКО наверх: из курса в практикум доплатой перейти
  * нельзя, это отдельная ступень (решение Сергея 06.09.2026). С 07.10.2026
- * доплата ведёт в VIP: Trade OS Plus снят с витрины. $349 + $2641 = $2990.
+ * доплата ведёт в VIP: Trade OS Plus снят с витрины. $347 + $2643 = $2990.
  */
 const UPGRADE_WINDOW_DAYS = 30;
-const VIP_TOPUP = '$2641';
-const TRADE_SYSTEM_PRICE = '$349';
+const VIP_TOPUP = '$2643';
+const TRADE_SYSTEM_PRICE = '$347';
 
 type Settings = Record<string, string>;
 

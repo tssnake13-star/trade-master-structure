@@ -47,7 +47,7 @@ const STAGES = [
 const LEVELS: { name: string; price?: string; alwaysPrice?: boolean; text: string }[] = [
   {
     name: 'Trade System',
-    price: '$349',
+    price: '$347',
     alwaysPrice: true,
     text: 'Этапов здесь нет. Вы получаете саму систему и проходите её сами, без проверки заданий и без тренировок под моим контролем.',
   },

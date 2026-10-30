@@ -136,7 +136,7 @@ export function PathsSection() {
             </p>
             <div className="flex-grow min-h-6" />
             <div className="mt-7 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-              <span className="ns-num text-[40px]">$199</span>
+              <span className="ns-num text-[40px]">$196</span>
               <span className="ns-cap">первый месяц, дальше 3, 6 или 12 месяцев</span>
             </div>
             <div className="mt-7 flex flex-wrap gap-3">
