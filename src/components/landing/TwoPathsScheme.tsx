@@ -31,7 +31,7 @@ const PATH_TRADE: Row[] = [
 
 const PATH_LEARN: Row[] = [
   { name: 'Trade System', note: 'Самостоятельно, 365 дней', price: '$347', publicPrice: true },
-  { name: 'Практикум', note: 'Вместе со мной, 60 дней', price: '$499', publicPrice: true },
+  { name: 'Практикум', note: 'Вместе со мной, 60 дней', price: '$497', publicPrice: true },
   { name: 'Потом подписка', note: 'Сразу после обучения' },
 ];
 

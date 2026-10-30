@@ -7,7 +7,7 @@ import { trackClick } from '@/lib/analytics';
  * а не сравнивает четыре тарифа между собой.
  *
  * ⚠️ Цены Trade OS Plus и VIP на лендинге не раскрываются (showPrices=false):
- * там видно только $347 и $499, остальные суммы живут на /access.
+ * там видно только $347 и $497, остальные суммы живут на /access.
  */
 
 const GOLD = 'hsl(var(--accent))';
@@ -17,7 +17,7 @@ type Row = { state: string; name: string; price?: string; alwaysPrice?: boolean 
 
 const ROWS: Row[] = [
   { state: 'Хочу разобрать систему сам, в своём темпе', name: 'Trade System', price: '$347', alwaysPrice: true },
-  { state: 'Систему знаю, а на живом графике применить не выходит', name: 'Практикум', price: '$499', alwaysPrice: true },
+  { state: 'Систему знаю, а на живом графике применить не выходит', name: 'Практикум', price: '$497', alwaysPrice: true },
   { state: 'Торгую давно и хочу собрать торговлю в систему', name: 'Trade OS Plus', price: '$1599' },
   { state: 'Нужна вся инфраструктура, вместе с инструментами', name: 'VIP', price: '$2990' },
 ];
