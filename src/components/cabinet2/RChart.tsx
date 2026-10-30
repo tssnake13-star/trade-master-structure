@@ -16,6 +16,8 @@ function smooth(pts: [number, number][]) {
 
 export interface RPoint { label: string; value: number; note?: string }
 
+const DRAW_MS = 3000;
+
 /**
  * Накопленный итог решений в R (кабинет v2, 29.10.2026, образец — ролик Kerfa): линия латунью прорисовывается,
  * под ней мягкая заливка, при наведении — вертикаль, точка и плашка с цифрой. Только настоящие итоги из журнала.
@@ -35,6 +37,8 @@ export default function RChart({ points, height = 250, compact = false }: { poin
     return () => ro?.disconnect();
   }, [points.length < 2]);
   const lineRef = useRef<SVGPathElement>(null);
+  const areaRef = useRef<SVGPathElement>(null);
+  const dotRef = useRef<SVGCircleElement>(null);
   const [hover, setHover] = useState<number | null>(null);
   const svgRef = useRef<SVGSVGElement>(null);
 
@@ -50,18 +54,26 @@ export default function RChart({ points, height = 250, compact = false }: { poin
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [points, H, W]);
 
-  // линия прорисовывается при каждой смене данных
+  // линия прорисовывается при каждой смене данных. 30.10.2026, Сергей: «она очень быстро появляется… сделать её плавнее».
+  // Было 1,3 с с резким стартом: почти вся линия вылетала за первые 0,3 с. Теперь 3 с равномерно с мягким началом и концом,
+  // заливка проявляется вместе с линией, точка загорается, когда линия до неё дошла
   useLayoutEffect(() => {
-    const el = lineRef.current;
-    if (!el) return;
+    const el = lineRef.current, area = areaRef.current, dot = dotRef.current;
+    if (!el || !area || !dot) return;
     const len = el.getTotalLength();
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    el.style.transition = 'none';
+    for (const n of [el, area, dot]) n.style.transition = 'none';
     el.style.strokeDasharray = `${len}`;
     el.style.strokeDashoffset = reduce ? '0' : `${len}`;
+    area.style.opacity = reduce ? '1' : '0';
+    dot.style.opacity = reduce ? '1' : '0';
     void el.getBoundingClientRect();
-    el.style.transition = 'stroke-dashoffset 1.3s cubic-bezier(.16,1,.3,1)';
+    el.style.transition = `stroke-dashoffset ${DRAW_MS}ms cubic-bezier(.45,.05,.55,.95)`;
+    area.style.transition = `opacity ${DRAW_MS}ms ease-in`;
+    dot.style.transition = `opacity 350ms ease-out ${DRAW_MS - 150}ms`;
     el.style.strokeDashoffset = '0';
+    area.style.opacity = '1';
+    dot.style.opacity = '1';
   }, [geo]);
 
   if (points.length < 2) return <div className="cv2-hint" style={{ padding: '30px 0' }}>Итогов пока мало для графика.</div>;
@@ -96,9 +108,9 @@ export default function RChart({ points, height = 250, compact = false }: { poin
         {!compact && points.map((p, i) => (i % step === 0 || i === last) && (
           <text key={i} x={x(i)} y={H - 6} textAnchor="middle" style={{ fill: 'var(--faint)', font: '11px var(--mono)' }}>{p.label}</text>
         ))}
-        <path d={`${smooth(pts)} L${x(last)},${y(lo)} L${x(0)},${y(lo)} Z`} fill="url(#cv2R)" className="cv2-in" />
+        <path ref={areaRef} d={`${smooth(pts)} L${x(last)},${y(lo)} L${x(0)},${y(lo)} Z`} fill="url(#cv2R)" />
         <path ref={lineRef} d={smooth(pts)} fill="none" stroke="#CDAA6E" strokeWidth={2.6} strokeLinecap="round" />
-        <circle cx={x(last)} cy={y(points[last].value)} r={4.5} fill="#CDAA6E" />
+        <circle ref={dotRef} cx={x(last)} cy={y(points[last].value)} r={4.5} fill="#CDAA6E" />
         {hover != null && (
           <>
             <line x1={x(hover)} x2={x(hover)} y1={pad.t} y2={H - pad.b} stroke="rgba(230,236,245,.25)" />

@@ -144,7 +144,19 @@
 .cv2-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 9px 15px; border-radius: 999px; font-size: 14px; font-weight: 600; white-space: nowrap; transition: background .25s, transform .2s; text-decoration: none; }
 .cv2-btn:active { transform: scale(0.97); }
 .cv2-btn:disabled { opacity: 0.5; cursor: default; }
-.cv2-btn-brass { background: var(--brass); color: var(--brass-ink); }
+.cv2-btn-brass { background: var(--brass); color: var(--brass-ink); position: relative; overflow: hidden; }
+/* 30.10.2026, Сергей: «все кнопки, такие как перейти в экосистему… пускай выделяются бликом» — тот же блик, что на кнопках сайта
+   (.cta-shine в v3-skin.css): тот же рисунок и круг 4,5 с. Только главные кнопки; выбранные пункты остаются с лучом по рамке */
+.cv2-shine { position: relative; overflow: hidden; }
+.cv2-btn-brass:not(:disabled)::after, .cv2-shine::after {
+  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 46%;
+  background: linear-gradient(100deg, transparent 0%, rgba(214, 150, 58, 0.42) 30%, rgba(255, 252, 244, 0.95) 50%, rgba(214, 150, 58, 0.42) 70%, transparent 100%);
+  transform: translateX(-160%) skewX(-18deg); will-change: transform;
+  animation: cv2BtnShine 4.5s cubic-bezier(.4,0,.2,1) infinite;
+  pointer-events: none;
+}
+@keyframes cv2BtnShine { 0%, 62% { transform: translateX(-160%) skewX(-18deg); } 100% { transform: translateX(330%) skewX(-18deg); } }
+@media (prefers-reduced-motion: reduce) { .cv2-btn-brass::after, .cv2-shine::after { animation: none; opacity: 0; } }
 .cv2-btn-brass:hover { background: var(--brass-hi); }
 .cv2-btn-ghost { border: 1px solid var(--line-2); color: var(--ink); }
 .cv2-btn-ghost:hover { background: rgba(230, 236, 245, 0.06); }

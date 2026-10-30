@@ -197,7 +197,7 @@ export default function DashboardBanners({ accessMap }: {
               Это последняя неделя зачёта.
             </p>
           )}
-          <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" style={cta} className="transition hover:brightness-110">
+          <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" style={cta} className="cv2-shine transition hover:brightness-110">
             Перейти в VIP
             <ArrowRight size={14} />
           </a>
@@ -241,7 +241,7 @@ export default function DashboardBanners({ accessMap }: {
             </div>
           )}
 
-          <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" style={cta} className="transition hover:brightness-110 xl:!mt-0">
+          <a href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer" style={cta} className="cv2-shine transition hover:brightness-110 xl:!mt-0">
             Узнать про поток
             <ArrowRight size={14} />
           </a>

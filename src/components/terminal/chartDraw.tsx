@@ -4,8 +4,10 @@ import type { ScenePanel, Shape, SLabel } from './scene';
 // Рисование фигур живого графика. Цвета поля — как на картинке бота.
 export const PANEL_BG = '#161b22';
 export const GRID = '#2a3038';
-export const UPC = '#26a17b';
-export const DNC = '#d1493f';
+// 30.10.2026, Сергей: «мне нравится цвет свечей» на правом мониторе главной — те же цвета, что в heroDeskLive.ts (UP, DOWN).
+// Только тело и фитиль свечи: зоны, уровни и отметки приходят из сцены бота со своими цветами
+export const UPC = '#e9c793';
+export const DNC = '#748093';
 export const PAD = { l: 6, r: 56, t: 10, b: 24 };
 
 /** По высоте: пока смотрим целиком — как на картинке (видна цель цикла); приблизили
