@@ -54,6 +54,10 @@ export default function RChart({ points, height = 250, compact = false }: { poin
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [points, H, W]);
 
+  // Кабинет перерисовывается каждую секунду (обратный отсчёт эфира), поэтому анимация привязана к самим значениям, а не к массиву:
+  // иначе она начиналась заново каждую секунду и линия не успевала дойти до конца
+  const sig = points.map((p) => p.value).join(',');
+
   // линия прорисовывается при каждой смене данных. 30.10.2026, Сергей: «она очень быстро появляется… сделать её плавнее».
   // Было 1,3 с с резким стартом: почти вся линия вылетала за первые 0,3 с. Теперь 3 с равномерно с мягким началом и концом,
   // заливка проявляется вместе с линией, точка загорается, когда линия до неё дошла
@@ -74,7 +78,8 @@ export default function RChart({ points, height = 250, compact = false }: { poin
     el.style.strokeDashoffset = '0';
     area.style.opacity = '1';
     dot.style.opacity = '1';
-  }, [geo]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sig, W, H]);
 
   if (points.length < 2) return <div className="cv2-hint" style={{ padding: '30px 0' }}>Итогов пока мало для графика.</div>;
 

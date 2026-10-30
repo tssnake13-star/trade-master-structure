@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -43,8 +43,11 @@ export function useJournal(opts: { userId?: string; open: boolean }) {
     })().catch(() => setLoaded(true));
     return () => { alive = false; };
   }, [userId, open]);
-  const byTime = (a: { time: string }, b: { time: string }) => new Date(b.time).getTime() - new Date(a.time).getTime();
-  return { verdicts: [...verdicts].sort(byTime), outcomes: [...outcomes].sort(byTime), loaded };
+  // useMemo: кабинет перерисовывается каждую секунду, новый массив на каждую перерисовку пересчитывал всё, что от него зависит
+  return useMemo(() => {
+    const byTime = (a: { time: string }, b: { time: string }) => new Date(b.time).getTime() - new Date(a.time).getTime();
+    return { verdicts: [...verdicts].sort(byTime), outcomes: [...outcomes].sort(byTime), loaded };
+  }, [verdicts, outcomes, loaded]);
 }
 
 /**

@@ -8,6 +8,10 @@ export const GRID = '#2a3038';
 // Только тело и фитиль свечи: зоны, уровни и отметки приходят из сцены бота со своими цветами
 export const UPC = '#e9c793';
 export const DNC = '#748093';
+// Тела свечей бот присылает в сцене непрозрачными прямоугольниками зелёного и красного (зоны у него полупрозрачные, fa < 1):
+// они лежат поверх наших, поэтому перекрашиваем их здесь
+const candleFill = (f: string | null | undefined, fa: number) =>
+  fa === 1 && f === '#26a17b' ? UPC : fa === 1 && f === '#d1493f' ? DNC : f;
 export const PAD = { l: 6, r: 56, t: 10, b: 24 };
 
 /** По высоте: пока смотрим целиком — как на картинке (видна цель цикла); приблизили
@@ -164,7 +168,7 @@ export function shapeNode(s: Shape, key: number, sx: (x: number) => number, sy: 
           y={ry}
           width={rw}
           height={rh}
-          fill={s.f || 'none'}
+          fill={candleFill(s.f, s.fa) || 'none'}
           fillOpacity={s.f ? s.fa : 0}
           stroke={s.e || 'none'}
           strokeWidth={s.e ? Math.max(0.8, s.ew) : 0}
