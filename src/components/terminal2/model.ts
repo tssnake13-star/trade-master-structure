@@ -61,7 +61,10 @@ export interface TerminalData {
   videos: JournalVideo[];
   meta: Meta | null;
   until: string | null;
+  /** проба с замками (демо-экран; с 30.10.2026 настоящая проба замков не имеет) */
   trial: boolean;
+  /** проба, открытая целиком (30.10.2026): всё как в подписке, только подпись «пробный доступ до …» */
+  trialOpen?: boolean;
   lockedList: { symbol: string; title: string | null }[];
   hiddenVerdicts: string[];
 }

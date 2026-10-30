@@ -7,6 +7,7 @@ import logoFallback from '@/assets/logo-tradeliketyo.png';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 import '@/styles/cabinet-v2.css';
 import Room from '@/components/cabinet2/Room';
+import { fmtTrialDate, pendingWebTrial, webTrialUntil } from '@/lib/webTrial';
 
 function LogoBlock({ logo }: { logo: string }) {
   return (
@@ -35,9 +36,12 @@ export default function SchoolAuth() {
   const navigate = useNavigate();
   const { session } = useAuth();
   const logo = useSiteAsset(SITE_ASSET_KEYS.schoolAuthLogo, logoFallback);
+  // 30.10.2026: пришёл по ссылке «Полная версия на компьютере» из школьного бота — после входа терминал откроется сам
+  const [fullTrial] = useState(() => pendingWebTrial());
+  const fullUntil = webTrialUntil(fullTrial);
 
   useEffect(() => {
-    if (session) navigate('/school/dashboard', { replace: true });
+    if (session) navigate(pendingWebTrial() ? '/school/full' : '/school/dashboard', { replace: true });
   }, [session, navigate]);
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -153,7 +157,13 @@ export default function SchoolAuth() {
         )}
         {/* 07.10.2026: при регистрации сам открывается пробный доступ к терминалу (триггер в базе).
             11.10.2026: до формы человек видит, что именно получит (разбор плана GPT, п.19) */}
-        {!isLogin && (
+        {fullTrial && (
+          <p className="mb-6 text-sm leading-relaxed px-2 text-center" style={{ color: '#C6D0E0' }}>
+            {isLogin ? 'Войдите или зарегистрируйтесь' : 'Зарегистрируйтесь'}, и откроется терминал ECHO-GATE INSIDE целиком, как
+            у подписчиков{fullUntil ? `, до ${fmtTrialDate(fullUntil)}` : ''}.
+          </p>
+        )}
+        {!isLogin && !fullTrial && (
           <div className="mb-6 text-sm leading-relaxed px-2" style={{ color: '#C6D0E0' }}>
             {/* 19.10.2026, его «все 7 пунктов согласен»: проба терминала — только через бота после 4 вопросов */}
             <p className="text-center">Регистрация бесплатная. Сразу откроется вводный курс.</p>

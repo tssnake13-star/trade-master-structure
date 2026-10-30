@@ -318,6 +318,7 @@ export default function TerminalView({ data, source, isAdmin, seenKey, scan = fa
             section={section}
             onSection={(s) => go(s)}
             trial={trial}
+            trialOpen={data.trialOpen}
             until={until}
             updatedAt={meta?.updated_at || null}
             now={now}

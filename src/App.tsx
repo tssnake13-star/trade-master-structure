@@ -26,6 +26,7 @@ const SchoolStudentDetail = lazy(() => import("./pages/SchoolStudentDetail"));
 const SchoolResetPassword = lazy(() => import("./pages/SchoolResetPassword"));
 const SchoolProfile = lazy(() => import("./pages/SchoolProfile"));
 const SchoolTerminal = lazy(() => import("./pages/SchoolTerminal"));
+const SchoolFullTrial = lazy(() => import("./pages/SchoolFullTrial"));
 const TgTerminal = lazy(() => import("./pages/TgTerminal"));
 const SchoolAnalytics = lazy(() => import("./pages/SchoolAnalytics"));
 const PreviewRedesign = lazy(() => import("./pages/PreviewRedesign"));
@@ -88,6 +89,7 @@ const App = () => (
             <Route path="/school/reset-password" element={<SchoolResetPassword />} />
             <Route path="/school/profile" element={<SchoolProfile />} />
             <Route path="/school/terminal" element={<SchoolTerminal />} />
+            <Route path="/school/full" element={<SchoolFullTrial />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           </Suspense>

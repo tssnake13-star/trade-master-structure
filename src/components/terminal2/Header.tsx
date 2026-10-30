@@ -13,13 +13,14 @@ import { TRIAL_LOCKED, type Section } from './model';
  * отдельной строкой под общими (25.09.2026, его слово: «где-нибудь отдельно, не с общими кнопками»).
  */
 export default function Header({
-  main, admin, section, onSection, trial, until, updatedAt, now, scan, fresh, onFresh, demo, onBack,
+  main, admin, section, onSection, trial, trialOpen, until, updatedAt, now, scan, fresh, onFresh, demo, onBack,
 }: {
   main: [Section, string][];
   admin: [Section, string][];
   section: Section;
   onSection: (s: Section) => void;
   trial: boolean;
+  trialOpen?: boolean;
   until: string | null;
   updatedAt: string | null;
   now: number;
@@ -91,7 +92,7 @@ export default function Header({
           </span>
           {until ? (
             <span className="tv2-status-sub">
-              {trial ? `пробный доступ до ${fmtDate(until)}` : `подписка до ${fmtDate(until)}`}
+              {trial || trialOpen ? `пробный доступ до ${fmtDate(until)}` : `подписка до ${fmtDate(until)}`}
             </span>
           ) : null}
         </span>

@@ -16,6 +16,7 @@ import { useCountUp } from '@/hooks/useCountUp';
 import { countNew, newDecisionsText, newestMs, readSeen, writeSeen } from '@/lib/journalSeen';
 import Cabinet from '@/components/cabinet2/Cabinet';
 import { useJournal } from '@/components/cabinet2/journal';
+import { pendingWebTrial } from '@/lib/webTrial';
 
 // v3 structure background for the cabinet — full-screen, faint, centred.
 const CabinetBg = () => (
@@ -261,6 +262,10 @@ export default function SchoolDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useDashboardTexts();
+  // 30.10.2026: пришёл по ссылке из школьного бота и подтвердил почту — сначала открываем пробу терминала
+  useEffect(() => {
+    if (session && pendingWebTrial()) navigate('/school/full', { replace: true });
+  }, [session, navigate]);
 
   const [courses, setCourses] = useState<Course[]>([]);
   const [accessMap, setAccessMap] = useState<Map<string, { courseId: string; unlocked: number[]; granted_at?: string | null; expires_at?: string | null }>>(new Map());
@@ -284,7 +289,7 @@ export default function SchoolDashboard() {
   // 21.09.2026, его слово: пункт видят все, как курсы: без доступа — с замком,
   // открыть нельзя; срок вышел — «Доступ истёк». Админ открывает всегда.
   const [eyeState, setEyeState] = useState<'open' | 'expired' | 'locked' | null>(null);
-  // 07.10.2026: пробный доступ на 7 дней при регистрации (is_trial) — подпись «пробный доступ»
+  // пробный доступ (is_trial) — подпись «пробный доступ»; с 30.10.2026 его открывает только ссылка из школьного бота
   const [eyeTrial, setEyeTrial] = useState(false);
   // 11.10.2026: конец пробного — в плитке видно, сколько дней осталось (раньше только в терминале)
   const [eyeUntil, setEyeUntil] = useState<string | null>(null);
@@ -309,16 +314,14 @@ export default function SchoolDashboard() {
     return () => { alive = false; };
   }, [user, role]);
   // 25.10.2026, идея 8 «цифра на кнопке с глазом»: сколько решений журнала ученик ещё не видел (что он видел, журнал
-  // запоминает в этом браузере — src/lib/journalSeen.ts). Пробному журнал отдаётся с задержкой, как в самом терминале
+  // запоминает в этом браузере — src/lib/journalSeen.ts). С 30.10.2026 пробному журнал отдаётся сразу, как подписчику
   const [newCount, setNewCount] = useState(0);
   useEffect(() => {
     if (!user || eyeState !== 'open') return;
     let alive = true;
     const db = supabase as unknown as SupabaseClient;
-    const items: PromiseLike<{ time: string }[]> = eyeTrial && role !== 'admin'
-      ? db.rpc('terminal_trial_verdicts').then(({ data }) => (data as { items?: { time: string }[] } | null)?.items || [])
-      : db.from('market_feed').select('data').eq('key', 'verdicts').maybeSingle()
-        .then(({ data }) => (data as { data?: { items?: { time: string }[] } } | null)?.data?.items || []);
+    const items: PromiseLike<{ time: string }[]> = db.from('market_feed').select('data').eq('key', 'verdicts').maybeSingle()
+      .then(({ data }) => (data as { data?: { items?: { time: string }[] } } | null)?.data?.items || []);
     items.then((list) => {
       if (!alive || !list.length) return;
       const seen = readSeen(user.id);
@@ -327,10 +330,10 @@ export default function SchoolDashboard() {
       setNewCount(countNew(list, seen));
     });
     return () => { alive = false; };
-  }, [user, eyeState, eyeTrial, role]);
+  }, [user, eyeState]);
   const openJournal = () => { setMobileSidebarOpen(false); navigate('/school/terminal?s=verdicts'); };
   // 29.10.2026, кабинет v2: решения и итоги из того же журнала, что в терминале (только настоящие данные)
-  const journal = useJournal({ userId: user?.id, open: eyeState === 'open', trial: eyeTrial, admin: role === 'admin' });
+  const journal = useJournal({ userId: user?.id, open: eyeState === 'open' });
   const logoVideo = useSiteAsset(SITE_ASSET_KEYS.schoolDashboardLogo, logoVideoFallback);
   const now = useNow(1000);
 

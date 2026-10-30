@@ -75,7 +75,7 @@ export default function Cabinet(p: CabinetProps) {
   const pct = p.mainProgress?.total ? Math.round((p.mainProgress.completed / p.mainProgress.total) * 100) : 0;
   const firstName = (p.name || '').trim().split(/\s+/)[0];
   const trialLeft = p.eye.trial && p.eye.until ? Math.max(1, Math.ceil((new Date(p.eye.until).getTime() - Date.now()) / 86400000)) : p.eye.trial ? 0 : null;
-  const showR = eyeOpen && !p.eye.trial && p.journal.outcomes.length > 0;
+  const showR = eyeOpen && p.journal.outcomes.length > 0;
   // три блока после текущего — в карточку «Продолжить обучение»
   const mainLessons = p.mainCourse ? p.lessonsOf(p.mainCourse.id) : [];
   const mainUnlocked = p.mainCourse ? p.unlockedOf(p.mainCourse, mainLessons) : [];

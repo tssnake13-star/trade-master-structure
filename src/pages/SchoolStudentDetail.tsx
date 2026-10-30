@@ -483,7 +483,7 @@ export default function SchoolStudentDetail() {
             {/* 07.10.2026, его слово: старое название «TRADE MASTER INSIDE» — должно быть ECHO-GATE INSIDE */}
             <h2 className="text-sm" style={{ fontFamily: font.heading, color: '#888' }}>ECHO-GATE INSIDE</h2>
             <span className="text-[11px]" style={{ color: terminalActive ? '#4a8a4a' : '#555', fontFamily: font.mono }}>
-              {terminalActive ? `${terminalTrial ? 'пробный, с замками, до' : 'открыт до'} ${new Date(terminalUntil!).toLocaleDateString('ru-RU')}`
+              {terminalActive ? `${terminalTrial ? 'пробный, по ссылке из бота, до' : 'открыт до'} ${new Date(terminalUntil!).toLocaleDateString('ru-RU')}`
                 : terminalUntil ? `срок вышел ${new Date(terminalUntil).toLocaleDateString('ru-RU')}` : 'не выдан'}
             </span>
           </div>

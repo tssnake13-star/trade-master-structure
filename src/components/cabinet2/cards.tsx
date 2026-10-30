@@ -211,7 +211,7 @@ export function VerdictsCard({ items, trial, seenMs, onOpenJournal, i = 0 }: {
       <div className="cv2-card-head" style={{ flexWrap: 'wrap' }}>
         <div>
           <h3>Мои решения</h3>
-          <div className="cv2-sub">{trial ? 'Пробный доступ: решения с задержкой в 3 дня' : 'Допуски и отказы с причиной, записаны до движения цены'}</div>
+          <div className="cv2-sub">{trial ? 'Пробный доступ: решения сразу, как у подписчиков' : 'Допуски и отказы с причиной, записаны до движения цены'}</div>
         </div>
         <DropGroup<VF> label="Фильтр решений" variant="sm" value={f} onChange={setF}
           items={[{ key: 'all', label: 'Все' }, { key: 'ok', label: 'Допуск' }, { key: 'no', label: 'Отказ' }]} />

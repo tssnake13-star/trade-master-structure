@@ -4,8 +4,8 @@ import { supabase } from '@/integrations/supabase/client';
 
 /**
  * Журнал решений для кабинета v2 (29.10.2026): те же записи, что в терминале, — решения Сергея «ДОПУСК / ОТКАЗ»
- * с причиной и итоги сделок. Только настоящие данные: подписчик читает market_feed, пробный — те же решения
- * с задержкой в 3 дня через RPC terminal_trial_verdicts (итогов у пробного нет). Без доступа к терминалу — пусто.
+ * с причиной и итоги сделок. Только настоящие данные из market_feed. 30.10.2026: проба открыта целиком, как подписка, —
+ * пробный читает то же, без задержки. Без доступа к терминалу — пусто.
  */
 export interface JVerdict {
   time: string;
@@ -24,8 +24,8 @@ export interface JOutcome {
   text?: string;
 }
 
-export function useJournal(opts: { userId?: string; open: boolean; trial: boolean; admin: boolean }) {
-  const { userId, open, trial, admin } = opts;
+export function useJournal(opts: { userId?: string; open: boolean }) {
+  const { userId, open } = opts;
   const [verdicts, setVerdicts] = useState<JVerdict[]>([]);
   const [outcomes, setOutcomes] = useState<JOutcome[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -33,23 +33,16 @@ export function useJournal(opts: { userId?: string; open: boolean; trial: boolea
     if (!userId || !open) { setLoaded(true); return; }
     let alive = true;
     const db = supabase as unknown as SupabaseClient;
-    const asTrial = trial && !admin;
     (async () => {
-      if (asTrial) {
-        const { data } = await db.rpc('terminal_trial_verdicts');
-        if (!alive) return;
-        setVerdicts(((data as { items?: JVerdict[] } | null)?.items || []).slice());
-      } else {
-        const { data } = await db.from('market_feed').select('key, data').in('key', ['verdicts', 'outcomes']);
-        if (!alive) return;
-        const rows = (data || []) as { key: string; data: { items?: unknown[] } | null }[];
-        setVerdicts((rows.find((r) => r.key === 'verdicts')?.data?.items || []) as JVerdict[]);
-        setOutcomes((rows.find((r) => r.key === 'outcomes')?.data?.items || []) as JOutcome[]);
-      }
+      const { data } = await db.from('market_feed').select('key, data').in('key', ['verdicts', 'outcomes']);
+      if (!alive) return;
+      const rows = (data || []) as { key: string; data: { items?: unknown[] } | null }[];
+      setVerdicts((rows.find((r) => r.key === 'verdicts')?.data?.items || []) as JVerdict[]);
+      setOutcomes((rows.find((r) => r.key === 'outcomes')?.data?.items || []) as JOutcome[]);
       setLoaded(true);
     })().catch(() => setLoaded(true));
     return () => { alive = false; };
-  }, [userId, open, trial, admin]);
+  }, [userId, open]);
   const byTime = (a: { time: string }, b: { time: string }) => new Date(b.time).getTime() - new Date(a.time).getTime();
   return { verdicts: [...verdicts].sort(byTime), outcomes: [...outcomes].sort(byTime), loaded };
 }

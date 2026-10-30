@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import type { FeedDocs, Verdict } from '@/components/terminal/Feeds';
+import type { FeedDocs } from '@/components/terminal/Feeds';
 import type { MarketRow } from '@/components/terminal/parts';
 import type { Scene } from '@/components/terminal/scene';
 import type { TimeItem } from '@/components/terminal/TimeMachine';
@@ -16,10 +16,9 @@ import { ADMIN_ONLY, LIVE_FEED, type Meta, type Section, type TerminalData, type
  * три картинки и общие ленты. Доступ — отдельная подписка со сроком (terminal_access). Закрывает её RLS в базе,
  * а не этот код: без действующей подписки запрос возвращает пусто.
  *
- * 07.10.2026, его слово: при регистрации человек сам получает пробный доступ на 7 дней (terminal_access.is_trial).
- * Замки тоже стоят в базе: пробному отдаются только открытые инструменты, итоги решений и журнал решений с задержкой
- * в 3 дня (функция terminal_trial_verdicts; 19.10.2026 его слово «задержку надо сделать в три дня»). Скринер,
- * ТОП-лист и тренд он видит закрытыми. Выдача через админку снимает is_trial — открыто всё.
+ * Пробный доступ (terminal_access.is_trial): 30.10.2026, его «да, делай» — открывается только личной ссылкой из школьного
+ * бота (/school/full, функция claim_web_trial) и отдаёт весь терминал, как подписка. Замки 07.10.2026 (3 инструмента,
+ * журнал с задержкой, скринер под замком) сняты в базе; от пробы на экране осталась подпись «пробный доступ до …».
  *
  * Обновление: раз в минуту смотрим только время расчёта (market_meta) — изменилось, перечитываем витрину целиком.
  * Пока открыт журнал решений, скринер или ТОП-лист, раз в 3 секунды смотрим время своей ленты (24.09.2026, его слово:
@@ -46,9 +45,7 @@ export function useTerminalLive({ user, isAdmin, section }: { user: { id: string
   const [videos, setVideos] = useState<JournalVideo[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
   const [until, setUntil] = useState<string | null>(null);
-  const [trial, setTrial] = useState(false);
-  const [lockedList, setLockedList] = useState<{ symbol: string; title: string | null }[]>([]);
-  const [hiddenVerdicts, setHiddenVerdicts] = useState<string[]>([]);
+  const [trialOpen, setTrialOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [boot, setBoot] = useState<BootSteps>({ access: false, market: false, feeds: false });
 
@@ -87,22 +84,10 @@ export function useTerminalLive({ user, isAdmin, section }: { user: { id: string
     setVideos(parseJournalVideos((videoRes.data as { value?: string } | null)?.value));
     const acc = accessRes.data as { expires_at?: string; is_trial?: boolean } | null;
     setUntil(acc?.expires_at || null);
-    const isTrial = !isAdmin && !!acc?.is_trial && !!acc.expires_at && new Date(acc.expires_at).getTime() > Date.now();
-    setTrial(isTrial);
+    setTrialOpen(!isAdmin && !!acc?.is_trial && !!acc.expires_at && new Date(acc.expires_at).getTime() > Date.now());
     setMeta((metaRes.data as Meta) || null);
-    const marketRows = (rowsRes.data || []) as MarketRow[];
-    setRows(marketRows);
-    const docs = readFeeds((feedRes.data || []) as { key: keyof FeedDocs; data: never; updated_at?: string }[]);
-    if (isTrial) {
-      // журнал решений пробному — только решения старше 3 дней; список закрытых инструментов — одни названия
-      const [vRes, cRes] = await Promise.all([db.rpc('terminal_trial_verdicts'), db.rpc('terminal_trial_catalog')]);
-      const v = vRes.data as { items?: Verdict[]; hidden?: (string | null)[] } | null;
-      docs.verdicts = { items: v?.items || [] };
-      setHiddenVerdicts((v?.hidden || []).filter((t): t is string => !!t));
-      const open = new Set(marketRows.map((r) => r.symbol));
-      setLockedList(((cRes.data || []) as { symbol: string; title: string | null }[]).filter((c) => !open.has(c.symbol)));
-    }
-    setFeeds(docs);
+    setRows((rowsRes.data || []) as MarketRow[]);
+    setFeeds(readFeeds((feedRes.data || []) as { key: keyof FeedDocs; data: never; updated_at?: string }[]));
     setLoading(false);
   }, [user, feedQuery, isAdmin]);
 
@@ -126,8 +111,7 @@ export function useTerminalLive({ user, isAdmin, section }: { user: { id: string
   // живые ленты открытой вкладки — раз в 3 секунды по времени ленты
   useEffect(() => {
     const key = section ? LIVE_FEED[section] : undefined;
-    // пробному живые ленты не отдаются вовсе (замки в базе) — опрашивать нечего
-    if (!user || !key || trial) return;
+    if (!user || !key) return;
     let alive = true;
     const tick = async () => {
       const { data } = await db.from('market_feed').select('updated_at').eq('key', key).maybeSingle();
@@ -146,11 +130,11 @@ export function useTerminalLive({ user, isAdmin, section }: { user: { id: string
       alive = false;
       window.clearInterval(t);
     };
-  }, [user, section, feedQuery, trial]);
+  }, [user, section, feedQuery]);
 
   const data: TerminalData = useMemo(
-    () => ({ rows, feeds, feedAt, videos, meta, until, trial, lockedList, hiddenVerdicts }),
-    [rows, feeds, feedAt, videos, meta, until, trial, lockedList, hiddenVerdicts],
+    () => ({ rows, feeds, feedAt, videos, meta, until, trial: false, trialOpen, lockedList: [], hiddenVerdicts: [] }),
+    [rows, feeds, feedAt, videos, meta, until, trialOpen],
   );
 
   // Картинки лежат в закрытом ящике: ссылка живёт час и только для вошедшего

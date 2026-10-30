@@ -365,7 +365,7 @@ export function DataDetail({ data, now, lastVerdict, scrAt, demo }: { data: Term
     ['Последнее решение', lastVerdict ? fmtAst(lastVerdict, true) : '—'],
     ['Журнал решений', data.feedAt.verdicts ? `обновлён ${fmtAst(data.feedAt.verdicts, true)}` : '—'],
     ['Итоги разбора', data.feedAt.outcomes ? `обновлены ${fmtAst(data.feedAt.outcomes, true)}` : '—'],
-    ...(data.until ? ([[data.trial ? 'Пробный доступ до' : 'Подписка до', fmtDate(data.until)]] as [string, ReactNode][]) : []),
+    ...(data.until ? ([[data.trial || data.trialOpen ? 'Пробный доступ до' : 'Подписка до', fmtDate(data.until)]] as [string, ReactNode][]) : []),
   ];
   return (
     <>
