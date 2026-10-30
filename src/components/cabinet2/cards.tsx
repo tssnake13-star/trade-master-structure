@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import { ArrowRight, Lock, MessageCircle, Ticket } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import type { DashboardTextKey } from '@/lib/dashboardTexts';
@@ -231,11 +232,18 @@ export function LockedEcosystemCard({ expired, i = 0 }: { expired: boolean; i?: 
       <p style={{ color: 'var(--soft)', margin: '14px 0 0', maxWidth: '58ch' }}>
         {expired
           ? 'Срок подписки закончился. Продлите её, и терминал с моими решениями снова откроется по кнопке с глазом.'
-          : 'Программа каждый день смотрит весь рынок, я говорю, какую сделку беру и почему. Вы отмечаете вход и нажимаете кнопку, дальше сделку ведёт Hunter_Bot.'}
+          : 'Программа каждый день смотрит весь рынок, я говорю, какую сделку беру и почему. Вы отмечаете вход и нажимаете кнопку, дальше сделку ведёт Hunter_Bot. Подключите Telegram, ответьте боту на 4 коротких вопроса, и если система вам подходит, откроются 7 дней терминала.'}
       </p>
-      <a className="cv2-btn cv2-btn-brass" style={{ marginTop: 16 }} href={DM} target="_blank" rel="noopener noreferrer">
-        <MessageCircle size={15} /> {expired ? 'Продлить подписку' : 'Подключить ECHO-GATE INSIDE'}
-      </a>
+      {/* 30.10.2026: без Telegram терминала нет, проба открывается через бота (/school/telegram) */}
+      {expired ? (
+        <a className="cv2-btn cv2-btn-brass" style={{ marginTop: 16 }} href={DM} target="_blank" rel="noopener noreferrer">
+          <MessageCircle size={15} /> Продлить подписку
+        </a>
+      ) : (
+        <Link className="cv2-btn cv2-btn-brass" style={{ marginTop: 16 }} to="/school/telegram">
+          <MessageCircle size={15} /> Подключить Telegram
+        </Link>
+      )}
     </article>
   );
 }

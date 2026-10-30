@@ -66,6 +66,25 @@ function detectSource(): string {
   }
 }
 
+/**
+ * Откуда человек пришёл в этой сессии браузера — для отметки при регистрации (30.10.2026, «не теряя лидов»): к странице
+ * регистрации он доходит уже внутри сайта, поэтому запоминается первый внешний источник сессии.
+ */
+const VISIT_SOURCE_KEY = 'tlt_visit_source';
+
+export function visitSource(): string {
+  if (!isBrowser) return 'direct';
+  try {
+    const saved = sessionStorage.getItem(VISIT_SOURCE_KEY);
+    if (saved) return saved;
+    const s = detectSource();
+    if (s !== 'internal') sessionStorage.setItem(VISIT_SOURCE_KEY, s);
+    return s === 'internal' ? 'direct' : s;
+  } catch {
+    return 'direct';
+  }
+}
+
 function device(): 'mobile' | 'desktop' {
   if (!isBrowser) return 'desktop';
   return window.innerWidth < 900 ? 'mobile' : 'desktop';
@@ -141,6 +160,7 @@ async function send(event_type: 'pageview' | 'scroll' | 'click' | 'alive', path:
  * (превью, открытие в новой вкладке) за живой визит не считаем.
  */
 export function trackPageview(path = isBrowser ? window.location.pathname : '/') {
+  visitSource();   // запомнить источник сессии до перехода на регистрацию
   void send('pageview', path);
   if (!isBrowser) return;
   window.setTimeout(() => {

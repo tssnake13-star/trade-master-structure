@@ -7,7 +7,8 @@ import logoFallback from '@/assets/logo-tradeliketyo.png';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 import '@/styles/cabinet-v2.css';
 import Room from '@/components/cabinet2/Room';
-import { fmtTrialDate, pendingWebTrial, webTrialUntil } from '@/lib/webTrial';
+import { clearLinkPending, fmtTrialDate, linkPending, markLinkPending, pendingWebTrial, webTrialUntil } from '@/lib/webTrial';
+import { visitSource } from '@/lib/analytics';
 
 function LogoBlock({ logo }: { logo: string }) {
   return (
@@ -41,7 +42,8 @@ export default function SchoolAuth() {
   const fullUntil = webTrialUntil(fullTrial);
 
   useEffect(() => {
-    if (session) navigate(pendingWebTrial() ? '/school/full' : '/school/dashboard', { replace: true });
+    // 30.10.2026: только что зарегистрировался — сначала «Подключите Telegram»
+    if (session) navigate(pendingWebTrial() ? '/school/full' : linkPending() ? '/school/telegram' : '/school/dashboard', { replace: true });
   }, [session, navigate]);
 
   const handleForgotPassword = async (e: React.FormEvent) => {
@@ -83,12 +85,17 @@ export default function SchoolAuth() {
           }
         }
 
+        // метка ставится до signUp: сессия может прийти сразу, и переход случится раньше следующей строки
+        markLinkPending();
         const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email,
           password,
-          options: { data: { full_name: fullName } },
+          options: { data: { full_name: fullName, source: visitSource() } },
         });
-        if (signUpError) throw signUpError;
+        if (signUpError) {
+          clearLinkPending();
+          throw signUpError;
+        }
 
         // Mark invite code as used if provided
         if (inviteCode.trim() && signUpData.user) {
@@ -165,14 +172,12 @@ export default function SchoolAuth() {
         )}
         {!isLogin && !fullTrial && (
           <div className="mb-6 text-sm leading-relaxed px-2" style={{ color: '#C6D0E0' }}>
-            {/* 19.10.2026, его «все 7 пунктов согласен»: проба терминала — только через бота после 4 вопросов */}
+            {/* 19.10.2026, его «все 7 пунктов согласен»: проба терминала — только через бота после 4 вопросов.
+                30.10.2026: следующий шаг регистрации — подключить Telegram (/school/telegram) */}
             <p className="text-center">Регистрация бесплатная. Сразу откроется вводный курс.</p>
             <p className="mt-2 text-center">
-              Терминал ECHO-GATE INSIDE на 7 дней открывает{' '}
-              <a href="https://tradeliketyo.com/trial" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">
-                бот в Telegram
-              </a>{' '}
-              после 4 коротких вопросов.
+              Следующим шагом вы подключите Telegram. После 4 коротких вопросов в боте откроются 7 дней терминала
+              ECHO-GATE INSIDE, как у подписчиков.
             </p>
           </div>
         )}

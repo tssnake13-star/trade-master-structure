@@ -1,4 +1,5 @@
 import { Lock } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import Boot, { type BootSteps } from '@/components/terminal/Boot';
 import Room from '@/components/cabinet2/Room';
 import { EYE_PATH } from '@/components/cabinet2/EyeButton';
@@ -55,8 +56,14 @@ export function NoAccess({ expired, onCabinet, onPrices }: { expired: boolean; o
             ECHO-GATE INSIDE открывается подпиской{first ? `, первый месяц стоит ${first.price}` : ''}. Стоимость всех
             сроков подписки есть на главной странице сайта, а подключиться можно, написав Сергею. Если подписка у вас
             есть, а экран пустой, тоже напишите: откроем.
+            {!expired ? ' А 7 дней можно посмотреть бесплатно: подключите Telegram и ответьте боту на 4 коротких вопроса.' : ''}
           </p>
           <div className="tv2-noaccess-btns">
+            {!expired ? (
+              <Link className="cv2-btn cv2-btn-brass" to="/school/telegram">
+                Подключить Telegram
+              </Link>
+            ) : null}
             <a className="cv2-btn cv2-btn-brass" href={TELEGRAM_LINKS.dm} target="_blank" rel="noopener noreferrer">
               Написать Сергею
             </a>

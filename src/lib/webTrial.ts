@@ -29,6 +29,33 @@ export function clearWebTrial() {
   }
 }
 
+/** 30.10.2026: только что зарегистрировался — следующий шаг «Подключите Telegram» (/school/telegram), и после подтверждения почты тоже */
+const LINK_KEY = 'tlt_link_tg';
+
+export function markLinkPending() {
+  try {
+    localStorage.setItem(LINK_KEY, '1');
+  } catch {
+    /* без хранилища кнопка есть в кабинете */
+  }
+}
+
+export function linkPending(): boolean {
+  try {
+    return localStorage.getItem(LINK_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+export function clearLinkPending() {
+  try {
+    localStorage.removeItem(LINK_KEY);
+  } catch {
+    /* нечего чистить */
+  }
+}
+
 /** конец пробы из ссылки — для подписи «до …» до входа (подпись проверяет база, здесь только дата) */
 export function webTrialUntil(t: string | null): Date | null {
   const exp = Number((t || '').split('.')[1]);

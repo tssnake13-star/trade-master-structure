@@ -16,7 +16,7 @@ import { useCountUp } from '@/hooks/useCountUp';
 import { countNew, newDecisionsText, newestMs, readSeen, writeSeen } from '@/lib/journalSeen';
 import Cabinet from '@/components/cabinet2/Cabinet';
 import { useJournal } from '@/components/cabinet2/journal';
-import { pendingWebTrial } from '@/lib/webTrial';
+import { linkPending, pendingWebTrial } from '@/lib/webTrial';
 
 // v3 structure background for the cabinet — full-screen, faint, centred.
 const CabinetBg = () => (
@@ -262,9 +262,11 @@ export default function SchoolDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useDashboardTexts();
-  // 30.10.2026: пришёл по ссылке из школьного бота и подтвердил почту — сначала открываем пробу терминала
+  // 30.10.2026: подтвердил почту и вернулся — сначала проба по ссылке из бота или шаг «Подключите Telegram»
   useEffect(() => {
-    if (session && pendingWebTrial()) navigate('/school/full', { replace: true });
+    if (!session) return;
+    if (pendingWebTrial()) navigate('/school/full', { replace: true });
+    else if (linkPending()) navigate('/school/telegram', { replace: true });
   }, [session, navigate]);
 
   const [courses, setCourses] = useState<Course[]>([]);

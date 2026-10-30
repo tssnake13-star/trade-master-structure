@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { TELEGRAM_LINKS } from '@/lib/constants';
-import { clearWebTrial, pendingWebTrial, saveWebTrial } from '@/lib/webTrial';
+import { clearLinkPending, clearWebTrial, pendingWebTrial, saveWebTrial } from '@/lib/webTrial';
 import '@/styles/cabinet-v2.css';
 import Room from '@/components/cabinet2/Room';
 
@@ -68,6 +68,7 @@ export default function SchoolFullTrial() {
         return;
       }
       clearWebTrial();
+      clearLinkPending();   // кнопка из бота уже связала аккаунт с Telegram
       if (data.ok) navigate('/school/terminal', { replace: true });
       else setFail(data.reason === 'expired' || data.reason === 'used' ? data.reason : 'bad');
     });
