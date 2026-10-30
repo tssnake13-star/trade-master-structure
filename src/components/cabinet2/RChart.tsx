@@ -16,7 +16,9 @@ function smooth(pts: [number, number][]) {
 
 export interface RPoint { label: string; value: number; note?: string }
 
-const DRAW_MS = 3000;
+const DRAW_MS = 3000;   // линия рисуется
+const FADE_MS = 700;    // гаснет
+const LOOP_MS = 7000;   // весь круг
 
 /**
  * Накопленный итог решений в R (кабинет v2, 29.10.2026, образец — ролик Kerfa): линия латунью прорисовывается,
@@ -54,32 +56,62 @@ export default function RChart({ points, height = 250, compact = false }: { poin
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [points, H, W]);
 
-  // Кабинет перерисовывается каждую секунду (обратный отсчёт эфира), поэтому анимация привязана к самим значениям, а не к массиву:
-  // иначе она начиналась заново каждую секунду и линия не успевала дойти до конца
+  // Кабинет перерисовывается каждую секунду (обратный отсчёт эфира), поэтому анимация привязана к самим значениям, а не к массиву
   const sig = points.map((p) => p.value).join(',');
+  const anims = useRef<Animation[]>([]);
 
-  // линия прорисовывается при каждой смене данных. 30.10.2026, Сергей: «она очень быстро появляется… сделать её плавнее».
-  // Было 1,3 с с резким стартом: почти вся линия вылетала за первые 0,3 с. Теперь 3 с равномерно с мягким началом и концом,
-  // заливка проявляется вместе с линией, точка загорается, когда линия до неё дошла
+  // 30.10.2026, Сергей: «она очень быстро появляется… плавнее», потом «она же зациклена была… должна повторяться. Просто плавнее».
+  // Круг: линия рисуется DRAW_MS равномерно с мягким началом и концом, заливка проявляется вместе с ней, точка загорается, когда
+  // линия до неё дошла; всё держится и мягко гаснет, потом сначала. Прежний повтор выходил случайно: линия перезапускалась
+  // каждую секунду вместе с отсчётом и за 0,3 с вылетала почти целиком.
   useLayoutEffect(() => {
     const el = lineRef.current, area = areaRef.current, dot = dotRef.current;
     if (!el || !area || !dot) return;
     const len = el.getTotalLength();
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    for (const n of [el, area, dot]) n.style.transition = 'none';
     el.style.strokeDasharray = `${len}`;
-    el.style.strokeDashoffset = reduce ? '0' : `${len}`;
-    area.style.opacity = reduce ? '1' : '0';
-    dot.style.opacity = reduce ? '1' : '0';
-    void el.getBoundingClientRect();
-    el.style.transition = `stroke-dashoffset ${DRAW_MS}ms cubic-bezier(.45,.05,.55,.95)`;
-    area.style.transition = `opacity ${DRAW_MS}ms ease-in`;
-    dot.style.transition = `opacity 350ms ease-out ${DRAW_MS - 150}ms`;
-    el.style.strokeDashoffset = '0';
-    area.style.opacity = '1';
-    dot.style.opacity = '1';
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const drawn = DRAW_MS / LOOP_MS, hold = (LOOP_MS - FADE_MS) / LOOP_MS;
+    const timing = { duration: LOOP_MS, iterations: Infinity };
+    anims.current = [
+      el.animate([
+        { strokeDashoffset: len, opacity: 1, offset: 0, easing: 'cubic-bezier(.45,.05,.55,.95)' },
+        { strokeDashoffset: 0, opacity: 1, offset: drawn },
+        { strokeDashoffset: 0, opacity: 1, offset: hold, easing: 'ease-in-out' },
+        { strokeDashoffset: 0, opacity: 0, offset: 1 },
+      ], timing),
+      area.animate([
+        { opacity: 0, offset: 0, easing: 'ease-in' },
+        { opacity: 1, offset: drawn },
+        { opacity: 1, offset: hold, easing: 'ease-in-out' },
+        { opacity: 0, offset: 1 },
+      ], timing),
+      dot.animate([
+        { opacity: 0, offset: 0 },
+        { opacity: 0, offset: (DRAW_MS - 150) / LOOP_MS },
+        { opacity: 1, offset: (DRAW_MS + 200) / LOOP_MS },
+        { opacity: 1, offset: hold, easing: 'ease-in-out' },
+        { opacity: 0, offset: 1 },
+      ], timing),
+    ];
+    return () => {
+      anims.current.forEach((x) => x.cancel());
+      anims.current = [];
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sig, W, H]);
+
+  // пока человек читает значение под курсором, линия стоит целиком и не гаснет
+  const hovering = hover != null;
+  useLayoutEffect(() => {
+    for (const x of anims.current) {
+      if (hovering) {
+        x.pause();
+        x.currentTime = DRAW_MS + 250;
+      } else {
+        x.play();
+      }
+    }
+  }, [hovering]);
 
   if (points.length < 2) return <div className="cv2-hint" style={{ padding: '30px 0' }}>Итогов пока мало для графика.</div>;
 
