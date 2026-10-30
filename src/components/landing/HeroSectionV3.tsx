@@ -130,9 +130,10 @@ export default function HeroSectionV3() {
           </p>
 
           <div className="ns-facts mt-10" style={{ opacity: 0, animation: 'v3hRise 1s cubic-bezier(0.16,1,0.3,1) 0.9s forwards' }}>
+            {/* 30.10.2026, Сергей: «где про ограничения сказано, убрать» — с 29.10 в пробе весь терминал */}
             <span>Дневник решений открыт всем навсегда</span>
-            <span>Проверка вашей сделки: 3 в день</span>
-            <span>7 дней программы бесплатно</span>
+            <span>Проверка вашей сделки в Telegram</span>
+            <span>7 дней весь терминал бесплатно</span>
           </div>
         </div>
       </div>

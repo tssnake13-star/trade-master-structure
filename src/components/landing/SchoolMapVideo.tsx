@@ -102,7 +102,7 @@ export default function SchoolMapVideo({ showCaption = true }: { showCaption?: b
           {state === 'ended' && (
             <div className="smv-end">
               <p className="smv-end-title">Начните с двери</p>
-              <p className="smv-end-sub">7 дней терминала бесплатно: журнал моих решений и проверка вашей сделки</p>
+              <p className="smv-end-sub">7 дней весь терминал бесплатно, как у подписчиков</p>
               <a
                 href={TELEGRAM_LINKS.trial}
                 target="_blank"

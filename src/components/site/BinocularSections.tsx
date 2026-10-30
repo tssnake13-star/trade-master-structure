@@ -102,20 +102,20 @@ export function FreeWeekSection() {
     <section id="free" className="section-animate py-14 md:py-20 ns-band">
       <div className="container-landing">
         <h2 className="text-foreground"><Words>Сначала посмотрите, как я решаю</Words></h2>
-        <p className="mt-4 text-base md:text-lg text-muted-foreground">7 дней бесплатно, всё открыто.</p>
+        {/* 30.10.2026, Сергей: с 29.10 в пробе весь терминал; «упомянуть одно ограничение — нет доступа к боту экосистемы» */}
+        <p className="mt-4 text-base md:text-lg text-muted-foreground">7 дней бесплатно, весь терминал, как у подписчиков: все инструменты, скринер и ТОП-лист.</p>
         <div className="mt-10 grid gap-3 md:grid-cols-3">
           <article className="ns-panel p-6 md:p-7">
             <h3 className="text-foreground">Дневник решений</h3>
             <p className="mt-3 text-base leading-relaxed text-muted-foreground">
-              Каждое моё решение записано до того, как цена пошла: беру или не беру, и почему. Убытки тоже. Открыт всем
-              навсегда, с задержкой в 3 дня. У подписчиков решения приходят сразу.
+              Каждое моё решение записано до того, как цена пошла: беру или не беру, и почему. Убытки тоже. В пробные
+              7 дней решения видны сразу, как у подписчиков. Дневник остаётся открытым и после пробы.
             </p>
           </article>
           <article className="ns-panel p-6 md:p-7" style={{ borderColor: 'hsl(var(--accent) / 0.4)' }}>
             <h3 className="text-foreground">Проверь свою сделку</h3>
             <p className="mt-3 text-base leading-relaxed text-muted-foreground">
               Выберите пару и «покупка» или «продажа». Система сразу скажет, можно входить или нельзя, и почему.
-              3 проверки в день.
             </p>
             <div className="mt-5 flex items-center justify-between gap-3 rounded-md px-4 py-3" style={{ border: '1px solid var(--ns-line-strong)', background: 'rgba(6,10,18,0.6)' }}>
               <span className="font-mono text-sm text-foreground" style={{ fontFamily: 'var(--font-mono)' }}>EURUSD · покупка</span>
@@ -135,7 +135,10 @@ export function FreeWeekSection() {
             className="cta-trial btn-primary px-7 py-4 text-base self-start">
             7 дней бесплатно
           </a>
-          <p className="ns-honest">Пробный доступ открывается в Telegram-боте после 4 коротких вопросов, если система вам подходит.</p>
+          <p className="ns-honest">
+            Пробный доступ открывается в Telegram-боте после 4 коротких вопросов, если система вам подходит. Одно отличие
+            от подписки: нет бота экосистемы, который присылает мои допуски в Telegram.
+          </p>
         </div>
       </div>
     </section>

@@ -29,7 +29,7 @@ const DualCTASection = () => {
             <p className="text-base md:text-lg text-foreground font-semibold mb-2">7 дней бесплатно</p>
             <p className="text-sm text-muted-foreground mb-6">
               Выберите пару и «покупка» или «продажа». Система сразу скажет, можно входить или нельзя, и почему.
-              3 проверки в день. Сначала 4 коротких вопроса в Telegram-боте.
+              Сначала 4 коротких вопроса в Telegram-боте, дальше 7 дней весь терминал, как у подписчиков.
             </p>
             <div className="flex-grow" />
             <a
