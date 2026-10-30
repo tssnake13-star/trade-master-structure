@@ -3,9 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
-import { clearLinkPending } from '@/lib/webTrial';
+import { clearLinkPending, linkPending } from '@/lib/webTrial';
 import '@/styles/cabinet-v2.css';
 import Room from '@/components/cabinet2/Room';
+import StepMark from '@/components/cabinet2/StepMark';
 
 /**
  * /school/telegram — шаг после регистрации (30.10.2026, его слова: «на сайте надо, чтобы они оставляли свой телеграм…
@@ -21,6 +22,8 @@ export default function SchoolTelegram() {
   const { session, user, loading } = useAuth();
   const [code, setCode] = useState<string | null>(null);
   const [linked, setLinked] = useState(false);
+  // «Шаг 2 из 2» только сразу после регистрации; кто пришёл из кабинета позже, шагов не проходит
+  const [afterSignup] = useState(() => linkPending());
 
   useEffect(() => {
     if (!loading && !session) navigate('/school', { replace: true });
@@ -73,6 +76,7 @@ export default function SchoolTelegram() {
           </>
         ) : (
           <>
+            {afterSignup && <StepMark step={2} total={2} label="Telegram" />}
             <h1 className="cv2-h1 mb-4">Подключите Telegram</h1>
             <p className="text-sm leading-relaxed" style={{ color: '#C6D0E0' }}>
               Telegram — наша главная связь: там я отвечаю на ваши вопросы, а почта остаётся запасной. Нажмите кнопку

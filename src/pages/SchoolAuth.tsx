@@ -7,6 +7,7 @@ import logoFallback from '@/assets/logo-tradeliketyo.png';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 import '@/styles/cabinet-v2.css';
 import Room from '@/components/cabinet2/Room';
+import StepMark from '@/components/cabinet2/StepMark';
 import { clearLinkPending, fmtTrialDate, linkPending, markLinkPending, pendingWebTrial, webTrialUntil } from '@/lib/webTrial';
 import { visitSource } from '@/lib/analytics';
 
@@ -159,6 +160,8 @@ export default function SchoolAuth() {
       <Room />
       <div className="w-full max-w-md cv2-glass cv2-in" style={{ padding: 28 }}>
         <LogoBlock logo={logo} />
+        {/* 30.10.2026: по ссылке из бота Telegram уже есть, второго шага нет */}
+        {!isLogin && !fullTrial && <StepMark step={1} total={2} label="аккаунт" />}
         {!isLogin && (
           <h1 className="cv2-h1 mb-6 text-center">Регистрация</h1>
         )}
@@ -176,8 +179,8 @@ export default function SchoolAuth() {
                 30.10.2026: следующий шаг регистрации — подключить Telegram (/school/telegram) */}
             <p className="text-center">Регистрация бесплатная. Сразу откроется вводный курс.</p>
             <p className="mt-2 text-center">
-              Следующим шагом вы подключите Telegram. После 4 коротких вопросов в боте откроются 7 дней терминала
-              ECHO-GATE INSIDE, как у подписчиков.
+              Шаг 2: вы подключите Telegram. После 4 коротких вопросов в боте откроются 7 дней терминала
+              <span className="whitespace-nowrap">ECHO-GATE INSIDE</span>, как у подписчиков.
             </p>
           </div>
         )}
