@@ -74,7 +74,7 @@ const CLICK_NAMES: Record<string, string> = {
   final_bot: 'Финальный блок → бот',
   package_trade_system: 'Тариф Trade System',
   // метки закреплены за продуктом, имена на витрине менялись:
-  // trade_os — тариф за $1599 (сейчас Trade OS Plus), trade_os_plus — за $2990 (сейчас VIP)
+  // trade_os — тариф за $1599 (сейчас Trade OS Plus), trade_os_plus — за $2987 (сейчас VIP)
   package_practicum: 'Тариф Практикум',
   package_trade_os: 'Тариф Trade OS Plus',
   package_trade_os_plus: 'Тариф VIP',

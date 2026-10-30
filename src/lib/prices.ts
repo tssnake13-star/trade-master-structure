@@ -22,7 +22,7 @@
  * 3 месяца считаются с первого дня (то же «ваши деньги не сгорают», что и мост в год).
  * Помесячной подписки по-прежнему нет: после первого месяца только 3, 6 или 12 месяцев.
  *
- * 30.10.2026, решение Сергея: первый месяц $199 → $196 (доплата до 3 месяцев $251), Trade System $349 → $347 (доплата до VIP $2643), практикум $499 → $497 (доплата до VIP $2493): сумма должна выглядеть рассчитанной, а не витриной.
+ * 30.10.2026, решение Сергея: первый месяц $199 → $196 (доплата до 3 месяцев $251), Trade System $349 → $347, практикум $499 → $497: сумма должна выглядеть рассчитанной, а не витриной. По этому же принципу (его «на своё усмотрение»): 6 месяцев $840 → $837, 12 месяцев $1490 → $1487, VIP $2990 → $2987, зачёркнутая $3499 у VIP убрана. Доплаты до VIP: из Trade System $2640, из практикума $2490, из 3 месяцев $2540; из 3 месяцев на год $1040.
  */
 export type EcoTier = {
   price: string;
@@ -38,13 +38,13 @@ export type EcoTier = {
 export const ECOSYSTEM: EcoTier[] = [
   { price: '$196', period: 'первый месяц', desc: 'Один раз на человека: ECHO-GATE INSIDE и те же роботы Hunter_Bot и Risk Sentinel на месяц.', saving: 'Продлите на 3 месяца в течение этого месяца: $196 засчитаются, доплата $251.', tgNote: 'Один раз на человека: тот же терминал, мой вердикт и те же роботы Hunter_Bot и Risk Sentinel.', featured: false },
   { price: '$447', period: '3 месяца', desc: 'ECHO-GATE INSIDE и роботы Hunter_Bot и Risk Sentinel в аренду на 3 месяца.', tgNote: '$149 в месяц.', featured: false },
-  { price: '$840', oldPrice: '$894', period: '6 месяцев', desc: 'ECHO-GATE INSIDE и роботы Hunter_Bot и Risk Sentinel в аренду на полгода.', saving: '$140 в месяц вместо $149, экономия $54.', featured: false },
-  { price: '$1490', oldPrice: '$1788', period: '12 месяцев', desc: 'ECHO-GATE INSIDE и роботы Hunter_Bot и Risk Sentinel в аренду на год.', saving: 'Около $124 в месяц вместо $149, экономия $298.', featured: true },
+  { price: '$837', oldPrice: '$894', period: '6 месяцев', desc: 'ECHO-GATE INSIDE и роботы Hunter_Bot и Risk Sentinel в аренду на полгода.', saving: 'Около $140 в месяц вместо $149, экономия $57.', featured: false },
+  { price: '$1487', oldPrice: '$1788', period: '12 месяцев', desc: 'ECHO-GATE INSIDE и роботы Hunter_Bot и Risk Sentinel в аренду на год.', saving: 'Около $124 в месяц вместо $149, экономия $301.', featured: true },
 ];
 
 /** Обучение. VIP на главной без цены, на /access и в терминале школьного бота с ценой. */
 export const STUDY_PRICES = {
   tradeSystem: { price: '$347', period: '365 дней' },
   practicum: { price: '$497', period: '60 дней' },
-  vip: { price: '$2990', oldPrice: '$3499', period: '365 дней + инструменты' },
+  vip: { price: '$2987', period: '365 дней + инструменты' },
 } as const;

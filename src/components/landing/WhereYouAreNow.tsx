@@ -19,7 +19,7 @@ const ROWS: Row[] = [
   { state: 'Хочу разобрать систему сам, в своём темпе', name: 'Trade System', price: '$347', alwaysPrice: true },
   { state: 'Систему знаю, а на живом графике применить не выходит', name: 'Практикум', price: '$497', alwaysPrice: true },
   { state: 'Торгую давно и хочу собрать торговлю в систему', name: 'Trade OS Plus', price: '$1599' },
-  { state: 'Нужна вся инфраструктура, вместе с инструментами', name: 'VIP', price: '$2990' },
+  { state: 'Нужна вся инфраструктура, вместе с инструментами', name: 'VIP', price: '$2987' },
 ];
 
 export default function WhereYouAreNow({ showPrices }: { showPrices: boolean }) {

@@ -26,7 +26,7 @@ type Row = { name: string; note: string; price?: string; publicPrice?: boolean }
 const PATH_TRADE: Row[] = [
   { name: 'ECHO-GATE INSIDE', note: 'Терминал, мой вердикт и советники' },
   { name: 'От вас 2 действия', note: 'Точка входа и кнопка СТАРТ' },
-  { name: 'Подписка', note: 'первый месяц, потом 3, 6 или 12 месяцев', price: '$196 · $447 · $840 · $1490' },
+  { name: 'Подписка', note: 'первый месяц, потом 3, 6 или 12 месяцев', price: '$196 · $447 · $837 · $1487' },
 ];
 
 const PATH_LEARN: Row[] = [
@@ -197,7 +197,7 @@ export default function TwoPathsScheme({
         <h3 className="mt-2 text-foreground" style={{ fontSize: 30, lineHeight: 1.05 }}>VIP</h3>
         <p className="mt-1.5 text-sm text-muted-foreground">Пять этапов обучения, терминал на год и инструменты навсегда</p>
         {showPrices && (
-          <div className="mt-3" style={{ ...SERIF, fontSize: 30, lineHeight: 1, color: 'hsl(var(--foreground))' }}>$2990</div>
+          <div className="mt-3" style={{ ...SERIF, fontSize: 30, lineHeight: 1, color: 'hsl(var(--foreground))' }}>$2987</div>
         )}
       </div>
     </div>

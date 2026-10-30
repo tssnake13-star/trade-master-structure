@@ -59,7 +59,7 @@ const LEVELS: { name: string; price?: string; alwaysPrice?: boolean; text: strin
   },
   {
     name: 'VIP',
-    price: '$2990',
+    price: '$2987',
     text: 'Все пять этапов до конца и выход на реальный рынок.',
   },
   {
