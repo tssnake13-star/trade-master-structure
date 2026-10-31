@@ -49,7 +49,7 @@ export function PainsSection() {
 const STEPS = [
   { who: 'программа', text: 'Каждый день проверяет все валютные пары и оставляет те, где рынок идёт в одну сторону и по-крупному, и по-мелкому.' },
   { who: 'я', text: 'Из этих пар я выбираю сделки и про каждую говорю «беру» или «не беру», и почему.' },
-  { who: 'вы', text: 'Вы отмечаете место, где войти, и нажимаете кнопку. Больше от вас ничего не нужно.', you: true },
+  { who: 'вы', text: 'Вы определяете зону и точку входа и нажимаете кнопку. Это самый важный шаг, и он остаётся за вами.', you: true },
   { who: 'Hunter_Bot и Risk Sentinel', text: 'Hunter_Bot, робот-исполнитель, сам входит, ставит защиту и переводит сделку в ноль. Risk Sentinel, страж счёта, останавливает торговлю, если неделя пошла плохо.' },
 ];
 
@@ -58,7 +58,7 @@ export function StepsSection() {
     <section id="how" className="section-animate py-14 md:py-20">
       <div className="container-landing">
         <h2 className="text-foreground"><Words>Как это работает</Words></h2>
-        <p className="mt-4 text-base md:text-lg text-muted-foreground">Четыре шага. Три из них делаете не вы.</p>
+        <p className="mt-4 text-base md:text-lg text-muted-foreground">Четыре шага. Три делают программа, я и робот, а ключевой делаете вы.</p>
         <div className="mt-10 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {STEPS.map((s, i) => (
             <div

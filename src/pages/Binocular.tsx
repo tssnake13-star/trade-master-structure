@@ -29,7 +29,9 @@ export default function Binocular() {
       sections={['top', 'week', 'roles', 'questions', 'robot', 'free', 'difference', 'prices', 'fit', 'faq', 'next']}
     >
       <PageHero
-        title="Я смотрю весь рынок за вас."
+        // 31.10.2026, его подход: «участие человека сводится к минимуму, но этот минимум и есть максимум»
+        title={<>Программа смотрит весь рынок, я говорю, что беру. <span className="block">Где войти, решаете вы.</span></>}
+        longTitle
         lede="И про каждую сделку говорю, беру я её или нет, и почему. Это подписка ECHO-GATE INSIDE: вы нажимаете кнопку, дальше сделку ведёт робот."
         actions={
           <>
