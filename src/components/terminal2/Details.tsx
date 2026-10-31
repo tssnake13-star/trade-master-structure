@@ -42,7 +42,7 @@ export function WeekDetail({ verdicts, now, trial, hidden, onOpenSymbol, onJourn
     <>
       <Head
         title="Решения недели"
-        sub={<>мои допуски и отказы · по Астане{trial ? ' · в пробном доступе с задержкой 3 дня' : ''}</>}
+        sub={<>мои допуски и отказы · форекс · по Астане{trial ? ' · в пробном доступе с задержкой 3 дня' : ''}</>}
         right={
           <DropGroup<Per>
             variant="sm"
@@ -126,7 +126,7 @@ export function RDetail({ points, now }: { points: RPoint[]; now: number }) {
     <>
       <Head
         title="Итог решений в R"
-        sub={<>сделки по моим решениям, итог из субботнего разбора недели{from ? ` · с ${fmtAst(from, true).slice(0, 10)}` : ''}</>}
+        sub={<>форекс · сделки по моим решениям, итог из субботнего разбора недели{from ? ` · с ${fmtAst(from, true).slice(0, 10)}` : ''}</>}
         right={
           <DropGroup<RPer>
             variant="sm"

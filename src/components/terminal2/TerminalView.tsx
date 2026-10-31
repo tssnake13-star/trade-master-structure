@@ -9,7 +9,7 @@ import { ScreenerCards } from '@/components/terminal/Screener';
 import { TimeMachine, type TimeItem } from '@/components/terminal/TimeMachine';
 import { HistoryView } from '@/components/terminal/History';
 import type { Layer } from '@/components/terminal/scene';
-import { DISCLAIMER } from '@/components/terminal/theme';
+import { DISCLAIMER, marketOfSym } from '@/components/terminal/theme';
 import Header from './Header';
 import InstrumentStrip from './Instruments';
 import { InstrumentMain, InstrumentRight, useInstrumentMedia, type ChartView } from './InstrumentView';
@@ -176,7 +176,8 @@ export default function TerminalView({ data, source, isAdmin, seenKey, scan = fa
     if (seen.current) {
       const neu = verdicts.filter((v) => !seen.current?.has(verdictKey(v))).sort((a, b) => b.time.localeCompare(a.time));
       if (neu.length) {
-        setFreshTick((n) => n + 1);
+        // 31.10.2026: в приборах только форекс — на решение по крипте прибор не вспыхивает
+        if (neu.some((v) => marketOfSym(v.instrument) === 'fx')) setFreshTick((n) => n + 1);
         setFresh(neu[0]);
       }
     }

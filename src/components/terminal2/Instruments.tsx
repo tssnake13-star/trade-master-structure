@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Lock, Maximize2, X } from 'lucide-react';
 import type { Verdict } from '@/components/terminal/Feeds';
+import { marketOfSym } from '@/components/terminal/theme';
 import { DayBars, DirStrip, Spark } from './Charts';
 import { dirCells, fmtAst, fmtR, freshness, hhmmAst, msOf, plural as word, rSeries, rStats, scrStats, weekOf } from './derive';
 import { DataDetail, DirDetail, RDetail, ScrDetail, WeekDetail } from './Details';
@@ -31,8 +32,10 @@ export interface StripProps {
 
 const reduceMotion = () => typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-export default function InstrumentStrip({ data, verdicts, now, demo, freshTick, onOpenSymbol, onSection, aside }: StripProps) {
+export default function InstrumentStrip({ data, verdicts: allVerdicts, now, demo, freshTick, onOpenSymbol, onSection, aside }: StripProps) {
   const { rows, feeds, meta, trial, hiddenVerdicts } = data;
+  // 31.10.2026, его слово: «решение по крипте всю убрать надо из этих карточек. Оставить только Форекс»; крипта остаётся в журнале, на своей вкладке
+  const verdicts = useMemo(() => allVerdicts.filter((v) => marketOfSym(v.instrument) === 'fx'), [allVerdicts]);
   const week = useMemo(() => weekOf(verdicts, now), [verdicts, now]);
   const points = useMemo(() => rSeries(verdicts, feeds.outcomes?.items), [verdicts, feeds.outcomes]);
   const rs = useMemo(() => rStats(points), [points]);
