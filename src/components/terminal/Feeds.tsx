@@ -250,7 +250,7 @@ function MonthTotals() {
   const U = 9;
   return (
     <div style={{ ...card, padding: 12, marginBottom: 12 }}>
-      <div style={{ ...label, marginBottom: 8 }}>Мой счёт: итог последних трёх месяцев</div>
+      <div style={{ ...label, marginBottom: 8 }}>Моя таблица: итог последних трёх месяцев</div>
       <div style={{ fontSize: 13, lineHeight: 1.55, color: FG, marginBottom: 12, padding: '8px 10px', borderLeft: `3px solid ${ACCENT}`, background: `${ACCENT}10`, borderRadius: 6 }}>
         Прибыльных сделок у меня около 1 из 4. Зато прибыльная в среднем в 9,5 раза больше убыточной, поэтому месяц закрывается в плюсе.
       </div>
@@ -649,7 +649,7 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
     <div>
       <MarketSwitch value={mk} onChange={setMk} counts={counts} locked={cryptoLocked ? 'crypto' : undefined} />
       <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
-        Мои допуски и отказы{oldest ? `, с ${fmtWhen(oldest).slice(0, 10)}` : ''}. До 09.09.2026 — из моей таблицы решений, с 09.09 — то, что получили подписчики в боте. Свежие сверху, хранятся последние 180 дней. Время — по вашему часовому поясу. Под каждым решением — что было дальше: итог из еженедельного разбора и куда пошла цена после сигнала.
+        Мои допуски и отказы{oldest ? `, с ${fmtWhen(oldest).slice(0, 10)}` : ''}. До 09.09.2026 — из моей таблицы решений, с 09.09 — то, что получили подписчики в боте. Свежие сверху. Время — по вашему часовому поясу. Под каждым решением — что было дальше: итог из еженедельного разбора и куда пошла цена после сигнала.
       </div>
       <MonthTotals />
       <div ref={calRef} style={{ scrollMarginTop: 12 }}>

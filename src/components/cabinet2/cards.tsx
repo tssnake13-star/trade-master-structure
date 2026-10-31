@@ -117,7 +117,7 @@ export function RCard({ outcomes, onDim, i = 0 }: { outcomes: JOutcome[]; onDim:
       <article ref={card} className="cv2-card cv2-glass s7 cv2-in" style={{ ...inStyle(i), cursor: 'pointer' }} tabIndex={0} role="button"
         aria-label="Открыть итоги решений" onClick={openPanel} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPanel(); } }}>
         <div className="cv2-card-head">
-          <div><h3>Итоги решений в R</h3><div className="cv2-sub">Форекс. Каждое решение записано до движения цены</div></div>
+          <div><h3>Итоги решений в R</h3><div className="cv2-sub">Форекс. С 09.09.2026 время решению ставит бот</div></div>
           <div onClick={(e) => e.stopPropagation()}>
             <DropGroup<Period> label="Период" variant="sm brass" value={period} onChange={setPeriod}
               items={[{ key: '30', label: '30 дней' }, { key: '90', label: '90 дней' }, { key: 'all', label: 'Всё' }]} />
@@ -214,7 +214,7 @@ export function VerdictsCard({ items, trial, seenMs, onOpenJournal, i = 0 }: {
       <div className="cv2-card-head" style={{ flexWrap: 'wrap' }}>
         <div>
           <h3>Мои решения</h3>
-          <div className="cv2-sub">{trial ? 'Пробный доступ: решения сразу, как у подписчиков' : 'Допуски и отказы с причиной, записаны до движения цены'}</div>
+          <div className="cv2-sub">{trial ? 'Пробный доступ: решения сразу, как у подписчиков' : 'Допуски и отказы с причиной. С 09.09.2026 время решению ставит бот'}</div>
         </div>
         <DropGroup<VF> label="Фильтр решений" variant="sm" value={f} onChange={setF}
           items={[{ key: 'all', label: 'Все' }, { key: 'ok', label: 'Допуск' }, { key: 'no', label: 'Отказ' }]} />
