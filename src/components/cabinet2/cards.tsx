@@ -9,6 +9,7 @@ import RChart, { type RPoint } from './RChart';
 import Expand from './Expand';
 import Countdown from './Countdown';
 import { fmtR, sideRu, tradesOfResult, whenAstana, type JOutcome, type JVerdict } from './journal';
+import { marketOfSym } from '@/components/terminal/theme';
 
 export type TFn = (key: DashboardTextKey, vars?: Record<string, string | number>) => string;
 const DM = 'https://t.me/tradeliketyo';
@@ -86,7 +87,8 @@ type Period = '30' | '90' | 'all';
 function seriesOf(outcomes: JOutcome[], period: Period) {
   const cut = period === 'all' ? 0 : Date.now() - Number(period) * 86400000;
   // по времени от старых к новым — не полагаемся на порядок, в котором пришли данные
-  const rows = [...outcomes].sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime()).filter((o) => new Date(o.time).getTime() >= cut)
+  // 31.10.2026, его слово: «решение по крипте всю убрать надо из этих карточек. Оставить только Форекс»; крипта остаётся в журнале, на своей вкладке
+  const rows = [...outcomes].filter((o) => marketOfSym(o.instrument) === 'fx').sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime()).filter((o) => new Date(o.time).getTime() >= cut)
     .map((o) => ({ o, trades: tradesOfResult(o.result) })).filter((x) => x.trades.length);
   let sum = 0;
   const pts: RPoint[] = [{ label: '', value: 0 }];
@@ -115,7 +117,7 @@ export function RCard({ outcomes, onDim, i = 0 }: { outcomes: JOutcome[]; onDim:
       <article ref={card} className="cv2-card cv2-glass s7 cv2-in" style={{ ...inStyle(i), cursor: 'pointer' }} tabIndex={0} role="button"
         aria-label="Открыть итоги решений" onClick={openPanel} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPanel(); } }}>
         <div className="cv2-card-head">
-          <div><h3>Итоги решений в R</h3><div className="cv2-sub">Каждое решение записано до движения цены</div></div>
+          <div><h3>Итоги решений в R</h3><div className="cv2-sub">Форекс. Каждое решение записано до движения цены</div></div>
           <div onClick={(e) => e.stopPropagation()}>
             <DropGroup<Period> label="Период" variant="sm brass" value={period} onChange={setPeriod}
               items={[{ key: '30', label: '30 дней' }, { key: '90', label: '90 дней' }, { key: 'all', label: 'Всё' }]} />
@@ -133,7 +135,7 @@ export function RCard({ outcomes, onDim, i = 0 }: { outcomes: JOutcome[]; onDim:
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.4fr) minmax(0, 1fr)', gap: 24 }} className="cv2-panel-grid">
             <div>
               <h3 style={{ margin: 0, fontSize: 18 }}>Итоги решений в R</h3>
-              <div className="cv2-sub">{period === 'all' ? 'за всё время журнала' : `за ${period} дней`} · по Астане</div>
+              <div className="cv2-sub">форекс · {period === 'all' ? 'за всё время журнала' : `за ${period} дней`} · по Астане</div>
               <div className="cv2-big num" style={{ marginTop: 14 }}>{fmtR(s.sum)}</div>
               <RChart points={s.pts} height={300} />
             </div>
