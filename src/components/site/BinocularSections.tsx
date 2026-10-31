@@ -100,6 +100,86 @@ export function RobotGuardSection() {
   );
 }
 
+// 31.10.2026, тексты дословно из «РАЗБОР ВОРОНКИ 31.10\ШАГ 3 — ключевой шаг.md», факты со слов Сергея
+const YOUR_STEPS = [
+  { t: 'Приходит допуск и мой вердикт.', d: 'Вы садитесь за график. Сколько будет допусков, решает рынок, а не я. За 4 недели в октябре 2026 их было 25, в среднем 6 в неделю. Для свинг-трейдинга это нормально.' },
+  { t: 'Вы определяете зону.', d: 'У среднего новичка на 1 инструмент уходит от 3 до 5 минут, дальше зависит от опыта. Как определять зону, показано в уроке «Точка входа». Уроки показывают, что делать. Почему именно так, объясняет обучение.' },
+  { t: 'Вы нажимаете СТАРТ на панели Hunter_Bot.', d: 'Когда цена дойдёт до зоны, Hunter_Bot начнёт открывать ордера. Цена уже в зоне, тогда сразу нажимаете work-BUY или work-SELL.' },
+];
+const STEP_COLS = ['Что произошло', 'Как это называется', 'Что дальше'];
+const STEP_OUTCOMES = [
+  ['Цена дошла до зоны, которую вы отметили', 'Вход', 'Сделку ведёт Hunter_Bot'],
+  ['Цена не дошла до зоны и ушла примерно на 3 к 1', 'Отмена, рынок не дал', 'Ждёте следующий допуск'],
+  ['Вы не успели: цена коснулась зоны без вас и ушла на 2–3 к 1', 'Пропуск', 'Эту сделку уже не вернуть, ждёте следующий допуск'],
+];
+
+export function YourStepSection() {
+  return (
+    <section id="step" className="section-animate pb-14 md:pb-20">
+      <div className="container-landing">
+        <div className="max-w-3xl">
+          <h2 className="text-foreground"><Words>Ваш шаг в сделке</Words></h2>
+          <p className="mt-4 text-base md:text-lg text-muted-foreground">
+            Программа находит сделку, я даю вердикт. Зона и точка входа на вас, и без этого шага сделки нет.
+          </p>
+        </div>
+        <div className="mt-10 grid gap-3 md:grid-cols-3">
+          {YOUR_STEPS.map((s, i) => (
+            <article key={s.t} className="ns-panel p-6 md:p-7">
+              <span className="ns-step-n">{i + 1}</span>
+              <h3 className="mt-2 text-foreground !text-[20px]">{s.t}</h3>
+              <p className="mt-3 text-base leading-relaxed text-muted-foreground">{s.d}</p>
+            </article>
+          ))}
+        </div>
+
+        <h3 className="mt-12 text-foreground">Сколько действует допуск</h3>
+        <p className="mt-3 text-base md:text-lg text-muted-foreground">Дат и часов у допуска нет, срок ему задаёт цена.</p>
+        {/* на телефоне строки таблицы идут карточками с подписями: три колонки на 390 px не помещаются */}
+        <table className="mt-6 block md:table w-full text-left border-collapse">
+          <thead className="hidden md:table-header-group">
+            <tr>
+              {STEP_COLS.map((c) => (
+                <th key={c} scope="col" className="ns-cap font-normal px-5 pb-3">{c}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody className="block md:table-row-group">
+            {STEP_OUTCOMES.map((row) => (
+              <tr key={row[1]} className="ns-panel block md:table-row mt-3 first:mt-0 md:mt-0 p-5 md:p-0">
+                {row.map((cell, i) => (
+                  <td key={STEP_COLS[i]} className={`block md:table-cell mt-3 first:mt-0 md:mt-0 md:px-5 md:py-4 md:align-top text-base ${i === 1 ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
+                    <span className="md:hidden block ns-cap mb-1">{STEP_COLS[i]}</span>
+                    {cell}
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p className="mt-6 text-base md:text-lg text-foreground/90" style={{ maxWidth: '78ch' }}>
+          Выбило по стопу, и пришёл второй триггер: зону определяете заново и входите снова. На одну ситуацию не больше 2 входов.
+        </p>
+
+        <div className="mt-10 grid gap-3 md:grid-cols-2">
+          <article className="ns-panel p-6 md:p-7">
+            <h3 className="text-foreground !text-[20px]">С чего работать</h3>
+            <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+              Первая настройка роботов идёт с компьютера. Следить за сделкой можно и с телефона, но это неудобно: нужен хотя бы планшет.
+            </p>
+          </article>
+          <article className="ns-panel p-6 md:p-7">
+            <h3 className="text-foreground !text-[20px]">Если возник вопрос</h3>
+            <p className="mt-3 text-base leading-relaxed text-muted-foreground">
+              Каждую неделю идёт прямой эфир: разбор рынка и ответы на вопросы. Есть конкретный вопрос по точке входа или по вашей сделке, разберём его там. Мои входы записаны в журнале, по ним можно сверяться.
+            </p>
+          </article>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function FreeWeekSection() {
   return (
     <section id="free" className="section-animate py-14 md:py-20 ns-band">
@@ -250,4 +330,8 @@ export const BINOCULAR_FAQ = [
   { q: 'Это копирование сделок или управление моим счётом?', a: 'Нет. Деньги в управление я не принимаю, доступа к вашему счёту у меня нет. Я публикую решения, а место входа и кнопку выбираете вы. Дальше сделку ведёт робот Hunter_Bot на вашем счёте.' },
   { q: 'Можно начать с одного месяца?', a: 'Да. Первый месяц стоит $196, один раз на человека. Если в течение этого месяца продлите на 3 месяца, $196 засчитаются: доплата $251, а 3 месяца считаются с первого дня.' },
   { q: 'Нужно ли разбираться в программировании?', a: 'Нет. Роботы ставятся по пошаговой инструкции, а если застрянете, напишите мне. Достаточно базовых навыков работы с компьютером.' },
+  { q: 'Сколько времени занимает мой шаг?', a: 'У среднего новичка от 3 до 5 минут на 1 инструмент, дальше зависит от опыта. В этот момент вы за графиком.' },
+  { q: 'Что будет, если я не успел отметить зону?', a: 'Если цена коснулась зоны без вас и ушла на 2–3 к 1, это пропуск. Эту сделку уже не вернуть, ждёте следующий допуск.' },
+  { q: 'Сколько допусков в неделю?', a: 'Сколько даст рынок. За 4 недели в октябре 2026 их было 25, в среднем 6 в неделю. Для свинг-трейдинга это нормально.' },
+  { q: 'Можно работать только с телефона?', a: 'Нет. Первая настройка роботов идёт с компьютера. Следить за сделкой с телефона можно, но неудобно: нужен хотя бы планшет.' },
 ];

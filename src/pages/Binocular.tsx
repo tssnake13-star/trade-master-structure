@@ -9,7 +9,7 @@ import ComparisonSection from '@/components/landing/ComparisonSection';
 import FAQSection from '@/components/landing/FAQSection';
 import WordmarkKinetic from '@/components/preview-next/WordmarkKinetic';
 import {
-  RolesSection, RobotGuardSection, FreeWeekSection, SubscriptionPricesSection, StartAndFitSection, BINOCULAR_FAQ,
+  RolesSection, RobotGuardSection, YourStepSection, FreeWeekSection, SubscriptionPricesSection, StartAndFitSection, BINOCULAR_FAQ,
 } from '@/components/site/BinocularSections';
 import TerminalLive from '@/components/site/TerminalLive';
 
@@ -23,7 +23,7 @@ export default function Binocular() {
       path="/binocular"
       title="Бинокль — торговать по системе Сергея Тё, не изучая её · TRADE LIKE TYO"
       description="Подписка ECHO-GATE INSIDE: программа смотрит весь рынок, Сергей даёт вердикт по каждой сделке, робот ведёт сделку, страж счёта держит лимиты. 7 дней бесплатно, первый месяц $196."
-      sections={['top', 'week', 'roles', 'questions', 'robot', 'free', 'difference', 'prices', 'fit', 'faq', 'next']}
+      sections={['top', 'week', 'roles', 'questions', 'robot', 'step', 'free', 'difference', 'prices', 'fit', 'faq', 'next']}
     >
       <PageHero
         // 31.10.2026, его подход: «участие человека сводится к минимуму, но этот минимум и есть максимум»
@@ -58,6 +58,7 @@ export default function Binocular() {
       <RolesSection />
       <FourQuestionsSection />
       <RobotGuardSection />
+      <YourStepSection />
       <FreeWeekSection />
       <WordmarkKinetic text="Допуск, " emphasis="не сигнал" />
       <ComparisonSection />
