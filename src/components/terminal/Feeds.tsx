@@ -64,6 +64,9 @@ export interface Verdict {
   // 19.10.2026: решения до кнопок в боте (до 09.09.2026) — из его таблицы решений; no_time — записан только день
   archive?: boolean;
   no_time?: boolean;
+  // 31.10.2026: запись автомата по крипте (/crypto auto) — решение системы, сделки нет; price — куда пошла цена
+  auto?: boolean;
+  price?: Outcome['price'];
 }
 
 type Open = (symbol: string) => void;
@@ -779,7 +782,12 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
                 // 18.10.2026, его «давай все четыре»: отказ, после которого цена ушла против сигнала, — отсечённая сделка
                 <div style={{ marginTop: 10, color: UP, fontSize: 13, fontWeight: 700 }}>🛡 Отказ сберёг: цена ушла против сигнала</div>
               ) : null}
-              <OutcomeBlock o={outOf.get(outKey(v.time, v.instrument, v.side))} />
+              <OutcomeBlock
+                o={
+                  outOf.get(outKey(v.time, v.instrument, v.side)) ||
+                  (v.auto ? { time: v.time, instrument: v.instrument, side: v.side, result: 'АВТОМАТ', text: 'записал бот по итогу системы, сделки не было', price: v.price } : undefined)
+                }
+              />
             </div>
             </Fragment>
           );
