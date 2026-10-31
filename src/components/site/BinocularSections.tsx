@@ -63,7 +63,7 @@ export function RobotGuardSection() {
         <div className="max-w-3xl">
           <h2 className="text-foreground"><Words>Hunter_Bot и Risk Sentinel</Words></h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            После кнопки сделку ведёт Hunter_Bot, руками её не трогаете..
+            После кнопки сделку ведёт Hunter_Bot, руками её не трогаете.
           </p>
         </div>
         <div className="mt-10 grid gap-3 md:grid-cols-2">
