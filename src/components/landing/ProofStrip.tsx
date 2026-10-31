@@ -16,7 +16,7 @@ const MONO: React.CSSProperties = { fontSize: 10, letterSpacing: '0.18em', textT
 const SERIF: React.CSSProperties = { fontFamily: "'Cormorant', serif", fontWeight: 500 };
 
 const NUMBERS: { value: string; label: string }[] = [
-  { value: '21', label: 'месяц в таблице' },
+  { value: '22', label: 'месяца в таблице' },
   { value: '397', label: 'сделок' },
   { value: '6,2%', label: 'в месяц в среднем' },
   // 30.10.2026, Сергей: 2,23% считалась от баланса с накопленной прибылью, лот при этом не рос. Теперь от депозита.
@@ -40,7 +40,7 @@ export default function ProofStrip() {
       <div className="mt-6 pt-5 grid md:grid-cols-2 gap-x-10 gap-y-3" style={{ borderTop: '1px solid hsl(var(--rule-soft))' }}>
         <p className="text-sm text-muted-foreground leading-relaxed">
           6,2% в месяц — это среднее за 22 месяца, а не помесячная норма:
-          <b className="text-foreground/85"> 3 месяца из 22 закрылись в минус</b>, лучший дал 26,2%.
+          <b className="text-foreground/85"> 3 месяца из 22 закрылись в минус</b>, лучший дал 26,5%.
           Риск 0,25% на сделку, профит-фактор 2,87.
         </p>
         <p className="text-sm text-muted-foreground leading-relaxed">
@@ -53,7 +53,7 @@ export default function ProofStrip() {
         Это моя таблица сделок за январь 2025 — октябрь 2026, депозит $50 000, без компаундинга. Не тест на истории.
         Максимальная просадка по закрытиям месяцев: $2 000 в апреле 2026. Это 4% от депозита и 2,23% от баланса на тот
         момент, раньше я показывал только вторую цифру. Худший месяц: 16 сделок, 16 стопов. Внутри месяца просадка могла
-        быть глубже. Выгрузки счетов я потерял, таблицу восстановил сам.
+        быть глубже.
         С 20.07.2026 решения можно проверить в журнале.{' '}
         <b className="text-foreground/80">Прошлый результат не гарантирует будущий — ни мой, ни ваш.</b>
       </p>

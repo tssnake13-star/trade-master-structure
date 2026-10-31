@@ -546,7 +546,7 @@ export function TimeMachine({ doc, symbols, onOpen }: { doc?: { items?: TimeItem
     <div>
       <MarketSwitch value={mk} onChange={pick} counts={counts} />
       <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>
-        Выберите решение, и вы увидите рынок таким, каким он был в момент решения. Решение записано в тот же день, задним числом его не поменять.
+        Выберите решение, и вы увидите рынок таким, каким он был в момент решения. С 09.09.2026 время записи ставит бот в момент решения.
       </div>
       <JournalCalendar
         items={items}

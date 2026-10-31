@@ -85,7 +85,7 @@ export function StepsSection() {
 }
 
 const NUMBERS = [
-  { n: '397', l: 'сделок за 22 месяца, каждая записана в дневник' },
+  { n: '397', l: 'сделок за 22 месяца в моей таблице' },
   { n: '+9,55R', l: 'средняя прибыльная сделка при стопе в 1R' },
   { n: '23,1%', l: 'прибыльных, примерно 1 из 4. Прибыльная в среднем в 9,5 раза больше убыточной' },
   { n: '3 из 22', l: 'месяц закрылся в минус' },
@@ -108,7 +108,7 @@ export function NumbersSection({ title, lede, caption }: { title: string; lede?:
             </div>
           ))}
         </div>
-        <p className="mt-6 pt-5 border-t border-border ns-cap">{caption}</p>
+        <div className="mt-6 pt-5 border-t border-border ns-cap space-y-2 [&>p]:max-w-[78ch]">{caption}</div>
       </div>
     </section>
   );
@@ -189,8 +189,8 @@ export function AuthorTeaser() {
             </p>
             <p className="mt-4 text-base md:text-lg leading-relaxed text-muted-foreground" style={{ maxWidth: '54ch' }}>
               Первые 3 года я только терял, ещё 2 года был около нуля. Потом пришёл учиться к опытному трейдеру и начал
-              делать то, что он говорит. Сегодня у меня своя система: 397 сделок за 22 месяца, и каждое решение записано в дневник до
-              движения цены.
+              делать то, что он говорит. Сегодня у меня своя система: 397 сделок за 22 месяца в моей таблице, а с 20.07.2026
+              мои решения записаны в публичный журнал.
             </p>
             <blockquote className="mt-8 text-[22px] md:text-[28px] font-medium leading-snug text-foreground" style={{ letterSpacing: '-0.02em', maxWidth: '30ch' }}>
               «<span className="cta-shine-text">Мои лучшие сделки — те, которые я не совершил</span>»
