@@ -32,7 +32,7 @@ export default function Binocular() {
         // 31.10.2026, его подход: «участие человека сводится к минимуму, но этот минимум и есть максимум»
         title={<>Программа смотрит весь рынок, я говорю, что беру. <span className="block">Где войти, решаете вы.</span></>}
         longTitle
-        lede="И про каждую сделку говорю, беру я её или нет, и почему. Это подписка ECHO-GATE INSIDE: вы нажимаете кнопку, дальше сделку ведёт робот."
+        lede="Про каждую сделку объясняю, почему беру её или нет. Это подписка ECHO-GATE INSIDE. Зону и точку входа определяете вы и нажимаете кнопку: это ключевой шаг, без него сделки нет. Дальше её ведёт Hunter_Bot."
         actions={
           <>
             <a href={TELEGRAM_LINKS.trial} target="_blank" rel="noopener noreferrer" data-orbit="" onClick={() => trackClick('binocular_hero_trial')}
