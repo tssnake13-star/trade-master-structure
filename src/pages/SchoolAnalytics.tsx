@@ -87,6 +87,8 @@ const CLICK_NAMES: Record<string, string> = {
   hero_trial: 'Главный экран → 7 дней',
   header_trial: 'Шапка сайта → 7 дней',
   header_login: 'Шапка сайта → Войти',
+  robots_video_play: 'Бинокль → ролик про роботов',
+  robots_video_trial: 'Ролик про роботов → 7 дней',
   sticky_trial: 'Нижняя кнопка на телефоне → 7 дней',
   final_trial: 'Финальный блок → 7 дней',
   trades_trial: 'Сделки → 7 дней',

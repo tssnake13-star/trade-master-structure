@@ -1,3 +1,4 @@
+import RobotsVideo from './RobotsVideo';
 import type { CSSProperties } from 'react';
 import { Check } from 'lucide-react';
 import { TELEGRAM_LINKS } from '@/lib/constants';
@@ -92,6 +93,8 @@ export function RobotGuardSection() {
             <p className="mt-4 ns-cap">Мои настройки. Дошли до лимита, и новые сделки не открываются.</p>
           </article>
         </div>
+        {/* 31.10.2026, Сергей: «ролик пойдёт на сайт и в бота» */}
+        <div className="mt-10"><RobotsVideo /></div>
       </div>
     </section>
   );
@@ -201,7 +204,7 @@ export function SubscriptionPricesSection() {
         <p className="mt-6 ns-honest" style={{ maxWidth: '78ch' }}>
           Помесячной подписки нет: после первого месяца 3, 6 или 12 месяцев. Возврата нет, подписка работает как аренда на
           срок, поэтому сначала 7 дней бесплатно. Торговли без убытков не бывает, и я её не обещаю. Зато риск каждой
-          сделки известен до входа, а из 21 месяца в минус закрылись только 3.
+          сделки известен до входа, а из 22 месяцев в минус закрылись только 3.
         </p>
       </div>
     </section>

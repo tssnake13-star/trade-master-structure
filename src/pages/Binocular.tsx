@@ -32,6 +32,8 @@ export default function Binocular() {
         // 31.10.2026, его подход: «участие человека сводится к минимуму, но этот минимум и есть максимум»
         title={<>Программа смотрит весь рынок, я говорю, что беру. <span className="block">Где войти, решаете вы.</span></>}
         longTitle
+        // 31.10.2026, Сергей: «с компьютера она маленькая, плохо видно, что написано». На планшете всё видно: там снимок во всю ширину
+        asideBelow
         lede="Про каждую сделку объясняю, почему беру её или нет. Это подписка ECHO-GATE INSIDE. Зону и точку входа определяете вы и нажимаете кнопку: это ключевой шаг, без него сделки нет. Дальше её ведёт Hunter_Bot."
         actions={
           <>
@@ -52,7 +54,7 @@ export default function Binocular() {
               <span>снимок 29.10.2026</span>
             </figcaption>
             <div className="overflow-hidden rounded-[5px]">
-              <img src={terminalShot} srcSet={`${terminalShotSm} 1100w, ${terminalShot} 2200w`} sizes="(min-width: 1024px) 640px, 100vw"
+              <img src={terminalShot} srcSet={`${terminalShotSm} 1100w, ${terminalShot} 2200w`} sizes="(min-width: 1280px) 1216px, 100vw"
                 alt="Экран программы ECHO-GATE INSIDE: приборы, список пар, решение по неделе и дневке, анализ циклов" width={2200} height={1224} className="w-full h-auto block" />
             </div>
           </figure>

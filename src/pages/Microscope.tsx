@@ -24,7 +24,8 @@ export default function Microscope() {
         lede="Почему цена идёт туда, куда идёт, и где в неё входить. Торговать по системе можно и без учёбы, для этого есть бинокль. Учатся те, кто хочет принимать решения сам."
         actions={
           <>
-            <a href="#levels" data-orbit="" className="v3h-btn v3h-btn--solid">Стоимость ниже ↓</a>
+            {/* 31.10.2026, Сергей: «стоимость же перед глазами… кнопка противоречит этой табличке». Карточка со стоимостью рядом, кнопка ведёт к тому, чего в ней нет */}
+            <a href="#levels" data-orbit="" className="v3h-btn v3h-btn--solid">Чем отличаются ↓</a>
             <a href="#stages" className="v3h-btn v3h-btn--ghost"><span className="cta-shine-text">5 этапов ниже ↓</span></a>
           </>
         }

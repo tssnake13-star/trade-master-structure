@@ -1,12 +1,12 @@
 import Words from '@/components/fx/Words';
-// Срез таблицы «TLT_Statement_2025-2026» (январь 2025 — сентябрь 2026), обновлено 04.10.2026.
+// Срез таблицы «TLT_Statement_2025-2026» (январь 2025 — октябрь 2026), обновлено 04.10.2026.
 // Обновлять только отсюда.
 const stats = [
-  { n: '+136,0%', l: 'доходность за 21 мес' },
-  { n: '2,92', l: 'profit factor' },
+  { n: '+136,74%', l: 'доходность за 22 мес' },
+  { n: '2,87', l: 'profit factor' },
   { n: '−4%', l: 'макс. просадка по закрытиям месяцев' },
   { n: '18/21', l: 'прибыльных месяцев' },
-  { n: '387', l: 'сделок за 21 мес' },
+  { n: '397', l: 'сделок за 22 мес' },
 ];
 
 const SystemStatsSection = () => {
@@ -15,11 +15,11 @@ const SystemStatsSection = () => {
       <div className="container-landing">
         <div className="max-w-3xl">
           <h2 className="text-foreground">
-            <Words>Прибыльных сделок 23,5%. <em>Этого хватает.</em></Words>
+            <Words>Прибыльных сделок 23,1%. <em>Этого хватает.</em></Words>
           </h2>
           <p className="mt-4 text-base md:text-lg text-muted-foreground">
-            Статистика системы за 21 месяц — 387 сделок. Риск 0,25% на сделку, без компаундинга.
-            В среднем это 6,5% в месяц, при этом 3 месяца из 21 закрылись в минус.
+            Статистика системы за 22 месяца — 397 сделок. Риск 0,25% на сделку, без компаундинга.
+            В среднем это 6,2% в месяц, при этом 3 месяца из 22 закрылись в минус.
             Прошлый результат не гарантирует будущий.
           </p>
         </div>
@@ -38,12 +38,12 @@ const SystemStatsSection = () => {
 
         <div className="mt-3 grid md:grid-cols-2 gap-3">
           <div className="border border-border rounded-xl bg-card p-5">
-            <div className="font-ui text-[12.5px] tracking-[0.01em]" style={{ color: 'hsl(var(--foreground))' }}>Win Rate 23,5% при R:R 9,5:1</div>
+            <div className="font-ui text-[12.5px] tracking-[0.01em]" style={{ color: 'hsl(var(--foreground))' }}>Win Rate 23,1% при R:R 9,5:1</div>
             <p className="mt-2 text-sm text-muted-foreground">Точка безубытка около 9,5%: при +9,5 R на прибыльную сделку и −1 R на стоп хватает одной прибыльной из десяти с половиной. Важно не как часто вы правы, а сколько берёте, когда правы.</p>
           </div>
           <div className="border border-border rounded-xl bg-card p-5">
-            <div className="font-ui text-[12.5px] tracking-[0.01em]" style={{ color: 'hsl(var(--foreground))' }}>Profit Factor 2,92</div>
-            <p className="mt-2 text-sm text-muted-foreground">На каждый потерянный $1 система возвращает $2,92. Результат на фиксированном риске — не «разгон депозита», а устойчивая работа.</p>
+            <div className="font-ui text-[12.5px] tracking-[0.01em]" style={{ color: 'hsl(var(--foreground))' }}>Profit Factor 2,87</div>
+            <p className="mt-2 text-sm text-muted-foreground">На каждый потерянный $1 система возвращает $2,87. Результат на фиксированном риске — не «разгон депозита», а устойчивая работа.</p>
           </div>
         </div>
 

@@ -92,7 +92,7 @@ const ComparisonSection = () => {
 
         <p className="mt-6 text-base md:text-lg text-foreground font-medium" style={{ maxWidth: '64ch' }}>
           Поэтому здесь безопаснее: я торгую с риском 0,25% на сделку, максимальная просадка
-          за 21 месяц по закрытиям месяцев <span className="text-foreground">4% от депозита</span> (2,23% от баланса на тот момент). Ваш риск выбираете вы.
+          за 22 месяца по закрытиям месяцев <span className="text-foreground">4% от депозита</span> (2,23% от баланса на тот момент). Ваш риск выбираете вы.
         </p>
       </div>
     </section>

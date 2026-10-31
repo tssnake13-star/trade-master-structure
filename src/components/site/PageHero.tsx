@@ -13,6 +13,7 @@ export default function PageHero({
   note,
   aside,
   longTitle = false,
+  asideBelow = false,
 }: {
   id?: string;
   title: ReactNode;
@@ -22,11 +23,13 @@ export default function PageHero({
   aside?: ReactNode;
   /** заголовок-предложение, а не короткая фраза: мельче на компьютере, чтобы кнопки остались на первом экране */
   longTitle?: boolean;
+  /** снимок под текстом и шире колонки текста: в половине экрана на компьютере мелкий текст снимка не читается */
+  asideBelow?: boolean;
 }) {
   return (
     <section id={id} className="relative overflow-hidden" style={{ paddingTop: 'clamp(108px, 11vw, 160px)', paddingBottom: 'clamp(56px, 7vw, 104px)' }}>
       <div className="container-landing relative">
-        <div className={`grid gap-10 lg:gap-14 items-center ${aside ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]' : ''}`}>
+        <div className={`grid gap-10 lg:gap-14 items-center ${aside && !asideBelow ? 'lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)]' : ''}`}>
           <div className="ns-rise">
             {/* 29.10.2026: подпись над заголовком убрана (признак шаблона), её смысл стоит в первой фразе под ним */}
             <h1 className={`ns-h1 text-foreground${longTitle ? ' ns-h1--long' : ''}`}>{title}</h1>
@@ -34,7 +37,7 @@ export default function PageHero({
             {actions && <div className="mt-9 flex flex-wrap items-center gap-3">{actions}</div>}
             {note && <p className="mt-6 ns-honest">{note}</p>}
           </div>
-          {aside && <div className="min-w-0">{aside}</div>}
+          {aside && <div className={`min-w-0${asideBelow ? ' xl:-mx-16' : ''}`}>{aside}</div>}
         </div>
       </div>
     </section>
