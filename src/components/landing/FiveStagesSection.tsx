@@ -64,7 +64,7 @@ const LEVELS: { name: string; price?: string; alwaysPrice?: boolean; text: strin
   },
   {
     name: 'ECHO-GATE INSIDE',
-    text: 'Этапов нет: 2 урока, точка входа и настройка роботов, дальше 2 действия на сделку.',
+    text: 'Этапов нет: блок уроков по точке входа и урок по настройке роботов, дальше 2 действия на сделку.',
   },
 ];
 

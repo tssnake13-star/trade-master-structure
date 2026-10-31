@@ -35,7 +35,7 @@ export default function Author() {
       <SeriesSection />
       <NextPages
         items={[
-          { to: '/binocular', title: 'Бинокль', text: 'Торговать по моей системе, не изучая её. 7 дней бесплатно.' },
+          { to: '/binocular', title: 'Бинокль', text: 'Торговать по моей системе, не изучая её целиком. 7 дней бесплатно.' },
           { to: '/microscope', title: 'Микроскоп', text: 'Научиться видеть рынок самому: видеообучение, практикум и VIP.' },
         ]}
       />

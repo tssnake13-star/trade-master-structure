@@ -39,7 +39,7 @@ export default function Microscope() {
       <FAQSection title="Вопросы об обучении" items={MICROSCOPE_FAQ} />
       <NextPages
         items={[
-          { to: '/binocular', title: 'Бинокль', text: 'Торговать по моей системе, не изучая её. 7 дней бесплатно.' },
+          { to: '/binocular', title: 'Бинокль', text: 'Торговать по моей системе, не изучая её целиком. 7 дней бесплатно.' },
           { to: '/author', title: 'Об авторе', text: '15 лет в рынке и путь к своей системе.' },
         ]}
       />

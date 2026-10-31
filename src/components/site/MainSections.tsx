@@ -131,7 +131,7 @@ export function PathsSection() {
             {/* 29.10.2026: подпись над заголовком («подписка ECHO-GATE INSIDE») убрана, она стала первыми словами текста */}
             <h3 className="text-foreground !text-[40px] !font-bold" style={{ letterSpacing: '-0.035em', lineHeight: 1 }}>Бинокль</h3>
             <p className="mt-5 text-base md:text-lg leading-relaxed text-foreground/90">
-              Подписка ECHO-GATE INSIDE. Торговать по моей системе, не изучая её: программа и мой вердикт по каждой
+              Подписка ECHO-GATE INSIDE. Торговать по моей системе, не изучая её целиком: программа и мой вердикт по каждой
               сделке, а от вас 2 действия, отметить место входа и нажать кнопку.
             </p>
             <div className="flex-grow min-h-6" />

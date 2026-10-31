@@ -185,7 +185,7 @@ export function StudyLevelsSection() {
             <li>В VIP оплаченное засчитывается полностью: 30 дней после видеообучения, 67 дней после практикума.</li>
             <li>Прямые эфиры есть в практикуме и после него остаются с подпиской. В Trade System их нет.</li>
             <li>
-              Хотите торговать по системе, не изучая её? Это{' '}
+              Хотите торговать по системе, не изучая её целиком? Это{' '}
               <Link to="/binocular" className="text-foreground underline underline-offset-4 decoration-[hsl(var(--accent))]">бинокль</Link>.
             </li>
           </ul>
