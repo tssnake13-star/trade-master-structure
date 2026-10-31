@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useEffect } from 'react';
-import logoFallback from '@/assets/logo-tradeliketyo.png';
+import logoVideoFallback from '@/assets/logo-header.mp4';
+import logoPoster from '@/assets/logo-header-poster.webp';
 import { useSiteAsset, SITE_ASSET_KEYS } from '@/hooks/useSiteAsset';
 import '@/styles/cabinet-v2.css';
 import Room from '@/components/cabinet2/Room';
@@ -14,7 +15,9 @@ import { visitSource } from '@/lib/analytics';
 function LogoBlock({ logo }: { logo: string }) {
   return (
     <div className="flex flex-col items-center mb-6">
-      <img src={logo} alt="TRADELIKETYO" className="rounded-xl object-cover" style={{ width: '7.5rem', height: '7.5rem' }} />
+      {/* 31.10.2026, Сергей: «живой логотип, как в левом верхнем углу сайта». Кадр-заставка на случай, когда телефон не запускает
+          видео сам (режим экономии заряда): логотип виден и без движения */}
+      <video key={logo} src={logo} poster={logoPoster} autoPlay muted loop playsInline preload="auto" role="img" aria-label="TRADELIKETYO" className="rounded-xl object-cover" style={{ width: '7.5rem', height: '7.5rem' }} />
       <span className="mt-4" style={{ color: 'var(--mut)', fontSize: 14 }}>Кабинет TRADE LIKE TYO</span>
     </div>
   );
@@ -37,7 +40,7 @@ export default function SchoolAuth() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { session } = useAuth();
-  const logo = useSiteAsset(SITE_ASSET_KEYS.schoolAuthLogo, logoFallback);
+  const logo = useSiteAsset(SITE_ASSET_KEYS.headerLogo, logoVideoFallback);
   // 30.10.2026: пришёл по ссылке «Полная версия на компьютере» из школьного бота — после входа терминал откроется сам
   const [fullTrial] = useState(() => pendingWebTrial());
   const fullUntil = webTrialUntil(fullTrial);
