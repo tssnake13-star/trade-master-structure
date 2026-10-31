@@ -11,10 +11,7 @@ import WordmarkKinetic from '@/components/preview-next/WordmarkKinetic';
 import {
   RolesSection, RobotGuardSection, FreeWeekSection, SubscriptionPricesSection, StartAndFitSection, BINOCULAR_FAQ,
 } from '@/components/site/BinocularSections';
-// 29.10.2026, Сергей: «картинку надо поменять, чтобы она соответствовала… хорошего качества» — настоящий терминал v2
-// глазами подписчика, снят в двойной плотности
-import terminalShot from '@/assets/site/terminal-2026-10-29.webp';
-import terminalShotSm from '@/assets/site/terminal-2026-10-29-1100.webp';
+import TerminalLive from '@/components/site/TerminalLive';
 
 /**
  * «Бинокль» — подписка ECHO-GATE INSIDE (28.10.2026, сайт из нескольких страниц, «Ночной кабинет»).
@@ -51,12 +48,9 @@ export default function Binocular() {
                 <i className="inline-block w-1.5 h-1.5 rounded-full" style={{ background: 'var(--v3-admit)', boxShadow: '0 0 8px var(--v3-admit)' }} />
                 ECHO-GATE INSIDE
               </span>
-              <span>снимок 29.10.2026</span>
+              <span>запись 31.10.2026</span>
             </figcaption>
-            <div className="overflow-hidden rounded-[5px]">
-              <img src={terminalShot} srcSet={`${terminalShotSm} 1100w, ${terminalShot} 2200w`} sizes="(min-width: 1280px) 1216px, 100vw"
-                alt="Экран программы ECHO-GATE INSIDE: приборы, список пар, решение по неделе и дневке, анализ циклов" width={2200} height={1224} className="w-full h-auto block" />
-            </div>
+            <TerminalLive />
           </figure>
         }
       />
