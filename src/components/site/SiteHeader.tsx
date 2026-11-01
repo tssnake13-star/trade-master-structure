@@ -39,7 +39,16 @@ export default function SiteHeader() {
       <header className="ns-header fixed top-0 left-0 right-0 z-50" data-solid={solid || open ? '' : undefined}>
         <div className="container-landing">
           <div className="flex items-center justify-between gap-6 h-16 md:h-[72px]">
-            <Link to="/" className="flex items-center gap-3 min-w-0" aria-label="TRADE LIKE TYO, главная">
+            {/* 01.11.2026, Сергей: на главной логотип поднимает страницу вверх, как раньше; ссылка на ту же страницу сама не прокручивает */}
+            <Link
+              to="/"
+              className="flex items-center gap-3 min-w-0"
+              aria-label="TRADE LIKE TYO, главная"
+              onClick={() => {
+                setOpen(false);
+                if (window.location.pathname === '/') window.scrollTo({ top: 0, left: 0 });
+              }}
+            >
               <span className="h-10 w-10 md:h-11 md:w-11 overflow-hidden rounded flex-shrink-0" style={{ background: 'rgba(230,236,245,0.05)' }}>
                 <video key={logoVideo} src={logoVideo} autoPlay muted loop playsInline preload="auto" className="h-full w-full object-cover" />
               </span>
