@@ -100,7 +100,7 @@ export function WeekDetail({ verdicts, now, trial, hidden, onOpenSymbol, onJourn
                   </button>
                   <span className="tv2-dirw">{v.side} {arrow(v.side)}</span>
                   <Pill v={v.verdict} />
-                  <span className="tv2-why">{v.reason || (v.scenario && v.scenario !== 'итог' ? `сценарий ${v.scenario}` : '')}</span>
+                  <span className="tv2-why">{v.reason || (v.scenario === 'итог' ? 'сценарий по контексту' : v.scenario ? `сценарий ${v.scenario}` : '')}</span>
                 </li>
               ))}
             </ul>
@@ -339,7 +339,7 @@ export function ScrDetail({ stats, trial, onOpenSymbol, onSection }: { stats: Sc
                     {t.side} {arrow(t.side)}
                   </span>
                   <span className="tv2-why">
-                    {t.scenario ? `сценарий ${t.scenario}` : ''}
+                    {t.scenario === 'итог' ? 'сценарий по контексту' : t.scenario ? `сценарий ${t.scenario}` : ''}
                     {t.day.passed != null ? ` · дневка пройдена на ${t.day.passed}%` : ''}
                   </span>
                 </li>
