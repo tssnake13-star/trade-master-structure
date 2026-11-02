@@ -210,8 +210,8 @@ export function FirstBlockSection() {
           <div className="lg:flex-1 ns-glass p-7 md:p-8">
             <h3 className="text-foreground !text-[20px]">Одно условие до оплаты</h3>
             <p className="mt-3 text-base leading-relaxed text-foreground/90">
-              Весь срок обучения работаем строго по моему алгоритму, без своих добавлений. Если хотите собрать свою систему,
-              я вам не помощник.
+              Весь срок обучения работаем строго по моему алгоритму, без своих добавлений. Дальше система и весь материал у вас,
+              и вы строите на них своё.
             </p>
             <p className="mt-4 text-base leading-relaxed text-muted-foreground">
               И честно: за 2 месяца практикума до реального рынка обычно не доходят. Реалистично вы доходите до четвёртого
