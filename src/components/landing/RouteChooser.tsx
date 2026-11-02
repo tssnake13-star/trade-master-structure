@@ -49,7 +49,7 @@ type Study = {
 
 const STUDY: Study[] = [
   { product: 'Trade System', who: 'сам, в своём темпе', price: STUDY_PRICES.tradeSystem.price, per: STUDY_PRICES.tradeSystem.period, anchor: 'trade-system', clickId: 'route_trade_system' },
-  { product: 'Практикум', who: 'вместе со мной, решения принимаем вместе', price: STUDY_PRICES.practicum.price, per: STUDY_PRICES.practicum.period, anchor: 'pkg-practicum', clickId: 'route_practicum' },
+  { product: 'Практикум', who: 'с моей обратной связью, минимум до 4-го этапа', price: STUDY_PRICES.practicum.price, per: STUDY_PRICES.practicum.period, anchor: 'pkg-practicum', clickId: 'route_practicum' },
   {
     product: 'VIP',
     who: 'всё сразу и инструменты навсегда',
