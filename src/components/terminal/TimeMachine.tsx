@@ -257,7 +257,7 @@ function dayRows(it: TimeItem): [string, string][] {
   if (it.d1?.acc) r.push(['Тренд по накоплениям', short(it.d1.acc)]);
   if (it.d1?.range) r.push(['Рейндж', short(it.d1.range)]);
   if (it.d1?.scen) r.push(['Сценарий', it.d1.scen]);
-  else if (it.scenario && !it.d1?.rows?.length) r.push(['Сценарий', it.scenario === 'итог' ? 'по контексту' : `сценарий ${it.scenario}`]);
+  else if (it.scenario && !it.d1?.rows?.length) r.push(['Сценарий', it.scenario === 'итог' ? 'по контексту' : it.scenario === 'модель 2' ? 'модель 2' : `сценарий ${it.scenario}`]);
   return r;
 }
 function Stamp({ it }: { it: TimeItem }) {

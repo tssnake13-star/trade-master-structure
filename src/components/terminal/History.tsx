@@ -109,7 +109,7 @@ function CallRow({ c, onOpen, known }: { c: HistCall; onOpen?: Open; known?: boo
         </button>
       ) : null}
       <span style={{ fontFamily: MONO, fontSize: 11, color: long ? UP : DOWN }}>{c.side}</span>
-      <span style={{ ...label, letterSpacing: '0.12em' }}>{c.scenario === 'итог' ? 'сценарий по контексту' : c.scenario ? `сценарий ${c.scenario}` : 'без сценария'}</span>
+      <span style={{ ...label, letterSpacing: '0.12em' }}>{c.scenario === 'итог' ? 'сценарий по контексту' : c.scenario === 'модель 2' ? 'модель 2' : c.scenario ? `сценарий ${c.scenario}` : 'без сценария'}</span>
       <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.1em', padding: '1px 7px', borderRadius: 6, color: stColor(c.status), border: `1px solid ${stColor(c.status)}55`, whiteSpace: 'nowrap' }}>
         {c.status}
       </span>

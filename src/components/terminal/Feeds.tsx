@@ -753,7 +753,7 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
                   {v.verdict}
                   {v.both_layers ? ' · оба слоя' : ''}
                 </span>
-                {v.scenario ? <span style={{ ...label }}>{v.scenario === 'итог' ? 'сценарий по контексту' : `сценарий ${v.scenario}`}</span> : null}
+                {v.scenario ? <span style={{ ...label }}>{v.scenario === 'итог' ? 'сценарий по контексту' : v.scenario === 'модель 2' ? 'модель 2' : `сценарий ${v.scenario}`}</span> : null}
                 {known ? (
                   <button
                     onClick={() => onOpen(v.instrument)}

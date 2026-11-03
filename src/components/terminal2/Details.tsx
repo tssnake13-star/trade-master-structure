@@ -100,7 +100,7 @@ export function WeekDetail({ verdicts, now, trial, hidden, onOpenSymbol, onJourn
                   </button>
                   <span className="tv2-dirw">{v.side} {arrow(v.side)}</span>
                   <Pill v={v.verdict} />
-                  <span className="tv2-why">{v.reason || (v.scenario === 'итог' ? 'сценарий по контексту' : v.scenario ? `сценарий ${v.scenario}` : '')}</span>
+                  <span className="tv2-why">{v.reason || (v.scenario === 'итог' ? 'сценарий по контексту' : v.scenario === 'модель 2' ? 'модель 2' : v.scenario ? `сценарий ${v.scenario}` : '')}</span>
                 </li>
               ))}
             </ul>
