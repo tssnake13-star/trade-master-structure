@@ -350,7 +350,7 @@ export function CycleCard({ title, c, color = ACCENT, dg = 4 }: { title: string;
           цель взята{c['разворот'] ? ` · родился цикл в другую сторону от ${fmtDate(c['разворот'])}` : ''}
         </div>
       ) : c['отработан'] ? (
-        <div style={{ ...label, marginTop: 6 }}>пройден 90%+ · цель не взята, цикл живой</div>
+        <div style={{ ...label, marginTop: 6 }}>пройден 80%+ · цель не взята, цикл живой</div>
       ) : hpN ? (
         <div style={{ ...label, marginTop: 6 }}>цель взята, переходов нет — цикл идёт дальше полупериодами</div>
       ) : null}
