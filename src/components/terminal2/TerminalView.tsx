@@ -263,7 +263,7 @@ export default function TerminalView({ data, source, isAdmin, seenKey, scan = fa
   else if (shown === 'screener') body = trial ? <TrialLock what="Скринер" /> : panel(0, <ScreenerCards doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />);
   else if (shown === 'top') body = trial ? <TrialLock what="ТОП-лист" /> : panel(0, <ScreenerCards part="top" doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />);
   else if (shown === 'trend' && isAdmin) body = panel(0, <TrendFeed doc={feeds.trend} symbols={symbols} onOpen={openSymbol} />);
-  else if (shown === 'model2' && isAdmin) body = panel(0, <Model2Feed doc={feeds.model2} symbols={symbols} onOpen={openSymbol} picUrl={source.picUrl} />);
+  else if (shown === 'model2' && isAdmin) body = panel(0, <Model2Feed doc={feeds.model2} picUrl={source.picUrl} />);
   else if (shown === 'verdicts')
     body = (
       <>

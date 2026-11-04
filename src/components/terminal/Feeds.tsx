@@ -171,8 +171,9 @@ export function TrendFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['trend']; s
 /** Модель 2 — ложный пробой недельной контекстной свечи (04.11.2026, его слово: «в терминале выход против недели
  *  вкладку — её удалить. Туда поместить все вот эти графики. С комментарием» и «каждую неделю графики должны
  *  обновляться… не хочу, чтобы они удалялись… 3 месяца»). Список — тот же, что бот присылает в воскресенье; каждая неделя
- *  своим блоком, свежая сверху и раскрыта, прошлые — по нажатию. Вкладка — только админу. */
-export function Model2Feed({ doc, symbols, onOpen, picUrl }: { doc?: FeedDocs['model2']; symbols: Set<string>; onOpen: Open; picUrl?: (p: string) => string }) {
+ *  своим блоком, свежая сверху и раскрыта, прошлые — по нажатию. Вкладка — только админу. Кнопки «открыть разбор» нет:
+ *  разбор инструмента — это первая модель, а здесь вторая (его слово 04.11.2026). */
+export function Model2Feed({ doc, picUrl }: { doc?: FeedDocs['model2']; picUrl?: (p: string) => string }) {
   const weeks = doc?.weeks || [];
   const [open, setOpen] = useState<Record<string, boolean>>({});
   const [urls, setUrls] = useState<Record<string, string>>({});
@@ -217,14 +218,6 @@ export function Model2Feed({ doc, symbols, onOpen, picUrl }: { doc?: FeedDocs['m
           <span style={{ color: up ? UP : DOWN }}>{up ? '🟢' : '🔴'}</span>
           <span style={{ fontFamily: MONO, fontSize: 14, color: FG }}>{it.instrument}</span>
           <span style={{ fontFamily: MONO, fontSize: 11, color: up ? UP : DOWN, letterSpacing: '0.08em' }}>ждём {it.side}</span>
-          {symbols.has(it.instrument) ? (
-            <button
-              onClick={() => onOpen(it.instrument)}
-              style={{ marginLeft: 'auto', fontFamily: MONO, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT, background: 'none', border: `1px solid ${BORDER}`, borderRadius: 7, padding: '5px 9px', cursor: 'pointer' }}
-            >
-              открыть разбор
-            </button>
-          ) : null}
         </div>
         <div style={{ color: FG, fontSize: 13, lineHeight: 1.55 }}>{cap(it.text)}.</div>
         <div style={{ color: DIM, fontSize: 12, lineHeight: 1.5 }}>Срок: {it.srok}.</div>
