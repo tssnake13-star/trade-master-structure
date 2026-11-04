@@ -222,7 +222,7 @@ export function Model2Feed({ doc, picUrl }: { doc?: FeedDocs['model2']; picUrl?:
     const up = it.side === 'LONG';
     const src = it.pic ? urls[it.pic] : undefined;
     return (
-      <div key={it.instrument} style={{ ...card, padding: 12, display: 'grid', gap: 8 }}>
+      <div key={`${it.instrument}-${it.side}`} style={{ ...card, padding: 12, display: 'grid', gap: 8 }}>
         <div style={{ display: 'flex', gap: 10, alignItems: 'baseline', flexWrap: 'wrap' }}>
           <span style={{ color: up ? UP : DOWN }}>{up ? '🟢' : '🔴'}</span>
           <span style={{ fontFamily: MONO, fontSize: 14, color: FG }}>{it.instrument}</span>

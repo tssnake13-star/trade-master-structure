@@ -445,7 +445,7 @@ export function HistoryViewM2({ doc }: { doc?: HistoryDocM2 }) {
         <div style={{ ...card, padding: 12 }}>
           <div style={{ ...label, marginBottom: 4 }}>живут сейчас</div>
           {live.map((c) => (
-            <CallRowM2 key={`${c.symbol}|${c.start}`} c={c} />
+            <CallRowM2 key={`${c.symbol}|${c.side}|${c.start}`} c={c} />
           ))}
         </div>
       ) : null}
@@ -453,7 +453,7 @@ export function HistoryViewM2({ doc }: { doc?: HistoryDocM2 }) {
         <div style={{ ...card, padding: 12 }}>
           <div style={{ ...label, marginBottom: 4 }}>закончились</div>
           {done.map((c) => (
-            <CallRowM2 key={`${c.symbol}|${c.start}`} c={c} />
+            <CallRowM2 key={`${c.symbol}|${c.side}|${c.start}`} c={c} />
           ))}
         </div>
       ) : null}
