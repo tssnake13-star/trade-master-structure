@@ -137,7 +137,7 @@ export function demoData(mode: DemoMode, now: number, extra: Verdict[] = []): Te
   }
   if (mode === 'admin') {
     feeds.trend = { lines: ['Демо: список тренда по накоплениям.', 'EURUSD — неделя и дневка вверх', 'USDCAD — неделя и дневка вниз'] };
-    feeds.falsex = { checked: list.length, items: [{ instrument: 'AUDUSD', state: 'ложный', hdir: 'вниз', text: 'демо: хвост за уровень против недели, закрытие вернулось', date: '27.10', age: 0 }] };
+    feeds.model2 = { checked: list.length, weeks: [{ week: '26.10.2026', week_iso: '2026-10-26', items: [{ instrument: 'AUDUSD', side: 'SHORT', edge: 'хай', depth: 21.2, new: true, ctx: '27.09', week: '26.10', text: 'демо: ложный пробой хая недельной контекстной свечи 27.09: неделя 26.10 ушла хвостом выше хая (21% высоты свечи) и закрылась внутри — ждём триггер в SHORT', srok: 'живёт по неделю 16.11 включительно' }] }] };
     feeds.verdicts_crypto = { items: [] };
   }
   return {

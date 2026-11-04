@@ -22,7 +22,8 @@ export interface FeedDocs {
   // verdicts_crypto — его решения по крипте в этом режиме, лента только администратору
   verdicts?: { items?: Verdict[]; crypto_private?: boolean };
   verdicts_crypto?: { items?: Verdict[] };
-  falsex?: { checked?: number; items?: FalseExit[] };
+  // 04.11.2026, его слово: вкладку «Выход против недели» убрать, туда — графики модели 2 с комментарием; недели копятся 3 месяца
+  model2?: { checked?: number; weeks?: Model2Week[] };
   // 25.09.2026: итоги решений из его субботнего разбора (таблица допусков) — кладутся раз в неделю
   outcomes?: { items?: Outcome[] };
   // 25.09.2026: история направления — мост пишет каждый полный круг
@@ -43,13 +44,26 @@ export interface Outcome {
   price?: { status: string; fav?: number | null; adv?: number | null; at?: string } | null;
 }
 
-export interface FalseExit {
+/** Модель 2 (04.11.2026): ложный пробой недельной контекстной свечи — одна строка списка, как в боте
+ *  (lozhnyi_proboy_nedeli.slova / srok), и картинка недели в закрытом ящике. */
+export interface Model2Item {
   instrument: string;
-  state: 'ложный' | 'разворот' | 'отменён';
-  hdir: 'вверх' | 'вниз';
+  side: 'LONG' | 'SHORT';
+  edge: 'хай' | 'лой';
+  depth: number; // хвост за краем, % высоты контекстной свечи
+  new: boolean; // пробой на этой неделе (иначе — ещё живёт с прошлых)
+  ctx: string; // дата контекстной свечи
+  week: string; // неделя пробоя
   text: string;
-  date?: string; // 23.09.2026: свеча события и её возраст в дневках
-  age?: number;
+  srok: string;
+  pic?: string;
+}
+
+export interface Model2Week {
+  week: string; // понедельник закрытой недели, после которой собран список
+  week_iso: string;
+  made?: string;
+  items: Model2Item[];
 }
 
 export interface Verdict {
@@ -154,55 +168,115 @@ export function TrendFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['trend']; s
   );
 }
 
-/** Просто выход против недели (до 23.09.2026 — «ложный выход»): дневка вышла хвостом за
- *  предварительный уровень против тренда недели, закрытие вернулось. Тот же список, что бот присылает
- *  каждое утро (kontekst_svecha.false_exit_scan). Вкладка — только админу (его слово 23.09.2026). */
-export function FalseExitFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['falsex']; symbols: Set<string>; onOpen: Open }) {
-  if (!doc) return <Empty what="Списка выходов против недели" />;
-  // 23.09.2026 вечер, его «верни оба»: просто выход, выход через зону выхода (разворот) и отмена выхода
-  const items = (doc.items || []).filter((i) => i.state === 'ложный' || i.state === 'разворот' || i.state === 'отменён');
-  // кружок — куда смотрит событие: у простого выхода и отмены неделя, у выхода через зону — сам выход
-  const up = (i: FalseExit) => (i.state === 'разворот' ? i.hdir !== 'вверх' : i.hdir === 'вверх');
-  const work = items.filter((i) => !i.age);
-  const back = items.filter((i) => (i.age || 0) > 0);
-  const row = (i: FalseExit) => (
-    <div key={i.instrument} style={{ ...card, padding: 12, display: 'flex', gap: 10, alignItems: 'baseline', flexWrap: 'wrap' }}>
-      <span style={{ color: up(i) ? UP : DOWN }}>{up(i) ? '🟢' : '🔴'}</span>
-      <span style={{ fontFamily: MONO, fontSize: 14, color: FG }}>{i.instrument}</span>
-      <span style={{ color: FG, fontSize: 13 }}>{i.text}</span>
-      {i.date ? <span style={{ fontFamily: MONO, fontSize: 11, color: DIM }}>{i.date}</span> : null}
-      {symbols.has(i.instrument) ? (
-        <button
-          onClick={() => onOpen(i.instrument)}
-          style={{ marginLeft: 'auto', fontFamily: MONO, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT, background: 'none', border: `1px solid ${BORDER}`, borderRadius: 7, padding: '5px 9px', cursor: 'pointer' }}
-        >
-          открыть разбор
-        </button>
-      ) : null}
-    </div>
-  );
+/** Модель 2 — ложный пробой недельной контекстной свечи (04.11.2026, его слово: «в терминале выход против недели
+ *  вкладку — её удалить. Туда поместить все вот эти графики. С комментарием» и «каждую неделю графики должны
+ *  обновляться… не хочу, чтобы они удалялись… 3 месяца»). Список — тот же, что бот присылает в воскресенье; каждая неделя
+ *  своим блоком, свежая сверху и раскрыта, прошлые — по нажатию. Вкладка — только админу. */
+export function Model2Feed({ doc, symbols, onOpen, picUrl }: { doc?: FeedDocs['model2']; symbols: Set<string>; onOpen: Open; picUrl?: (p: string) => string }) {
+  const weeks = doc?.weeks || [];
+  const [open, setOpen] = useState<Record<string, boolean>>({});
+  const [urls, setUrls] = useState<Record<string, string>>({});
+  const isOpen = (w: Model2Week, i: number) => open[w.week_iso] ?? i === 0;
+  // картинки — только у раскрытых недель; ссылки одним запросом, живут час
+  const picKey = weeks
+    .filter((w, i) => isOpen(w, i))
+    .flatMap((w) => w.items.map((it) => it.pic || ''))
+    .filter(Boolean)
+    .join('|');
+  useEffect(() => {
+    const paths = picKey.split('|').filter((p) => p && !urls[p]);
+    if (!paths.length) return;
+    if (picUrl) {
+      setUrls((u) => ({ ...u, ...Object.fromEntries(paths.map((p) => [p, picUrl(p)])) }));
+      return;
+    }
+    let alive = true;
+    supabase.storage
+      .from('terminal')
+      .createSignedUrls(paths, 3600)
+      .then(({ data }) => {
+        if (!alive || !data) return;
+        const m: Record<string, string> = {};
+        data.forEach((d) => {
+          if (d.path && d.signedUrl) m[d.path] = d.signedUrl;
+        });
+        setUrls((u) => ({ ...u, ...m }));
+      });
+    return () => {
+      alive = false;
+    };
+  }, [picKey]);
+  if (!doc) return <Empty what="Списка модели 2" />;
+  const cap = (t: string) => (t ? t[0].toUpperCase() + t.slice(1) : t);
+  const row = (it: Model2Item) => {
+    const up = it.side === 'LONG';
+    const src = it.pic ? urls[it.pic] : undefined;
+    return (
+      <div key={it.instrument} style={{ ...card, padding: 12, display: 'grid', gap: 8 }}>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'baseline', flexWrap: 'wrap' }}>
+          <span style={{ color: up ? UP : DOWN }}>{up ? '🟢' : '🔴'}</span>
+          <span style={{ fontFamily: MONO, fontSize: 14, color: FG }}>{it.instrument}</span>
+          <span style={{ fontFamily: MONO, fontSize: 11, color: up ? UP : DOWN, letterSpacing: '0.08em' }}>ждём {it.side}</span>
+          {symbols.has(it.instrument) ? (
+            <button
+              onClick={() => onOpen(it.instrument)}
+              style={{ marginLeft: 'auto', fontFamily: MONO, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT, background: 'none', border: `1px solid ${BORDER}`, borderRadius: 7, padding: '5px 9px', cursor: 'pointer' }}
+            >
+              открыть разбор
+            </button>
+          ) : null}
+        </div>
+        <div style={{ color: FG, fontSize: 13, lineHeight: 1.55 }}>{cap(it.text)}.</div>
+        <div style={{ color: DIM, fontSize: 12, lineHeight: 1.5 }}>Срок: {it.srok}.</div>
+        {src ? (
+          <a href={src} target="_blank" rel="noreferrer" title="Открыть картинку целиком">
+            <img src={src} alt={`${it.instrument} — ложный пробой недельной контекстной свечи`} loading="lazy" style={{ width: '100%', borderRadius: 8, border: `1px solid ${BORDER}`, display: 'block' }} />
+          </a>
+        ) : it.pic ? (
+          <div style={{ color: DIM, fontSize: 12 }}>Картинка загружается…</div>
+        ) : null}
+      </div>
+    );
+  };
   return (
     <div>
       <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
-        Дневка против тренда недели: просто выход (хвост за предварительным уровнем, закрытие вернулось), выход через зону выхода (разворот) и отмена выхода (цена вернулась). Список обновляется каждое утро после закрытия дневки. Информация, не запрет.
+        Модель 2 — ложный пробой недельной контекстной свечи: неделя ушла хвостом за хай или лой контекстной свечи и закрылась внутри. Ждём триггер H4 в сторону, обратную шипу: такой триггер приходит допуском без карточки системы, обычный триггер против него не приходит. Сигнал живёт три недели или пока неделя не закроется за границей контекстной свечи. Новая неделя появляется здесь после её закрытия, прошлые хранятся три месяца. Видно только вам.
       </div>
-      {doc.checked === 0 ? (
-        <div style={{ color: DIM, fontSize: 13 }}>Свечей не было — проверить не удалось.</div>
-      ) : !items.length ? (
-        <div style={{ color: DIM, fontSize: 13 }}>За последние дни выходов против недели нет.</div>
-      ) : null}
-      {work.length ? (
-        <>
-          <div style={{ ...label, margin: '6px 0 8px' }}>новые — последняя закрытая дневка</div>
-          <div style={{ display: 'grid', gap: 8, marginBottom: 14 }}>{work.map(row)}</div>
-        </>
-      ) : null}
-      {back.length ? (
-        <>
-          <div style={{ ...label, margin: '6px 0 8px' }}>за последние дни</div>
-          <div style={{ display: 'grid', gap: 8 }}>{back.map(row)}</div>
-        </>
-      ) : null}
+      {doc.checked === 0 && !weeks.length ? <div style={{ color: DIM, fontSize: 13 }}>Свечей недели не было — проверить не удалось.</div> : null}
+      {weeks.map((w, i) => {
+        const novye = w.items.filter((it) => it.new);
+        const zhivut = w.items.filter((it) => !it.new);
+        const on = isOpen(w, i);
+        return (
+          <div key={w.week_iso} style={{ marginBottom: 16 }}>
+            <button
+              onClick={() => setOpen((o) => ({ ...o, [w.week_iso]: !on }))}
+              style={{ ...label, display: 'flex', width: '100%', justifyContent: 'space-between', background: 'none', border: 'none', borderBottom: `1px solid ${BORDER}`, padding: '8px 0', cursor: 'pointer', color: FG }}
+            >
+              <span>неделя с {w.week.slice(0, 5)} · новых {novye.length} · ещё живут {zhivut.length}</span>
+              <span style={{ color: DIM }}>{on ? '▾' : '▸'}</span>
+            </button>
+            {on ? (
+              <div style={{ marginTop: 10 }}>
+                {!w.items.length ? <div style={{ color: DIM, fontSize: 13 }}>Ложных пробоев контекстной свечи не было.</div> : null}
+                {novye.length ? (
+                  <>
+                    <div style={{ ...label, margin: '6px 0 8px' }}>новые — ложный пробой на этой неделе</div>
+                    <div style={{ display: 'grid', gap: 10, marginBottom: 14 }}>{novye.map(row)}</div>
+                  </>
+                ) : null}
+                {zhivut.length ? (
+                  <>
+                    <div style={{ ...label, margin: '6px 0 8px' }}>ещё живут — пробой на прошлых неделях</div>
+                    <div style={{ display: 'grid', gap: 10 }}>{zhivut.map(row)}</div>
+                  </>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        );
+      })}
     </div>
   );
 }
