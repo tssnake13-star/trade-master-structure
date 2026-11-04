@@ -17,11 +17,13 @@ import { newestMs, readSeen, timeMs, writeSeen } from '@/lib/journalSeen';
 export interface FeedDocs {
   // at — время скринера с поясом (мост с 22.09.2026); time — строка бота по часам VPS
   screener?: { time?: string | null; at?: string | null; groups?: string | null; top?: string | null; leaders?: Record<string, string> | null };
-  trend?: { lines?: string[] };
   // 18.10.2026: crypto_private — крипта «только ему» (/crypto me): подписчику журнал крипты под замком;
   // verdicts_crypto — его решения по крипте в этом режиме, лента только администратору
   verdicts?: { items?: Verdict[]; crypto_private?: boolean };
   verdicts_crypto?: { items?: Verdict[] };
+  // 04.11.2026, его слово: «завести отдельный журнал по модели номер 2… этот журнал вижу только я» — его решения
+  // по допускам модели 2 (ВЕРДИКТЫ_МОДЕЛЬ_2.md), в журнал решений модели 1 они не идут; лента только администратору
+  verdicts_m2?: { items?: Verdict[] };
   // 04.11.2026, его слово: вкладку «Выход против недели» убрать, туда — графики модели 2 с комментарием; недели копятся 3 месяца
   model2?: { checked?: number; weeks?: Model2Week[] };
   // 25.09.2026: итоги решений из его субботнего разбора (таблица допусков) — кладутся раз в неделю
@@ -160,12 +162,38 @@ export function ScreenerFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['screene
   );
 }
 
-export function TrendFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['trend']; symbols: Set<string>; onOpen: Open }) {
-  const lines = doc?.lines || [];
-  if (!lines.length) return <Empty what="Списка тренда" />;
+/** Вкладка «Модель 2»: ложные пробои недели (графики по неделям) и журнал модели 2 — его решения по её допускам,
+ *  отдельно от журнала решений модели 1 (его слово 04.11.2026). Обе — только админу. */
+export function Model2Tabs({ doc, journal, symbols, onOpen, picUrl }: { doc?: FeedDocs['model2']; journal?: FeedDocs['verdicts_m2']; symbols: Set<string>; onOpen: Open; picUrl?: (p: string) => string }) {
+  const [m, setM] = useState<'weeks' | 'journal'>('weeks');
+  const tab = (k: 'weeks' | 'journal', txt: string) => (
+    <button
+      key={k}
+      onClick={() => setM(k)}
+      aria-pressed={m === k}
+      style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', color: m === k ? FG : DIM, background: m === k ? `${ACCENT}22` : 'none', border: `1px solid ${m === k ? ACCENT : BORDER}` }}
+    >
+      {txt}
+    </button>
+  );
+  const n = journal?.items?.length || 0;
   return (
-    <div style={{ ...card, padding: 14 }}>
-      <TextBlock text={lines.join('\n')} symbols={symbols} onOpen={onOpen} />
+    <div>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
+        {tab('weeks', 'Ложные пробои недели')}
+        {tab('journal', n ? `Журнал модели 2 · ${n}` : 'Журнал модели 2')}
+      </div>
+      {m === 'weeks' ? (
+        <Model2Feed doc={doc} picUrl={picUrl} />
+      ) : (
+        <div>
+          <div style={{ color: DIM, fontSize: 12, lineHeight: 1.5, marginBottom: 12 }}>
+            Ваши решения по допускам модели 2 — ложный пробой недельной контекстной свечи. В журнал решений модели 1 они не
+            попадают. Видно только вам.
+          </div>
+          <VerdictsFeed doc={journal} symbols={symbols} onOpen={onOpen} picUrl={picUrl} bare />
+        </div>
+      )}
     </div>
   );
 }
@@ -625,7 +653,8 @@ function OutcomeBlock({ o }: { o?: Outcome }) {
 }
 
 // 18.10.2026: picUrl — терминал в Телеграме берёт картинки из открытого ящика tgpub, а не по подписанной ссылке
-export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picUrl, privateCrypto, seenKey, fx = false }: { doc?: FeedDocs['verdicts']; outcomes?: FeedDocs['outcomes']; videos?: JournalVideo[]; symbols: Set<string>; onOpen: Open; picUrl?: (path: string) => string; privateCrypto?: FeedDocs['verdicts_crypto']; seenKey?: string; fx?: boolean }) {
+// 04.11.2026: bare — журнал модели 2: без вводных слов журнала решений и без итогов счёта по месяцам (они про модель 1)
+export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picUrl, privateCrypto, seenKey, fx = false, bare = false }: { doc?: FeedDocs['verdicts']; outcomes?: FeedDocs['outcomes']; videos?: JournalVideo[]; symbols: Set<string>; onOpen: Open; picUrl?: (path: string) => string; privateCrypto?: FeedDocs['verdicts_crypto']; seenKey?: string; fx?: boolean; bare?: boolean }) {
   // 18.10.2026: администратору — и его решения по крипте «только мне» (privateCrypto); подписчику в этом режиме
   // журнал крипты под замком
   const all = [...(doc?.items || []), ...(privateCrypto?.items || [])].sort((a, b) => b.time.localeCompare(a.time));
@@ -717,10 +746,12 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
   return (
     <div>
       <MarketSwitch value={mk} onChange={setMk} counts={counts} locked={cryptoLocked ? 'crypto' : undefined} />
+      {bare ? null : (
       <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
         Мои допуски и отказы{oldest ? `, с ${fmtWhen(oldest).slice(0, 10)}` : ''}. До 09.09.2026 — из моей таблицы решений, с 09.09 — то, что получили подписчики в боте. Свежие сверху. Время — по вашему часовому поясу. Под каждым решением — что было дальше: итог из еженедельного разбора и куда пошла цена после сигнала.
       </div>
-      <MonthTotals />
+      )}
+      {bare ? null : <MonthTotals />}
       <div ref={calRef} style={{ scrollMarginTop: 12 }}>
       {/* 19.10.2026, его слово: «по журналу 10 сделок за сентябрь… везде должно быть одинаково»: календарь считает все
           решения — и валюты, и крипту (биткоин 08.09, 2 стопа), а не только открытую вкладку */}

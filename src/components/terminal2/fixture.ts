@@ -136,9 +136,9 @@ export function demoData(mode: DemoMode, now: number, extra: Verdict[] = []): Te
     list = list.filter((r) => open.has(r.symbol));
   }
   if (mode === 'admin') {
-    feeds.trend = { lines: ['Демо: список тренда по накоплениям.', 'EURUSD — неделя и дневка вверх', 'USDCAD — неделя и дневка вниз'] };
     feeds.model2 = { checked: list.length, weeks: [{ week: '26.10.2026', week_iso: '2026-10-26', items: [{ instrument: 'AUDUSD', side: 'SHORT', edge: 'хай', depth: 21.2, new: true, ctx: '27.09', week: '26.10', text: 'демо: ложный пробой хая недельной контекстной свечи 27.09: неделя 26.10 ушла хвостом выше хая (21% высоты свечи) и закрылась внутри — ждём триггер в SHORT', srok: 'живёт по неделю 16.11 включительно' }] }] };
     feeds.verdicts_crypto = { items: [] };
+    feeds.verdicts_m2 = { items: [{ time: '2026-11-04T10:01:00+05:00', instrument: 'USDJPY', side: 'LONG', scenario: 'модель 2', verdict: 'ДОПУСК', both_layers: false, reason: 'Демо: модель 2 — неделя ложно пробила лой контекстной свечи и закрылась внутри, беру покупку от зоны синхронизации.' }] };
   }
   return {
     rows: list,
