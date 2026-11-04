@@ -2,7 +2,7 @@ import { Fragment, useEffect, useRef, useState, type CSSProperties, type ReactNo
 import { supabase } from '@/integrations/supabase/client';
 import { mondayOfSignal, type JournalVideo } from '@/lib/journalVideos';
 import { ACCENT, DIM, DOWN, FG, MONO, UP, BORDER, card, label, fmtWhen, fromBotTime, pill, marketOfSym, type MarketKey } from './theme';
-import type { HistoryDoc } from './History';
+import type { HistoryDoc, HistoryDocM2 } from './History';
 import { Beam } from './parts';
 import { VideoReviews, WeekHeader } from './Reviews';
 import type { TimeItem } from './TimeMachine';
@@ -28,6 +28,8 @@ export interface FeedDocs {
   outcomes?: { items?: Outcome[] };
   // 25.09.2026: история направления — мост пишет каждый полный круг
   history?: HistoryDoc;
+  // 04.11.2026: история направления по модели 2 (вторая вкладка «Истории направления»), только админу
+  history_m2?: HistoryDocM2;
   // 18.10.2026: «Машина времени» и «Тренажёр» — кладёт субботний terminal_ishody.py
   timemachine?: { items?: TimeItem[] };
 }

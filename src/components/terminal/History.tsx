@@ -327,3 +327,160 @@ export function HistoryOf({ doc, symbol }: { doc?: HistoryDoc; symbol: string })
     </div>
   );
 }
+
+// ─────────────────────────── история направления по модели 2 ───────────────────────────
+// ⛔ 04.11.2026, его слово: «в этой истории направления… удалять не будем… нужна вторая вкладка, где история направления
+// по модели номер 2… пускай она вот так добавляется… чтобы посмотреть историю». Мост каждый круг кладёт ленту history_m2:
+// вызов модели 2 — недели подряд, на которых живёт ложный пробой недельной контекстной свечи в одну сторону. Итог — его
+// правило: за время жизни сигнала неделя закрылась за противоположной границей контекстной свечи (ложный пробой хая —
+// ниже лоя) — «сбылось», за пробитой — «не сбылось», ни того ни другого — «не решилось».
+
+export interface HistCallM2 {
+  symbol: string;
+  side: 'LONG' | 'SHORT';
+  edge: 'хай' | 'лой';
+  ctx: string; // дата контекстной свечи
+  week: string; // неделя первого ложного пробоя (понедельник)
+  week_last: string; // неделя последнего пробоя в ту же сторону
+  depth: number; // хвост за краем, % высоты свечи
+  povtorov: number; // сколько раз пробой повторился и продлил срок
+  start: string; // закрытие недели пробоя
+  end_week: string | null; // неделя, закрытием которой вызов кончился
+  why: string | null;
+  live: boolean;
+  dopuskov: number; // допусков модели 2 в боте за время вызова
+  zagl: number; // заглушённых встречных триггеров
+  status: string; // сбылось · не сбылось · не решилось · пока не решилось
+}
+
+export interface HistoryDocM2 {
+  calls?: HistCallM2[];
+  nedel?: number;
+  at?: string;
+}
+
+const stM2 = (s: string) => (s === 'сбылось' ? UP : s === 'не сбылось' ? DOWN : s === 'пока не решилось' ? ACCENT : DIM);
+
+function CallRowM2({ c }: { c: HistCallM2 }) {
+  const long = c.side === 'LONG';
+  return (
+    <div style={{ display: 'flex', gap: 8, alignItems: 'baseline', flexWrap: 'wrap', padding: '7px 0', borderBottom: `1px solid ${BORDER}` }}>
+      <span style={{ fontFamily: MONO, fontSize: 11, color: DIM, minWidth: 44 }}>{c.week}</span>
+      <span style={{ fontFamily: MONO, fontSize: 13, color: FG }}>{c.symbol}</span>
+      <span style={{ fontFamily: MONO, fontSize: 11, color: long ? UP : DOWN }}>{c.side}</span>
+      <span style={{ fontFamily: MONO, fontSize: 10, letterSpacing: '0.1em', padding: '1px 7px', borderRadius: 6, color: stM2(c.status), border: `1px solid ${stM2(c.status)}55`, whiteSpace: 'nowrap' }}>
+        {c.status}
+      </span>
+      <span style={{ color: DIM, fontSize: 12 }}>
+        ложный пробой {c.edge === 'хай' ? 'хая' : 'лоя'} свечи {c.ctx}, хвост {c.depth < 1 ? 'меньше 1' : Math.round(c.depth)}%
+        {c.povtorov ? ` · повторился ${c.povtorov} раз, последний — неделя ${c.week_last}` : ''}
+        {c.live ? ' · живёт' : ` · кончился с неделей ${c.end_week}: ${c.why}`}
+        {c.dopuskov || c.zagl ? ` · в боте: допусков ${c.dopuskov}, заглушено встречных ${c.zagl}` : ''}
+      </span>
+    </div>
+  );
+}
+
+/** История модели 2: итоги, живые сверху, потом закончившиеся — свежие сверху. */
+export function HistoryViewM2({ doc }: { doc?: HistoryDocM2 }) {
+  const calls = doc?.calls || [];
+  if (!doc || !calls.length)
+    return (
+      <div style={{ ...card, padding: 16, color: DIM, fontSize: 13, lineHeight: 1.6 }}>
+        История модели 2 появится с ближайшего обновления терминала: мост посчитает ложные пробои недельной контекстной свечи
+        за последние три месяца и дальше будет добавлять каждую неделю.
+      </div>
+    );
+  const asT = (cs: HistCallM2[]): Tally => ({
+    n: cs.length,
+    ok: cs.filter((c) => c.status === 'сбылось').length,
+    bad: cs.filter((c) => c.status === 'не сбылось').length,
+    open: cs.filter((c) => c.status === 'пока не решилось').length,
+  });
+  const t = asT(calls);
+  const nores = calls.filter((c) => c.status === 'не решилось').length;
+  const live = calls.filter((c) => c.live);
+  const done = calls.filter((c) => !c.live);
+  const head = { ...label, letterSpacing: '0.06em', textAlign: 'right' as const, whiteSpace: 'nowrap' as const };
+  const grp: [ReactNode, HistCallM2[]][] = [
+    ['ждём LONG (шип вниз)', calls.filter((c) => c.side === 'LONG')],
+    ['ждём SHORT (шип вверх)', calls.filter((c) => c.side === 'SHORT')],
+    ['хвост за 27% и дальше', calls.filter((c) => c.depth >= 27)],
+    ['хвост короче 27%', calls.filter((c) => c.depth < 27)],
+  ];
+  return (
+    <div style={{ display: 'grid', gap: 14 }}>
+      <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6 }}>
+        Модель 2 — ложный пробой недельной контекстной свечи. Вызов — недели подряд, когда по инструменту живёт такой
+        пробой в одну сторону (повтор пробоя продлевает вызов). Движение сбылось — за время жизни сигнала неделя закрылась
+        за противоположной границей контекстной свечи (ложный пробой хая — ниже лоя, лоя — выше хая). Не сбылось — неделя
+        закрылась за пробитой границей. Не решилось — за три недели ни того ни другого. Последние {doc.nedel || 13} недель,
+        каждая следующая добавляется сама. Видно только вам.
+      </div>
+      <div style={{ ...card, padding: 12, display: 'flex', gap: 16, flexWrap: 'wrap', alignItems: 'baseline' }}>
+        <span style={{ ...label }}>вызовов {t.n}</span>
+        <span style={{ fontFamily: MONO, fontSize: 13, color: UP }}>сбылось {t.ok}</span>
+        <span style={{ fontFamily: MONO, fontSize: 13, color: DOWN }}>не сбылось {t.bad}</span>
+        <span style={{ fontFamily: MONO, fontSize: 13, color: DIM }}>не решилось {nores}</span>
+        <span style={{ fontFamily: MONO, fontSize: 13, color: ACCENT }}>пока не решилось {t.open}</span>
+        <span style={{ fontFamily: MONO, fontSize: 13, color: FG }}>сбылось из решённых {share(t)}</span>
+      </div>
+      <div style={{ ...card, padding: 12, overflowX: 'auto' }}>
+        <div style={{ ...label, marginBottom: 8 }}>в разрезе</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(120px, 1fr) repeat(5, minmax(40px, auto))', gap: '6px 10px', alignItems: 'baseline' }}>
+          <span />
+          <span style={head}>всего</span>
+          <span style={head}>сбылось</span>
+          <span style={head}>не сбылось</span>
+          <span style={head}>ждут</span>
+          <span style={head}>доля</span>
+          {grp
+            .filter(([, cs]) => cs.length)
+            .map(([name, cs], i) => (
+              <TallyRow key={i} name={name} t={asT(cs)} />
+            ))}
+        </div>
+      </div>
+      {live.length ? (
+        <div style={{ ...card, padding: 12 }}>
+          <div style={{ ...label, marginBottom: 4 }}>живут сейчас</div>
+          {live.map((c) => (
+            <CallRowM2 key={`${c.symbol}|${c.start}`} c={c} />
+          ))}
+        </div>
+      ) : null}
+      {done.length ? (
+        <div style={{ ...card, padding: 12 }}>
+          <div style={{ ...label, marginBottom: 4 }}>закончились</div>
+          {done.map((c) => (
+            <CallRowM2 key={`${c.symbol}|${c.start}`} c={c} />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+/** Вкладка «История направления» — две вкладки: модель 1 (как была) и модель 2 (его слово 04.11.2026). */
+export function HistoryTabs({ doc, docM2, order, symbols, onOpen }: { doc?: HistoryDoc; docM2?: HistoryDocM2; order: string[]; symbols: Set<string>; onOpen: Open }) {
+  const [m, setM] = useState<1 | 2>(1);
+  const tab = (k: 1 | 2, txt: string) => (
+    <button
+      key={k}
+      onClick={() => setM(k)}
+      aria-pressed={m === k}
+      style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', color: m === k ? FG : DIM, background: m === k ? `${ACCENT}22` : 'none', border: `1px solid ${m === k ? ACCENT : BORDER}` }}
+    >
+      {txt}
+    </button>
+  );
+  return (
+    <div>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
+        {tab(1, 'Модель 1 · направление')}
+        {tab(2, 'Модель 2 · ложный пробой недели')}
+      </div>
+      {m === 1 ? <HistoryView doc={doc} order={order} symbols={symbols} onOpen={onOpen} /> : <HistoryViewM2 doc={docM2} />}
+    </div>
+  );
+}

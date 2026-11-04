@@ -7,7 +7,7 @@ import { TradingStyle } from '@/components/terminal/Decision';
 import { Model2Feed, TrendFeed, VerdictsFeed, type Verdict } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
 import { TimeMachine, type TimeItem } from '@/components/terminal/TimeMachine';
-import { HistoryView } from '@/components/terminal/History';
+import { HistoryTabs } from '@/components/terminal/History';
 import type { Layer } from '@/components/terminal/scene';
 import { DISCLAIMER, marketOfSym } from '@/components/terminal/theme';
 import Header from './Header';
@@ -304,7 +304,7 @@ export default function TerminalView({ data, source, isAdmin, seenKey, scan = fa
     ) : (
       panel(0, <div className="tv2-empty">Загружаю сделки до и после…</div>, '')
     );
-  else if (shown === 'history' && isAdmin) body = panel(0, <HistoryView doc={feeds.history} order={rows.map((r) => r.symbol)} symbols={symbols} onOpen={openSymbol} />);
+  else if (shown === 'history' && isAdmin) body = panel(0, <HistoryTabs doc={feeds.history} docM2={feeds.history_m2} order={rows.map((r) => r.symbol)} symbols={symbols} onOpen={openSymbol} />);
 
   return (
     <div className="cv2 tv2">

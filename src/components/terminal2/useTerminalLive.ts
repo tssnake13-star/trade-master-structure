@@ -35,7 +35,8 @@ export function useTerminalLive({ user, isAdmin, section }: { user: { id: string
     const q = db.from('market_feed').select('key, data, updated_at');
     // 18.10.2026: verdicts_crypto — его решения по крипте «только мне», ученику не запрашивается (и база не отдаёт)
     // 20.10.2026: лента timemachine большая — в общую загрузку не входит; её грузит вкладка «Сделки до и после»
-    const skip = isAdmin ? ['timemachine'] : [...ADMIN_ONLY, 'verdicts_crypto', 'timemachine'];
+    // 04.11.2026: history_m2 — история модели 2, только админу
+    const skip = isAdmin ? ['timemachine'] : [...ADMIN_ONLY, 'verdicts_crypto', 'timemachine', 'history_m2'];
     return q.not('key', 'in', `(${skip.join(',')})`);
   }, [isAdmin]);
 
