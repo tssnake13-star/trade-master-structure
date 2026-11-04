@@ -4,7 +4,7 @@ import { Lock } from 'lucide-react';
 import Room from '@/components/cabinet2/Room';
 import TerminalSidebar from '@/components/terminal/Sidebar';
 import { TradingStyle } from '@/components/terminal/Decision';
-import { Model2Tabs, VerdictsFeed, type Verdict } from '@/components/terminal/Feeds';
+import { Model2Feed, Model2Journal, VerdictsFeed, type Verdict } from '@/components/terminal/Feeds';
 import { ScreenerCards } from '@/components/terminal/Screener';
 import { TimeMachine, type TimeItem } from '@/components/terminal/TimeMachine';
 import { HistoryTabs } from '@/components/terminal/History';
@@ -262,8 +262,9 @@ export default function TerminalView({ data, source, isAdmin, seenKey, scan = fa
     );
   else if (shown === 'screener') body = trial ? <TrialLock what="Скринер" /> : panel(0, <ScreenerCards doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />);
   else if (shown === 'top') body = trial ? <TrialLock what="ТОП-лист" /> : panel(0, <ScreenerCards part="top" doc={feeds.screener} symbols={symbols} onOpen={openSymbol} />);
-  else if (shown === 'model2' && isAdmin)
-    body = panel(0, <Model2Tabs doc={feeds.model2} journal={feeds.verdicts_m2} symbols={symbols} onOpen={openSymbol} picUrl={source.picUrl} />);
+  else if (shown === 'model2' && isAdmin) body = panel(0, <Model2Feed doc={feeds.model2} picUrl={source.picUrl} />);
+  else if (shown === 'verdicts_m2' && isAdmin)
+    body = panel(0, <Model2Journal doc={feeds.verdicts_m2} symbols={symbols} onOpen={openSymbol} picUrl={source.picUrl} />);
   else if (shown === 'verdicts')
     body = (
       <>

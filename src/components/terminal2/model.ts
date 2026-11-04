@@ -13,7 +13,7 @@ import type { JournalVideo } from '@/lib/journalVideos';
 
 // 21.09.2026, его слово: вкладку «Резонанс» из «Глаза системы» убрать
 // 27.09.2026, его слово: «переименуй топ циклов… или, наверное, просто топ. Оставь» — вкладка «ТОП»
-export type Section = 'instrument' | 'screener' | 'top' | 'model2' | 'verdicts' | 'timemachine' | 'history';
+export type Section = 'instrument' | 'screener' | 'top' | 'model2' | 'verdicts_m2' | 'verdicts' | 'timemachine' | 'history';
 export const SECTIONS: [Section, string][] = [
   ['instrument', 'Инструмент'],
   ['screener', 'Скринер'],
@@ -21,6 +21,9 @@ export const SECTIONS: [Section, string][] = [
   // 04.11.2026, его слово: «вкладку „Тренд“… удалить… пускай две останется — модель и история направления»
   // 04.11.2026, его слово: вкладку «Выход против недели» убрать, на её место — модель 2 (графики с комментарием); только админу
   ['model2', 'Модель 2'],
+  // 04.11.2026, его слово: «здесь должен быть журнал модели 2… вместо тренда» — его решения по допускам модели 2;
+  // ключ вкладки = ключ ленты verdicts_m2, ученику лента не загружается
+  ['verdicts_m2', 'Журнал модели 2'],
   // 25.09.2026, его слово: «переименовать в журнал решений… или даже журнал решений Сергея»
   ['verdicts', 'Журнал решений Сергея'],
   // 21.10.2026, его слово: «Верни машину времени в веб-версию… переименуй в сделки до и после»
@@ -30,11 +33,11 @@ export const SECTIONS: [Section, string][] = [
 ];
 // 25.09.2026 и 13.10.2026, его слово: эти вкладки видит только администратор, отдельной строкой; ученику их ленты
 // не загружаются вовсе (ключ ленты совпадает с вкладкой)
-export const ADMIN_ONLY: Section[] = ['model2', 'history'];
+export const ADMIN_ONLY: Section[] = ['model2', 'verdicts_m2', 'history'];
 // пробному под замком (TrialLock) — в строке вкладок идут последними
 export const TRIAL_LOCKED: Section[] = ['screener', 'top', 'timemachine'];
 // ленты, которые бот кладёт в базу сразу после его кнопки: вкладка → ключ ленты (24.09 журнал, 25.09 скринер)
-export const LIVE_FEED: Partial<Record<Section, string>> = { verdicts: 'verdicts', screener: 'screener', top: 'screener' };
+export const LIVE_FEED: Partial<Record<Section, string>> = { verdicts: 'verdicts', verdicts_m2: 'verdicts_m2', screener: 'screener', top: 'screener' };
 
 export type Tab = 'Анализ' | 'Циклы' | 'Накопления' | 'Рейндж' | 'Как в боте' | 'История';
 export const TABS: Tab[] = ['Анализ', 'Циклы', 'Накопления', 'Рейндж', 'Как в боте', 'История'];

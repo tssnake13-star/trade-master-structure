@@ -162,38 +162,17 @@ export function ScreenerFeed({ doc, symbols, onOpen }: { doc?: FeedDocs['screene
   );
 }
 
-/** Вкладка «Модель 2»: ложные пробои недели (графики по неделям) и журнал модели 2 — его решения по её допускам,
- *  отдельно от журнала решений модели 1 (его слово 04.11.2026). Обе — только админу. */
-export function Model2Tabs({ doc, journal, symbols, onOpen, picUrl }: { doc?: FeedDocs['model2']; journal?: FeedDocs['verdicts_m2']; symbols: Set<string>; onOpen: Open; picUrl?: (p: string) => string }) {
-  const [m, setM] = useState<'weeks' | 'journal'>('weeks');
-  const tab = (k: 'weeks' | 'journal', txt: string) => (
-    <button
-      key={k}
-      onClick={() => setM(k)}
-      aria-pressed={m === k}
-      style={{ fontFamily: MONO, fontSize: 11, letterSpacing: '0.1em', textTransform: 'uppercase', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', color: m === k ? FG : DIM, background: m === k ? `${ACCENT}22` : 'none', border: `1px solid ${m === k ? ACCENT : BORDER}` }}
-    >
-      {txt}
-    </button>
-  );
-  const n = journal?.items?.length || 0;
+/** Журнал модели 2 — отдельная вкладка администратора (04.11.2026, его слово: «завести отдельный журнал по модели
+ *  номер 2… этот журнал вижу только я» и «здесь должен быть журнал модели 2… вместо тренда»). Его решения по допускам
+ *  модели 2 — тем же видом, что журнал решений, без его вводных слов и итогов счёта (они про модель 1). */
+export function Model2Journal({ doc, symbols, onOpen, picUrl }: { doc?: FeedDocs['verdicts_m2']; symbols: Set<string>; onOpen: Open; picUrl?: (p: string) => string }) {
   return (
     <div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 14 }}>
-        {tab('weeks', 'Ложные пробои недели')}
-        {tab('journal', n ? `Журнал модели 2 · ${n}` : 'Журнал модели 2')}
+      <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 12 }}>
+        Ваши решения по допускам модели 2 — ложный пробой недельной контекстной свечи. В журнал решений модели 1 они не
+        попадают. Видно только вам.
       </div>
-      {m === 'weeks' ? (
-        <Model2Feed doc={doc} picUrl={picUrl} />
-      ) : (
-        <div>
-          <div style={{ color: DIM, fontSize: 12, lineHeight: 1.5, marginBottom: 12 }}>
-            Ваши решения по допускам модели 2 — ложный пробой недельной контекстной свечи. В журнал решений модели 1 они не
-            попадают. Видно только вам.
-          </div>
-          <VerdictsFeed doc={journal} symbols={symbols} onOpen={onOpen} picUrl={picUrl} bare />
-        </div>
-      )}
+      <VerdictsFeed doc={doc} symbols={symbols} onOpen={onOpen} picUrl={picUrl} bare />
     </div>
   );
 }
@@ -854,7 +833,8 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
                   {v.both_layers ? ' · оба слоя' : ''}
                 </span>
                 {v.scenario ? <span style={{ ...label }}>{v.scenario === 'итог' ? 'сценарий по контексту' : v.scenario === 'модель 2' ? 'модель 2' : `сценарий ${v.scenario}`}</span> : null}
-                {known ? (
+                {/* 04.11.2026: в журнале модели 2 кнопки нет — разбор инструмента это первая модель (его слово) */}
+                {known && !bare ? (
                   <button
                     onClick={() => onOpen(v.instrument)}
                     style={{ marginLeft: 'auto', fontFamily: MONO, fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: ACCENT, background: 'none', border: `1px solid ${BORDER}`, borderRadius: 7, padding: '5px 9px', cursor: 'pointer' }}
