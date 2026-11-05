@@ -1,0 +1,1088 @@
+<!doctype html>
+<html lang="ru">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Бесплатный тренажёр TRADE LIKE TYO: 10 реальных ситуаций. Решите сами — допуск или отказ, потом посмотрите, что решила система и что было дальше.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Тренажёр «Допуск или отказ» — TRADE LIKE TYO">
+<meta property="og:description" content="10 реальных ситуаций: решите сами, допуск или отказ, и посмотрите, что было дальше. Бесплатно.">
+<meta property="og:image" content="https://www.tradeliketyo.com/trener/img/01_h4.jpg">
+<link rel="icon" href="/favicon.png">
+<style>html,body{margin:0}img{max-width:100%}[hidden]{display:none!important}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<title>Тренажёр «Допуск или отказ»</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Unbounded:wght@500;700&display=swap">
+<style>
+/* Тёмный терминал, как графики бота: одна колонка под телефон, решение — в нижней панели. Единый тёмный вид по выбору. */
+:root {
+  color-scheme: dark;
+  --bg: #11151b;
+  --panel: #191e26;
+  --line: #2a313c;
+  --fg: #ece6d8;
+  --muted: #8f97a4;
+  --gold: #e8b04a;
+  --up: #2fbf8f;
+  --down: #e5534b;
+  --cyan: #2cc6df;
+  --f-display: "Unbounded", "Golos Text", system-ui, sans-serif;
+  --f-body: "Golos Text", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, "Consolas", monospace;
+}
+html, body { background: var(--bg); color: var(--fg); }
+body {
+  font-family: var(--f-body); font-size: 16px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 720px; margin: 0 auto; padding-block: 20px 120px; display: flex; flex-direction: column; gap: 22px; }
+.eyebrow { font-family: var(--f-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1, h2 { font-family: var(--f-display); font-weight: 700; text-wrap: balance; margin: 0; letter-spacing: -.01em; }
+h1 { font-size: clamp(26px, 6.4vw, 38px); line-height: 1.15; }
+h2 { font-size: 19px; line-height: 1.3; }
+p { margin: 0; max-width: 62ch; }
+.muted { color: var(--muted); }
+.mono { font-family: var(--f-mono); font-variant-numeric: tabular-nums; }
+
+/* вводный экран */
+.honest { border: 1px solid var(--line); background: var(--panel); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+.big { font-family: var(--f-display); font-size: clamp(44px, 13vw, 64px); color: var(--gold); line-height: 1; }
+.bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.bar span { height: 12px; border-radius: 3px; background: var(--down); opacity: .85; }
+.bar span.win { background: var(--up); }
+.bar-cap { display: flex; justify-content: space-between; font-family: var(--f-mono); font-size: 12px; color: var(--muted); }
+
+/* ситуация */
+.ticket { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.sym { font-family: var(--f-mono); font-weight: 600; font-size: 22px; }
+.chip { font-family: var(--f-mono); font-size: 13px; padding: 4px 10px; border-radius: 999px; border: 1px solid currentColor; }
+.chip.short { color: var(--down); } .chip.long { color: var(--up); }
+.frame { display: flex; flex-direction: column; gap: 10px; }
+.frame-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.tf { font-family: var(--f-mono); font-size: 13px; color: var(--gold); letter-spacing: .06em; }
+.shot { display: block; width: 100%; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #161a20; padding: 0; cursor: zoom-in; }
+.shot img { display: block; width: 100%; height: auto; }
+.shot:focus-visible, button:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.hint { font-size: 13px; color: var(--muted); }
+
+/* нижняя панель решения */
+.dock {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
+  background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px);
+  border-top: 1px solid var(--line);
+  padding: 12px max(16px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
+}
+.dock-in { max-width: 720px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.btn { font-family: var(--f-display); font-weight: 700; font-size: 17px; border-radius: 12px; padding: 15px 12px; border: 0; cursor: pointer; color: #0d1014; }
+.btn.yes { background: var(--up); }
+.btn.no { background: var(--down); }
+.btn.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); font-family: var(--f-body); font-weight: 600; font-size: 15px; }
+.btn.wide { width: 100%; }
+a.btn { display: block; text-align: center; text-decoration: none; box-sizing: border-box; }
+.btn[disabled] { opacity: .45; cursor: default; }
+
+/* результат */
+.verdict { border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--line); background: var(--panel); }
+.verdict.ok { border-color: color-mix(in srgb, var(--up) 60%, var(--line)); }
+.verdict.miss { border-color: color-mix(in srgb, var(--down) 60%, var(--line)); }
+.verdict .line1 { font-family: var(--f-display); font-size: 20px; }
+.ok .mark { color: var(--up); } .miss .mark { color: var(--down); }
+.why { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.why li { display: grid; grid-template-columns: 92px 1fr; gap: 12px; padding: 12px 0; border-top: 1px solid var(--line); }
+.why li:first-child { border-top: 0; padding-top: 0; }
+.why b { font-family: var(--f-mono); font-size: 13px; font-weight: 600; color: var(--gold); padding-top: 2px; }
+.voice { border: 1px dashed var(--gold); border-radius: 12px; padding: 14px 16px; color: var(--muted); font-size: 15px; }
+.voice strong { color: var(--gold); font-weight: 600; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.fact { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.fact span { font-size: 12px; color: var(--muted); }
+.fact strong { font-family: var(--f-mono); font-size: 16px; font-variant-numeric: tabular-nums; }
+.fact.take strong { color: var(--up); }
+.fact.stop strong { color: var(--down); }
+.legend { font-size: 13.5px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px 16px; }
+.legend b { color: var(--fg); font-weight: 600; }
+.tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 4px; }
+.tab { font-family: var(--f-body); font-weight: 600; font-size: 15px; padding: 10px; border: 0; border-radius: 9px; background: transparent; color: var(--muted); cursor: pointer; }
+.tab[aria-selected="true"] { background: var(--line); color: var(--fg); }
+.tabpane { display: flex; flex-direction: column; gap: 10px; }
+.var-title { font-family: var(--f-display); font-size: 17px; margin: 14px 0 0; padding-top: 14px; border-top: 1px solid var(--line); }
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cmp { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.cmp span { font-size: 13px; color: var(--muted); }
+.cmp strong { font-family: var(--f-mono); font-size: 20px; color: var(--up); }
+.cmp.neg strong { color: var(--down); }
+.breakdown { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
+.note { font-size: 14px; color: var(--muted); border-left: 2px solid var(--line); padding-left: 12px; }
+.maket { font-family: var(--f-mono); font-size: 12px; color: var(--muted); text-align: center; }
+
+/* карточка допуска — язык терминала */
+.card { border: 1px solid var(--line); background: var(--panel); border-radius: 12px; padding: 6px 14px; overflow-x: auto; }
+.card-head { font-family: var(--f-mono); font-weight: 600; font-size: 16px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.card-head.ok { color: var(--up); } .card-head.no { color: var(--down); }
+.row { display: grid; grid-template-columns: 24px 1fr; gap: 8px; padding: 9px 0; border-top: 1px solid color-mix(in srgb, var(--line) 60%, transparent); font-size: 14.5px; line-height: 1.45; }
+.card-head + .row { border-top: 0; }
+.row .ic { text-align: center; }
+.row .tx { min-width: 0; overflow-wrap: anywhere; }
+.row .tx .why-note { display: block; color: var(--muted); font-size: 13px; }
+.row .sub { display: block; color: var(--muted); font-size: 13px; padding-top: 3px; }
+.row.top .tx { color: var(--gold); font-weight: 600; }
+/* почему шорт / лонг / отказ — крупно, потом только то, что за */
+.why-big { font-family: var(--f-display); font-weight: 700; font-size: clamp(32px, 10vw, 52px); line-height: 1.05; letter-spacing: -.01em; text-wrap: balance; }
+.why-big.short { color: var(--down); } .why-big.long { color: var(--up); } .why-big.otkaz { color: var(--gold); }
+.why-sub { color: var(--muted); font-size: 15px; }
+.reasons { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.reasons li { display: grid; grid-template-columns: 26px 1fr; gap: 10px; padding: 13px 0; border-top: 1px solid var(--line); }
+.reasons li:first-child { border-top: 0; }
+.reasons .ic { font-size: 18px; line-height: 1.3; }
+.reasons .tx { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.reasons .t { font-weight: 700; font-size: 17px; }
+.reasons .d { font-size: 15px; }
+.reasons .raw { font-family: var(--f-mono); font-size: 12.5px; color: var(--muted); overflow-wrap: anywhere; }
+.reasons .hl { border-left: 3px solid var(--gold); background: color-mix(in srgb, var(--gold) 10%, transparent); padding: 8px 10px; border-radius: 0 8px 8px 0; font-size: 14.5px; }
+details.more { border: 1px solid var(--line); border-radius: 10px; padding: 10px 14px; }
+details.more .card { margin-top: 10px; }
+details.more summary { cursor: pointer; color: var(--muted); font-size: 14px; }
+details.more pre { font-family: var(--f-mono); font-size: 12.5px; white-space: pre-wrap; margin: 10px 0 0; color: var(--fg); }
+
+/* увеличение графика */
+.zoom { position: fixed; inset: 0; z-index: 40; background: rgba(5, 7, 10, .94); display: flex; flex-direction: column; }
+.zoom-bar { display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: calc(10px + env(safe-area-inset-top, 0px)) max(16px, env(safe-area-inset-right, 0px)) 10px max(16px, env(safe-area-inset-left, 0px)); color: var(--fg); }
+.zoom-scroll { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; }
+.zoom-scroll img { display: block; width: 1100px; max-width: none; height: auto; }
+@media (prefers-reduced-motion: no-preference) {
+  .view { animation: rise .35s ease-out both; }
+  @keyframes rise { from { opacity: .001; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+}
+@media (max-width: 420px) { .why li { grid-template-columns: 1fr; gap: 4px; } }
+</style>
+
+<!-- 1. Перед стартом -->
+<section class="wrap view" id="v-intro">
+  <div class="eyebrow">Тренажёр · Допуск или отказ</div>
+  <h1>Сначала честно о том, как выглядит моя торговля</h1>
+  <div class="honest">
+    <div class="big mono">23,1%</div>
+    <p>Столько сделок в моей системе закрываются в прибыль. Из 4 сделок 3 закрываются стопом.</p>
+    <div>
+      <div class="bar" aria-hidden="true"><span class="win"></span><span></span><span></span><span></span></div>
+      <div class="bar-cap"><span>1 тейк</span><span>3 стопа</span></div>
+    </div>
+    <p>Деньги делает то, что средний тейк в 9,5 раза больше стопа. Средний выигрыш +9,55 R, средний проигрыш −1,00 R.</p>
+    <p class="muted">Здесь вы учитесь видеть ситуацию так, как вижу её я. Обещания прибыли здесь нет. В тренажёре будут и сделки, которые закрылись стопом.</p>
+  </div>
+  <p>Как это устроено. Терминал поймал триггер на H4. Вы смотрите четыре графика в тот момент, когда решение ещё не принято: H4, дневку, неделю и поводыря. Потом нажимаете «Допуск» или «Отказ». После ответа увидите решение системы, зону входа и что было дальше.</p>
+  <button class="btn yes wide" id="b-start" type="button">Понятно, начать</button>
+  <div class="maket">Статистика счёта: срез на 31.10.2026</div>
+</section>
+
+<!-- 2. Ситуация до ответа -->
+<section class="wrap view sit" id="v-sit-1" data-n="1" data-right="ДОПУСК" hidden>
+  <div class="eyebrow">Ситуация 1 из 10</div>
+  <div class="ticket"><span class="sym">USDCHF</span><span class="chip short">триггер в шорт</span></div>
+  <p>Терминал поймал триггер на продажу. Графики показаны в момент решения, будущего на них нет. Решите: вы бы пустили эту сделку?</p>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Триггер на H4</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="H4" aria-label="Увеличить график H4"><img loading="lazy" alt="График H4 на момент триггера: накопления, свинги, реверс, PPR, треугольники" src="img/01_h4.jpg"></button>
+    <p class="hint">Розовая вертикаль — свеча триггера. Правее неё будущее, его здесь нет.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Дневка</h2><span class="tf">D1</span></div>
+    <button class="shot" type="button" data-src="D1" aria-label="Увеличить дневной график"><img loading="lazy" alt="Дневной график с циклом, накоплениями и реверсом" src="img/01_d1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Неделя</h2><span class="tf">W1</span></div>
+    <button class="shot" type="button" data-src="W1" aria-label="Увеличить недельный график"><img loading="lazy" alt="Недельный график с циклом и накоплениями" src="img/01_w1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Поводырь: индекс доллара</h2><span class="tf">DXY · D1</span></div>
+    <button class="shot" type="button" data-src="DXY" aria-label="Увеличить график индекса доллара"><img loading="lazy" alt="Дневной график индекса доллара" src="img/01_dxy.jpg"></button>
+    <p class="hint">Для долларовой пары ведёт индекс доллара.</p>
+  </div>
+  <p class="hint">Нажмите на график, чтобы рассмотреть его крупно.</p>
+</section>
+
+<!-- 3. Ответ -->
+<section class="wrap view res" id="v-res-1" hidden>
+  <div class="eyebrow">Ситуация 1 из 10 · USDCHF · шорт</div>
+  <div class="verdict" id="verdict-1">
+    <div class="line1"><span class="mark" id="mark-1"></span> <span id="mine-1"></span></div>
+    <p>Решение системы: <strong>допуск</strong>.</p>
+  </div>
+
+  <div class="frame">
+    <div class="why-big short">ПОЧЕМУ ШОРТ</div><p class="why-sub">Решение системы: допуск. Ниже фильтры, которые были за.</p><ul class="reasons"><li><span class="ic">✅</span><span class="tx"><span class="t">Неделя: цикл пройден</span><span class="d">Неделя смотрит против сделки.</span><span class="hl">Для второго сценария так и должно быть: недельный цикл должен быть пройден.</span><span class="raw">W1 [1/3] · свинг ↑ | свеча ↓ | накопления ↑</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Подтверждение на дневке</span><span class="d">Развернулись в сторону сделки: свинг ↓, реверс ↓.</span><span class="raw">Подтверждение [2/3] · свинг ↓ | свеча ↑ | реверс ↓</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Контекст за</span><span class="d">По контексту (DXY SELL).</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Сценарий 2</span><span class="d">Недельный цикл уже пройден. Дневка развернулась против недели, и её цикл ещё не пройден. Сделка идёт по дневке.</span><span class="raw">Цикл: сценарий 2 · подтверждение есть · контекст за</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Точка входа: тест накопления на H4</span><span class="d">Цена коснулась накопления на H4, на этом касании пришёл триггер. Это первая модель точки входа.</span><span class="raw">Тест накопления H4: сопротивление от 19.02 08:00 · касание 28.02 16:00</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Запас хода есть</span><span class="d">Движению есть куда идти.</span><span class="raw">Запас хода: входить можно · у поводыря (индекс доллара, SHORT) запас до лоу 27.09</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Архив</span><span class="d">Похожих ситуаций в архиве: 3.</span></span></li></ul>
+    <details class="more"><summary>Полная карточка терминала</summary><div class="card" role="list"><div class="card-head ok">✅ ДОПУСК | SHORT USDCHF</div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">W1 [1/3] · свинг ↑ | свеча ↓ | накопления ↑<span class="why-note">неделя против, второй сценарий: недельный цикл пройден, есть подтверждение</span></span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">D1 [1/3] · свинг ↓ | свеча ↑ | накопления ↑<span class="why-note">не запрещает: неделя не в споре</span></span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Подтверждение [2/3] · свинг ↓ | свеча ↑ | реверс ↓</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Контекст: ✅ По контексту (DXY SELL)</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Цикл: сценарий 2 · подтверждение есть · контекст за</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Тест накопления H4: сопротивление от 19.02 08:00 · касание 28.02 16:00</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Запас хода: входить можно · у поводыря (индекс доллара, SHORT) запас до лоу 27.09</span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Рейндж недели — предупреждение, не блокирует:<span class="sub">USDCHF · неделя: внутри контекстной свечи SHORT от 09.07.2023 · закрытий внутри 84 · выхода нет · цена на 73% от лоу к хаю</span></span></div>
+<div class="row" role="listitem"><span class="ic">📈</span><span class="tx">Накопления — информация, не запрет:<span class="sub">USDCHF · неделя: тренд вверх — свежий, после разворота (25.08.24 → 26.01, отменены 07.04.24 и 28.04.24)</span><span class="sub">USDCHF · дневка: тренд вверх (05.12.24 → 14.02); просто выход вниз из 14.02 против недели — рабочий сценарий в LONG. Потенциальная точка входа — предварительный уровень и зона выхода</span><span class="sub">индекс доллара · неделя: тренд вверх (24.11.24 → 19.01)</span><span class="sub">индекс доллара · дневка: тренд вверх (24.09.24 → 24.01); просто выход вниз из 24.01 против недели — рабочий сценарий в LONG</span></span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Накопления против сделки — информация, не запрет</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Архив: 3 аналогов из 958</span></div></div><pre>Аналогов: 3 (порог: 0)
+Медианный индекс: 86%
+Топ аналоги:
+  №334 | 20.03.2012 | AUDUSD | 91%
+  №772 | 28.10.2015 | EURAUD | 86%
+  №733 | 25.04.2018 | GBPCAD | 85%
+✅ По контексту (DXY SELL)</pre></details>
+    <p class="note">Те же фильтры пропускают и сделки, которые потом закрываются стопом.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Зона входа</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="ZONA" aria-label="Увеличить график зоны входа"><img loading="lazy" alt="Зона синхронизации на H4 в момент триггера" src="img/01_zona.jpg"></button>
+    <p>Сошлись три метода: накопление, свинг и треугольник. Продажа (START-SELL) ставится на нижний край зоны: ордер ждёт, пока цена до него дойдёт.</p><div class="facts"><div class="fact"><span>Зона синхронизации</span><strong>0.90246 – 0.90543</strong></div><div class="fact"><span>START-SELL</span><strong>0.90246</strong></div></div>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Что было дальше</h2><span class="tf">Hunter_Bot</span></div>
+    <button class="shot" type="button" aria-label="Увеличить график: что было дальше"><img loading="lazy" alt="Что было дальше: вход, стоп, тейк, безубыток" src="img/01_posle.jpg"></button><div class="legend"><span><b>▼</b> вход</span><span><b style="color:var(--gold)">●</b> 5 к 1: стоп на вход</span><span><b style="color:var(--up)">●</b> тейк</span><span><b style="color:var(--down)">●</b> стоп</span></div><p>Цена дошла до START в первой же свече после триггера. Hunter_Bot поставил стоп 30% от ATR дневки и тейк 9 к 1. На 5 к 1 стоп переехал на вход, в безубыток. Сделка дошла до тейка 9 к 1. С пирамидой на том же 5 к 1 Hunter_Bot ещё закрывает 70% объёма, а пирамида добавляет 3 ордера по ходу движения. Поэтому итог другой.</p><div class="facts"><div class="fact stop"><span>Стоп · 30% ATR дневки</span><strong>0.90401</strong></div><div class="fact take"><span>Тейк · 9 к 1</span><strong>0.88853</strong></div></div><div class="compare"><div class="cmp"><span>Итог без пирамиды</span><strong>+9,0 R</strong></div><div class="cmp"><span>Итог с пирамидой</span><strong>+11,8 R</strong></div></div>
+  </div>
+
+  <p class="note">Эта сделка закрылась тейком. Из 4 сделок по системе 3 закрываются стопом, и такие в тренажёре тоже будут.</p>
+  <div style="display:grid; gap:10px">
+    <button class="btn yes wide" type="button" data-next="7">Следующая ситуация →</button>
+    <button class="btn ghost wide" type="button" id="b-again-1" data-again="1">Пройти эту ситуацию заново</button>
+  </div>
+  <div class="maket">Макет · Не является инвестиционной рекомендацией</div>
+</section>
+
+
+<!-- 2. Ситуация до ответа -->
+<section class="wrap view sit" id="v-sit-7" data-n="7" data-right="ДОПУСК" hidden>
+  <div class="eyebrow">Ситуация 2 из 10</div>
+  <div class="ticket"><span class="sym">EURCHF</span><span class="chip long">триггер в лонг</span></div>
+  <p>Терминал поймал триггер на покупку. Графики показаны в момент решения, будущего на них нет. Решите: вы бы пустили эту сделку?</p>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Триггер на H4</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="H4" aria-label="Увеличить график H4"><img loading="lazy" alt="График H4 на момент триггера: накопления, свинги, реверс, PPR, треугольники" src="img/07_h4.jpg"></button>
+    <p class="hint">Розовая вертикаль — свеча триггера. Правее неё будущее, его здесь нет.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Дневка</h2><span class="tf">D1</span></div>
+    <button class="shot" type="button" data-src="D1" aria-label="Увеличить дневной график"><img loading="lazy" alt="Дневной график с циклом, накоплениями и реверсом" src="img/07_d1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Неделя</h2><span class="tf">W1</span></div>
+    <button class="shot" type="button" data-src="W1" aria-label="Увеличить недельный график"><img loading="lazy" alt="Недельный график с циклом и накоплениями" src="img/07_w1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Поводырь: доллар-франк</h2><span class="tf">USDCHF · D1</span></div>
+    <button class="shot" type="button" data-src="DXY" aria-label="Увеличить график индекса доллара"><img loading="lazy" alt="Дневной график индекса доллара" src="img/07_dxy.jpg"></button>
+    <p class="hint">EURCHF входит в группу, которую ведёт USDCHF. За сделку здесь рост USDCHF.</p>
+  </div>
+  <p class="hint">Нажмите на график, чтобы рассмотреть его крупно.</p>
+</section>
+
+<!-- 3. Ответ -->
+<section class="wrap view res" id="v-res-7" hidden>
+  <div class="eyebrow">Ситуация 2 из 10 · EURCHF · лонг</div>
+  <div class="verdict" id="verdict-7">
+    <div class="line1"><span class="mark" id="mark-7"></span> <span id="mine-7"></span></div>
+    <p>Решение системы: <strong>допуск</strong>.</p>
+  </div>
+
+  <div class="frame">
+    <div class="why-big long">ПОЧЕМУ ЛОНГ</div><p class="why-sub">Решение системы: допуск. Ниже фильтры, которые были за.</p><ul class="reasons"><li><span class="ic">⭐</span><span class="tx"><span class="t">Неделя за 3 из 3</span><span class="d">Неделя смотрит в сторону сделки: свинг ↑, свеча ↑, накопления ↑.</span><span class="raw">W1 [3/3] · свинг ↑ | свеча ↑ | накопления ↑</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Подтверждение на дневке</span><span class="d">Развернулись в сторону сделки: свинг ↑, свеча ↑, реверс ↑.</span><span class="raw">Подтверждение [3/3] · свинг ↑ | свеча ↑ | реверс ↑</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Контекст за</span><span class="d">По контексту (CHF BUY).</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Сценарий 1</span><span class="d">Недельный цикл не закончен, и цикл дневки в ту же сторону тоже не закончен. Неделя и дневка смотрят в одну сторону.</span><span class="raw">Цикл: сценарий 1 · подтверждение есть · поводырь за</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Всё в одну сторону</span><span class="d">Цикл, критерии и накопления смотрят в сторону сделки.</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Точка входа: тест накопления на H4</span><span class="d">Цена коснулась накопления на H4, на этом касании пришёл триггер. Это первая модель точки входа.</span><span class="raw">Тест накопления H4: поддержка от 14.09 12:00 · касание 18.09 20:00 · предварительный выход вверх 17.09 12:00</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Запас хода есть</span><span class="d">Движению есть куда идти.</span><span class="raw">Запас хода: входить можно · у USDCHF хай 29.07 переписан 16.09, а у индекса доллара (LONG) запас до хая 24.06 · у самого EURCHF хай 22.06 переписан 13.07</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Архив</span><span class="d">Похожих ситуаций в архиве: 4.</span></span></li></ul>
+    <details class="more"><summary>Полная карточка терминала</summary><div class="card" role="list"><div class="card-head ok">✅ ДОПУСК | LONG EURCHF</div>
+<div class="row" role="listitem"><span class="ic">⭐️</span><span class="tx">W1 [3/3] · свинг ↑ | свеча ↑ | накопления ↑</span></div>
+<div class="row" role="listitem"><span class="ic">⭐️</span><span class="tx">D1 [3/3] · свинг ↑ | свеча ↑ | накопления ↑</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Подтверждение [3/3] · свинг ↑ | свеча ↑ | реверс ↑</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Контекст: ✅ По контексту (CHF BUY)</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Цикл: сценарий 1 · подтверждение есть · поводырь за</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Тест накопления H4: поддержка от 14.09 12:00 · касание 18.09 20:00 · предварительный выход вверх 17.09 12:00</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Запас хода: входить можно · у USDCHF хай 29.07 переписан 16.09, а у индекса доллара (LONG) запас до хая 24.06 · у самого EURCHF хай 22.06 переписан 13.07</span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Рейндж недели — предупреждение, не блокирует:<span class="sub">EURCHF · неделя: внутри контекстной свечи LONG от 09.08.2026 · закрытий внутри 5 · выхода нет · предварительный выход вверх 13.09.2026 · цена сейчас выше хая — выход засчитается закрытием недели</span></span></div>
+<div class="row" role="listitem"><span class="ic">📈</span><span class="tx">Накопления — информация, не запрет:<span class="sub">EURCHF · неделя: тренд вверх (29.03 → 14.06)</span><span class="sub">EURCHF · дневка: тренд вверх (19.08 → 03.09)</span><span class="sub">USDCHF (поводырь) · неделя: тренд вверх (15.02 → 10.05)</span><span class="sub">USDCHF (поводырь) · дневка: боковик (живая поддержка 03.09)</span></span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Цикл, критерии и накопления смотрят в одну сторону</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Архив: 4 аналогов из 1002</span></div>
+<div class="row" role="listitem"><span class="ic">➖</span><span class="tx">Технический резонанс D1: нет</span></div></div><pre>Аналогов: 4 (порог: 0)
+Медианный индекс: 88%
+Топ аналоги:
+  №446 | 10.04.2007 | EURUSD | 93%
+  №640 | 09.11.2015 | AUDCHF | 89%
+  №309 | 13.07.2005 | USDJPY | 87%
+✅ По контексту (CHF BUY)</pre></details>
+    <p class="note">Те же фильтры пропускают и сделки, которые потом закрываются стопом.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Зона входа</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="ZONA" aria-label="Увеличить график зоны входа"><img loading="lazy" alt="Зона синхронизации на H4 в момент триггера" src="img/07_zona.jpg"></button>
+    <p>Сошлись два метода: накопление и треугольник. Покупка (START-BUY) ставится на уровень внутри зоны, ближайший к цене: ордер ждёт, пока цена до него дойдёт.</p><div class="facts"><div class="fact"><span>Зона синхронизации</span><strong>0.94358 – 0.94452</strong></div><div class="fact"><span>START-BUY</span><strong>0.94389</strong></div></div>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Что было дальше</h2><span class="tf">Hunter_Bot</span></div>
+    <button class="shot" type="button" aria-label="Увеличить график: что было дальше"><img loading="lazy" alt="Что было дальше: вход, стоп, тейк, безубыток" src="img/07_posle.jpg"></button><div class="legend"><span><b>▲</b> вход</span><span><b style="color:var(--gold)">●</b> 5 к 1: стоп на вход</span><span><b style="color:var(--up)">●</b> тейк</span><span><b style="color:var(--down)">●</b> стоп</span></div><p>Цена дошла до START через 3 свечи H4 после триггера. Hunter_Bot поставил стоп 30% от ATR дневки и тейк 9 к 1. Цена пошла против сделки и закрыла её стопом. Сразу после стопа Hunter_Bot перезашёл: на графике это ПЕРЕЗАХОД. И эта сделка закрылась стопом.</p><div class="facts"><div class="fact stop"><span>Стоп · 30% ATR дневки</span><strong>0.94280</strong></div><div class="fact take"><span>Тейк · 9 к 1</span><strong>0.95397</strong></div></div><div class="compare"><div class="cmp neg"><span>Итог без пирамиды</span><strong>−2,1 R</strong></div><div class="cmp neg"><span>Итог с пирамидой</span><strong>−2,1 R</strong></div></div>
+  </div>
+
+  <p class="note">Это правильный допуск, и он закрылся стопом. Так заканчиваются 3 из 4 сделок системы: стоп маленький, а тейк, когда приходит, в разы больше.</p>
+  <div style="display:grid; gap:10px">
+    <button class="btn yes wide" type="button" data-next="9">Следующая ситуация →</button>
+    <button class="btn ghost wide" type="button" id="b-again-7" data-again="7">Пройти эту ситуацию заново</button>
+  </div>
+  <div class="maket">Макет · Не является инвестиционной рекомендацией</div>
+</section>
+
+
+<!-- 2. Ситуация до ответа -->
+<section class="wrap view sit" id="v-sit-9" data-n="9" data-right="ОТКАЗ" hidden>
+  <div class="eyebrow">Ситуация 3 из 10</div>
+  <div class="ticket"><span class="sym">NZDUSD</span><span class="chip short">триггер в шорт</span></div>
+  <p>Терминал поймал триггер на продажу. Графики показаны в момент решения, будущего на них нет. Решите: вы бы пустили эту сделку?</p>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Триггер на H4</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="H4" aria-label="Увеличить график H4"><img loading="lazy" alt="График H4 на момент триггера: накопления, свинги, реверс, PPR, треугольники" src="img/09_h4.jpg"></button>
+    <p class="hint">Розовая вертикаль — свеча триггера. Правее неё будущее, его здесь нет.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Дневка</h2><span class="tf">D1</span></div>
+    <button class="shot" type="button" data-src="D1" aria-label="Увеличить дневной график"><img loading="lazy" alt="Дневной график с циклом, накоплениями и реверсом" src="img/09_d1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Неделя</h2><span class="tf">W1</span></div>
+    <button class="shot" type="button" data-src="W1" aria-label="Увеличить недельный график"><img loading="lazy" alt="Недельный график с циклом и накоплениями" src="img/09_w1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Поводырь: индекс доллара</h2><span class="tf">DXY · D1</span></div>
+    <button class="shot" type="button" data-src="DXY" aria-label="Увеличить график индекса доллара"><img loading="lazy" alt="Дневной график индекса доллара" src="img/09_dxy.jpg"></button>
+    <p class="hint">Для долларовой пары ведёт индекс доллара.</p>
+  </div>
+  <p class="hint">Нажмите на график, чтобы рассмотреть его крупно.</p>
+</section>
+
+<!-- 3. Ответ -->
+<section class="wrap view res" id="v-res-9" hidden>
+  <div class="eyebrow">Ситуация 3 из 10 · NZDUSD · шорт</div>
+  <div class="verdict" id="verdict-9">
+    <div class="line1"><span class="mark" id="mark-9"></span> <span id="mine-9"></span></div>
+    <p>Решение системы: <strong>отказ</strong>.</p>
+  </div>
+
+  <div class="frame">
+    <div class="why-big otkaz">ПОЧЕМУ ОТКАЗ</div><p class="why-sub">Решение системы: отказ. Ниже фильтры, которые закрыли вход.</p><ul class="reasons"><li><span class="ic">⛔</span><span class="tx"><span class="t">Запас хода выработан</span><span class="d">Движение уже прошло, входить поздно.</span><span class="raw">Запас хода: входить нельзя · у поводыря (индекс доллара, LONG) хай 24.06 переписан 01.10 · у самого NZDUSD лоу 26.06 переписан 29.09</span></span></li></ul>
+    <details class="more"><summary>Полная карточка терминала</summary><div class="card" role="list"><div class="card-head no">🚫 ОТКАЗ | SHORT NZDUSD</div>
+<div class="row" role="listitem"><span class="ic">⭐️</span><span class="tx">W1 [3/3] · свинг ↓ | свеча ↓ | накопления ↓</span></div>
+<div class="row" role="listitem"><span class="ic">⭐️</span><span class="tx">D1 [3/3] · свинг ↓ | свеча ↓ | накопления ↓</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Подтверждение [3/3] · свинг ↓ | свеча ↓ | реверс ↓</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Контекст: ✅ По контексту (DXY BUY)</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Цикл: сценарий 1 · подтверждение есть · контекст за</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Тест накопления H4: сопротивление от 02.10 12:00 · касание 13.10 20:00 · предварительный выход вниз 05.10 04:00 · накоплений с контактом: 2</span></div>
+<div class="row" role="listitem"><span class="ic">⛔</span><span class="tx">Запас хода: входить нельзя · у поводыря (индекс доллара, LONG) хай 24.06 переписан 01.10 · у самого NZDUSD лоу 26.06 переписан 29.09<span class="why-note">БЛОКИРУЕТ</span></span></div>
+<div class="row" role="listitem"><span class="ic">📈</span><span class="tx">Накопления — информация, не запрет:<span class="sub">NZDUSD · неделя: тренд вниз (25.01 → 16.08)</span><span class="sub">NZDUSD · дневка: тренд вниз (16.09 → 07.10)</span><span class="sub">индекс доллара · неделя: тренд вверх (12.04 → 23.08)</span><span class="sub">индекс доллара · дневка: тренд вверх (03.09 → 24.09)</span></span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Цикл, критерии и накопления смотрят в одну сторону</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Архив: 4 аналогов из 1002</span></div>
+<div class="row" role="listitem"><span class="ic">⛔</span><span class="tx">Причина отказа: Запас хода: входить нельзя — у индекса доллара хай 24.06 переписан 01.10, у самого NZDUSD лоу 26.06 переписан 29.09</span></div></div></details>
+    <p class="note">Отказ не всегда сберегает: бывает, что после отказа цена всё же идёт в сторону сделки.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Зона входа</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="ZONA" aria-label="Увеличить график зоны входа"><img loading="lazy" alt="Зона синхронизации на H4 в момент триггера" src="img/09_zona.jpg"></button>
+    <p>Сошлись два метода: свинг и треугольник. Продажа (START-SELL) ставится на нижний край зоны: сюда встал бы ордер, если бы система пустила сделку.</p><div class="facts"><div class="fact"><span>Зона синхронизации</span><strong>0.56169 – 0.56209</strong></div><div class="fact"><span>START-SELL</span><strong>0.56169</strong></div></div>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Что было дальше</h2><span class="tf">Hunter_Bot</span></div>
+    <button class="shot" type="button" aria-label="Увеличить график: что было дальше"><img loading="lazy" alt="Что было дальше: вход, стоп, тейк, безубыток" src="img/09_posle.jpg"></button><div class="legend"><span><b>▼</b> вход</span><span><b style="color:var(--gold)">●</b> 5 к 1: стоп на вход</span><span><b style="color:var(--up)">●</b> тейк</span><span><b style="color:var(--down)">●</b> стоп</span></div><p>Если бы вошли: цена дошла до START в первой же свече после триггера. Hunter_Bot поставил стоп 30% от ATR дневки и тейк 9 к 1. Цена пошла против сделки и закрыла её стопом. Сразу после стопа Hunter_Bot перезашёл: на графике это ПЕРЕЗАХОД. На 5 к 1 стоп переехал на вход, в безубыток. Цена вернулась к входу, сделка закрылась в безубыток. С пирамидой на том же 5 к 1 Hunter_Bot ещё закрывает 70% объёма, а пирамида добавляет 3 ордера по ходу движения. Поэтому итог другой.</p><div class="facts"><div class="fact stop"><span>Стоп · 30% ATR дневки</span><strong>0.56278</strong></div><div class="fact take"><span>Тейк · 9 к 1</span><strong>0.55186</strong></div></div><div class="compare"><div class="cmp neg"><span>Если бы вошли, без пирамиды</span><strong>−1,0 R</strong></div><div class="cmp neg"><span>Если бы вошли, с пирамидой</span><strong>−0,3 R</strong></div></div>
+  </div>
+
+  <p class="note">Отказ тоже решение. Фильтры закрыли вход, и сделка, если бы её взяли, тейка не дала.</p>
+  <div style="display:grid; gap:10px">
+    <button class="btn yes wide" type="button" data-next="2">Следующая ситуация →</button>
+    <button class="btn ghost wide" type="button" id="b-again-9" data-again="9">Пройти эту ситуацию заново</button>
+  </div>
+  <div class="maket">Макет · Не является инвестиционной рекомендацией</div>
+</section>
+
+
+<!-- 2. Ситуация до ответа -->
+<section class="wrap view sit" id="v-sit-2" data-n="2" data-right="ДОПУСК" hidden>
+  <div class="eyebrow">Ситуация 4 из 10</div>
+  <div class="ticket"><span class="sym">USDCAD</span><span class="chip short">триггер в шорт</span></div>
+  <p>Терминал поймал триггер на продажу. Графики показаны в момент решения, будущего на них нет. Решите: вы бы пустили эту сделку?</p>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Триггер на H4</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="H4" aria-label="Увеличить график H4"><img loading="lazy" alt="График H4 на момент триггера: накопления, свинги, реверс, PPR, треугольники" src="img/02_h4.jpg"></button>
+    <p class="hint">Розовая вертикаль — свеча триггера. Правее неё будущее, его здесь нет.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Дневка</h2><span class="tf">D1</span></div>
+    <button class="shot" type="button" data-src="D1" aria-label="Увеличить дневной график"><img loading="lazy" alt="Дневной график с циклом, накоплениями и реверсом" src="img/02_d1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Неделя</h2><span class="tf">W1</span></div>
+    <button class="shot" type="button" data-src="W1" aria-label="Увеличить недельный график"><img loading="lazy" alt="Недельный график с циклом и накоплениями" src="img/02_w1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Поводырь: индекс доллара</h2><span class="tf">DXY · D1</span></div>
+    <button class="shot" type="button" data-src="DXY" aria-label="Увеличить график индекса доллара"><img loading="lazy" alt="Дневной график индекса доллара" src="img/02_dxy.jpg"></button>
+    <p class="hint">Для долларовой пары ведёт индекс доллара.</p>
+  </div>
+  <p class="hint">Нажмите на график, чтобы рассмотреть его крупно.</p>
+</section>
+
+<!-- 3. Ответ -->
+<section class="wrap view res" id="v-res-2" hidden>
+  <div class="eyebrow">Ситуация 4 из 10 · USDCAD · шорт</div>
+  <div class="verdict" id="verdict-2">
+    <div class="line1"><span class="mark" id="mark-2"></span> <span id="mine-2"></span></div>
+    <p>Решение системы: <strong>допуск</strong>.</p>
+  </div>
+
+  <div class="frame">
+    <div class="why-big short">ПОЧЕМУ ШОРТ</div><p class="why-sub">Решение системы: допуск. Ниже фильтры, которые были за.</p><ul class="reasons"><li><span class="ic">🔥</span><span class="tx"><span class="t">ТОП-лист: №2</span><span class="d">Инструмент был в ТОП-листе на момент триггера.</span></span></li><li><span class="ic">⭐</span><span class="tx"><span class="t">Неделя за 3 из 3</span><span class="d">Неделя смотрит в сторону сделки: свинг ↓, свеча ↓, накопления ↓.</span><span class="raw">W1 [3/3] · свинг ↓ | свеча ↓ | накопления ↓</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Подтверждение на дневке</span><span class="d">Развернулись в сторону сделки: свинг ↓, свеча ↓, реверс ↓.</span><span class="raw">Подтверждение [3/3] · свинг ↓ | свеча ↓ | реверс ↓</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Сценарий 1</span><span class="d">Недельный цикл не закончен, и цикл дневки в ту же сторону тоже не закончен. Неделя и дневка смотрят в одну сторону.</span><span class="raw">Цикл: сценарий 1 · подтверждение есть · поводырь за</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Всё в одну сторону</span><span class="d">Цикл, критерии и накопления смотрят в сторону сделки.</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Точка входа: зона без теста накопления</span><span class="d">Теста накопления на H4 нет, но рядом сошлись свинг и зона выхода из накопления. Это вторая модель точки входа.</span><span class="raw">Тест накопления H4: теста нет · зона без теста накопления: сошлись свинг + зона выхода из накопления</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Запас хода есть</span><span class="d">Движению есть куда идти.</span><span class="raw">Запас хода: входить можно · у поводыря (индекс доллара, SHORT) запас до лоу 17.09</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Архив</span><span class="d">Похожих ситуаций в архиве: 1.</span></span></li></ul>
+    <details class="more"><summary>Полная карточка терминала</summary><div class="card" role="list"><div class="card-head ok">✅ ДОПУСК | SHORT USDCAD</div>
+<div class="row top" role="listitem"><span class="ic">🔥</span><span class="tx">ТОП-ЛИСТ — №2 в списке</span></div>
+<div class="row" role="listitem"><span class="ic">⭐️</span><span class="tx">W1 [3/3] · свинг ↓ | свеча ↓ | накопления ↓</span></div>
+<div class="row" role="listitem"><span class="ic">⭐️</span><span class="tx">D1 [3/3] · свинг ↓ | свеча ↓ | накопления ↓</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Подтверждение [3/3] · свинг ↓ | свеча ↓ | реверс ↓</span></div>
+<div class="row" role="listitem"><span class="ic">➖</span><span class="tx">Контекст: ➖ Нейтральный контекст</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Цикл: сценарий 1 · подтверждение есть · поводырь за</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Тест накопления H4: теста нет · зона без теста накопления: сошлись свинг + зона выхода из накопления</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Запас хода: входить можно · у поводыря (индекс доллара, SHORT) запас до лоу 17.09</span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Рейндж недели — предупреждение, не блокирует:<span class="sub">USDCAD · неделя: внутри контекстной свечи SHORT от 06.04.2025 · закрытий внутри 34 · выхода нет · предварительный выход вниз 27.07.2025 · цена на 1% от лоу к хаю</span></span></div>
+<div class="row" role="listitem"><span class="ic">📈</span><span class="tx">Накопления — информация, не запрет:<span class="sub">USDCAD · неделя: тренд вниз (15.12.24 → 23.02)</span><span class="sub">USDCAD · дневка: тренд вниз — свежий, после разворота (20.11 → 28.11, отменены 25.09 и 02.10)</span><span class="sub">индекс доллара (поводырь) · неделя: тренд вниз (13.07 → 10.08)</span><span class="sub">индекс доллара (поводырь) · дневка: тренд вверх (25.09 → 21.10)</span></span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Цикл, критерии и накопления смотрят в одну сторону</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Архив: 1 аналогов из 996</span></div></div><pre>Аналогов: 1 (порог: 0)
+Медианный индекс: 86%
+Топ аналоги:
+  №424 | 30.09.2016 | GBPAUD | 86%
+➖ Нейтральный контекст</pre></details>
+    <p class="note">Те же фильтры пропускают и сделки, которые потом закрываются стопом.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Зона входа</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="ZONA" aria-label="Увеличить график зоны входа"><img loading="lazy" alt="Зона синхронизации на H4 в момент триггера" src="img/02_zona.jpg"></button>
+    <p>Сошлись два метода: накопление и свинг. Продажа (START-SELL) ставится на нижний край зоны: ордер ждёт, пока цена до него дойдёт.</p><div class="facts"><div class="fact"><span>Зона синхронизации</span><strong>1.38579 – 1.38738</strong></div><div class="fact"><span>START-SELL</span><strong>1.38579</strong></div></div>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Что было дальше</h2><span class="tf">Hunter_Bot</span></div>
+    <button class="shot" type="button" aria-label="Увеличить график: что было дальше"><img loading="lazy" alt="Что было дальше: вход, стоп, тейк, безубыток" src="img/02_posle.jpg"></button><div class="legend"><span><b>▼</b> вход</span><span><b style="color:var(--gold)">●</b> 5 к 1: стоп на вход</span><span><b style="color:var(--up)">●</b> тейк</span><span><b style="color:var(--down)">●</b> стоп</span></div><p>Цена дошла до START через 2 свечи H4 после триггера. Hunter_Bot поставил стоп 30% от ATR дневки и тейк 9 к 1. На 5 к 1 стоп переехал на вход, в безубыток. Сделка дошла до тейка 9 к 1. С пирамидой на том же 5 к 1 Hunter_Bot ещё закрывает 70% объёма, а пирамида добавляет 3 ордера по ходу движения. Поэтому итог другой.</p><div class="facts"><div class="fact stop"><span>Стоп · 30% ATR дневки</span><strong>1.38748</strong></div><div class="fact take"><span>Тейк · 9 к 1</span><strong>1.37060</strong></div></div><div class="compare"><div class="cmp"><span>Итог без пирамиды</span><strong>+9,0 R</strong></div><div class="cmp"><span>Итог с пирамидой</span><strong>+11,6 R</strong></div></div>
+  </div>
+
+  <p class="note">Эта сделка закрылась тейком. Из 4 сделок по системе 3 закрываются стопом, и такие в тренажёре тоже будут.</p>
+  <div style="display:grid; gap:10px">
+    <button class="btn yes wide" type="button" data-next="8">Следующая ситуация →</button>
+    <button class="btn ghost wide" type="button" id="b-again-2" data-again="2">Пройти эту ситуацию заново</button>
+  </div>
+  <div class="maket">Макет · Не является инвестиционной рекомендацией</div>
+</section>
+
+
+<!-- 2. Ситуация до ответа -->
+<section class="wrap view sit" id="v-sit-8" data-n="8" data-right="ДОПУСК" hidden>
+  <div class="eyebrow">Ситуация 5 из 10</div>
+  <div class="ticket"><span class="sym">AUDCHF</span><span class="chip short">триггер в шорт</span></div>
+  <p>Терминал поймал триггер на продажу. Графики показаны в момент решения, будущего на них нет. Решите: вы бы пустили эту сделку?</p>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Триггер на H4</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="H4" aria-label="Увеличить график H4"><img loading="lazy" alt="График H4 на момент триггера: накопления, свинги, реверс, PPR, треугольники" src="img/08_h4.jpg"></button>
+    <p class="hint">Розовая вертикаль — свеча триггера. Правее неё будущее, его здесь нет.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Дневка</h2><span class="tf">D1</span></div>
+    <button class="shot" type="button" data-src="D1" aria-label="Увеличить дневной график"><img loading="lazy" alt="Дневной график с циклом, накоплениями и реверсом" src="img/08_d1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Неделя</h2><span class="tf">W1</span></div>
+    <button class="shot" type="button" data-src="W1" aria-label="Увеличить недельный график"><img loading="lazy" alt="Недельный график с циклом и накоплениями" src="img/08_w1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Поводырь: доллар-франк</h2><span class="tf">USDCHF · D1</span></div>
+    <button class="shot" type="button" data-src="DXY" aria-label="Увеличить график индекса доллара"><img loading="lazy" alt="Дневной график индекса доллара" src="img/08_dxy.jpg"></button>
+    <p class="hint">AUDCHF входит в группу, которую ведёт USDCHF. За сделку здесь падение USDCHF.</p>
+  </div>
+  <p class="hint">Нажмите на график, чтобы рассмотреть его крупно.</p>
+</section>
+
+<!-- 3. Ответ -->
+<section class="wrap view res" id="v-res-8" hidden>
+  <div class="eyebrow">Ситуация 5 из 10 · AUDCHF · шорт</div>
+  <div class="verdict" id="verdict-8">
+    <div class="line1"><span class="mark" id="mark-8"></span> <span id="mine-8"></span></div>
+    <p>Решение системы: <strong>допуск</strong>.</p>
+  </div>
+
+  <div class="frame">
+    <div class="why-big short">ПОЧЕМУ ШОРТ</div><p class="why-sub">Решение системы: допуск. Ниже фильтры, которые были за.</p><ul class="reasons"><li><span class="ic">✅</span><span class="tx"><span class="t">Неделя: цикл пройден</span><span class="d">Неделя смотрит против сделки.</span><span class="hl">Для второго сценария так и должно быть: недельный цикл должен быть пройден.</span><span class="raw">W1 [1/3] · свинг ↑ | свеча ↓ | накопления ↑</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Подтверждение на дневке</span><span class="d">Развернулись в сторону сделки: свинг ↓, свеча ↓, реверс ↓.</span><span class="raw">Подтверждение [3/3] · свинг ↓ | свеча ↓ | реверс ↓</span></span></li><li><span class="ic">⚠️</span><span class="tx"><span class="t">Поводырь группы против</span><span class="d">Поводырь группы смотрит в другую сторону. Терминал всё равно пропустил сделку, с пометкой «для сведения»: по циклам всё сходится.</span><span class="hl">Это предупреждение, а не запрет.</span><span class="raw">Контекст: ⛔ Отказ: сигнал против контекста (CHF BUY)</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Сценарий 2</span><span class="d">Недельный цикл уже пройден. Дневка развернулась против недели, и её цикл ещё не пройден. Сделка идёт по дневке.</span><span class="raw">Цикл: сценарий 2 · подтверждение есть · поводырь группы против — для сведения</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Точка входа: тест накопления на H4</span><span class="d">Цена коснулась накопления на H4, на этом касании пришёл триггер. Это первая модель точки входа.</span><span class="raw">Тест накопления H4: сопротивление от 30.09 04:00 · касание 13.10 12:00 · накоплений с контактом: 3</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Запас хода есть</span><span class="d">Движению есть куда идти.</span><span class="raw">Запас хода: входить можно · у поводыря (USDCHF, SHORT) запас до лоу 20.08</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Архив</span><span class="d">Похожих ситуаций в архиве: 1.</span></span></li></ul>
+    <details class="more"><summary>Полная карточка терминала</summary><div class="card" role="list"><div class="card-head ok">✅ ДОПУСК | SHORT AUDCHF</div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">W1 [1/3] · свинг ↑ | свеча ↓ | накопления ↑<span class="why-note">неделя против, второй сценарий: недельный цикл пройден, есть подтверждение</span></span></div>
+<div class="row" role="listitem"><span class="ic">⭐️</span><span class="tx">D1 [3/3] · свинг ↓ | свеча ↓ | накопления ↓</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Подтверждение [3/3] · свинг ↓ | свеча ↓ | реверс ↓</span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Контекст: ⛔ Отказ: сигнал против контекста (CHF BUY)<span class="why-note">поводырь группы против · для сведения, не блокирует (/povodyr)</span></span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Цикл: сценарий 2 · подтверждение есть · поводырь группы против — для сведения</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Тест накопления H4: сопротивление от 30.09 04:00 · касание 13.10 12:00 · накоплений с контактом: 3</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Запас хода: входить можно · у поводыря (USDCHF, SHORT) запас до лоу 20.08</span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Рейндж недели — предупреждение, не блокирует:<span class="sub">AUDCHF · неделя: внутри контекстной свечи LONG от 06.09.2026 · закрытий внутри 4 · выхода нет · предварительный выход вниз 04.10.2026 · цена сейчас ниже лоя — выход засчитается закрытием недели</span></span></div>
+<div class="row" role="listitem"><span class="ic">📈</span><span class="tx">Накопления — информация, не запрет:<span class="sub">AUDCHF · неделя: тренд вверх (21.06 → 19.07)</span><span class="sub">AUDCHF · дневка: тренд вниз (23.09 → 01.10)</span><span class="sub">USDCHF (поводырь) · неделя: тренд вверх (10.05 → 16.08)</span><span class="sub">USDCHF (поводырь) · дневка: тренд вверх (03.09 → 16.09)</span></span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Накопления: неделя и дневка смотрят в разные стороны — информация, не запрет</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Архив: 1 аналогов из 1002</span></div></div><pre>Аналогов: 1 (порог: 0)
+Медианный индекс: 86%
+Топ аналоги:
+  №991 | 25.11.2022 | EURJPY | 86%
+⛔ Отказ: сигнал против контекста (CHF BUY)</pre></details>
+    <p class="note">Те же фильтры пропускают и сделки, которые потом закрываются стопом.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Зона входа</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="ZONA" aria-label="Увеличить график зоны входа"><img loading="lazy" alt="Зона синхронизации на H4 в момент триггера" src="img/08_zona.jpg"></button>
+    <p>Сошлись три метода: накопление, свинг и треугольник. Продажа (START-SELL) ставится на уровень внутри зоны, ближайший к цене: ордер ждёт, пока цена до него дойдёт.</p><div class="facts"><div class="fact"><span>Зона синхронизации</span><strong>0.57949 – 0.58147</strong></div><div class="fact"><span>START-SELL</span><strong>0.58098</strong></div></div>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Что было дальше</h2><span class="tf">Hunter_Bot</span></div>
+    <button class="shot" type="button" aria-label="Увеличить график: что было дальше"><img loading="lazy" alt="Что было дальше: вход, стоп, тейк, безубыток" src="img/08_posle.jpg"></button><div class="legend"><span><b>▼</b> вход</span><span><b style="color:var(--gold)">●</b> 5 к 1: стоп на вход</span><span><b style="color:var(--up)">●</b> тейк</span><span><b style="color:var(--down)">●</b> стоп</span></div><p>Цена дошла до START в первой же свече после триггера. Hunter_Bot поставил стоп 30% от ATR дневки и тейк 9 к 1. Цена пошла против сделки и закрыла её стопом. Сразу после стопа Hunter_Bot перезашёл: на графике это ПЕРЕЗАХОД. И эта сделка закрылась стопом.</p><div class="facts"><div class="fact stop"><span>Стоп · 30% ATR дневки</span><strong>0.58213</strong></div><div class="fact take"><span>Тейк · 9 к 1</span><strong>0.57061</strong></div></div><div class="compare"><div class="cmp neg"><span>Итог без пирамиды</span><strong>−2,0 R</strong></div><div class="cmp neg"><span>Итог с пирамидой</span><strong>−2,0 R</strong></div></div>
+  </div>
+
+  <p class="note">Это правильный допуск, и он закрылся стопом. Так заканчиваются 3 из 4 сделок системы: стоп маленький, а тейк, когда приходит, в разы больше.</p>
+  <div style="display:grid; gap:10px">
+    <button class="btn yes wide" type="button" data-next="5">Следующая ситуация →</button>
+    <button class="btn ghost wide" type="button" id="b-again-8" data-again="8">Пройти эту ситуацию заново</button>
+  </div>
+  <div class="maket">Макет · Не является инвестиционной рекомендацией</div>
+</section>
+
+
+<!-- 2. Ситуация до ответа -->
+<section class="wrap view sit" id="v-sit-5" data-n="5" data-right="ДОПУСК" hidden>
+  <div class="eyebrow">Ситуация 6 из 10</div>
+  <div class="ticket"><span class="sym">GBPJPY</span><span class="chip long">триггер в лонг</span></div>
+  <p>Терминал поймал триггер на покупку. Графики показаны в момент решения, будущего на них нет. Решите: вы бы пустили эту сделку?</p>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Триггер на H4</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="H4" aria-label="Увеличить график H4"><img loading="lazy" alt="График H4 на момент триггера: накопления, свинги, реверс, PPR, треугольники" src="img/05_h4.jpg"></button>
+    <p class="hint">Розовая вертикаль — свеча триггера. Правее неё будущее, его здесь нет.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Дневка</h2><span class="tf">D1</span></div>
+    <button class="shot" type="button" data-src="D1" aria-label="Увеличить дневной график"><img loading="lazy" alt="Дневной график с циклом, накоплениями и реверсом" src="img/05_d1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Неделя</h2><span class="tf">W1</span></div>
+    <button class="shot" type="button" data-src="W1" aria-label="Увеличить недельный график"><img loading="lazy" alt="Недельный график с циклом и накоплениями" src="img/05_w1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Поводырь: доллар-иена</h2><span class="tf">USDJPY · D1</span></div>
+    <button class="shot" type="button" data-src="DXY" aria-label="Увеличить график индекса доллара"><img loading="lazy" alt="Дневной график индекса доллара" src="img/05_dxy.jpg"></button>
+    <p class="hint">GBPJPY входит в группу, которую ведёт USDJPY. За сделку здесь рост USDJPY.</p>
+  </div>
+  <p class="hint">Нажмите на график, чтобы рассмотреть его крупно.</p>
+</section>
+
+<!-- 3. Ответ -->
+<section class="wrap view res" id="v-res-5" hidden>
+  <div class="eyebrow">Ситуация 6 из 10 · GBPJPY · лонг</div>
+  <div class="verdict" id="verdict-5">
+    <div class="line1"><span class="mark" id="mark-5"></span> <span id="mine-5"></span></div>
+    <p>Решение системы: <strong>допуск</strong>.</p>
+  </div>
+
+  <div class="frame">
+    <div class="why-big long">ПОЧЕМУ ЛОНГ</div><p class="why-sub">Решение системы: допуск. Ниже фильтры, которые были за.</p><ul class="reasons"><li><span class="ic">✅</span><span class="tx"><span class="t">Подтверждение на дневке</span><span class="d">Развернулись в сторону сделки: свинг ↑, свеча ↑, реверс ↑.</span><span class="raw">Подтверждение [3/3] · свинг ↑ | свеча ↑ | реверс ↑</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Контекст за</span><span class="d">По контексту (JPY BUY).</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Сценарий по контексту</span><span class="d">Сценарий по контексту: поводырь, направление и подтверждение дневки и триггер сошлись. Неделя здесь не запрещает.</span><span class="raw">Цикл: сценарий по контексту — неделя и недельный цикл вниз · подтверждение есть · поводырь за</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Точка входа: тест накопления на H4</span><span class="d">Цена коснулась накопления на H4, на этом касании пришёл триггер. Это первая модель точки входа.</span><span class="raw">Тест накопления H4: поддержка от 29.04 16:00 · касание 06.05 04:00</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Запас хода есть</span><span class="d">Движению есть куда идти.</span><span class="raw">Запас хода: входить можно · у поводыря (USDJPY, LONG) запас до хая 10.01</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Архив</span><span class="d">Похожих ситуаций в архиве: 3.</span></span></li></ul>
+    <details class="more"><summary>Полная карточка терминала</summary><div class="card" role="list"><div class="card-head ok">✅ ДОПУСК | LONG GBPJPY</div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">W1 [0/3] · свинг ↓ | свеча ↓ | накопления ↓<span class="why-note">неделя и недельный цикл вниз, но контекст, дневка и подтверждение за — сценарий по контексту</span></span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">D1 [2/3] · свинг ↑ | свеча ↑ | накопления ↓</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Подтверждение [3/3] · свинг ↑ | свеча ↑ | реверс ↑</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Контекст: ✅ По контексту (JPY BUY)</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Цикл: сценарий по контексту — неделя и недельный цикл вниз · подтверждение есть · поводырь за</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Тест накопления H4: поддержка от 29.04 16:00 · касание 06.05 04:00</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Запас хода: входить можно · у поводыря (USDJPY, LONG) запас до хая 10.01</span></div>
+<div class="row" role="listitem"><span class="ic">📈</span><span class="tx">Накопления — информация, не запрет:<span class="sub">GBPJPY · неделя: тренд вниз (15.12.24 → 30.03)</span><span class="sub">GBPJPY · дневка: тренд вниз (19.12.24 → 02.01); просто выход вверх из 07.04 против недели — рабочий сценарий в SHORT. Потенциальная точка входа — предварительный уровень и зона выхода</span><span class="sub">USDJPY (поводырь) · неделя: тренд вниз (12.01 → 02.03)</span><span class="sub">USDJPY (поводырь) · дневка: тренд вниз (06.02 → 03.04)</span></span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Накопления против сделки — информация, не запрет</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Архив: 3 аналогов из 970</span></div>
+<div class="row" role="listitem"><span class="ic">➖</span><span class="tx">Технический резонанс D1: нет</span></div></div><pre>Аналогов: 3 (порог: 0)
+Медианный индекс: 87%
+Топ аналоги:
+  №201 | 02.09.2011 | USDCHF | 88%
+  №393 | 10.12.2012 | GBPUSD | 87%
+  №946 | 01.09.2022 | AUDJPY | 86%
+✅ По контексту (JPY BUY)</pre></details>
+    <p class="note">Те же фильтры пропускают и сделки, которые потом закрываются стопом.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Зона входа</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="ZONA" aria-label="Увеличить график зоны входа"><img loading="lazy" alt="Зона синхронизации на H4 в момент триггера" src="img/05_zona.jpg"></button>
+    <p>Сошлись два метода: накопление и треугольник. Покупка (START-BUY) ставится на уровень внутри зоны, ближайший к цене: ордер ждёт, пока цена до него дойдёт.</p><div class="facts"><div class="fact"><span>Зона синхронизации</span><strong>190.610 – 191.433</strong></div><div class="fact"><span>START-BUY</span><strong>191.078</strong></div></div>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Что было дальше</h2><span class="tf">Hunter_Bot</span></div>
+    <button class="shot" type="button" aria-label="Увеличить график: что было дальше"><img loading="lazy" alt="Что было дальше: вход, стоп, тейк, безубыток" src="img/05_posle.jpg"></button><div class="legend"><span><b>▲</b> вход</span><span><b style="color:var(--gold)">●</b> 5 к 1: стоп на вход</span><span><b style="color:var(--up)">●</b> тейк</span><span><b style="color:var(--down)">●</b> стоп</span></div><p>Цена дошла до START в первой же свече после триггера. Hunter_Bot поставил стоп 30% от ATR дневки и тейк 9 к 1. Цена пошла против сделки и закрыла её стопом. Сразу после стопа Hunter_Bot перезашёл: на графике это ПЕРЕЗАХОД. На 5 к 1 стоп переехал на вход, в безубыток. Сделка дошла до тейка 9 к 1. С пирамидой на том же 5 к 1 Hunter_Bot ещё закрывает 70% объёма, а пирамида добавляет 3 ордера по ходу движения. Поэтому итог другой.</p><div class="facts"><div class="fact stop"><span>Стоп · 30% ATR дневки</span><strong>190.623</strong></div><div class="fact take"><span>Тейк · 9 к 1</span><strong>195.223</strong></div></div><div class="compare"><div class="cmp"><span>Итог без пирамиды</span><strong>+9,0 R</strong></div><div class="cmp"><span>Итог с пирамидой</span><strong>+12,0 R</strong></div></div>
+  </div>
+
+  <p class="note">Эта сделка закрылась тейком. Из 4 сделок по системе 3 закрываются стопом, и такие в тренажёре тоже будут.</p>
+  <div style="display:grid; gap:10px">
+    <button class="btn yes wide" type="button" data-next="10">Следующая ситуация →</button>
+    <button class="btn ghost wide" type="button" id="b-again-5" data-again="5">Пройти эту ситуацию заново</button>
+  </div>
+  <div class="maket">Макет · Не является инвестиционной рекомендацией</div>
+</section>
+
+
+<!-- 2. Ситуация до ответа -->
+<section class="wrap view sit" id="v-sit-10" data-n="10" data-right="ОТКАЗ" hidden>
+  <div class="eyebrow">Ситуация 7 из 10</div>
+  <div class="ticket"><span class="sym">EURCAD</span><span class="chip long">триггер в лонг</span></div>
+  <p>Терминал поймал триггер на покупку. Графики показаны в момент решения, будущего на них нет. Решите: вы бы пустили эту сделку?</p>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Триггер на H4</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="H4" aria-label="Увеличить график H4"><img loading="lazy" alt="График H4 на момент триггера: накопления, свинги, реверс, PPR, треугольники" src="img/10_h4.jpg"></button>
+    <p class="hint">Розовая вертикаль — свеча триггера. Правее неё будущее, его здесь нет.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Дневка</h2><span class="tf">D1</span></div>
+    <button class="shot" type="button" data-src="D1" aria-label="Увеличить дневной график"><img loading="lazy" alt="Дневной график с циклом, накоплениями и реверсом" src="img/10_d1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Неделя</h2><span class="tf">W1</span></div>
+    <button class="shot" type="button" data-src="W1" aria-label="Увеличить недельный график"><img loading="lazy" alt="Недельный график с циклом и накоплениями" src="img/10_w1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Поводырь: доллар-канадец</h2><span class="tf">USDCAD · D1</span></div>
+    <button class="shot" type="button" data-src="DXY" aria-label="Увеличить график индекса доллара"><img loading="lazy" alt="Дневной график индекса доллара" src="img/10_dxy.jpg"></button>
+    <p class="hint">EURCAD входит в группу, которую ведёт USDCAD. За сделку здесь рост USDCAD.</p>
+  </div>
+  <p class="hint">Нажмите на график, чтобы рассмотреть его крупно.</p>
+</section>
+
+<!-- 3. Ответ -->
+<section class="wrap view res" id="v-res-10" hidden>
+  <div class="eyebrow">Ситуация 7 из 10 · EURCAD · лонг</div>
+  <div class="verdict" id="verdict-10">
+    <div class="line1"><span class="mark" id="mark-10"></span> <span id="mine-10"></span></div>
+    <p>Решение системы: <strong>отказ</strong>.</p>
+  </div>
+
+  <div class="frame">
+    <div class="why-big otkaz">ПОЧЕМУ ОТКАЗ</div><p class="why-sub">Решение системы: отказ. Ниже фильтры, которые закрыли вход.</p><ul class="reasons"><li><span class="ic">⛔</span><span class="tx"><span class="t">Неделя против сделки</span><span class="d">Недельный график смотрит в другую сторону.</span><span class="raw">W1 [1/3] · ✅ свинг ↑ | ❌ свеча ↓ | ❌ накопления ↓</span></span></li><li><span class="ic">⛔</span><span class="tx"><span class="t">Нет подтверждения на дневке</span><span class="d">Разворот на дневке в сторону сделки ещё не начался.</span><span class="raw">Подтверждение [0/3] · свинг ↓ | свеча ↓ | реверс ↓</span></span></li><li><span class="ic">⛔</span><span class="tx"><span class="t">Сценария нет</span><span class="d">Неделя смотрит вниз (2/3); недельный цикл вниз пройден на 59%, для второго сценария нужно 80%.</span><span class="raw">Цикл: сценария нет: неделя смотрит вниз (2/3); недельный цикл вниз пройден на 59%, для второго сценария нужно 80%.</span></span></li><li><span class="ic">⛔</span><span class="tx"><span class="t">Нет точки входа</span><span class="d">Теста накопления на H4 нет, и свинг с зоной выхода из накопления рядом не сошлись.</span><span class="raw">Тест накопления H4: за 3 последние свечи H4 контакта с поддержкой нет (свечи по 01.10 20:00); зоны без теста накопления нет — свинг и зона выхода из накопления рядом не сошлись</span></span></li></ul>
+    <details class="more"><summary>Полная карточка терминала</summary><div class="card" role="list"><div class="card-head no">🚫 ОТКАЗ | LONG EURCAD</div>
+<div class="row" role="listitem"><span class="ic">⛔</span><span class="tx">W1 [1/3] · ✅ свинг ↑ | ❌ свеча ↓ | ❌ накопления ↓<span class="why-note">БЛОКИРУЕТ</span></span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">D1 [0/3] · свинг ↓ | свеча ↓ | накопления —<span class="why-note">не запрещает: неделя не в споре</span></span></div>
+<div class="row" role="listitem"><span class="ic">⛔</span><span class="tx">Подтверждение [0/3] · свинг ↓ | свеча ↓ | реверс ↓<span class="why-note">нужен реверс и с ним свинг или свеча</span></span></div>
+<div class="row" role="listitem"><span class="ic">➖</span><span class="tx">Контекст: ➖ Нейтральный контекст</span></div>
+<div class="row" role="listitem"><span class="ic">⛔</span><span class="tx">Цикл: сценария нет: неделя смотрит вниз (2/3); недельный цикл вниз пройден на 59%, для второго сценария нужно 80%.<span class="why-note">БЛОКИРУЕТ</span></span></div>
+<div class="row" role="listitem"><span class="ic">⛔</span><span class="tx">Тест накопления H4: за 3 последние свечи H4 контакта с поддержкой нет (свечи по 01.10 20:00); зоны без теста накопления нет — свинг и зона выхода из накопления рядом не сошлись<span class="why-note">БЛОКИРУЕТ</span></span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Запас хода: входить можно · у USDCAD хай 25.06 переписан 01.10, у индекса доллара хай 24.06 переписан 01.10, а у самого EURCAD запас до хая 05.08</span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Рейндж недели — предупреждение, не блокирует:<span class="sub">EURCAD · неделя: внутри контекстной свечи LONG от 31.08.2025 · закрытий внутри 55 · выхода нет · предварительный выход вниз 22.03.2026 · цена сейчас ниже лоя — выход засчитается закрытием недели</span></span></div>
+<div class="row" role="listitem"><span class="ic">📈</span><span class="tx">Накопления — информация, не запрет:<span class="sub">EURCAD · неделя: тренд вниз (12.07 → 30.08)</span><span class="sub">EURCAD · дневка: просто выход вверх из 21.09 против недели — рабочий сценарий в SHORT. Потенциальная точка входа — предварительный уровень и зона выхода</span><span class="sub">USDCAD (поводырь) · неделя: тренд вниз (23.02.25 → 21.06)</span><span class="sub">USDCAD (поводырь) · дневка: тренд вверх (15.05 → 03.09)</span></span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Накопления против сделки — информация, не запрет</span></div>
+<div class="row" role="listitem"><span class="ic">➖</span><span class="tx">Технический резонанс D1: нет</span></div>
+<div class="row" role="listitem"><span class="ic">⛔</span><span class="tx">Причины отказа:<span class="sub">• W1 недостаточно подтверждений (1/3)</span><span class="sub">• Цикл: сценария нет: неделя смотрит вниз (2/3); недельный цикл вниз пройден на 59%, для второго сценария нужно 80%.</span><span class="sub">• Тест накопления H4: за 3 последние свечи H4 контакта с поддержкой нет; зоны без теста накопления нет — свинг и зона выхода из накопления рядом не сошлись</span></span></div></div></details>
+    <p class="note">Отказ не всегда сберегает: бывает, что после отказа цена всё же идёт в сторону сделки.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Зона входа</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="ZONA" aria-label="Увеличить график зоны входа"><img loading="lazy" alt="Зона синхронизации на H4 в момент триггера" src="img/10_zona.jpg"></button>
+    <p>Зоны входа нет. Теста накопления на H4 нет, и свинг с зоной выхода из накопления рядом не сошлись. Ставить ордер было некуда.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Что было дальше</h2><span class="tf">Hunter_Bot</span></div>
+    <button class="shot" type="button" aria-label="Увеличить график: что было дальше"><img loading="lazy" alt="Что было дальше после отказа" src="img/10_posle.jpg"></button><p>Входа не было: ставить ордер было некуда. За следующие 36 свечей H4 цена ушла вниз, против лонга.</p>
+  </div>
+
+  <p class="note">Отказ тоже решение. Входить было некуда, а цена потом ушла против сделки.</p>
+  <div style="display:grid; gap:10px">
+    <button class="btn yes wide" type="button" data-next="11">Следующая ситуация →</button>
+    <button class="btn ghost wide" type="button" id="b-again-10" data-again="10">Пройти эту ситуацию заново</button>
+  </div>
+  <div class="maket">Макет · Не является инвестиционной рекомендацией</div>
+</section>
+
+
+<!-- 2. Ситуация до ответа -->
+<section class="wrap view sit" id="v-sit-11" data-n="11" data-right="ДОПУСК" hidden>
+  <div class="eyebrow">Ситуация 8 из 10</div>
+  <div class="ticket"><span class="sym">EURCHF</span><span class="chip short">триггер в шорт</span></div>
+  <p>Терминал поймал триггер на продажу. Графики показаны в момент решения, будущего на них нет. Решите: вы бы пустили эту сделку?</p>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Триггер на H4</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="H4" aria-label="Увеличить график H4"><img loading="lazy" alt="График H4 на момент триггера: накопления, свинги, реверс, PPR, треугольники" src="img/11_h4.jpg"></button>
+    <p class="hint">Розовая вертикаль — свеча триггера. Правее неё будущее, его здесь нет.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Дневка</h2><span class="tf">D1</span></div>
+    <button class="shot" type="button" data-src="D1" aria-label="Увеличить дневной график"><img loading="lazy" alt="Дневной график с циклом, накоплениями и реверсом" src="img/11_d1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Неделя</h2><span class="tf">W1</span></div>
+    <button class="shot" type="button" data-src="W1" aria-label="Увеличить недельный график"><img loading="lazy" alt="Недельный график с циклом и накоплениями" src="img/11_w1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Поводырь: доллар-франк</h2><span class="tf">USDCHF · D1</span></div>
+    <button class="shot" type="button" data-src="DXY" aria-label="Увеличить график индекса доллара"><img loading="lazy" alt="Дневной график индекса доллара" src="img/11_dxy.jpg"></button>
+    <p class="hint">EURCHF входит в группу, которую ведёт USDCHF. За сделку здесь падение USDCHF.</p>
+  </div>
+  <p class="hint">Нажмите на график, чтобы рассмотреть его крупно.</p>
+</section>
+
+<!-- 3. Ответ -->
+<section class="wrap view res" id="v-res-11" hidden>
+  <div class="eyebrow">Ситуация 8 из 10 · EURCHF · шорт</div>
+  <div class="verdict" id="verdict-11">
+    <div class="line1"><span class="mark" id="mark-11"></span> <span id="mine-11"></span></div>
+    <p>Решение системы: <strong>допуск</strong>.</p>
+  </div>
+
+  <div class="frame">
+    <div class="why-big short">ПОЧЕМУ ШОРТ</div><p class="why-sub">Решение системы: допуск. Ниже фильтры, которые были за.</p><ul class="reasons"><li><span class="ic">✅</span><span class="tx"><span class="t">Неделя: цикл пройден</span><span class="d">Неделя смотрит против сделки.</span><span class="hl">Для второго сценария так и должно быть: недельный цикл должен быть пройден.</span><span class="raw">W1 [0/3] · свинг ↑ | свеча ↑ | накопления ↑</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Подтверждение на дневке</span><span class="d">Развернулись в сторону сделки: свинг ↓, реверс ↓.</span><span class="raw">Подтверждение [2/3] · свинг ↓ | свеча ↑ | реверс ↓</span></span></li><li><span class="ic">⚠️</span><span class="tx"><span class="t">Поводырь группы против</span><span class="d">Поводырь группы смотрит в другую сторону. Терминал всё равно пропустил сделку, с пометкой «для сведения»: по циклам всё сходится.</span><span class="hl">Это предупреждение, а не запрет.</span><span class="raw">Контекст: ⛔ Отказ: сигнал против контекста (CHF BUY)</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Сценарий 2</span><span class="d">Недельный цикл уже пройден. Дневка развернулась против недели, и её цикл ещё не пройден. Сделка идёт по дневке.</span><span class="raw">Цикл: сценарий 2 · подтверждение есть · поводырь группы против — для сведения</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Точка входа: тест накопления на H4</span><span class="d">Цена коснулась накопления на H4, на этом касании пришёл триггер. Это первая модель точки входа.</span><span class="raw">Тест накопления H4: сопротивление от 17.09 12:00 · касание 25.09 12:00 · накоплений с контактом: 4</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Запас хода есть</span><span class="d">Движению есть куда идти.</span><span class="raw">Запас хода: входить можно · у поводыря (USDCHF, SHORT) запас до лоу 20.08</span></span></li></ul>
+    <details class="more"><summary>Полная карточка терминала</summary><div class="card" role="list"><div class="card-head ok">✅ ДОПУСК | SHORT EURCHF</div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">W1 [0/3] · свинг ↑ | свеча ↑ | накопления ↑<span class="why-note">неделя против, второй сценарий: недельный цикл пройден, есть подтверждение</span></span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">D1 [1/3] · свинг ↓ | свеча ↑ | накопления ↑<span class="why-note">не запрещает: неделя не в споре</span></span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Подтверждение [2/3] · свинг ↓ | свеча ↑ | реверс ↓</span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Контекст: ⛔ Отказ: сигнал против контекста (CHF BUY)<span class="why-note">поводырь группы против · для сведения, не блокирует (/povodyr)</span></span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Цикл: сценарий 2 · подтверждение есть · поводырь группы против — для сведения</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Тест накопления H4: сопротивление от 17.09 12:00 · касание 25.09 12:00 · накоплений с контактом: 4</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Запас хода: входить можно · у поводыря (USDCHF, SHORT) запас до лоу 20.08</span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Рейндж недели — предупреждение, не блокирует:<span class="sub">EURCHF · неделя: внутри контекстной свечи LONG от 09.08.2026 · закрытий внутри 5 · выхода нет · предварительный выход вверх 13.09.2026 · цена сейчас выше хая — выход засчитается закрытием недели</span></span></div>
+<div class="row" role="listitem"><span class="ic">📈</span><span class="tx">Накопления — информация, не запрет:<span class="sub">EURCHF · неделя: тренд вверх (29.03 → 14.06)</span><span class="sub">EURCHF · дневка: тренд вверх (30.07 → 19.08); просто выход вниз из 11.09 против недели — рабочий сценарий в LONG. Потенциальная точка входа — предварительный уровень и зона выхода</span><span class="sub">USDCHF (поводырь) · неделя: тренд вверх (15.02 → 10.05)</span><span class="sub">USDCHF (поводырь) · дневка: тренд вверх (19.08 → 03.09)</span></span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Накопления против сделки — информация, не запрет</span></div>
+<div class="row" role="listitem"><span class="ic">➖</span><span class="tx">Технический резонанс D1: нет</span></div></div><pre>Аналогов: 0 (порог: 0)
+Похожих сделок в архиве не найдено
+⛔ Отказ: сигнал против контекста (CHF BUY)</pre></details>
+    <p class="note">Те же фильтры пропускают и сделки, которые потом закрываются стопом.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Зона входа</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="ZONA" aria-label="Увеличить график зоны входа"><img loading="lazy" alt="Зона синхронизации на H4 в момент триггера" src="img/11_zona.jpg"></button>
+    <p>Сошлись три метода: накопление, свинг и треугольник. Продажа (START-SELL) ставится на уровень внутри зоны, ближайший к цене: ордер ждёт, пока цена до него дойдёт.</p><div class="facts"><div class="fact"><span>Зона синхронизации</span><strong>0.94423 – 0.94610</strong></div><div class="fact"><span>START-SELL</span><strong>0.94509</strong></div></div>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Что было дальше</h2><span class="tf">Hunter_Bot</span></div>
+    <button class="shot" type="button" aria-label="Увеличить график: что было дальше"><img loading="lazy" alt="Что было дальше: вход, стоп, тейк, безубыток" src="img/11_posle.jpg"></button><div class="legend"><span><b>▼</b> вход</span><span><b style="color:var(--gold)">●</b> 5 к 1: стоп на вход</span><span><b style="color:var(--up)">●</b> тейк</span><span><b style="color:var(--down)">●</b> стоп</span></div><p>Цена дошла до START в первой же свече после триггера. Hunter_Bot поставил стоп 30% от ATR дневки и тейк 9 к 1. Цена пошла против сделки и закрыла её стопом. Сразу после стопа Hunter_Bot перезашёл: на графике это ПЕРЕЗАХОД. И эта сделка закрылась стопом. С пирамидой Hunter_Bot по ходу движения добавил 1 ордер. Он тоже закрылся стопом, поэтому итог с пирамидой глубже.</p><div class="facts"><div class="fact stop"><span>Стоп · 30% ATR дневки</span><strong>0.94638</strong></div><div class="fact take"><span>Тейк · 9 к 1</span><strong>0.93348</strong></div></div><div class="compare"><div class="cmp neg"><span>Итог без пирамиды</span><strong>−2,0 R</strong></div><div class="cmp neg"><span>Итог с пирамидой</span><strong>−3,5 R</strong></div></div>
+  </div>
+
+  <p class="note">Это правильный допуск, и он закрылся стопом. Так заканчиваются 3 из 4 сделок системы: стоп маленький, а тейк, когда приходит, в разы больше.</p>
+  <div style="display:grid; gap:10px">
+    <button class="btn yes wide" type="button" data-next="3">Следующая ситуация →</button>
+    <button class="btn ghost wide" type="button" id="b-again-11" data-again="11">Пройти эту ситуацию заново</button>
+  </div>
+  <div class="maket">Макет · Не является инвестиционной рекомендацией</div>
+</section>
+
+
+<!-- 2. Ситуация до ответа -->
+<section class="wrap view sit" id="v-sit-3" data-n="3" data-right="ДОПУСК" hidden>
+  <div class="eyebrow">Ситуация 9 из 10</div>
+  <div class="ticket"><span class="sym">EURJPY</span><span class="chip long">триггер в лонг</span></div>
+  <p>Терминал поймал триггер на покупку. Графики показаны в момент решения, будущего на них нет. Решите: вы бы пустили эту сделку?</p>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Триггер на H4</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="H4" aria-label="Увеличить график H4"><img loading="lazy" alt="График H4 на момент триггера: накопления, свинги, реверс, PPR, треугольники" src="img/03_h4.jpg"></button>
+    <p class="hint">Розовая вертикаль — свеча триггера. Правее неё будущее, его здесь нет.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Дневка</h2><span class="tf">D1</span></div>
+    <button class="shot" type="button" data-src="D1" aria-label="Увеличить дневной график"><img loading="lazy" alt="Дневной график с циклом, накоплениями и реверсом" src="img/03_d1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Неделя</h2><span class="tf">W1</span></div>
+    <button class="shot" type="button" data-src="W1" aria-label="Увеличить недельный график"><img loading="lazy" alt="Недельный график с циклом и накоплениями" src="img/03_w1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Поводырь: доллар-иена</h2><span class="tf">USDJPY · D1</span></div>
+    <button class="shot" type="button" data-src="DXY" aria-label="Увеличить график индекса доллара"><img loading="lazy" alt="Дневной график индекса доллара" src="img/03_dxy.jpg"></button>
+    <p class="hint">EURJPY входит в группу, которую ведёт USDJPY. За сделку здесь рост USDJPY.</p>
+  </div>
+  <p class="hint">Нажмите на график, чтобы рассмотреть его крупно.</p>
+</section>
+
+<!-- 3. Ответ -->
+<section class="wrap view res" id="v-res-3" hidden>
+  <div class="eyebrow">Ситуация 9 из 10 · EURJPY · лонг</div>
+  <div class="verdict" id="verdict-3">
+    <div class="line1"><span class="mark" id="mark-3"></span> <span id="mine-3"></span></div>
+    <p>Решение системы: <strong>допуск</strong>.</p>
+  </div>
+
+  <div class="frame">
+    <div class="why-big long">ПОЧЕМУ ЛОНГ</div><p class="why-sub">Решение системы: допуск. Ниже фильтры, которые были за.</p><ul class="reasons"><li><span class="ic">🔥</span><span class="tx"><span class="t">ТОП-лист: №5</span><span class="d">Инструмент был в ТОП-листе на момент триггера.</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Неделя за 2 из 3</span><span class="d">Неделя смотрит в сторону сделки: свинг ↑, свеча ↑.</span><span class="raw">W1 [2/3] · свинг ↑ | свеча ↑ | накопления ↓</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Подтверждение на дневке</span><span class="d">Развернулись в сторону сделки: свинг ↑, свеча ↑, реверс ↑.</span><span class="raw">Подтверждение [3/3] · свинг ↑ | свеча ↑ | реверс ↑</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Контекст за</span><span class="d">По контексту (JPY BUY).</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Сценарий 1</span><span class="d">Недельный цикл не закончен, и цикл дневки в ту же сторону тоже не закончен. Неделя и дневка смотрят в одну сторону.</span><span class="raw">Цикл: сценарий 1 · подтверждение есть · поводырь за</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Точка входа: тест накопления на H4</span><span class="d">Цена коснулась накопления на H4, на этом касании пришёл триггер. Это первая модель точки входа.</span><span class="raw">Тест накопления H4: поддержка от 13.06 16:00 · касание 19.06 04:00 · накоплений с контактом: 2</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Запас хода есть</span><span class="d">Движению есть куда идти.</span><span class="raw">Запас хода: входить можно · у поводыря (USDJPY, LONG) запас до хая 12.05 · у самого EURJPY хай 13.05 переписан 06.06</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Архив</span><span class="d">Похожих ситуаций в архиве: 8.</span></span></li></ul>
+    <details class="more"><summary>Полная карточка терминала</summary><div class="card" role="list"><div class="card-head ok">✅ ДОПУСК | LONG EURJPY</div>
+<div class="row top" role="listitem"><span class="ic">🔥</span><span class="tx">ТОП-ЛИСТ — №5 в списке</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">W1 [2/3] · свинг ↑ | свеча ↑ | накопления ↓</span></div>
+<div class="row" role="listitem"><span class="ic">⭐️</span><span class="tx">D1 [3/3] · свинг ↑ | свеча ↑ | накопления ↑</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Подтверждение [3/3] · свинг ↑ | свеча ↑ | реверс ↑</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Контекст: ✅ По контексту (JPY BUY)</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Цикл: сценарий 1 · подтверждение есть · поводырь за</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Тест накопления H4: поддержка от 13.06 16:00 · касание 19.06 04:00 · накоплений с контактом: 2</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Запас хода: входить можно · у поводыря (USDJPY, LONG) запас до хая 12.05 · у самого EURJPY хай 13.05 переписан 06.06</span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Рейндж недели — предупреждение, не блокирует:<span class="sub">EURJPY · неделя: внутри контекстной свечи SHORT от 30.03.2025 · закрытий внутри 10 · выхода нет · предварительный выход вверх 08.06.2025 · цена сейчас выше хая — выход засчитается закрытием недели</span></span></div>
+<div class="row" role="listitem"><span class="ic">📈</span><span class="tx">Накопления — информация, не запрет:<span class="sub">EURJPY · неделя: тренд вниз (21.04.24 → 20.04)</span><span class="sub">EURJPY · дневка: тренд вверх (16.05 → 27.05)</span><span class="sub">USDJPY (поводырь) · неделя: тренд вниз (27.04 → 18.05)</span><span class="sub">USDJPY (поводырь) · дневка: тренд вниз (27.01 → 06.02); просто выход вверх из 02.06 против недели — рабочий сценарий в SHORT</span></span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Накопления: неделя и дневка смотрят в разные стороны — информация, не запрет</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Архив: 8 аналогов из 976</span></div>
+<div class="row" role="listitem"><span class="ic">➖</span><span class="tx">Технический резонанс D1: нет</span></div></div><pre>Аналогов: 8 (порог: 0)
+Медианный индекс: 87%
+Топ аналоги:
+  №843 | 05.03.2020 | EURNZD | 92%
+  №778 | 02.05.2017 | EURAUD | 92%
+  №235 | 08.12.2005 | GBPJPY | 89%
+✅ По контексту (JPY BUY)</pre></details>
+    <p class="note">Те же фильтры пропускают и сделки, которые потом закрываются стопом.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Зона входа</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="ZONA" aria-label="Увеличить график зоны входа"><img loading="lazy" alt="Зона синхронизации на H4 в момент триггера" src="img/03_zona.jpg"></button>
+    <p>Сошлись три метода: накопление, свинг и треугольник. Покупка (START-BUY) ставится на верхний край зоны: ордер ждёт, пока цена до него дойдёт.</p><div class="facts"><div class="fact"><span>Зона синхронизации</span><strong>166.027 – 166.336</strong></div><div class="fact"><span>START-BUY</span><strong>166.336</strong></div></div>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Что было дальше</h2><span class="tf">Hunter_Bot</span></div>
+    <button class="shot" type="button" aria-label="Увеличить график: что было дальше"><img loading="lazy" alt="Что было дальше: вход, стоп, тейк, безубыток" src="img/03_posle.jpg"></button><div class="legend"><span><b>▲</b> вход</span><span><b style="color:var(--gold)">●</b> 5 к 1: стоп на вход</span><span><b style="color:var(--up)">●</b> тейк</span><span><b style="color:var(--down)">●</b> стоп</span></div><p>Цена дошла до START в первой же свече после триггера. Hunter_Bot поставил стоп 30% от ATR дневки и тейк 9 к 1. На 5 к 1 стоп переехал на вход, в безубыток. Сделка дошла до тейка 9 к 1. С пирамидой на том же 5 к 1 Hunter_Bot ещё закрывает 70% объёма, а пирамида добавляет 3 ордера по ходу движения. Поэтому итог другой.</p><div class="facts"><div class="fact stop"><span>Стоп · 30% ATR дневки</span><strong>166.013</strong></div><div class="fact take"><span>Тейк · 9 к 1</span><strong>169.261</strong></div></div><div class="compare"><div class="cmp"><span>Итог без пирамиды</span><strong>+9,0 R</strong></div><div class="cmp"><span>Итог с пирамидой</span><strong>+11,8 R</strong></div></div>
+  </div>
+
+  <p class="note">Эта сделка закрылась тейком. Из 4 сделок по системе 3 закрываются стопом, и такие в тренажёре тоже будут.</p>
+  <div style="display:grid; gap:10px">
+    <button class="btn yes wide" type="button" data-next="6">Следующая ситуация →</button>
+    <button class="btn ghost wide" type="button" id="b-again-3" data-again="3">Пройти эту ситуацию заново</button>
+  </div>
+  <div class="maket">Макет · Не является инвестиционной рекомендацией</div>
+</section>
+
+
+<!-- 2. Ситуация до ответа -->
+<section class="wrap view sit" id="v-sit-6" data-n="6" data-right="ДОПУСК" hidden>
+  <div class="eyebrow">Ситуация 10 из 10</div>
+  <div class="ticket"><span class="sym">USDCHF</span><span class="chip short">триггер в шорт</span></div>
+  <p>Терминал поймал триггер на продажу. Графики показаны в момент решения, будущего на них нет. Решите: вы бы пустили эту сделку?</p>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Триггер на H4</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="H4" aria-label="Увеличить график H4"><img loading="lazy" alt="График H4 на момент триггера: накопления, свинги, реверс, PPR, треугольники" src="img/06_h4.jpg"></button>
+    <p class="hint">Розовая вертикаль — свеча триггера. Правее неё будущее, его здесь нет.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Дневка</h2><span class="tf">D1</span></div>
+    <button class="shot" type="button" data-src="D1" aria-label="Увеличить дневной график"><img loading="lazy" alt="Дневной график с циклом, накоплениями и реверсом" src="img/06_d1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Неделя</h2><span class="tf">W1</span></div>
+    <button class="shot" type="button" data-src="W1" aria-label="Увеличить недельный график"><img loading="lazy" alt="Недельный график с циклом и накоплениями" src="img/06_w1.jpg"></button>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Поводырь: индекс доллара</h2><span class="tf">DXY · D1</span></div>
+    <button class="shot" type="button" data-src="DXY" aria-label="Увеличить график индекса доллара"><img loading="lazy" alt="Дневной график индекса доллара" src="img/06_dxy.jpg"></button>
+    <p class="hint">Для долларовой пары ведёт индекс доллара.</p>
+  </div>
+  <p class="hint">Нажмите на график, чтобы рассмотреть его крупно.</p>
+</section>
+
+<!-- 3. Ответ -->
+<section class="wrap view res" id="v-res-6" hidden>
+  <div class="eyebrow">Ситуация 10 из 10 · USDCHF · шорт</div>
+  <div class="verdict" id="verdict-6">
+    <div class="line1"><span class="mark" id="mark-6"></span> <span id="mine-6"></span></div>
+    <p>Решение системы: <strong>допуск</strong>.</p>
+  </div>
+
+  <div class="frame">
+    <div class="why-big short">ПОЧЕМУ ШОРТ</div><p class="why-sub">Решение системы: допуск. Ниже фильтры, которые были за.</p><ul class="reasons"><li><span class="ic">🔥</span><span class="tx"><span class="t">ТОП-лист: №4</span><span class="d">Инструмент был в ТОП-листе на момент триггера.</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Неделя за 2 из 3</span><span class="d">Неделя смотрит в сторону сделки: свинг ↓, накопления ↓.</span><span class="raw">W1 [2/3] · свинг ↓ | свеча ↑ | накопления ↓</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Подтверждение на дневке</span><span class="d">Развернулись в сторону сделки: свинг ↓, реверс ↓.</span><span class="raw">Подтверждение [2/3] · свинг ↓ | свеча ↑ | реверс ↓</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Контекст за</span><span class="d">По контексту (DXY SELL).</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Сценарий 1</span><span class="d">Недельный цикл не закончен, и цикл дневки в ту же сторону тоже не закончен. Неделя и дневка смотрят в одну сторону.</span><span class="raw">Цикл: сценарий 1 · подтверждение есть · контекст за</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Всё в одну сторону</span><span class="d">Цикл, критерии и накопления смотрят в сторону сделки.</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Точка входа: тест накопления на H4</span><span class="d">Цена коснулась накопления на H4, на этом касании пришёл триггер. Это первая модель точки входа.</span><span class="raw">Тест накопления H4: сопротивление от 13.08 08:00 · касание 03.09 08:00 · предварительный выход вниз 22.08 20:00 · накоплений с контактом: 2</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Запас хода есть</span><span class="d">Движению есть куда идти.</span><span class="raw">Запас хода: входить можно · у поводыря (индекс доллара, SHORT) запас до лоу 01.07</span></span></li><li><span class="ic">✅</span><span class="tx"><span class="t">Архив</span><span class="d">Похожих ситуаций в архиве: 1.</span></span></li></ul>
+    <details class="more"><summary>Полная карточка терминала</summary><div class="card" role="list"><div class="card-head ok">✅ ДОПУСК | SHORT USDCHF</div>
+<div class="row top" role="listitem"><span class="ic">🔥</span><span class="tx">ТОП-ЛИСТ — №4 в списке</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">W1 [2/3] · свинг ↓ | свеча ↑ | накопления ↓</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">D1 [2/3] · свинг ↓ | свеча ↑ | накопления ↓</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Подтверждение [2/3] · свинг ↓ | свеча ↑ | реверс ↓</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Контекст: ✅ По контексту (DXY SELL)</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Цикл: сценарий 1 · подтверждение есть · контекст за</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Тест накопления H4: сопротивление от 13.08 08:00 · касание 03.09 08:00 · предварительный выход вниз 22.08 20:00 · накоплений с контактом: 2</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Запас хода: входить можно · у поводыря (индекс доллара, SHORT) запас до лоу 01.07</span></div>
+<div class="row" role="listitem"><span class="ic">⚠️</span><span class="tx">Рейндж недели — предупреждение, не блокирует:<span class="sub">USDCHF · неделя: внутри контекстной свечи SHORT от 28.07.2024 · закрытий внутри 56 · выхода нет · предварительный выход вниз 24.08.2025 · цена сейчас ниже лоя — выход засчитается закрытием недели</span></span></div>
+<div class="row" role="listitem"><span class="ic">📈</span><span class="tx">Накопления — информация, не запрет:<span class="sub">USDCHF · неделя: тренд вниз (18.05 → 27.07)</span><span class="sub">USDCHF · дневка: тренд вниз (12.06 → 14.08); просто выход вверх из 16.07 против недели — рабочий сценарий в SHORT. Потенциальная точка входа — предварительный уровень и зона выхода</span><span class="sub">индекс доллара · неделя: тренд вниз (13.07 → 10.08)</span><span class="sub">индекс доллара · дневка: тренд вверх (07.07 → 14.08)</span></span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Цикл, критерии и накопления смотрят в одну сторону</span></div>
+<div class="row" role="listitem"><span class="ic">✅</span><span class="tx">Архив: 1 аналогов из 986</span></div></div><pre>Аналогов: 1 (порог: 0)
+Медианный индекс: 87%
+Топ аналоги:
+  №515 | 10.03.2015 | GBPJPY | 87%
+✅ По контексту (DXY SELL)</pre></details>
+    <p class="note">Те же фильтры пропускают и сделки, которые потом закрываются стопом.</p>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Зона входа</h2><span class="tf">H4</span></div>
+    <button class="shot" type="button" data-src="ZONA" aria-label="Увеличить график зоны входа"><img loading="lazy" alt="Зона синхронизации на H4 в момент триггера" src="img/06_zona.jpg"></button>
+    <p>Сошлись два метода: свинг и треугольник. Продажа (START-SELL) ставится на нижний край зоны: ордер ждёт, пока цена до него дойдёт.</p><div class="facts"><div class="fact"><span>Зона синхронизации</span><strong>0.80448 – 0.80608</strong></div><div class="fact"><span>START-SELL</span><strong>0.80448</strong></div></div>
+  </div>
+
+  <div class="frame">
+    <div class="frame-head"><h2>Что было дальше</h2><span class="tf">Hunter_Bot</span></div>
+    <button class="shot" type="button" aria-label="Увеличить график: что было дальше"><img loading="lazy" alt="Что было дальше: вход, стоп, тейк, безубыток" src="img/06_posle.jpg"></button><div class="legend"><span><b>▼</b> вход</span><span><b style="color:var(--gold)">●</b> 5 к 1: стоп на вход</span><span><b style="color:var(--up)">●</b> тейк</span><span><b style="color:var(--down)">●</b> стоп</span></div><p>Цена дошла до START в первой же свече после триггера. Hunter_Bot поставил стоп 30% от ATR дневки и тейк 9 к 1. Цена пошла против сделки и закрыла её стопом. Сразу после стопа Hunter_Bot перезашёл: на графике это ПЕРЕЗАХОД. На 5 к 1 стоп переехал на вход, в безубыток. Сделка дошла до тейка 9 к 1. С пирамидой на том же 5 к 1 Hunter_Bot ещё закрывает 70% объёма, а пирамида добавляет 3 ордера по ходу движения. Поэтому итог другой.</p><div class="facts"><div class="fact stop"><span>Стоп · 30% ATR дневки</span><strong>0.80623</strong></div><div class="fact take"><span>Тейк · 9 к 1</span><strong>0.78875</strong></div></div><div class="compare"><div class="cmp"><span>Итог без пирамиды</span><strong>+9,0 R</strong></div><div class="cmp"><span>Итог с пирамидой</span><strong>+12,3 R</strong></div></div>
+  </div>
+
+  <p class="note">Эта сделка закрылась тейком. Из 4 сделок по системе 3 закрываются стопом, и такие в тренажёре тоже будут.</p>
+  <div style="display:grid; gap:10px">
+    <button class="btn yes wide" type="button" data-final="1">Итоги тренажёра →</button>
+    <button class="btn ghost wide" type="button" id="b-again-6" data-again="6">Пройти эту ситуацию заново</button>
+  </div>
+  <div class="maket">Макет · Не является инвестиционной рекомендацией</div>
+</section>
+
+
+
+
+<!-- Итоги: мост в подписку -->
+<section class="wrap view" id="v-final" hidden>
+  <div class="eyebrow">Тренажёр пройден</div>
+  <h1 id="final-title">Вы прошли все ситуации</h1>
+  <div class="honest">
+    <div class="big mono" id="final-score">—</div>
+    <p id="final-score-text">столько раз вы совпали с системой.</p>
+  </div>
+  <h2>Каждый день это делает терминал, вживую</h2>
+  <ul class="reasons">
+    <li><span class="ic">1</span><span class="tx"><span class="t">Терминал находит триггер</span><span class="d">Он смотрит все инструменты сразу и собирает ту самую карточку, которую вы сейчас читали: неделя, дневка, сценарий, точка входа, запас хода.</span></span></li>
+    <li><span class="ic">2</span><span class="tx"><span class="t">Я даю вердикт</span><span class="d">По каждому допуску моё «беру» или «не беру» с причиной. Решение записано в журнал до движения цены.</span></span></li>
+    <li><span class="ic">3</span><span class="tx"><span class="t">Вы отмечаете точку входа и нажимаете СТАРТ</span><span class="d">Это всё, что нужно сделать вам. Как находить зону, показано в блоке уроков, его проходят один раз в начале.</span></span></li>
+    <li><span class="ic">4</span><span class="tx"><span class="t">Дальше сделку ведёт Hunter_Bot</span><span class="d">Он входит в зоне, ставит стоп и тейк 9 к 1 и переводит в безубыток на 5 к 1, как вы видели в ситуациях. Risk Sentinel держит лимиты недели и месяца.</span></span></li>
+  </ul>
+  <div class="voice"><strong>Честно.</strong> Торговли без убытков не бывает, и я её не обещаю. Бывает и такое, что несколько стопов подряд, как в ситуациях со стопом. Зато риск каждой сделки известен до входа, а из 22 месяцев в минус закрылись 3.</div>
+  <div class="facts">
+    <div class="fact"><span>Первый месяц подписки</span><strong>$196</strong></div>
+    <div class="fact"><span>Дальше</span><strong>3, 6 или 12 мес.</strong></div>
+  </div>
+  <p class="hint">Первый месяц можно взять один раз. Внутри тот же терминал, мой вердикт и роботы, что и у всех подписчиков.</p>
+  <div style="display:grid; gap:10px">
+    <a class="btn yes wide tg" id="go-pay" href="https://t.me/New_TradeLikeTYO_bot?start=trener_done_pay">Подключить: первый месяц $196</a>
+    <a class="btn ghost wide tg" id="go-probe" href="https://t.me/New_TradeLikeTYO_bot?start=trener_done_probe">Сначала посмотреть вживую: 7 дней терминала бесплатно</a>
+    <button class="btn ghost wide" type="button" data-again="1">Пройти тренажёр заново</button>
+  </div>
+  <div class="maket">Не является инвестиционной рекомендацией</div>
+</section>
+
+<div class="dock" id="dock" hidden>
+  <div class="dock-in">
+    <button class="btn yes" type="button" id="b-yes">Допуск</button>
+    <button class="btn no" type="button" id="b-no">Отказ</button>
+  </div>
+</div>
+
+<div class="zoom" id="zoom" hidden role="dialog" aria-modal="true" aria-label="График крупно">
+  <div class="zoom-bar"><span class="muted" id="zoom-cap">Листайте график пальцем</span><button class="btn ghost" type="button" id="zoom-close">Закрыть</button></div>
+  <div class="zoom-scroll"><img id="zoom-img" alt=""></div>
+</div>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>
+(function () {
+  var tg = window.Telegram && window.Telegram.WebApp;
+  if (tg && tg.initData) { try { tg.ready(); tg.expand(); } catch (e) {} }
+  document.addEventListener("click", function (e) {
+    var a = e.target.closest && e.target.closest("a.tg");
+    if (a && tg && tg.initData && tg.openTelegramLink) { e.preventDefault(); tg.openTelegramLink(a.href); }
+  });
+  var $ = function (id) { return document.getElementById(id); };
+  var views = Array.prototype.map.call(document.querySelectorAll("section.view"), function (s) { return s.id; });
+  var cur = null;
+  function show(id) {
+    views.forEach(function (v) { $(v).hidden = v !== id; });
+    var sit = id.indexOf("v-sit-") === 0;
+    $("dock").hidden = !sit;
+    if (sit) { cur = $(id); }
+    window.scrollTo(0, 0);
+  }
+  function answer(v) {
+    if (!cur) return;
+    var n = cur.getAttribute("data-n"), ok = v === cur.getAttribute("data-right");
+    $("verdict-" + n).className = "verdict " + (ok ? "ok" : "miss");
+    $("mark-" + n).textContent = ok ? "✓" : "✕";
+    $("mine-" + n).textContent = "Ваш ответ: " + (v === "ДОПУСК" ? "допуск" : "отказ") + (ok ? ". Совпало с системой" : ". У системы по-другому");
+    score[n] = ok;
+    show("v-res-" + n);
+  }
+  var score = {};
+  document.querySelectorAll("[data-final]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var all = Object.keys(score).length, hit = Object.keys(score).filter(function (k) { return score[k]; }).length;
+      $("final-score").textContent = hit + " из " + all;
+      ["go-pay", "go-probe"].forEach(function (id) {
+        var a = $(id), base = a.getAttribute("href").split("_s")[0];
+        a.setAttribute("href", base + "_s" + hit + "x" + all);   // ?start=trener_done_pay_s7x10 — бот запишет счёт
+      });
+      show("v-final");
+    });
+  });
+  $("b-start").addEventListener("click", function () { show("v-sit-1"); });
+  $("b-yes").addEventListener("click", function () { answer("ДОПУСК"); });
+  $("b-no").addEventListener("click", function () { answer("ОТКАЗ"); });
+  document.querySelectorAll("[data-again]").forEach(function (b) {
+    b.addEventListener("click", function () { show("v-sit-" + b.getAttribute("data-again")); });
+  });
+  document.querySelectorAll("[data-next]").forEach(function (b) {
+    b.addEventListener("click", function () { show("v-sit-" + b.getAttribute("data-next")); });
+  });
+  document.querySelectorAll("[data-tab]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var group = b.parentNode;
+      group.querySelectorAll("[data-tab]").forEach(function (x) {
+        var on = x === b;
+        x.setAttribute("aria-selected", on ? "true" : "false");
+        $(x.getAttribute("data-tab")).hidden = !on;
+      });
+    });
+  });
+  document.querySelectorAll(".shot").forEach(function (b) {
+    b.addEventListener("click", function () {
+      $("zoom-img").src = b.querySelector("img").src;
+      $("zoom-img").alt = b.querySelector("img").alt;
+      $("zoom").hidden = false;
+    });
+  });
+  function closeZoom() { $("zoom").hidden = true; }
+  $("zoom-close").addEventListener("click", closeZoom);
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeZoom(); });
+})();
+</script>
