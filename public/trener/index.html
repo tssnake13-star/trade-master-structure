@@ -116,6 +116,7 @@ a.btn { display: block; text-align: center; text-decoration: none; box-sizing: b
 .cmp.neg strong { color: var(--down); }
 .breakdown { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
 .note { font-size: 14px; color: var(--muted); border-left: 2px solid var(--line); padding-left: 12px; }
+.backlink { align-self: flex-start; background: none; border: 0; padding: 4px 0; color: var(--muted); font: 600 14px var(--f-body); cursor: pointer; }
 .maket { font-family: var(--f-mono); font-size: 12px; color: var(--muted); text-align: center; }
 
 /* карточка допуска — язык терминала */
@@ -1021,9 +1022,18 @@ details.more pre { font-family: var(--f-mono); font-size: 12.5px; white-space: p
 (function () {
   var tg = window.Telegram && window.Telegram.WebApp;
   if (tg && tg.initData) { try { tg.ready(); tg.expand(); } catch (e) {} }
-  // 05.11.2026: открыли из терминала (вкладка «Тренажёр») — кнопка «Назад» Телеграма возвращает в терминал
-  if (tg && tg.initData && tg.BackButton && document.referrer.indexOf("/tg/") > -1) {
-    try { tg.BackButton.show(); tg.BackButton.onClick(function () { history.back(); }); } catch (e) {}
+  // 05.11.2026: открыли из терминала школьного бота (вкладка «Тренажёр») — адрес возврата пришёл в ?back=.
+  // Своя кнопка «← Терминал» вверху каждого экрана и кнопка «Назад» Телеграма (по referrer она не работала)
+  var back = new URLSearchParams(location.search).get("back");
+  if (back && back.indexOf("/tg/") === 0) {
+    var goBack = function () { location.href = back + location.hash; };
+    document.querySelectorAll("section.view").forEach(function (s) {
+      var bt = document.createElement("button");
+      bt.type = "button"; bt.className = "backlink"; bt.textContent = "← Терминал";
+      bt.addEventListener("click", goBack);
+      s.insertBefore(bt, s.firstChild);
+    });
+    if (tg && tg.BackButton) { try { tg.BackButton.show(); tg.BackButton.onClick(goBack); } catch (e) {} }
   }
   document.addEventListener("click", function (e) {
     var a = e.target.closest && e.target.closest("a.tg");

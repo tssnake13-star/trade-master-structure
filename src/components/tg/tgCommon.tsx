@@ -47,7 +47,7 @@ export interface TgData {
 
 declare global {
   interface Window {
-    Telegram?: { WebApp?: { initData: string; ready: () => void; expand: () => void; openLink?: (u: string) => void; openTelegramLink?: (u: string) => void; setHeaderColor?: (c: string) => void; setBackgroundColor?: (c: string) => void; platform?: string; isVersionAtLeast?: (v: string) => boolean; requestFullscreen?: () => void } };
+    Telegram?: { WebApp?: { initData: string; ready: () => void; expand: () => void; openLink?: (u: string) => void; openTelegramLink?: (u: string) => void; setHeaderColor?: (c: string) => void; setBackgroundColor?: (c: string) => void; platform?: string; isVersionAtLeast?: (v: string) => boolean; requestFullscreen?: () => void; BackButton?: { show?: () => void; hide?: () => void } } };
   }
 }
 

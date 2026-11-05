@@ -262,7 +262,12 @@ export default function TgView({ bot, d, fresh, scan = false, pubUrl, sceneUrl, 
           10 реальных ситуаций из моей торговли. Вы смотрите графики в момент триггера и решаете сами: допуск или отказ.
           Потом видите, что решила система, где была зона входа и что было дальше.
         </p>
-        <button type="button" className="cv2-btn cv2-btn-brass tg-next" onClick={() => { window.location.href = '/trener/' + window.location.hash; }}>
+        <button type="button" className="cv2-btn cv2-btn-brass tg-next" onClick={() => {
+            // 05.11.2026: «Назад» в школьном боте не работал — адрес терминала (с пропуском ?p=) передаём явно, тренажёр
+            // по нему возвращает и своей кнопкой «← Терминал», и кнопкой «Назад» Телеграма
+            const back = window.location.pathname + window.location.search;
+            window.location.href = '/trener/?back=' + encodeURIComponent(back) + window.location.hash;
+          }}>
           Начать тренажёр
         </button>
         <div className="tg-note">Бесплатно и без ограничений.</div>

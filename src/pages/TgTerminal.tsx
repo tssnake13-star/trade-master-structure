@@ -49,6 +49,8 @@ export default function TgTerminal() {
       try {
         tg?.ready();
         tg?.expand();
+        // 05.11.2026: вернулись из тренажёра — кнопка «Назад» Телеграма здесь не нужна
+        tg?.BackButton?.hide?.();
         // 29.10.2026: шапка и фон Телеграма — цвет ночной комнаты терминала v2
         tg?.setHeaderColor?.(NIGHT_BG);
         tg?.setBackgroundColor?.(NIGHT_BG);
