@@ -6,7 +6,7 @@ import InstrumentTicker from '@/components/landing/InstrumentTicker';
 import TradesSection from '@/components/landing/TradesSection';
 import DualCTASection from '@/components/landing/DualCTASection';
 import WordmarkKinetic from '@/components/preview-next/WordmarkKinetic';
-import { PainsSection, StepsSection, NumbersSection, PathsSection, AuthorTeaser } from '@/components/site/MainSections';
+import { PainsSection, StepsSection, TrenerSection, NumbersSection, PathsSection, AuthorTeaser } from '@/components/site/MainSections';
 
 /**
  * Главная (28.10.2026, сайт из нескольких страниц, «Ночной кабинет»). Сергей: «первая страница — по болям…
@@ -47,6 +47,7 @@ const Index = () => {
       <InstrumentTicker />
       <PainsSection />
       <StepsSection />
+      <TrenerSection />
       <WordmarkKinetic text="Система, " emphasis="не эмоция" />
       <NumbersSection
         title="Решения, записанные до движения цены"

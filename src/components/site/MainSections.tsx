@@ -84,6 +84,37 @@ export function StepsSection() {
   );
 }
 
+/**
+ * 05.11.2026, его «да» на тексты: бесплатный тренажёр «Допуск или отказ» (страница /trener, статика, поэтому обычная
+ * ссылка, а не Link). Его слово: «надо к этому подвести со всех сторон… и на сайте, и в боте».
+ */
+export function TrenerSection() {
+  return (
+    <section id="trener" className="section-animate py-14 md:py-20 ns-band">
+      <div className="container-landing grid gap-10 lg:grid-cols-2 lg:items-center">
+        <div>
+          <span className="ns-step-n">Тренажёр · бесплатно</span>
+          <h2 className="text-foreground mt-3"><Words>Решите сами: допуск или отказ?</Words></h2>
+          <p className="mt-4 text-base md:text-lg text-muted-foreground" style={{ maxWidth: '52ch' }}>
+            10 реальных ситуаций из моей торговли. Вы видите графики в момент триггера и решаете, входить в сделку или нет.
+            Потом смотрите, какие фильтры системы были за, где стояла точка входа и что было дальше.
+          </p>
+          <p className="mt-3 ns-cap" style={{ maxWidth: '52ch' }}>Сделки там не только прибыльные: в моей системе 3 сделки из 4 закрываются стопом.</p>
+          <div className="mt-8">
+            <a href="/trener/" data-orbit="" onClick={() => trackClick('main_trener')} className="btn-primary px-6 py-3.5 text-base">
+              Открыть тренажёр
+            </a>
+          </div>
+        </div>
+        <a href="/trener/" onClick={() => trackClick('main_trener_pic')} className="ns-panel block overflow-hidden" aria-label="Открыть тренажёр">
+          <img src="/trener/img/01_h4.jpg" alt="График H4 в момент триггера: USDCHF, шорт" loading="lazy" className="block w-full h-auto" />
+          <div className="p-4 ns-cap">Ситуация 1: USDCHF, триггер в шорт. Что решила система, увидите в тренажёре.</div>
+        </a>
+      </div>
+    </section>
+  );
+}
+
 const NUMBERS = [
   { n: '397', l: 'сделок за 22 месяца в моей таблице' },
   { n: '+9,55R', l: 'средняя прибыльная сделка при стопе в 1R' },
