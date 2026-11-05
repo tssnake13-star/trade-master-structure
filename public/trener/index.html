@@ -1021,6 +1021,10 @@ details.more pre { font-family: var(--f-mono); font-size: 12.5px; white-space: p
 (function () {
   var tg = window.Telegram && window.Telegram.WebApp;
   if (tg && tg.initData) { try { tg.ready(); tg.expand(); } catch (e) {} }
+  // 05.11.2026: открыли из терминала (вкладка «Тренажёр») — кнопка «Назад» Телеграма возвращает в терминал
+  if (tg && tg.initData && tg.BackButton && document.referrer.indexOf("/tg/") > -1) {
+    try { tg.BackButton.show(); tg.BackButton.onClick(function () { history.back(); }); } catch (e) {}
+  }
   document.addEventListener("click", function (e) {
     var a = e.target.closest && e.target.closest("a.tg");
     if (a && tg && tg.initData && tg.openTelegramLink) { e.preventDefault(); tg.openTelegramLink(a.href); }

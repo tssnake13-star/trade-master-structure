@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
-import { ChartCandlestick, ClipboardList, History, Lock, ScanSearch, Tag, Trophy, type LucideIcon } from 'lucide-react';
+import { ChartCandlestick, ClipboardList, Dumbbell, History, Lock, ScanSearch, Tag, Trophy, type LucideIcon } from 'lucide-react';
 import Room from '@/components/cabinet2/Room';
 import DropGroup from '@/components/cabinet2/DropGroup';
 import { BrandEye } from '@/components/terminal2/Screens';
@@ -28,7 +28,7 @@ import '@/styles/tg-v2.css';
  * закреплено внизу (его требование 18.10.2026), выбранная вкладка — латунная пилюля с лучом по рамке, без бегущих бликов.
  */
 
-const ICON: Record<Tab, LucideIcon> = { inst: ChartCandlestick, scr: ScanSearch, top: Trophy, dec: ClipboardList, tm: History, price: Tag };
+const ICON: Record<Tab, LucideIcon> = { inst: ChartCandlestick, scr: ScanSearch, top: Trophy, dec: ClipboardList, tm: History, price: Tag, tr: Dumbbell };
 const KINDS: [keyof MarketRow, string][] = [['chart_cycles', 'Сценарий'], ['chart_trend', 'Накопления'], ['chart_all', 'Все циклы']];
 
 /** Запуск, пока Телеграм отдаёт подпись и база проверяет вход: тот же экран, что у веб-терминала v2, свои строки */
@@ -91,7 +91,7 @@ export default function TgView({ bot, d, fresh, scan = false, pubUrl, sceneUrl, 
   const nav = (
     <nav className="tg-nav" aria-label="Разделы терминала">
       {/* 29.10.2026: пять вкладок (школьный бот) — подписи мельче, чтобы «Инструмент» не рвался посреди слова (tg-v2.css) */}
-      <div className={tabs.length >= 5 ? 'tg-nav-in many' : 'tg-nav-in'} role="tablist" aria-label="Разделы терминала" style={{ '--n': tabs.length } as CSSProperties}>
+      <div className={tabs.length >= 6 ? 'tg-nav-in many six' : tabs.length >= 5 ? 'tg-nav-in many' : 'tg-nav-in'} role="tablist" aria-label="Разделы терминала" style={{ '--n': tabs.length } as CSSProperties}>
         {tabIdx >= 0 ? (
           <span className="tg-nav-ind" aria-hidden="true" style={{ transform: `translateX(${tabIdx * 100}%)` }}>
             <span className="cv2-drop" />
@@ -252,6 +252,22 @@ export default function TgView({ bot, d, fresh, scan = false, pubUrl, sceneUrl, 
     body = <TimeMachine doc={d.feeds?.timemachine} symbols={symbols} onOpen={open} />;
   } else if (tab === 'price') {
     body = <TgPrices />;
+  } else if (tab === 'tr') {
+    // 05.11.2026: тренажёр — отдельная страница /trener; открываем в этом же окне Телеграма и передаём хвост адреса
+    // (#tgWebAppData…), чтобы кнопки в конце тренажёра открыли бота внутри Телеграма, а «назад» вернул в терминал
+    body = (
+      <div className="tv2-panel tg-trener">
+        <h1 className="tg-ins-title">Тренажёр «Допуск или отказ»</h1>
+        <p className="tg-trener-t">
+          10 реальных ситуаций из моей торговли. Вы смотрите графики в момент триггера и решаете сами: допуск или отказ.
+          Потом видите, что решила система, где была зона входа и что было дальше.
+        </p>
+        <button type="button" className="cv2-btn cv2-btn-brass tg-next" onClick={() => { window.location.href = '/trener/' + window.location.hash; }}>
+          Начать тренажёр
+        </button>
+        <div className="tg-note">Бесплатно и без ограничений.</div>
+      </div>
+    );
   }
   // 25.10.2026: раздел проявляется при переключении вкладки
   return shell(
