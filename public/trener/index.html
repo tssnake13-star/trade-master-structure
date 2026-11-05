@@ -116,6 +116,9 @@ a.btn { display: block; text-align: center; text-decoration: none; box-sizing: b
 .cmp.neg strong { color: var(--down); }
 .breakdown { margin: 0; padding-left: 18px; color: var(--muted); font-size: 14px; display: flex; flex-direction: column; gap: 4px; }
 .note { font-size: 14px; color: var(--muted); border-left: 2px solid var(--line); padding-left: 12px; }
+.facts.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.path { border: 1px solid var(--line); background: var(--panel); border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.path-k { font-family: var(--f-display); font-weight: 700; font-size: 18px; line-height: 1.25; }
 .backlink { align-self: flex-start; background: none; border: 0; padding: 4px 0; color: var(--muted); font: 600 14px var(--f-body); cursor: pointer; }
 .maket { font-family: var(--f-mono); font-size: 12px; color: var(--muted); text-align: center; }
 
@@ -976,32 +979,44 @@ details.more pre { font-family: var(--f-mono); font-size: 12.5px; white-space: p
 
 
 
-<!-- Итоги: мост в подписку -->
+
+<!-- Итоги: его слово 05.11.2026 «делай так, чтобы тебе самому хотелось купить подписку или прийти на обучение» -->
 <section class="wrap view" id="v-final" hidden>
   <div class="eyebrow">Тренажёр пройден</div>
-  <h1 id="final-title">Вы прошли все ситуации</h1>
+  <h1>Вы совпали с системой</h1>
   <div class="honest">
     <div class="big mono" id="final-score">—</div>
-    <p id="final-score-text">столько раз вы совпали с системой.</p>
+    <p id="final-verdict"></p>
   </div>
-  <h2>Каждый день это делает терминал, вживую</h2>
-  <ul class="reasons">
-    <li><span class="ic">1</span><span class="tx"><span class="t">Терминал находит триггер</span><span class="d">Он смотрит все инструменты сразу и собирает ту самую карточку, которую вы сейчас читали: неделя, дневка, сценарий, точка входа, запас хода.</span></span></li>
-    <li><span class="ic">2</span><span class="tx"><span class="t">Я даю вердикт</span><span class="d">По каждому допуску моё «беру» или «не беру» с причиной. Решение записано в журнал до движения цены.</span></span></li>
-    <li><span class="ic">3</span><span class="tx"><span class="t">Вы отмечаете точку входа и нажимаете СТАРТ</span><span class="d">Это всё, что нужно сделать вам. Как находить зону, показано в блоке уроков, его проходят один раз в начале.</span></span></li>
-    <li><span class="ic">4</span><span class="tx"><span class="t">Дальше сделку ведёт Hunter_Bot</span><span class="d">Он входит в зоне, ставит стоп и тейк 9 к 1 и переводит в безубыток на 5 к 1, как вы видели в ситуациях. Risk Sentinel держит лимиты недели и месяца.</span></span></li>
-  </ul>
-  <div class="voice"><strong>Честно.</strong> Торговли без убытков не бывает, и я её не обещаю. Бывает и такое, что несколько стопов подряд, как в ситуациях со стопом. Зато риск каждой сделки известен до входа, а из 22 месяцев в минус закрылись 3.</div>
-  <div class="facts">
-    <div class="fact"><span>Первый месяц подписки</span><strong>$196</strong></div>
-    <div class="fact"><span>Дальше</span><strong>3, 6 или 12 мес.</strong></div>
+
+  <h2>Проверить меня можно</h2>
+  <p>Каждое моё решение, допуск или отказ, публикуется в журнале до того, как цена пошла. Журнал открыт всем: вкладка «Решения» в терминале школьного бота. Задним числом там ничего не переписывается.</p>
+  <div class="facts three">
+    <div class="fact take"><span>Счёт за 22 месяца</span><strong>+136,74%</strong></div>
+    <div class="fact"><span>Убыточных месяцев</span><strong>3 из 22</strong></div>
+    <div class="fact"><span>Сделок за это время</span><strong>397</strong></div>
   </div>
-  <p class="hint">Первый месяц можно взять один раз. Внутри тот же терминал, мой вердикт и роботы, что и у всех подписчиков.</p>
-  <div style="display:grid; gap:10px">
-    <a class="btn yes wide tg" id="go-pay" href="https://t.me/New_TradeLikeTYO_bot?start=trener_done_pay">Подключить: первый месяц $196</a>
-    <a class="btn ghost wide tg" id="go-probe" href="https://t.me/New_TradeLikeTYO_bot?start=trener_done_probe">Сначала посмотреть вживую: 7 дней терминала бесплатно</a>
-    <button class="btn ghost wide" type="button" data-again="1">Пройти тренажёр заново</button>
+  <p class="hint">Таблица счёта, срез на 31.10.2026, риск 0,25% на сделку. Торговли без убытков не бывает, и я её не обещаю: прибыльных сделок 23,1%, остальные закрываются стопом или в ноль.</p>
+
+  <h2>Дальше два пути</h2>
+  <div class="path">
+    <div class="path-k">Торговать по системе, не изучая её целиком</div>
+    <p>Терминал каждый день находит такие ситуации, как в тренажёре, по всем инструментам. Я даю вердикт по каждому допуску. Вы отмечаете точку входа и нажимаете СТАРТ, дальше сделку ведёт Hunter_Bot, а Risk Sentinel держит лимиты недели и месяца.</p>
+    <p class="hint">Один раз в начале вы изучаете блок уроков по точке входа и урок по настройке роботов.</p>
+    <div class="facts"><div class="fact"><span>Первый месяц подписки</span><strong>$196</strong></div></div>
+    <a class="btn yes wide tg" id="go-pay" href="https://t.me/New_TradeLikeTYO_bot?start=trener_done_pay">Подключить подписку</a>
+    <a class="btn ghost wide tg" id="go-probe" href="https://t.me/New_TradeLikeTYO_bot?start=trener_done_probe">Сначала 7 дней терминала бесплатно</a>
   </div>
+  <div class="path">
+    <div class="path-k">Научиться видеть это самому</div>
+    <p>С таких тренировок по готовым сделкам начинается второй этап моего обучения. Дальше я даю только дату, без направления и подсказок, сделку вы делаете сами, а я проверяю каждое решение. Перед реальным рынком минимум 50 тренировок.</p>
+    <div class="facts">
+      <div class="fact"><span>Видеообучение Trade System, сами</span><strong>$347</strong></div>
+      <div class="fact"><span>Практикум со мной, 60 дней</span><strong>$497</strong></div>
+    </div>
+    <a class="btn ghost wide tg" id="go-learn" href="https://t.me/New_TradeLikeTYO_bot?start=trener_done_learn">Узнать про обучение</a>
+  </div>
+  <button class="btn ghost wide" type="button" data-again="1">Пройти тренажёр заново</button>
   <div class="maket">Не является инвестиционной рекомендацией</div>
 </section>
 
@@ -1063,9 +1078,15 @@ details.more pre { font-family: var(--f-mono); font-size: 12.5px; white-space: p
     b.addEventListener("click", function () {
       var all = Object.keys(score).length, hit = Object.keys(score).filter(function (k) { return score[k]; }).length;
       $("final-score").textContent = hit + " из " + all;
-      ["go-pay", "go-probe"].forEach(function (id) {
+      var r = all ? hit / all : 0;
+      $("final-verdict").textContent = r >= 0.8
+        ? "Глаз у вас есть: в большинстве ситуаций вы видите то же, что система. Сложнее другое: каждый день находить такие ситуации по всем инструментам и не ломать правила после серии стопов. Эту часть берёт на себя терминал."
+        : r >= 0.5
+        ? "Часть решений вы приняли так же, как система, а часть по-своему. Разница почти всегда в том, что система смотрит сразу на неделю, дневку, поводыря и запас хода, а глазом всё это держать трудно."
+        : "Для первого раза так бывает часто. Система держит в голове сразу неделю, дневку, поводыря и запас хода, а без опыта увидеть всё вместе трудно.";
+      ["go-pay", "go-probe", "go-learn"].forEach(function (id) {
         var a = $(id), base = a.getAttribute("href").split("_s")[0];
-        a.setAttribute("href", base + "_s" + hit + "x" + all);   // ?start=trener_done_pay_s7x10 — бот запишет счёт
+        a.setAttribute("href", base + "_s" + hit + "x" + all);   // ?start=trener_done_…_s7x10 — бот запишет счёт
       });
       show("v-final");
     });
