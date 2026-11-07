@@ -682,6 +682,42 @@ function OutcomeBlock({ o }: { o?: Outcome }) {
   );
 }
 
+// 07.11.2026, его слово: «нажимаешь на сделку в календаре… как будто проскакивает мимо… где-то наверху застревает…
+// посередине экрана должна быть прям она: дата, инструмент, график». Причина: картинки карточек грузятся по пути
+// (loading=lazy, высоты у них заранее нет) и толкают нужную карточку вниз, пока экран к ней едет. Поэтому карточку
+// ведём до места: далеко — сразу прыжок к ней (картинки по дороге тогда не грузятся и не толкают), рядом — плавно;
+// когда прокрутка встала, проверяем ещё раз и плавно доводим, пока карточка не перестанет сдвигаться.
+// Карточка ниже экрана — посередине; выше экрана — дата у верхнего края. Пользователь сам крутит — доводка прекращается.
+// Проба 07.11 на 220 карточках с догружающимися картинками: старый переход оставлял сделку на 31 000 px ниже экрана,
+// плавный с доводкой — посередине через 4,5 с с рывками, прыжок с доводкой — посередине за 0,75 с.
+function bringToCenter(el: HTMLElement) {
+  const evs = ['wheel', 'touchstart', 'keydown', 'pointerdown'];
+  let stop = false;
+  const cancel = () => { stop = true; };
+  evs.forEach((e) => window.addEventListener(e, cancel, { passive: true }));
+  const go = (behavior: ScrollBehavior = 'smooth') =>
+    el.scrollIntoView({ behavior, block: el.getBoundingClientRect().height <= window.innerHeight * 0.9 ? 'center' : 'start' });
+  go(Math.abs(el.getBoundingClientRect().top) > window.innerHeight * 2 ? 'auto' : 'smooth');
+  const t0 = performance.now();
+  let last = NaN, still = 0, settled: number | null = null;
+  const tick = () => {
+    if (stop || !el.isConnected || performance.now() - t0 > 7000) {
+      evs.forEach((e) => window.removeEventListener(e, cancel));
+      return;
+    }
+    const top = el.getBoundingClientRect().top;
+    still = Math.abs(top - last) < 0.5 ? still + 1 : 0;
+    last = top;
+    // ~130 мс на месте: карточка встала там же, где после прошлой доводки, — готово; сдвинулась — доводим снова
+    if (still === 8 && (settled == null || Math.abs(top - settled) > 2)) {
+      settled = top;
+      go();
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
 // 18.10.2026: picUrl — терминал в Телеграме берёт картинки из открытого ящика tgpub, а не по подписанной ссылке
 // 04.11.2026: bare — журнал модели 2: без вводных слов журнала решений и без итогов счёта по месяцам (они про модель 1)
 export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picUrl, privateCrypto, seenKey, fx = false, bare = false }: { doc?: FeedDocs['verdicts']; outcomes?: FeedDocs['outcomes']; videos?: JournalVideo[]; symbols: Set<string>; onOpen: Open; picUrl?: (path: string) => string; privateCrypto?: FeedDocs['verdicts_crypto']; seenKey?: string; fx?: boolean; bare?: boolean }) {
@@ -790,16 +826,20 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
         resultOf={(v) => outOf.get(outKey(v.time, v.instrument, v.side))?.result}
         monthOf={(v) => outOf.get(outKey(v.time, v.instrument, v.side))?.month}
         exitOf={(v) => outOf.get(outKey(v.time, v.instrument, v.side))?.exit}
-        onPick={(day) => {
+        onPick={(day, item) => {
+          // 07.11.2026: нажатие на сделку ведёт к ЭТОЙ сделке (раньше — к первому решению дня, а в дне их бывает несколько)
+          const want = item ? marketOfSym(item.instrument) : null;
           const other = all.find((v) => dayOf(v.time) === day && marketOfSym(v.instrument) !== mk);
-          const here = all.some((v) => dayOf(v.time) === day && marketOfSym(v.instrument) === mk);
-          if (!here && other && !(cryptoLocked && marketOfSym(other.instrument) === 'crypto')) setMk(marketOfSym(other.instrument));
+          const here = want ? want === mk : all.some((v) => dayOf(v.time) === day && marketOfSym(v.instrument) === mk);
+          if (want && !here && !(cryptoLocked && want === 'crypto')) setMk(want);
+          else if (!want && !here && other && !(cryptoLocked && marketOfSym(other.instrument) === 'crypto')) setMk(marketOfSym(other.instrument));
+          const mark = item ? outKey(item.time, item.instrument, item.side) : day;
           window.setTimeout(() => {
-            const el = document.querySelector(`[data-day="${day}"]`);
-            if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const el = (item && document.querySelector(`[data-pick="${CSS.escape(mark)}"]`)) || document.querySelector(`[data-day="${day}"]`);
+            if (el) bringToCenter(el as HTMLElement);
           }, here ? 0 : 60);
-          setFlash(day);
-          window.setTimeout(() => setFlash((f) => (f === day ? null : f)), 2600);
+          setFlash(mark);
+          window.setTimeout(() => setFlash((f) => (f === mark ? null : f)), 3200);
         }}
       />
       </div>
@@ -836,8 +876,9 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
             {newWeek ? <WeekHeader monday={wk} video={wv} onPlay={() => wv && play(wv.id)} /> : null}
             <div
               data-day={i === 0 || dayOf(items[i - 1].time) !== dayOf(v.time) ? dayOf(v.time) : undefined}
+              data-pick={outKey(v.time, v.instrument, v.side)}
               className={fresh ? 'eg-new' : undefined}
-              style={{ ...card, padding: 12, scrollMarginTop: 12, transition: 'box-shadow .3s', ...(flash === dayOf(v.time) ? { boxShadow: `0 0 0 2px ${ACCENT}` } : null), ...(fresh ? { '--n': nIdx } : null) } as CSSProperties}
+              style={{ ...card, padding: 12, scrollMarginTop: 12, transition: 'box-shadow .3s', ...(flash === dayOf(v.time) || flash === outKey(v.time, v.instrument, v.side) ? { boxShadow: `0 0 0 2px ${ACCENT}` } : null), ...(fresh ? { '--n': nIdx } : null) } as CSSProperties}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
                 {/* 10.10.2026, его слово: «дата и время сигнала в журнале — очень заметно, но не очень крупно» —
