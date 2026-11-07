@@ -496,7 +496,7 @@ const dayOfTm = (time: string) => new Date(new Date(time).getTime() + 5 * 3600e3
 
 /** ⛔ 21.10.2026, его слово: «Верни машину времени в веб-версию… переименуй в сделки до и после» — вкладка называется
  *  «Сделки до и после» (имя компонента и ленты timemachine прежние). «В машину времени добавь календарь, по которому
- *  легче выбирать допуск/отказ из журнала» — календарь журнала решений (JournalCalendar) без итогов месяца: нажатие на
+ *  легче выбирать допуск/отказ из журнала» — календарь журнала решений (JournalCalendar), с 07.11 с итогами месяца: нажатие на
  *  день открывает решение этого дня. */
 export function TimeMachine({ doc, symbols, onOpen }: { doc?: { items?: TimeItem[] }; symbols: Set<string>; onOpen: Open }) {
   // 18.10.2026: форекс и крипта — переключателем, как в журнале решений
@@ -548,15 +548,24 @@ export function TimeMachine({ doc, symbols, onOpen }: { doc?: { items?: TimeItem
       <div style={{ color: DIM, fontSize: 13, lineHeight: 1.6, marginBottom: 10 }}>
         Выберите решение, и вы увидите рынок таким, каким он был в момент решения. С 09.09.2026 время записи ставит бот в момент решения.
       </div>
+      {/* 07.11.2026, его слово: «календарь в сделках до и после… чтобы выглядел так же, как в журнале… они же должны быть
+          одинаковые» — те же итоги месяца, обе вкладки рынков, хвост месяца с ноября 2026 — в день и месяц закрытия */}
       <JournalCalendar
-        items={items}
+        items={all}
         resultOf={(x) => x.result}
-        stats={false}
+        monthOf={(x) => {
+          const e = (x.exit || '').slice(0, 7);
+          return e >= '2026-11' && e > dayOfTm(x.time).slice(0, 7) ? e : undefined;
+        }}
+        exitOf={(x) => (x.exit ? x.exit.slice(0, 10) : undefined)}
         hint="Число — результат сделки в R: 1 R — это один стоп. Рамкой — решение без входа. Нажмите на число — откроется эта сделка; на день без сделки — первое решение дня. Другие решения того же дня — в ленте ниже, в пунктирной рамке."
         onPick={(day, x) => {
           // ⛔ 21.10.2026: открываем то решение, на которое нажали (квадратик сделки или сделку дня), а не первое в ленте
-          const i = x ? items.indexOf(x) : items.findIndex((y) => dayOfTm(y.time) === day);
+          const m = x ? marketOfSym(x.instrument) : mk;
+          const list = m === mk ? items : all.filter((y) => marketOfSym(y.instrument) === m);
+          const i = x ? list.indexOf(x) : list.findIndex((y) => dayOfTm(y.time) === day);
           if (i < 0) return;
+          if (m !== mk) setMk(m);
           setIdx(i);
           hide();
           window.setTimeout(() => {
