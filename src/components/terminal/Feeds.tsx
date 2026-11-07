@@ -46,6 +46,10 @@ export interface Outcome {
   result?: string; // «ВОШЁЛ · СТОП», «ОТМЕНИЛ», «НЕ ВХОДИЛ»…
   text?: string; // что было дальше — его словами
   price?: { status: string; fav?: number | null; adv?: number | null; at?: string } | null;
+  // 07.11.2026, его слово: «октябрь не трогай вообще… все сделки, которые сейчас открыты, уходят на результат ноября» —
+  // месяц, в итог которого засчитана сделка (ГГГГ-ММ), если он не совпадает с месяцем сигнала (ВЫХОДЫ_СДЕЛОК.json → month)
+  month?: string;
+  exit?: string; // день закрытия (ГГГГ-ММ-ДД) — с ноября 2026 сделка стоит в календаре в этот день
 }
 
 /** Модель 2 (04.11.2026): ложный пробой недельной контекстной свечи — одна строка списка, как в боте
@@ -420,9 +424,11 @@ function useWide(px = 900) {
 // много таких ошибок… исправляй все» — нажатие открывало первое решение дня в списке (а список — от новых к старым).
 // who — чьё решение дало каждый квадратик сделки (номер в items), first — самое раннее решение дня, firstTrade — самое
 // раннее решение дня со сделкой: нажатие на день открывает сделку, на квадратик — его сделку
-type DayMark = { trades: number[]; who: number[]; first: number; firstTrade: number | null; n: number };
+type DayMark = { trades: number[]; who: number[]; first: number; firstTrade: number | null; n: number; moved?: boolean[] };
+// хвосты: сделки прошлых месяцев, засчитанные в итог этого месяца (месяц → сделки в R и чьё решение дало каждую)
+type Carry = Map<string, { trades: number[]; who: number[] }>;
 
-function MonthGrid({ ym, by, onPick, big, stats = true }: { ym: string; by: Map<string, DayMark>; onPick: (day: string, idx?: number) => void; big: boolean; stats?: boolean }) {
+function MonthGrid({ ym, by, carry, onPick, big, stats = true }: { ym: string; by: Map<string, DayMark>; carry?: Carry; onPick: (day: string, idx?: number) => void; big: boolean; stats?: boolean }) {
   const [y, m] = ym.split('-').map(Number);
   const days = new Date(Date.UTC(y, m, 0)).getUTCDate();
   const off = (new Date(Date.UTC(y, m - 1, 1)).getUTCDay() + 6) % 7;
@@ -431,9 +437,15 @@ function MonthGrid({ ym, by, onPick, big, stats = true }: { ym: string; by: Map<
   let plus = 0, minus = 0, wins = 0, losses = 0;
   for (const [k, x] of by)
     if (k.startsWith(ym))
-      for (const t of x.trades) {
+      for (const [j, t] of x.trades.entries()) {
+        // 07.11.2026, его слово: квадратик остаётся в дне сигнала, а в итог месяца сделка идёт по закрытию (с ноября)
+        if (x.moved?.[j]) continue;
         if (t > 0) { plus += t; wins += 1; } else if (t < 0) { minus -= t; losses += 1; }
       }
+  const tails = carry?.get(ym);
+  for (const t of tails?.trades || []) {
+    if (t > 0) { plus += t; wins += 1; } else if (t < 0) { minus -= t; losses += 1; }
+  }
   const sum = plus - minus;
   const wr = wins + losses ? Math.round((wins / (wins + losses)) * 100) : null;
   const avgWin = wins ? plus / wins : 0;
@@ -459,6 +471,20 @@ function MonthGrid({ ym, by, onPick, big, stats = true }: { ym: string; by: Map<
           <div style={{ fontFamily: MONO, fontSize: 11.5, color: DIM, marginTop: 2 }}>
             винрейт <span style={{ color: FG, fontWeight: 700 }}>{wr}%</span> ({wins} из {wins + losses})
             {wins && losses ? <> · тейк в среднем в {fmtNum(avgWin / avgLoss)} раза больше стопа</> : null}
+          </div>
+        ) : null}
+        {tails?.trades.length ? (
+          <div style={{ fontFamily: MONO, fontSize: 11.5, color: DIM, marginTop: 4, display: 'flex', flexWrap: 'wrap', gap: 3, justifyContent: 'center', alignItems: 'center' }}>
+            <span>в т.ч. сделки прошлого месяца:</span>
+            {tails.trades.map((t, j) => (
+              <span
+                key={j}
+                onClick={() => onPick('', tails.who[j])}
+                style={{ cursor: 'pointer', background: colorOfR(t), color: t !== 0 ? '#0a0a0a' : FG, borderRadius: 3, padding: '0 4px', fontWeight: 700, lineHeight: '16px' }}
+              >
+                {fmtR1(t)}
+              </span>
+            ))}
           </div>
         ) : null}
         </>
@@ -526,7 +552,7 @@ function MonthGrid({ ym, by, onPick, big, stats = true }: { ym: string; by: Map<
  *  заметные» — на широком экране три месяца, на телефоне один; цифры крупнее, стрелки золотые. */
 // 21.10.2026, его слово: «в машину времени добавь календарь, по которому легче выбирать допуск/отказ из журнала» — тот же
 // календарь и в «Сделках до и после» (TimeMachine): итог решения берёт resultOf, итоги месяца там скрыты (stats=false)
-export function JournalCalendar<T extends { time: string }>({ items, resultOf, onPick, hint, stats = true }: { items: T[]; resultOf: (x: T) => string | undefined; onPick: (day: string, item?: T) => void; hint?: string; stats?: boolean }) {
+export function JournalCalendar<T extends { time: string }>({ items, resultOf, monthOf, exitOf, onPick, hint, stats = true }: { items: T[]; resultOf: (x: T) => string | undefined; monthOf?: (x: T) => string | undefined; exitOf?: (x: T) => string | undefined; onPick: (day: string, item?: T) => void; hint?: string; stats?: boolean }) {
   const wide = useWide();
   const now = dayOf(new Date().toISOString()).slice(0, 7);
   const [end, setEnd] = useState(now);
@@ -536,12 +562,32 @@ export function JournalCalendar<T extends { time: string }>({ items, resultOf, o
   const canBack = first > JOURNAL_FROM;
   const canFwd = end < now;
   const by = new Map<string, DayMark>();
+  const carry: Carry = new Map();
   const at = (i: number) => new Date(items[i].time).getTime();
   items.forEach((v, i) => {
     const d = dayOf(v.time);
     const cur = by.get(d) || { trades: [], who: [], first: i, firstTrade: null, n: 0 };
     cur.n += 1;
-    const tr = tradesOfResult(resultOf(v));
+    const tr0 = tradesOfResult(resultOf(v));
+    // 07.11.2026: сделка, засчитанная в другой месяц, в клетку дня сигнала не идёт — она в итоге своего месяца
+    // ⛔ закрытые месяцы (до ноября 2026) не меняются: перенос в месяц закрытия — только в ноябрь 2026 и позже
+    const mo = monthOf?.(v);
+    const moved = !!mo && mo >= '2026-11' && mo > d.slice(0, 7);
+    // 07.11.2026, его слово: «11,2 в ноябре, три минуса в ноябре, по закрытию… и последующие месяцы так» — сделка стоит
+    // в календаре в день закрытия; день не записан — строкой под итогом своего месяца
+    const ex = moved ? exitOf?.(v) : undefined;
+    if (moved && tr0.length && ex && ex.slice(0, 7) === mo) {
+      const e = by.get(ex) || { trades: [], who: [], first: i, firstTrade: null, n: 0 };
+      e.n += 1;
+      e.trades.push(...tr0); e.who.push(...tr0.map(() => i));
+      if (e.firstTrade == null) e.firstTrade = i;
+      by.set(ex, e);
+    } else if (moved && tr0.length) {
+      const c = carry.get(mo!) || { trades: [], who: [] };
+      c.trades.push(...tr0); c.who.push(...tr0.map(() => i));
+      carry.set(mo!, c);
+    }
+    const tr = moved ? [] : tr0;
     cur.trades.push(...tr);
     cur.who.push(...tr.map(() => i));
     if (at(i) < at(cur.first)) cur.first = i;
@@ -571,7 +617,7 @@ export function JournalCalendar<T extends { time: string }>({ items, resultOf, o
         {arrow(1, canFwd)}
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: `repeat(${months.length}, minmax(0, 1fr))`, gap: 22 }}>
-        {months.map((ym) => <MonthGrid key={ym} ym={ym} by={by} onPick={(day, i) => onPick(day, i == null ? undefined : items[i])} big={wide} stats={stats} />)}
+        {months.map((ym) => <MonthGrid key={ym} ym={ym} by={by} carry={carry} onPick={(day, i) => onPick(i == null ? day : dayOf(items[i].time), i == null ? undefined : items[i])} big={wide} stats={stats} />)}
       </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, fontSize: 12.5, color: DIM, marginTop: 10 }}>
         {[[UP, 'тейк'], [DOWN, 'стоп'], ['#4a453e', 'безубыток']].map(([c, n]) => (
@@ -614,6 +660,11 @@ function OutcomeBlock({ o }: { o?: Outcome }) {
               </span>
             ) : null}
             {o.text ? <span style={{ color: FG, fontSize: 13, lineHeight: 1.6 }}>{o.text}</span> : null}
+            {o.month ? (
+              <span style={{ fontFamily: MONO, fontSize: 11, color: DIM }}>
+                засчитано в итог: {MONTH_NAMES[+o.month.slice(5, 7) - 1].toLowerCase()} {o.month.slice(0, 4)}
+              </span>
+            ) : null}
           </div>
           {o.price ? (
             <div
@@ -737,6 +788,8 @@ export function VerdictsFeed({ doc, outcomes, videos = [], symbols, onOpen, picU
       <JournalCalendar
         items={all}
         resultOf={(v) => outOf.get(outKey(v.time, v.instrument, v.side))?.result}
+        monthOf={(v) => outOf.get(outKey(v.time, v.instrument, v.side))?.month}
+        exitOf={(v) => outOf.get(outKey(v.time, v.instrument, v.side))?.exit}
         onPick={(day) => {
           const other = all.find((v) => dayOf(v.time) === day && marketOfSym(v.instrument) !== mk);
           const here = all.some((v) => dayOf(v.time) === day && marketOfSym(v.instrument) === mk);
